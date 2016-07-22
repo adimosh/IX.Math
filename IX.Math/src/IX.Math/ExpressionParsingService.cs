@@ -4,7 +4,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
+
+#if NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
+using IX.Math.PlatformMitigation;
+#endif
 
 namespace IX.Math
 {
