@@ -5,7 +5,7 @@ namespace IX.Math.UnitTests
 {
     public class ExpressionCorrectnessChecker
     {
-        [Theory]
+        [Theory(DisplayName="Expression")]
         [MemberData(nameof(ProvideDataForTheory))]
         public void ExpressionCorrectnessCheckerTest(string expression, object[] parameters, object expectedResult)
         {
@@ -94,6 +94,12 @@ namespace IX.Math.UnitTests
                     new object[] { 13 },
                     false
                 },
+                new object[]
+                {
+                    "7+14+79<3+(7*12)",
+                    new object[0],
+                    false
+                }
             };
         }
     }
