@@ -16,7 +16,6 @@ namespace IX.Math
         private readonly MathDefinition definition;
         private readonly Regex paranthesesMatcher;
         private readonly string operatorsForRegex;
-        private readonly ReaderWriterLockSlim rwl;
         private readonly string[] separateOperatorsInOrder;
         private readonly string[] allOperatorsInOrder;
         private readonly Dictionary<string, Func<Expression, Expression, Expression>> expressionGenerators;
@@ -47,8 +46,6 @@ namespace IX.Math
         public ExpressionParsingService(MathDefinition definition)
         {
             this.definition = definition;
-
-            rwl = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
             paranthesesMatcher =
                 new Regex($"(?'before'.*)(?'toreplace'{Regex.Escape(definition.Parantheses.Item1)}(?'body'.*?){Regex.Escape(definition.Parantheses.Item2)})(?'after'.*)");
@@ -363,13 +360,10 @@ namespace IX.Math
 
             var split = s.Split(new[] { op }, StringSplitOptions.None);
             if (split.Length > 1)
-                return ((BinaryExpression)expressionGenerators[op](GenerateExpression(split[0], ref numericType, symbolTable, constants, externalParameters, cancellationToken),
-                    GenerateExpression(string.Join(op, split.Skip(1).ToArray()), ref numericType, symbolTable, constants, externalParameters, cancellationToken)))
-#if NETSTANDARD10 || NETSTANDARD11
-                    ;
-#else
+                return ((BinaryExpression)expressionGenerators[op](
+                        GenerateExpression(split[0], ref numericType, symbolTable, constants, externalParameters, cancellationToken),
+                        GenerateExpression(string.Join(op, split.Skip(1).ToArray()), ref numericType, symbolTable, constants, externalParameters, cancellationToken)))
                     .ReduceIfConstantOperation();
-#endif
 
             return null;
         }

@@ -1,4 +1,4 @@
-﻿#if !NETSTANDARD10 && !NETSTANDARD11
+﻿using IX.Math.PlatformMitigation;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -45,13 +45,11 @@ namespace IX.Math
             MethodInfo mi;
             Type[] typeParams = new Type[] { type, type };
 
-#if !NETSTANDARD12
-            mi = typeof(ValueGetters).GetMethods(BindingFlags.Static | BindingFlags.Public)
-                .SingleOrDefault(p => p.Name == Enum.GetName(typeof(ExpressionType), eType) && p.GetParameters().Select(q => q.ParameterType).SequenceEqual(typeParams));
-#else
-            mi = type.GetRuntimeMethods()
-                .SingleOrDefault(p => p.IsStatic && p.Name == Enum.GetName(typeof(ExpressionType), eType) && p.GetParameters().Select(q => q.ParameterType).SequenceEqual(typeParams));
-#endif
+            mi = type.GetTypeMethods().SingleOrDefault(p =>
+                    p.IsStatic &&
+                    p.IsPublic &&
+                    p.Name == Enum.GetName(typeof(ExpressionType), eType) &&
+                    p.GetParameters().Select(q => q.ParameterType).SequenceEqual(typeParams));
 
             if (mi == null)
             {
@@ -76,21 +74,29 @@ namespace IX.Math
                     case ExpressionType.NotEqual:
                         opName = "op_Inequality";
                         break;
+                    case ExpressionType.LessThan:
+                        opName = "op_LessThan";
+                        break;
+                    case ExpressionType.LessThanOrEqual:
+                        opName = "op_LessThanOrEqual";
+                        break;
+                    case ExpressionType.GreaterThan:
+                        opName = "op_GreaterThan";
+                        break;
+                    case ExpressionType.GreaterThanOrEqual:
+                        opName = "op_GreaterThanOrEqual";
+                        break;
                     default:
                         opName = null;
                         break;
                 }
 
                 if (opName != null)
-                {
-#if !NETSTANDARD12
-                    mi = type.GetMethods(BindingFlags.Static | BindingFlags.Public)
-                        .SingleOrDefault(p => p.Name == opName && p.GetParameters().Select(q => q.ParameterType).SequenceEqual(typeParams));
-#else
-                    mi = type.GetRuntimeMethods()
-                        .SingleOrDefault(p => p.IsStatic && p.Name == opName && p.GetParameters().Select(q => q.ParameterType).SequenceEqual(typeParams));
-#endif
-                }
+                    mi = type.GetTypeMethods().SingleOrDefault(p =>
+                            p.IsStatic &&
+                            p.IsPublic &&
+                            p.Name == opName &&
+                            p.GetParameters().Select(q => q.ParameterType).SequenceEqual(typeParams));
                 else
                     mi = null;
             }
@@ -99,4 +105,3 @@ namespace IX.Math
         }
     }
 }
-#endif
