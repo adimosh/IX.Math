@@ -35,7 +35,11 @@ namespace IX.Math
                 OrSymbol = "|",
                 PowerSymbol = "^",
                 SubtractSymbol = "-",
-                XorSymbol = "#"
+                XorSymbol = "#",
+                GreaterThanOrEqualSymbol = ">=",
+                GreaterThanSymbol = ">",
+                LessThanOrEqualSymbol = "<=",
+                LessThanSymbol = "<"
             })
         {
         }
@@ -53,6 +57,10 @@ namespace IX.Math
 
             separateOperatorsInOrder = new[]
             {
+                definition.GreaterThanOrEqualSymbol,
+                definition.LessThanOrEqualSymbol,
+                definition.GreaterThanSymbol,
+                definition.LessThanSymbol,
                 definition.DoesNotEqualSymbol,
                 definition.EqualsSymbol,
                 definition.XorSymbol,
@@ -67,6 +75,10 @@ namespace IX.Math
 
             allOperatorsInOrder = new[]
             {
+                definition.GreaterThanOrEqualSymbol,
+                definition.LessThanOrEqualSymbol,
+                definition.GreaterThanSymbol,
+                definition.LessThanSymbol,
                 definition.DoesNotEqualSymbol,
                 definition.EqualsSymbol,
                 definition.XorSymbol,
@@ -82,7 +94,7 @@ namespace IX.Math
 
             expressionGenerators = new Dictionary<string, Func<Expression, Expression, Expression>>
             {
-                [definition.AddSymbol] = (left, right) =>  Expression.Add(left, right),
+                [definition.AddSymbol] = (left, right) => Expression.Add(left, right),
                 [definition.AndSymbol] = (left, right) => Expression.And(left, right),
                 [definition.DivideSymbol] = (left, right) => Expression.Divide(left, right),
                 [definition.DoesNotEqualSymbol] = (left, right) => Expression.NotEqual(left, right),
@@ -91,11 +103,36 @@ namespace IX.Math
                 [definition.OrSymbol] = (left, right) => Expression.Or(left, right),
                 [definition.PowerSymbol] = (left, right) => Expression.Power(left, right),
                 [definition.SubtractSymbol] = (left, right) => Expression.Subtract(left, right),
-                [definition.XorSymbol] = (left, right) => Expression.ExclusiveOr(left, right)
+                [definition.XorSymbol] = (left, right) => Expression.ExclusiveOr(left, right),
+                [definition.GreaterThanOrEqualSymbol] = (left, right) => Expression.GreaterThanOrEqual(left, right),
+                [definition.GreaterThanSymbol] = (left, right) => Expression.GreaterThan(left, right),
+                [definition.LessThanOrEqualSymbol] = (left, right) => Expression.LessThanOrEqual(left, right),
+                [definition.LessThanSymbol] = (left, right) => Expression.LessThan(left, right),
             };
         }
 
         public Delegate GenerateDelegate(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            IEnumerable<ParameterExpression> externalParameters;
+            Expression body = CreateBody(expressionToParse, out externalParameters, cancellationToken);
+
+            return Expression.Lambda(body, externalParameters).Compile();
+        }
+
+        public object ExecuteExpression(string expressionToParse, object[] arguments = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            IEnumerable<ParameterExpression> externalParameters;
+            Expression body = CreateBody(expressionToParse, out externalParameters, cancellationToken);
+
+            if (body is ConstantExpression && !externalParameters.Any())
+                return ((ConstantExpression)body).Value;
+
+            return Expression.Lambda(body, externalParameters).Compile()?.DynamicInvoke(arguments ?? new object[0]);
+        }
+
+        private Expression CreateBody(string expressionToParse,
+            out IEnumerable<ParameterExpression> externalParams,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             Dictionary<string, RawExpressionContainer> symbolTable = new Dictionary<string, RawExpressionContainer>();
             Dictionary<string, string> reverseSymbolTable = new Dictionary<string, string>();
@@ -160,17 +197,15 @@ namespace IX.Math
             // Generate expressions
             Expression body = GenerateExpression(symbolTable[string.Empty].Expression, ref numericType, symbolTable, constants, externalParameters, cancellationToken);
 
-            if (body.CanReduce)
+            int reduceAttempt = 0;
+            while (body.CanReduce && reduceAttempt < 30)
             {
-                int reduceAttempt = 0;
-                while (body.CanReduce && reduceAttempt < 30)
-                {
-                    body = body.Reduce();
-                    reduceAttempt++;
-                }
+                body = body.Reduce();
+                reduceAttempt++;
             }
 
-            return Expression.Lambda(body, externalParameters.Values).Compile();
+            externalParams = externalParameters.Values;
+            return body;
         }
 
         private void PopulateTables(string p,
@@ -181,7 +216,7 @@ namespace IX.Math
         {
             var expressions = p.Split(allOperatorsInOrder, StringSplitOptions.RemoveEmptyEntries);
 
-            foreach(var exp in expressions)
+            foreach (var exp in expressions)
             {
                 if (constants.ContainsKey(exp))
                     continue;
@@ -328,8 +363,13 @@ namespace IX.Math
 
             var split = s.Split(new[] { op }, StringSplitOptions.None);
             if (split.Length > 1)
-                return expressionGenerators[op](GenerateExpression(split[0], ref numericType, symbolTable, constants, externalParameters, cancellationToken),
-                    GenerateExpression(string.Join(op, split.Skip(1).ToArray()), ref numericType, symbolTable, constants, externalParameters, cancellationToken));
+                return ((BinaryExpression)expressionGenerators[op](GenerateExpression(split[0], ref numericType, symbolTable, constants, externalParameters, cancellationToken),
+                    GenerateExpression(string.Join(op, split.Skip(1).ToArray()), ref numericType, symbolTable, constants, externalParameters, cancellationToken)))
+#if NETSTANDARD10 || NETSTANDARD11
+                    ;
+#else
+                    .ReduceIfConstantOperation();
+#endif
 
             return null;
         }

@@ -41,12 +41,26 @@ namespace IX.Math
 
         [DataMember]
         public string NotSymbol { get; set; }
+        #endregion
 
+        #region Comparison symbols
         [DataMember]
         public string EqualsSymbol { get; set; }
 
         [DataMember]
         public string DoesNotEqualSymbol { get; set; }
+
+        [DataMember]
+        public string GreaterThanSymbol { get; set; }
+
+        [DataMember]
+        public string GreaterThanOrEqualSymbol { get; set; }
+
+        [DataMember]
+        public string LessThanSymbol { get; set; }
+
+        [DataMember]
+        public string LessThanOrEqualSymbol { get; set; }
         #endregion
 
         //[DataMember]
