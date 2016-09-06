@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 
 namespace IX.Math
 {
@@ -62,20 +59,5 @@ namespace IX.Math
         [DataMember]
         public string LessThanOrEqualSymbol { get; set; }
         #endregion
-
-        //[DataMember]
-        //public string AddSymbol { get; set; }
-
-        //[DataMember]
-        //public string AddSymbol { get; set; }
-
-        //[DataMember]
-        //public string AddSymbol { get; set; }
-
-        //[DataMember]
-        //public string AddSymbol { get; set; }
-
-        //[DataMember]
-        //public string AddSymbol { get; set; }
     }
 }
