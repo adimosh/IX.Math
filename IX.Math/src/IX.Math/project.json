@@ -140,6 +140,10 @@
     }
   },
 
+  "buildOptions": {
+    "xmlDoc": true
+  },
+
   "authors": [ "Adrian Mos" ],
   "copyright": "Adrian Mos, 2016",
   "description": "A library for transforming text expressions containing mathematical operations into executable delegates.",

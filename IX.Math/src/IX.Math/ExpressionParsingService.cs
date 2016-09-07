@@ -11,7 +11,10 @@ using IX.Math.PlatformMitigation;
 
 namespace IX.Math
 {
-    public sealed class ExpressionParsingService
+    /// <summary>
+    /// A service that is able to parse strings containing mathematical expressions and solve them.
+    /// </summary>
+    public sealed class ExpressionParsingService : IExpressionParsingService
     {
         private readonly MathDefinition definition;
         private readonly Regex paranthesesMatcher;
@@ -20,6 +23,9 @@ namespace IX.Math
         private readonly string[] allOperatorsInOrder;
         private readonly Dictionary<string, Func<Expression, Expression, Expression>> expressionGenerators;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpressionParsingService"/> class with a standard math definition object.
+        /// </summary>
         public ExpressionParsingService()
             : this(new MathDefinition
             {
@@ -43,6 +49,10 @@ namespace IX.Math
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpressionParsingService"/> class with a specified math definition object.
+        /// </summary>
+        /// <param name="definition">The math definition to use.</param>
         public ExpressionParsingService(MathDefinition definition)
         {
             this.definition = definition;
@@ -108,6 +118,12 @@ namespace IX.Math
             };
         }
 
+        /// <summary>
+        /// Generates a delegate from a mathematical expression.
+        /// </summary>
+        /// <param name="expressionToParse">The mathematical expression to parse.</param>
+        /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
+        /// <returns>A <see cref="Delegate"/> that can be used to calculate the result of the given expression.</returns>
         public Delegate GenerateDelegate(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
             IEnumerable<ParameterExpression> externalParameters;
@@ -116,7 +132,25 @@ namespace IX.Math
             return Expression.Lambda(body, externalParameters).Compile();
         }
 
-        public object ExecuteExpression(string expressionToParse, object[] arguments = null, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        /// Interprets a mathematical expression and executes it, returning the result.
+        /// </summary>
+        /// <param name="expressionToParse">The mathematical expression to parse.</param>
+        /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
+        /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
+        public object ExecuteExpression(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return ExecuteExpression(expressionToParse, null, cancellationToken);
+        }
+
+        /// <summary>
+        /// Interprets a mathematical expression and executes it, returning the result.
+        /// </summary>
+        /// <param name="expressionToParse">The mathematical expression to parse.</param>
+        /// <param name="arguments">The arguments to pass to the expression.</param>
+        /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
+        /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
+        public object ExecuteExpression(string expressionToParse, object[] arguments, CancellationToken cancellationToken = default(CancellationToken))
         {
             IEnumerable<ParameterExpression> externalParameters;
             Expression body = CreateBody(expressionToParse, out externalParameters, cancellationToken);
@@ -127,6 +161,7 @@ namespace IX.Math
             return Expression.Lambda(body, externalParameters).Compile()?.DynamicInvoke(arguments ?? new object[0]);
         }
 
+        #region Algorithm
         private Expression CreateBody(string expressionToParse,
             out IEnumerable<ParameterExpression> externalParams,
             CancellationToken cancellationToken = default(CancellationToken))
@@ -367,5 +402,6 @@ namespace IX.Math
 
             return null;
         }
+        #endregion
     }
 }
