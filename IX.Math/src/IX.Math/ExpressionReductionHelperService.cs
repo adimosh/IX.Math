@@ -1,4 +1,5 @@
 ﻿using IX.Math.PlatformMitigation;
+using IX.Math.SimplificationAide;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -25,7 +26,14 @@ namespace IX.Math
 
                 object result;
 
-                MethodInfo mi = GetProperOperator(leftConstant.Type, opExp.NodeType);
+                MethodInfo mi;
+                mi = TryCalculateDirect(leftConstant.Type, opExp.NodeType);
+
+                if (mi == null)
+                {
+                    mi = GetProperOperator(leftConstant.Type, opExp.NodeType);
+                }
+
                 if (mi != null)
                 {
                     if (mi.IsStatic)
@@ -51,6 +59,13 @@ namespace IX.Math
             {
                 return operationExpression;
             }
+        }
+
+        private static MethodInfo TryCalculateDirect(Type type, ExpressionType nodeType)
+        {
+            return typeof(MathematicalOperationsAide)
+                .GetTypeMethods()
+                .SingleOrDefault(p => p.Name == Enum.GetName(typeof(ExpressionType), nodeType) && p.ReturnType == type);
         }
 
         private static MethodInfo GetProperOperator(Type type, ExpressionType eType)
