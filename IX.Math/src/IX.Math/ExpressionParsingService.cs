@@ -19,9 +19,11 @@ namespace IX.Math
         private readonly MathDefinition definition;
         private readonly Regex paranthesesMatcher;
         private readonly string operatorsForRegex;
-        private readonly string[] separateOperatorsInOrder;
+        private readonly string[] binaryOperatorsInOrder;
+        private readonly string[] unaryOperatorsInOrder;
         private readonly string[] allOperatorsInOrder;
-        private readonly Dictionary<string, Func<Expression, Expression, Expression>> expressionGenerators;
+        private readonly Dictionary<string, Func<Expression, Expression, Expression>> binaryExpressionGenerators;
+        private readonly Dictionary<string, Func<Type, Expression, Expression>> unaryExpressionGenerators;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionParsingService"/> class with a standard math definition object.
@@ -64,7 +66,7 @@ namespace IX.Math
 
             operatorsForRegex = $"(?:{Regex.Escape(definition.AddSymbol)}|{Regex.Escape(definition.AndSymbol)}|{Regex.Escape(definition.DivideSymbol)}|{Regex.Escape(definition.DoesNotEqualSymbol)}|{Regex.Escape(definition.EqualsSymbol)}|{Regex.Escape(definition.MultiplySymbol)}|{Regex.Escape(definition.NotSymbol)}|{Regex.Escape(definition.OrSymbol)}|{Regex.Escape(definition.PowerSymbol)}|{Regex.Escape(definition.SubtractSymbol)}|{Regex.Escape(definition.XorSymbol)}|{Regex.Escape(definition.ShiftLeftSymbol)}|{Regex.Escape(definition.ShiftRightSymbol)})";
 
-            separateOperatorsInOrder = new[]
+            binaryOperatorsInOrder = new[]
             {
                 definition.GreaterThanOrEqualSymbol,
                 definition.LessThanOrEqualSymbol,
@@ -82,6 +84,12 @@ namespace IX.Math
                 definition.PowerSymbol,
                 definition.ShiftLeftSymbol,
                 definition.ShiftRightSymbol,
+            };
+
+            unaryOperatorsInOrder = new[]
+            {
+                definition.SubtractSymbol,
+                definition.NotSymbol
             };
 
             allOperatorsInOrder = new[]
@@ -105,7 +113,7 @@ namespace IX.Math
                 definition.NotSymbol
             };
 
-            expressionGenerators = new Dictionary<string, Func<Expression, Expression, Expression>>
+            binaryExpressionGenerators = new Dictionary<string, Func<Expression, Expression, Expression>>
             {
                 [definition.AddSymbol] = (left, right) => Expression.Add(left, right),
                 [definition.AndSymbol] = (left, right) => Expression.And(left, right),
@@ -123,6 +131,12 @@ namespace IX.Math
                 [definition.LessThanSymbol] = (left, right) => Expression.LessThan(left, right),
                 [definition.ShiftLeftSymbol] = (left, right) => Expression.LeftShift(left, right),
                 [definition.ShiftRightSymbol] = (left, right) => Expression.RightShift(left, right),
+            };
+
+            unaryExpressionGenerators = new Dictionary<string, Func<Type, Expression, Expression>>
+            {
+                [definition.SubtractSymbol] = (type, expr) => Expression.Subtract(Expression.Constant(Convert.ChangeType(0, type), type), expr),
+                [definition.NotSymbol] = (type, expr) => Expression.Negate(expr)
             };
         }
 
@@ -210,7 +224,7 @@ namespace IX.Math
             }
 
             // Generate expressions
-            Expression body = GenerateExpression(symbolTable[string.Empty].Expression, ref numericType, symbolTable, constants, externalParameters, cancellationToken);
+            Expression body = GenerateExpression(symbolTable[string.Empty].Expression, numericType, symbolTable, constants, externalParameters, cancellationToken);
 
             int reduceAttempt = 0;
             while (body.CanReduce && reduceAttempt < 30)
@@ -392,18 +406,12 @@ beginning:
 
         private Expression GenerateExpression(
             string s,
-            ref Type numericType,
+            Type numericType,
             Dictionary<string, RawExpressionContainer> symbolTable,
             Dictionary<string, ConstantExpression> constants,
             Dictionary<string, ParameterExpression> externalParameters,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (s.StartsWith(definition.NotSymbol))
-            {
-                return Expression.Negate(GenerateExpression(s.Substring(definition.NotSymbol.Length), ref numericType, symbolTable, constants, externalParameters,
-                    cancellationToken));
-            }
-
             ConstantExpression constantResult;
             if (constants.TryGetValue(s, out constantResult))
                 return constantResult;
@@ -414,11 +422,18 @@ beginning:
 
             RawExpressionContainer expression;
             if (symbolTable.TryGetValue(s, out expression))
-                return GenerateExpression(expression.Expression, ref numericType, symbolTable, constants, externalParameters, cancellationToken);
+                return GenerateExpression(expression.Expression, numericType, symbolTable, constants, externalParameters, cancellationToken);
 
-            foreach (string op in separateOperatorsInOrder)
+            foreach (string op in binaryOperatorsInOrder)
             {
-                var exp = ExpressionByOneOperator(s, op, ref numericType, symbolTable, constants, externalParameters, cancellationToken);
+                var exp = ExpressionByBinaryOperator(s, op, numericType, symbolTable, constants, externalParameters, cancellationToken);
+                if (exp != null)
+                    return exp;
+            }
+
+            foreach (string op in unaryOperatorsInOrder)
+            {
+                var exp = ExpressionByUnaryOperator(s, op, numericType, symbolTable, constants, externalParameters, cancellationToken);
                 if (exp != null)
                     return exp;
             }
@@ -426,9 +441,9 @@ beginning:
             throw new InvalidOperationException();
         }
 
-        private Expression ExpressionByOneOperator(
+        private Expression ExpressionByBinaryOperator(
             string s, string op,
-            ref Type numericType,
+            Type numericType,
             Dictionary<string, RawExpressionContainer> symbolTable,
             Dictionary<string, ConstantExpression> constants,
             Dictionary<string, ParameterExpression> externalParameters,
@@ -438,10 +453,55 @@ beginning:
 
             var split = s.Split(new[] { op }, StringSplitOptions.None);
             if (split.Length > 1)
-                return ((BinaryExpression)expressionGenerators[op](
-                        GenerateExpression(split[0], ref numericType, symbolTable, constants, externalParameters, cancellationToken),
-                        GenerateExpression(string.Join(op, split.Skip(1).ToArray()), ref numericType, symbolTable, constants, externalParameters, cancellationToken)))
-                    .ReduceIfConstantOperation();
+            {
+                if (string.IsNullOrWhiteSpace(split[0]))
+                {
+                    // We are having a unary operator - until this is treated differently, let's simply return null
+                }
+                else
+                {
+                    // We are having a binary operator
+                    try
+                    {
+                        return (binaryExpressionGenerators[op](
+                                GenerateExpression(split[0], numericType, symbolTable, constants, externalParameters, cancellationToken),
+                                GenerateExpression(string.Join(op, split.Skip(1).ToArray()), numericType, symbolTable, constants, externalParameters, cancellationToken)))
+                            .ReduceIfConstantOperation();
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private Expression ExpressionByUnaryOperator(
+            string s, string op,
+            Type numericType,
+            Dictionary<string, RawExpressionContainer> symbolTable,
+            Dictionary<string, ConstantExpression> constants,
+            Dictionary<string, ParameterExpression> externalParameters,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (s.StartsWith(op))
+            {
+                try
+                {
+                    return (unaryExpressionGenerators[op](
+                        numericType,
+                        GenerateExpression(s.Substring(op.Length), numericType, symbolTable, constants, externalParameters, cancellationToken)))
+                        .ReduceIfConstantOperation();
+                }
+                catch
+                {
+                    return null;
+                }
+            }
 
             return null;
         }

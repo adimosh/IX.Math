@@ -1,6 +1,6 @@
 {
   "title": "IX.Math",
-  "version": "0.3.2",
+  "version": "0.3.3",
 
   "dependencies": {
     "System.Collections": "4.0.11",
@@ -10,8 +10,7 @@
     "System.Runtime.Extensions": "4.1.0",
     "System.Runtime.Serialization.Primitives": "4.1.1",
     "System.Text.RegularExpressions": "4.1.0",
-    "System.Threading.Tasks": "4.0.11",
-    "System.Diagnostics.Debug": "4.0.11"
+    "System.Threading.Tasks": "4.0.11"
   },
 
   "frameworks": {

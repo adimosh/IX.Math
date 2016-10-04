@@ -3,7 +3,6 @@ using System.Diagnostics;
 
 namespace IX.Math
 {
-    [DebuggerDisplay("{expression}")]
     internal class RawExpressionContainer : IEquatable<RawExpressionContainer>
     {
         private string expression;

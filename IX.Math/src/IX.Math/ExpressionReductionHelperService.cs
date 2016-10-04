@@ -8,31 +8,44 @@ namespace IX.Math
 {
     internal static class ExpressionReductionHelperService
     {
-        internal static Expression ReduceIfConstantOperation(this BinaryExpression operationExpression)
+        internal static Expression ReduceIfConstantOperation(this Expression operationExpression)
         {
-            if (!(operationExpression.Left is ConstantExpression) || !(operationExpression.Right is ConstantExpression))
-                return operationExpression;
-
-            var leftConstant = (ConstantExpression)operationExpression.Left;
-            var rightConstant = (ConstantExpression)operationExpression.Right;
-
-            if (leftConstant.Type != rightConstant.Type)
-                return operationExpression;
-
-            object result;
-
-            MethodInfo mi = GetProperOperator(leftConstant.Type, operationExpression.NodeType);
-            if (mi != null)
+            if (operationExpression is BinaryExpression)
             {
-                if (mi.IsStatic)
+                var opExp = operationExpression as BinaryExpression;
+
+                if (!(opExp.Left is ConstantExpression) || !(opExp.Right is ConstantExpression))
+                    return opExp;
+
+                var leftConstant = (ConstantExpression)opExp.Left;
+                var rightConstant = (ConstantExpression)opExp.Right;
+
+                if (leftConstant.Type != rightConstant.Type)
+                    return opExp;
+
+                object result;
+
+                MethodInfo mi = GetProperOperator(leftConstant.Type, opExp.NodeType);
+                if (mi != null)
                 {
-                    result = mi.Invoke(null, new[] { leftConstant.Value, rightConstant.Value });
+                    if (mi.IsStatic)
+                    {
+                        result = mi.Invoke(null, new[] { leftConstant.Value, rightConstant.Value });
+                    }
+                    else
+                    {
+                        result = mi.Invoke(leftConstant.Value, new[] { rightConstant.Value });
+                    }
+                    return Expression.Constant(result, result.GetType());
                 }
                 else
                 {
-                    result = mi.Invoke(leftConstant.Value, new[] { rightConstant.Value });
+                    return opExp;
                 }
-                return Expression.Constant(result, result.GetType());
+            }
+            else if (operationExpression is UnaryExpression)
+            {
+                return operationExpression;
             }
             else
             {
