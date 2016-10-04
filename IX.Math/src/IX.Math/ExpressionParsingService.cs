@@ -145,11 +145,16 @@ namespace IX.Math
         /// </summary>
         /// <param name="expressionToParse">The mathematical expression to parse.</param>
         /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
-        /// <returns>A <see cref="Delegate"/> that can be used to calculate the result of the given expression.</returns>
+        /// <returns>A <see cref="Delegate"/> that can be used to calculate the result of the given expression, or <c>null</c> (<c>Nothing</c> in Visual Basic).</returns>
         public Delegate GenerateDelegate(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
             IEnumerable<ParameterExpression> externalParameters;
             Expression body = CreateBody(expressionToParse, out externalParameters, cancellationToken);
+
+            if (body == null)
+            {
+                return null;
+            }
 
             return Expression.Lambda(body, externalParameters).Compile();
         }
@@ -177,8 +182,15 @@ namespace IX.Math
             IEnumerable<ParameterExpression> externalParameters;
             Expression body = CreateBody(expressionToParse, out externalParameters, cancellationToken);
 
+            if (body == null)
+            {
+                return expressionToParse;
+            }
+
             if (body is ConstantExpression && !externalParameters.Any())
+            {
                 return ((ConstantExpression)body).Value;
+            }
 
             return Expression.Lambda(body, externalParameters).Compile()?.DynamicInvoke(arguments ?? new object[0]);
         }
@@ -225,6 +237,12 @@ namespace IX.Math
 
             // Generate expressions
             Expression body = GenerateExpression(symbolTable[string.Empty].Expression, numericType, symbolTable, constants, externalParameters, cancellationToken);
+
+            if (body == null)
+            {
+                externalParams = new ParameterExpression[0];
+                return null;
+            }
 
             int reduceAttempt = 0;
             while (body.CanReduce && reduceAttempt < 30)
@@ -438,7 +456,7 @@ beginning:
                     return exp;
             }
 
-            throw new InvalidOperationException();
+            return null;
         }
 
         private Expression ExpressionByBinaryOperator(
@@ -463,9 +481,17 @@ beginning:
                     // We are having a binary operator
                     try
                     {
+                        Expression left = GenerateExpression(split[0], numericType, symbolTable, constants, externalParameters, cancellationToken);
+                        if (left == null)
+                            return null;
+
+                        Expression right = GenerateExpression(string.Join(op, split.Skip(1).ToArray()), numericType, symbolTable, constants, externalParameters, cancellationToken);
+                        if (right == null)
+                            return null;
+
                         return (binaryExpressionGenerators[op](
-                                GenerateExpression(split[0], numericType, symbolTable, constants, externalParameters, cancellationToken),
-                                GenerateExpression(string.Join(op, split.Skip(1).ToArray()), numericType, symbolTable, constants, externalParameters, cancellationToken)))
+                                left,
+                                right))
                             .ReduceIfConstantOperation();
                     }
                     catch
@@ -492,9 +518,13 @@ beginning:
             {
                 try
                 {
+                    Expression expr = GenerateExpression(s.Substring(op.Length), numericType, symbolTable, constants, externalParameters, cancellationToken);
+                    if (expr == null)
+                        return null;
+
                     return (unaryExpressionGenerators[op](
                         numericType,
-                        GenerateExpression(s.Substring(op.Length), numericType, symbolTable, constants, externalParameters, cancellationToken)))
+                        expr))
                         .ReduceIfConstantOperation();
                 }
                 catch
