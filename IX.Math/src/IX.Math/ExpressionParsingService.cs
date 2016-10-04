@@ -44,7 +44,9 @@ namespace IX.Math
                 GreaterThanOrEqualSymbol = ">=",
                 GreaterThanSymbol = ">",
                 LessThanOrEqualSymbol = "<=",
-                LessThanSymbol = "<"
+                LessThanSymbol = "<",
+                ShiftRightSymbol = ">>",
+                ShiftLeftSymbol = "<<",
             })
         {
         }
@@ -58,9 +60,9 @@ namespace IX.Math
             this.definition = definition;
 
             paranthesesMatcher =
-                new Regex($"(?'before'.*)(?'toreplace'{Regex.Escape(definition.Parantheses.Item1)}(?'body'.*?){Regex.Escape(definition.Parantheses.Item2)})(?'after'.*)");
+                new Regex($"(?'before'.*)(?'toreplace'{Regex.Escape(definition.Parantheses.Item1)}(?'body'.*){Regex.Escape(definition.Parantheses.Item2)})(?'after'.*)");
 
-            operatorsForRegex = $"(?:{Regex.Escape(definition.AddSymbol)}|{Regex.Escape(definition.AndSymbol)}|{Regex.Escape(definition.DivideSymbol)}|{Regex.Escape(definition.DoesNotEqualSymbol)}|{Regex.Escape(definition.EqualsSymbol)}|{Regex.Escape(definition.MultiplySymbol)}|{Regex.Escape(definition.NotSymbol)}|{Regex.Escape(definition.OrSymbol)}|{Regex.Escape(definition.PowerSymbol)}|{Regex.Escape(definition.SubtractSymbol)}|{Regex.Escape(definition.XorSymbol)})";
+            operatorsForRegex = $"(?:{Regex.Escape(definition.AddSymbol)}|{Regex.Escape(definition.AndSymbol)}|{Regex.Escape(definition.DivideSymbol)}|{Regex.Escape(definition.DoesNotEqualSymbol)}|{Regex.Escape(definition.EqualsSymbol)}|{Regex.Escape(definition.MultiplySymbol)}|{Regex.Escape(definition.NotSymbol)}|{Regex.Escape(definition.OrSymbol)}|{Regex.Escape(definition.PowerSymbol)}|{Regex.Escape(definition.SubtractSymbol)}|{Regex.Escape(definition.XorSymbol)}|{Regex.Escape(definition.ShiftLeftSymbol)}|{Regex.Escape(definition.ShiftRightSymbol)})";
 
             separateOperatorsInOrder = new[]
             {
@@ -77,7 +79,9 @@ namespace IX.Math
                 definition.SubtractSymbol,
                 definition.DivideSymbol,
                 definition.MultiplySymbol,
-                definition.PowerSymbol
+                definition.PowerSymbol,
+                definition.ShiftLeftSymbol,
+                definition.ShiftRightSymbol,
             };
 
             allOperatorsInOrder = new[]
@@ -96,6 +100,8 @@ namespace IX.Math
                 definition.DivideSymbol,
                 definition.MultiplySymbol,
                 definition.PowerSymbol,
+                definition.ShiftLeftSymbol,
+                definition.ShiftRightSymbol,
                 definition.NotSymbol
             };
 
@@ -115,6 +121,8 @@ namespace IX.Math
                 [definition.GreaterThanSymbol] = (left, right) => Expression.GreaterThan(left, right),
                 [definition.LessThanOrEqualSymbol] = (left, right) => Expression.LessThanOrEqual(left, right),
                 [definition.LessThanSymbol] = (left, right) => Expression.LessThan(left, right),
+                [definition.ShiftLeftSymbol] = (left, right) => Expression.LeftShift(left, right),
+                [definition.ShiftRightSymbol] = (left, right) => Expression.RightShift(left, right),
             };
         }
 
@@ -169,38 +177,13 @@ namespace IX.Math
             Dictionary<string, RawExpressionContainer> symbolTable = new Dictionary<string, RawExpressionContainer>();
             Dictionary<string, string> reverseSymbolTable = new Dictionary<string, string>();
 
-            int index = 1;
-            string expression = expressionToParse;
+            //int index = 1;
 
             // Break by parantheses
-            var match = paranthesesMatcher.Match(expression);
 
-            while (match.Success)
-            {
-                RawExpressionContainer capture = new RawExpressionContainer { Expression = match.Groups["body"].Value };
-
-                string paramIndex; bool shouldAdd;
-                if (reverseSymbolTable.TryGetValue(capture.Expression, out paramIndex))
-                {
-                    shouldAdd = false;
-                }
-                else
-                {
-                    while (expression.Contains(paramIndex = $"param{index}"))
-                        index++;
-                    shouldAdd = true;
-                }
-
-                expression = match.Result($"${{before}}param{index}${{after}}");
-
-                if (shouldAdd)
-                {
-                    symbolTable.Add($"param{index}", capture);
-                    reverseSymbolTable.Add(capture.Expression, $"param{index}");
-                }
-
-                match = paranthesesMatcher.Match(expression);
-            }
+            // Algorithm is wrong in determining multiple imbricated paranthesis
+            int i = 0;
+            string expression = BreakOneLevel(expressionToParse, symbolTable, reverseSymbolTable, ref i);
 
             symbolTable.Add(string.Empty, new RawExpressionContainer { Expression = expression });
 
@@ -238,6 +221,66 @@ namespace IX.Math
 
             externalParams = externalParameters.Values;
             return body;
+        }
+
+        private string BreakOneLevel(string source, Dictionary<string, RawExpressionContainer> symbolTable, Dictionary<string, string> reverseSymbolTable, ref int i)
+        {
+            if (string.IsNullOrWhiteSpace(source))
+                return string.Empty;
+
+            int op = source.IndexOf(definition.Parantheses.Item1);
+            int cp = source.IndexOf(definition.Parantheses.Item2);
+
+beginning:
+            if (op != -1)
+            {
+                if (cp != -1)
+                {
+                    if (op < cp)
+                    {
+                        string expr3 = BreakOneLevel(source.Substring(op + definition.Parantheses.Item1.Length), symbolTable, reverseSymbolTable, ref i);
+                        source = $"{source.Substring(0, op)}{expr3}";
+                        op = source.IndexOf(definition.Parantheses.Item1);
+                        cp = source.IndexOf(definition.Parantheses.Item2);
+
+                        goto beginning;
+                    }
+
+                    return ProcessSubExpression(source, cp, symbolTable, reverseSymbolTable, ref i);
+                }
+                else
+                    throw new InvalidOperationException();
+            }
+            else
+            {
+                if (cp == -1)
+                {
+                    return source;
+                }
+                else
+                {
+                    return ProcessSubExpression(source, cp, symbolTable, reverseSymbolTable, ref i);
+                }
+            }
+        }
+
+        private string ProcessSubExpression(string source, int cp, Dictionary<string, RawExpressionContainer> symbolTable, Dictionary<string, string> reverseSymbolTable, ref int i)
+        {
+            string expr1 = source.Substring(0, cp);
+
+            RawExpressionContainer rec = new RawExpressionContainer { Expression = expr1 };
+            string expr2;
+
+            int k = cp + definition.Parantheses.Item2.Length;
+            if (!reverseSymbolTable.TryGetValue(rec.Expression, out expr2))
+            {
+                i++;
+                expr2 = $"item{i}";
+                symbolTable.Add(expr2, rec);
+                reverseSymbolTable.Add(rec.Expression, expr2);
+            }
+
+            return $"{expr2}{(source.Length == k ? string.Empty : source.Substring(k))}";
         }
 
         private void PopulateTables(string p,

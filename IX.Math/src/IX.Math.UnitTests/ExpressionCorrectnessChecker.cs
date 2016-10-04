@@ -10,8 +10,17 @@ namespace IX.Math.UnitTests
         public void ExpressionCorrectnessCheckerTest(string expression, object[] parameters, object expectedResult)
         {
             ExpressionParsingService service = new ExpressionParsingService();
-            var del = service.GenerateDelegate(expression);
-            var result = del.DynamicInvoke(parameters);
+            
+            object result;
+            try
+            {
+                var del = service.GenerateDelegate(expression);
+                result = del.DynamicInvoke(parameters);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"The method should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
+            }
 
             var convertedResult = Convert.ChangeType(result, expectedResult.GetType());
 
@@ -99,6 +108,30 @@ namespace IX.Math.UnitTests
                     "7+14+79<3+(7*12)",
                     new object[0],
                     false
+                },
+                new object[]
+                {
+                    "-1.00<-1",
+                    new object[0],
+                    false
+                },
+                new object[]
+                {
+                    "1<<1",
+                    new object[0],
+                    2
+                },
+                new object[]
+                {
+                    "((1+1)-(1-1))+((1-1)-(1+1))",
+                    new object[0],
+                    0
+                },
+                new object[]
+                {
+                    "((6-3)*(3+3))-1",
+                    new object[0],
+                    17
                 }
             };
         }

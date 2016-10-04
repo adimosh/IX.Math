@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace IX.Math
 {
+    [DebuggerDisplay("{expression}")]
     internal class RawExpressionContainer : IEquatable<RawExpressionContainer>
     {
         private string expression;

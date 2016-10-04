@@ -113,5 +113,19 @@ namespace IX.Math
         [DataMember]
         public string LessThanOrEqualSymbol { get; set; }
         #endregion
+
+        #region Bitwise symbols
+        /// <summary>
+        /// A symbol for a comparison of less than or equal.
+        /// </summary>
+        [DataMember]
+        public string ShiftRightSymbol { get; set; }
+
+        /// <summary>
+        /// A symbol for a comparison of less than or equal.
+        /// </summary>
+        [DataMember]
+        public string ShiftLeftSymbol { get; set; }
+        #endregion
     }
 }
