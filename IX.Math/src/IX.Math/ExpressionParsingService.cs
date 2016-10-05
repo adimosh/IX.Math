@@ -4,10 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
-
-#if NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
 using IX.Math.PlatformMitigation;
-#endif
 
 namespace IX.Math
 {
@@ -16,6 +13,8 @@ namespace IX.Math
     /// </summary>
     public sealed class ExpressionParsingService : IExpressionParsingService
     {
+        private static Regex functionSupport = new Regex(@"(?'functionName'.*?)\((?'expression'.*?)\)");
+
         private readonly MathDefinition definition;
         private readonly Regex paranthesesMatcher;
         private readonly string operatorsForRegex;
@@ -234,9 +233,15 @@ namespace IX.Math
 
             symbolTable.Select(p => p.Value.Expression).ToList().ForEach(p => PopulateTables(p, externalParameters, constants, symbolTable, ref numericType));
 
+            Dictionary<string, ConstantExpression> typeChangers = new Dictionary<string, ConstantExpression>();
             foreach (var c in constants.Where(p => p.Value.Type != numericType))
             {
-                constants[c.Key] = Expression.Constant(Convert.ChangeType(c.Value.Value, numericType), numericType);
+                typeChangers[c.Key] = Expression.Constant(Convert.ChangeType(c.Value.Value, numericType), numericType);
+            }
+
+            foreach (var c in typeChangers)
+            {
+                constants[c.Key] = c.Value;
             }
 
             foreach (var c in externalParameters.Where(p => p.Value.Type != numericType))
@@ -296,22 +301,29 @@ beginning:
                         }
                         else
                         {
-                            string expr4 = source.Substring(0, op);
+                            string expr4 = op == 0 ? string.Empty : source.Substring(0, op);
 
                             if (!allOperatorsInOrder.Any(p => expr4.EndsWith(p)))
                             {
                                 // We have a function call
 
                                 int inx = allOperatorsInOrder.Max(p => expr4.LastIndexOf(p));
-                                var expr5 = expr4.Substring(inx);
-                                string op1 = allOperatorsInOrder.OrderByDescending(p => p.Length).First(p => expr5.StartsWith(p));
-                                var expr6 = expr5.Substring(op1.Length);
+                                var expr5 = inx == -1 ? expr4 : expr4.Substring(inx);
+                                string op1 = allOperatorsInOrder.OrderByDescending(p => p.Length).FirstOrDefault(p => expr5.StartsWith(p));
+                                var expr6 = op1 == null ? expr5 : expr5.Substring(op1.Length);
 
                                 i++;
                                 string expr2 = $"item{i}";
-                                var rec = new RawExpressionContainer { Expression = $"item{i}(item{i-1})" };
+                                var rec = new RawExpressionContainer { Expression = $"{expr6}(item{i-1})" };
                                 symbolTable.Add(expr2, rec);
                                 reverseSymbolTable.Add(rec.Expression, expr2);
+
+                                if (expr6 == expr4)
+                                    expr4 = string.Empty;
+                                else
+                                    expr4 = expr4.Substring(0, expr4.Length - expr6.Length);
+
+                                expr3 = expr3.Replace($"item{i - 1}", $"item{i}");
                             }
 
                             source = $"{expr4}{expr3}";
@@ -378,6 +390,12 @@ beginning:
 
                 if (symbolTable.ContainsKey(exp))
                     continue;
+
+                if (exp.Contains(definition.Parantheses.Item1))
+                {
+                    numericType = typeof(double);
+                    continue;
+                }
 
                 object value;
                 if (TryGetNumericValue(exp, ref numericType, out value))
@@ -521,7 +539,29 @@ beginning:
             Dictionary<string, ParameterExpression> externalParameters,
             CancellationToken cancellationToken = default(CancellationToken))
         {
+            Match match = functionSupport.Match(expression);
+
+            if (match.Success)
+            {
+                string functionName = match.Groups["functionName"].Value;
+                string expr = match.Groups["expression"].Value;
+
+                var body = GenerateExpression(expr, numericType, symbolTable, constants, externalParameters, cancellationToken);
+
+                if (body == null)
+                {
+                    return null;
+                }
+
+                return GenerateInternalFunctionCallExpression(functionName, body, symbolTable, constants, externalParameters, cancellationToken);
+            }
+
             return null;
+        }
+
+        private Expression GenerateInternalFunctionCallExpression(string functionName, Expression body, Dictionary<string, RawExpressionContainer> symbolTable, Dictionary<string, ConstantExpression> constants, Dictionary<string, ParameterExpression> externalParameters, CancellationToken cancellationToken)
+        {
+            return SupportedFunctionsLocator.LoadUnaryFunction(functionName, body);
         }
 
         private Expression ExpressionByBinaryOperator(

@@ -5,16 +5,28 @@ namespace IX.Math.UnitTests
 {
     public class ExpressionCorrectnessChecker
     {
-        [Theory(DisplayName="Expression")]
+        [Theory(DisplayName = "Expression")]
         [MemberData(nameof(ProvideDataForTheory))]
         public void ExpressionCorrectnessCheckerTest(string expression, object[] parameters, object expectedResult)
         {
             ExpressionParsingService service = new ExpressionParsingService();
-            
+
+            Delegate del;
+            try
+            {
+                del = service.GenerateDelegate(expression);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"The generation process should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
+            }
+
+            if (del == null)
+                throw new InvalidOperationException("No delegate was generated!");
+
             object result;
             try
             {
-                var del = service.GenerateDelegate(expression);
                 result = del.DynamicInvoke(parameters);
             }
             catch (Exception ex)
@@ -132,6 +144,12 @@ namespace IX.Math.UnitTests
                     "((6-3)*(3+3))-1",
                     new object[0],
                     17
+                },
+                new object[]
+                {
+                    "2+sqrt(4)+2",
+                    new object[0],
+                    6
                 }
             };
         }
