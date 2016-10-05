@@ -207,9 +207,18 @@ namespace IX.Math
 
             // Break by parantheses
 
-            // Algorithm is wrong in determining multiple imbricated paranthesis
+            // Algorithm determines multiple imbricated parantheses
             int i = 0;
-            string expression = BreakOneLevel(expressionToParse, symbolTable, reverseSymbolTable, ref i);
+            string expression;
+            try
+            {
+                expression = BreakOneLevel(expressionToParse, symbolTable, reverseSymbolTable, ref i);
+            }
+            catch
+            {
+                externalParams = null;
+                return null;
+            }
 
             symbolTable.Add(string.Empty, new RawExpressionContainer { Expression = expression });
 
@@ -236,7 +245,16 @@ namespace IX.Math
             }
 
             // Generate expressions
-            Expression body = GenerateExpression(symbolTable[string.Empty].Expression, numericType, symbolTable, constants, externalParameters, cancellationToken);
+            Expression body;
+            try
+            {
+                body = GenerateExpression(symbolTable[string.Empty].Expression, numericType, symbolTable, constants, externalParameters, cancellationToken);
+            }
+            catch
+            {
+                externalParams = null;
+                return null;
+            }
 
             if (body == null)
             {
@@ -271,7 +289,34 @@ beginning:
                     if (op < cp)
                     {
                         string expr3 = BreakOneLevel(source.Substring(op + definition.Parantheses.Item1.Length), symbolTable, reverseSymbolTable, ref i);
-                        source = $"{source.Substring(0, op)}{expr3}";
+
+                        if (op == 0)
+                        {
+                            source = expr3;
+                        }
+                        else
+                        {
+                            string expr4 = source.Substring(0, op);
+
+                            if (!allOperatorsInOrder.Any(p => expr4.EndsWith(p)))
+                            {
+                                // We have a function call
+
+                                int inx = allOperatorsInOrder.Max(p => expr4.LastIndexOf(p));
+                                var expr5 = expr4.Substring(inx);
+                                string op1 = allOperatorsInOrder.OrderByDescending(p => p.Length).First(p => expr5.StartsWith(p));
+                                var expr6 = expr5.Substring(op1.Length);
+
+                                i++;
+                                string expr2 = $"item{i}";
+                                var rec = new RawExpressionContainer { Expression = $"item{i}(item{i-1})" };
+                                symbolTable.Add(expr2, rec);
+                                reverseSymbolTable.Add(rec.Expression, expr2);
+                            }
+
+                            source = $"{expr4}{expr3}";
+                        }
+
                         op = source.IndexOf(definition.Parantheses.Item1);
                         cp = source.IndexOf(definition.Parantheses.Item2);
 
@@ -430,18 +475,26 @@ beginning:
             Dictionary<string, ParameterExpression> externalParameters,
             CancellationToken cancellationToken = default(CancellationToken))
         {
+            // Check whether expression is constant
             ConstantExpression constantResult;
             if (constants.TryGetValue(s, out constantResult))
                 return constantResult;
 
+            // Check whether expression is an external parameter
             ParameterExpression parameterResult;
             if (externalParameters.TryGetValue(s, out parameterResult))
                 return parameterResult;
 
+            // Check whether the expression already exists in the symbols table
             RawExpressionContainer expression;
             if (symbolTable.TryGetValue(s, out expression))
                 return GenerateExpression(expression.Expression, numericType, symbolTable, constants, externalParameters, cancellationToken);
 
+            // Check whether the expression is a function call
+            if (s.Contains(definition.Parantheses.Item1))
+                return GenerateFunctionCallExpression(new RawExpressionContainer { Expression = s }.Expression, numericType, symbolTable, constants, externalParameters, cancellationToken);
+
+            // Check whether the expression is a binary operator
             foreach (string op in binaryOperatorsInOrder)
             {
                 var exp = ExpressionByBinaryOperator(s, op, numericType, symbolTable, constants, externalParameters, cancellationToken);
@@ -449,6 +502,7 @@ beginning:
                     return exp;
             }
 
+            // Check whether the expression is a unary operator
             foreach (string op in unaryOperatorsInOrder)
             {
                 var exp = ExpressionByUnaryOperator(s, op, numericType, symbolTable, constants, externalParameters, cancellationToken);
@@ -456,6 +510,17 @@ beginning:
                     return exp;
             }
 
+            return null;
+        }
+
+        private Expression GenerateFunctionCallExpression(
+            string expression,
+            Type numericType,
+            Dictionary<string, RawExpressionContainer> symbolTable,
+            Dictionary<string, ConstantExpression> constants,
+            Dictionary<string, ParameterExpression> externalParameters,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
             return null;
         }
 
