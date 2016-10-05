@@ -846,6 +846,7 @@ namespace IX.Math.SimplificationAide
         {
             return left | right;
         }
+
         /// <summary>
         /// Bitwise combines two numbers.
         /// </summary>
@@ -957,6 +958,7 @@ namespace IX.Math.SimplificationAide
         {
             return left ^ right;
         }
+
         /// <summary>
         /// Bitwise exclusively combines two numbers.
         /// </summary>
@@ -1054,6 +1056,832 @@ namespace IX.Math.SimplificationAide
         public static ulong Xor(ulong left, ulong right)
         {
             return left ^ right;
+        }
+        #endregion
+
+        #region Equal
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(bool left, bool right)
+        {
+            return left == right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(byte left, byte right)
+        {
+            return left == right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(sbyte left, sbyte right)
+        {
+            return left == right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(short left, short right)
+        {
+            return left == right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(ushort left, ushort right)
+        {
+            return left == right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(char left, char right)
+        {
+            return left == right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(int left, int right)
+        {
+            return left == right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(uint left, uint right)
+        {
+            return left == right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(long left, long right)
+        {
+            return left == right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(ulong left, ulong right)
+        {
+            return left == right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(float left, float right)
+        {
+            return left == right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(double left, double right)
+        {
+            return left == right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool Equal(TimeSpan left, TimeSpan right)
+        {
+            return left == right;
+        }
+        #endregion
+
+        #region NotEqual
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(bool left, bool right)
+        {
+            return left != right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(byte left, byte right)
+        {
+            return left != right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(sbyte left, sbyte right)
+        {
+            return left != right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(short left, short right)
+        {
+            return left != right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(ushort left, ushort right)
+        {
+            return left != right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(char left, char right)
+        {
+            return left != right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(int left, int right)
+        {
+            return left != right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(uint left, uint right)
+        {
+            return left != right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(long left, long right)
+        {
+            return left != right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(ulong left, ulong right)
+        {
+            return left != right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(float left, float right)
+        {
+            return left != right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(double left, double right)
+        {
+            return left != right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are not equal.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool NotEqual(TimeSpan left, TimeSpan right)
+        {
+            return left != right;
+        }
+        #endregion
+
+        #region GreaterThan
+        /// <summary>
+        /// Determines whether or not two numbers are greater than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThan(byte left, byte right)
+        {
+            return left > right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThan(sbyte left, sbyte right)
+        {
+            return left > right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThan(short left, short right)
+        {
+            return left > right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThan(ushort left, ushort right)
+        {
+            return left > right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThan(char left, char right)
+        {
+            return left > right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThan(int left, int right)
+        {
+            return left > right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThan(uint left, uint right)
+        {
+            return left > right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThan(long left, long right)
+        {
+            return left > right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThan(ulong left, ulong right)
+        {
+            return left > right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThan(float left, float right)
+        {
+            return left > right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThan(double left, double right)
+        {
+            return left > right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThan(TimeSpan left, TimeSpan right)
+        {
+            return left > right;
+        }
+        #endregion
+
+        #region GreaterThanOrEqual
+        /// <summary>
+        /// Determines whether or not two numbers are greater than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThanOrEqual(byte left, byte right)
+        {
+            return left >= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThanOrEqual(sbyte left, sbyte right)
+        {
+            return left >= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThanOrEqual(short left, short right)
+        {
+            return left >= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThanOrEqual(ushort left, ushort right)
+        {
+            return left >= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThanOrEqual(char left, char right)
+        {
+            return left >= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThanOrEqual(int left, int right)
+        {
+            return left >= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThanOrEqual(uint left, uint right)
+        {
+            return left >= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThanOrEqual(long left, long right)
+        {
+            return left >= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThanOrEqual(ulong left, ulong right)
+        {
+            return left >= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThanOrEqual(float left, float right)
+        {
+            return left >= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThanOrEqual(double left, double right)
+        {
+            return left >= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are greater than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool GreaterThanOrEqual(TimeSpan left, TimeSpan right)
+        {
+            return left >= right;
+        }
+        #endregion
+
+        #region LessThan
+        /// <summary>
+        /// Determines whether or not two numbers are less than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThan(byte left, byte right)
+        {
+            return left < right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThan(sbyte left, sbyte right)
+        {
+            return left < right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThan(short left, short right)
+        {
+            return left < right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThan(ushort left, ushort right)
+        {
+            return left < right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThan(char left, char right)
+        {
+            return left < right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThan(int left, int right)
+        {
+            return left < right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThan(uint left, uint right)
+        {
+            return left < right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThan(long left, long right)
+        {
+            return left < right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThan(ulong left, ulong right)
+        {
+            return left < right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThan(float left, float right)
+        {
+            return left < right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThan(double left, double right)
+        {
+            return left < right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThan(TimeSpan left, TimeSpan right)
+        {
+            return left < right;
+        }
+        #endregion
+
+        #region LessThanOrEqual
+        /// <summary>
+        /// Determines whether or not two numbers are less than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThanOrEqual(byte left, byte right)
+        {
+            return left <= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThanOrEqual(sbyte left, sbyte right)
+        {
+            return left <= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThanOrEqual(short left, short right)
+        {
+            return left <= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThanOrEqual(ushort left, ushort right)
+        {
+            return left <= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThanOrEqual(char left, char right)
+        {
+            return left <= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThanOrEqual(int left, int right)
+        {
+            return left <= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThanOrEqual(uint left, uint right)
+        {
+            return left <= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThanOrEqual(long left, long right)
+        {
+            return left <= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThanOrEqual(ulong left, ulong right)
+        {
+            return left <= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThanOrEqual(float left, float right)
+        {
+            return left <= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThanOrEqual(double left, double right)
+        {
+            return left <= right;
+        }
+
+        /// <summary>
+        /// Determines whether or not two numbers are less than or equal to one another.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The result.</returns>
+        public static bool LessThanOrEqual(TimeSpan left, TimeSpan right)
+        {
+            return left <= right;
         }
         #endregion
     }

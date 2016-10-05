@@ -65,7 +65,17 @@ namespace IX.Math
         {
             return typeof(MathematicalOperationsAide)
                 .GetTypeMethods()
-                .SingleOrDefault(p => p.Name == Enum.GetName(typeof(ExpressionType), nodeType) && p.ReturnType == type);
+                .SingleOrDefault(p =>
+                {
+                    var pars = p.GetParameters();
+
+                    if (pars.Length != 2)
+                        return false;
+
+                    return p.Name == Enum.GetName(typeof(ExpressionType), nodeType) &&
+                        pars[0].ParameterType == type &&
+                        pars[1].ParameterType == type;
+                });
         }
 
         private static MethodInfo GetProperOperator(Type type, ExpressionType eType)
