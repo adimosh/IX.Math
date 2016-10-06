@@ -191,7 +191,24 @@ namespace IX.Math
                 return ((ConstantExpression)body).Value;
             }
 
-            return Expression.Lambda(body, externalParameters).Compile()?.DynamicInvoke(arguments ?? new object[0]);
+            if (arguments == null)
+            {
+                arguments = new object[0];
+            }
+
+            if (externalParameters.Count() != arguments.Length)
+            {
+                return expressionToParse;
+            }
+
+            try
+            {
+                return Expression.Lambda(body, externalParameters).Compile()?.DynamicInvoke(arguments) ?? expressionToParse;
+            }
+            catch (Exception ex)
+            {
+                throw new ExpressionNotValidLogicallyException(ex);
+            }
         }
 
         #region Algorithm
