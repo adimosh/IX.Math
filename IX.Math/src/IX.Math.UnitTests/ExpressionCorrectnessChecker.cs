@@ -150,6 +150,12 @@ namespace IX.Math.UnitTests
                     "2+sqrt(4)+2",
                     new object[0],
                     6
+                },
+                new object[]
+                {
+                    "2.0*x-7*y",
+                    new object[] { (float)12.5, 2 },
+                    11
                 }
             };
         }

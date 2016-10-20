@@ -10,8 +10,6 @@
 
 namespace IX.Math {
     using System;
-    using System.Diagnostics;
-    using System.Globalization;
     using System.Reflection;
     
     
@@ -67,6 +65,15 @@ namespace IX.Math {
         public static string NotValidInternally {
             get {
                 return ResourceManager.GetString("NotValidInternally", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to The numerical type is either not a numerical type, or is not yet supported..
+        /// </summary>
+        public static string NumericTypeInvalid {
+            get {
+                return ResourceManager.GetString("NumericTypeInvalid", resourceCulture);
             }
         }
     }

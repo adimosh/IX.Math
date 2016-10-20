@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using IX.Math.PlatformMitigation;
+using IX.Math.SimplificationAide;
 
 namespace IX.Math
 {
@@ -148,7 +149,37 @@ namespace IX.Math
         public Delegate GenerateDelegate(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
             IEnumerable<ParameterExpression> externalParameters;
-            Expression body = CreateBody(expressionToParse, out externalParameters, cancellationToken);
+            Expression body = CreateBody(expressionToParse, typeof(int), out externalParameters, cancellationToken);
+
+            if (body == null)
+            {
+                return null;
+            }
+
+            return Expression.Lambda(body, externalParameters).Compile();
+        }
+
+        /// <summary>
+        /// Generates a delegate from a mathematical expression.
+        /// </summary>
+        /// <param name="expressionToParse">The mathematical expression to parse.</param>
+        /// <param name="numericalType">The numerical type to use.</param>
+        /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
+        /// <returns>A <see cref="Delegate"/> that can be used to calculate the result of the given expression, or <c>null</c> (<c>Nothing</c> in Visual Basic).</returns>
+        /// <remarks>
+        /// <para>The numerical type is not guaranteed to be the type requested. It will, however, be at least the requested typeas size.</para>
+        /// <para>For instance, if type <see cref="int"/> is requested, but a <see cref="double"/> value is found anywhere in the expression, the resulting type will be
+        /// <see cref="double"/>.</para>
+        /// </remarks>
+        public Delegate GenerateDelegate(string expressionToParse, Type numericalType, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (!NumericTypeAide.NumericTypesConversionDictionary.ContainsKey(numericalType))
+            {
+                throw new InvalidOperationException(Resources.NumericTypeInvalid);
+            }
+
+            IEnumerable<ParameterExpression> externalParameters;
+            Expression body = CreateBody(expressionToParse, numericalType, out externalParameters, cancellationToken);
 
             if (body == null)
             {
@@ -166,7 +197,24 @@ namespace IX.Math
         /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
         public object ExecuteExpression(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return ExecuteExpression(expressionToParse, null, cancellationToken);
+            return ExecuteExpression(expressionToParse, typeof(int), null, cancellationToken);
+        }
+
+        /// <summary>
+        /// Interprets a mathematical expression and executes it, returning the result.
+        /// </summary>
+        /// <param name="expressionToParse">The mathematical expression to parse.</param>
+        /// <param name="numericalType">The numerical type to use.</param>
+        /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
+        /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
+        /// <remarks>
+        /// <para>The numerical type is not guaranteed to be the type requested. It will, however, be at least the requested typeas size.</para>
+        /// <para>For instance, if type <see cref="int"/> is requested, but a <see cref="double"/> value is found anywhere in the expression, the resulting type will be
+        /// <see cref="double"/>.</para>
+        /// </remarks>
+        public object ExecuteExpression(string expressionToParse, Type numericalType, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return ExecuteExpression(expressionToParse, numericalType, null, cancellationToken);
         }
 
         /// <summary>
@@ -176,10 +224,25 @@ namespace IX.Math
         /// <param name="arguments">The arguments to pass to the expression.</param>
         /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
         /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
+        /// <remarks>
+        /// <para>The numerical type that will be used will be the type with the highest capacity between the used types.</para>
+        /// <para>All numerical arguments will have been converted to the numerical type before being used as parameters.</para>
+        /// </remarks>
         public object ExecuteExpression(string expressionToParse, object[] arguments, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Type numericType = typeof(int);
+            foreach (var argument in arguments)
+            {
+                CheckNumericType(argument, ref numericType);
+            }
+
+            return ExecuteExpression(expressionToParse, numericType, arguments, cancellationToken);
+        }
+
+        private object ExecuteExpression(string expressionToParse, Type requestedNumericalType, object[] arguments, CancellationToken cancellationToken = default(CancellationToken))
+        {
             IEnumerable<ParameterExpression> externalParameters;
-            Expression body = CreateBody(expressionToParse, out externalParameters, cancellationToken);
+            Expression body = CreateBody(expressionToParse, requestedNumericalType, out externalParameters, cancellationToken);
 
             if (body == null)
             {
@@ -211,15 +274,14 @@ namespace IX.Math
             }
         }
 
-        #region Algorithm
-        private Expression CreateBody(string expressionToParse,
+        private Expression CreateBody(
+            string expressionToParse,
+            Type numericTypeToStart,
             out IEnumerable<ParameterExpression> externalParams,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             Dictionary<string, RawExpressionContainer> symbolTable = new Dictionary<string, RawExpressionContainer>();
             Dictionary<string, string> reverseSymbolTable = new Dictionary<string, string>();
-
-            //int index = 1;
 
             // Break by parantheses
 
@@ -243,7 +305,7 @@ namespace IX.Math
             if (expression.Contains(definition.PowerSymbol))
                 numericType = typeof(double);
             else
-                numericType = typeof(int);
+                numericType = numericTypeToStart;
 
             Dictionary<string, ParameterExpression> externalParameters = new Dictionary<string, ParameterExpression>();
             Dictionary<string, ConstantExpression> constants = new Dictionary<string, ConstantExpression>();
@@ -657,6 +719,32 @@ beginning:
 
             return null;
         }
-        #endregion
+
+        private static void CheckNumericType(object value, ref Type numericType)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            int numericTypeInt;
+            if (!NumericTypeAide.NumericTypesConversionDictionary.TryGetValue(numericType, out numericTypeInt))
+            {
+                throw new InvalidOperationException(Resources.NumericTypeInvalid);
+            }
+
+            Type currentType = value.GetType();
+
+            int currentTypeInt;
+            if (!NumericTypeAide.NumericTypesConversionDictionary.TryGetValue(currentType, out currentTypeInt))
+            {
+                return;
+            }
+
+            if (currentTypeInt > numericTypeInt)
+            {
+                numericType = NumericTypeAide.InverseNumericTypesConversionDictionary[currentTypeInt];
+            }
+        }
     }
 }
