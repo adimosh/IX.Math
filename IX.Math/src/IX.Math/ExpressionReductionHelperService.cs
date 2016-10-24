@@ -93,7 +93,7 @@ namespace IX.Math
 
             if (!(exp is ConstantExpression))
             {
-                return exp;
+                return operationExpression;
             }
 
             var constant = (ConstantExpression)exp;
@@ -114,7 +114,7 @@ namespace IX.Math
 
         private static MethodInfo TryCalculateUnaryDirect(Type type, ExpressionType nodeType)
         {
-            return typeof(MathematicalUnaryOperationAide)
+            return typeof(MathematicalUnaryOperationsAide)
                 .GetTypeMethods()
                 .SingleOrDefault(p =>
                 {

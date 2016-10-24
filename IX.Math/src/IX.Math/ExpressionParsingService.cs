@@ -167,7 +167,7 @@ namespace IX.Math
         /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
         /// <returns>A <see cref="Delegate"/> that can be used to calculate the result of the given expression, or <c>null</c> (<c>Nothing</c> in Visual Basic).</returns>
         /// <remarks>
-        /// <para>The numerical type is not guaranteed to be the type requested. It will, however, be at least the requested typeas size.</para>
+        /// <para>The numerical type is not guaranteed to be the type requested. It will, however, be at least the requested type as size.</para>
         /// <para>For instance, if type <see cref="int"/> is requested, but a <see cref="double"/> value is found anywhere in the expression, the resulting type will be
         /// <see cref="double"/>.</para>
         /// </remarks>
@@ -208,7 +208,7 @@ namespace IX.Math
         /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
         /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
         /// <remarks>
-        /// <para>The numerical type is not guaranteed to be the type requested. It will, however, be at least the requested typeas size.</para>
+        /// <para>The numerical type is not guaranteed to be the type requested. It will, however, be at least the requested type as size.</para>
         /// <para>For instance, if type <see cref="int"/> is requested, but a <see cref="double"/> value is found anywhere in the expression, the resulting type will be
         /// <see cref="double"/>.</para>
         /// </remarks>

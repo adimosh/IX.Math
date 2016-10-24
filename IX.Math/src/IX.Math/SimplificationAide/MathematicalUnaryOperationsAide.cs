@@ -3,7 +3,7 @@
     /// <summary>
     /// Named method aide for mathematical binary operations.
     /// </summary>
-    public static class MathematicalUnaryOperationAide
+    public static class MathematicalUnaryOperationsAide
     {
         /// <summary>
         /// Negates the value (bitwise).

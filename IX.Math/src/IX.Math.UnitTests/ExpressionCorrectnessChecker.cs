@@ -34,9 +34,7 @@ namespace IX.Math.UnitTests
                 throw new InvalidOperationException($"The method should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
             }
 
-            var convertedResult = Convert.ChangeType(result, expectedResult.GetType());
-
-            Assert.Equal(expectedResult, convertedResult);
+            Assert.Equal(expectedResult, result);
         }
 
         public static object[][] ProvideDataForTheory()
@@ -89,13 +87,13 @@ namespace IX.Math.UnitTests
                 {
                     "x^2",
                     new object[] { 2 },
-                    4
+                    4.0
                 },
                 new object[]
                 {
                     "x^3",
                     new object[] { 3 },
-                    27
+                    27.0
                 },
                 new object[]
                 {
@@ -149,13 +147,25 @@ namespace IX.Math.UnitTests
                 {
                     "2+sqrt(4)+2",
                     new object[0],
-                    6
+                    6.0
                 },
                 new object[]
                 {
                     "2.0*x-7*y",
                     new object[] { (float)12.5, 2 },
-                    11
+                    (float)11.0
+                },
+                new object[]
+                {
+                    "2*x-7*y",
+                    new object[] { 12, 2 },
+                    10
+                },
+                new object[]
+                {
+                    "!x",
+                    new object[] { 32768 },
+                    -32768
                 }
             };
         }
