@@ -13,47 +13,11 @@ namespace IX.Math
         {
             if (operationExpression is BinaryExpression)
             {
-                var opExp = operationExpression as BinaryExpression;
-
-                if (!(opExp.Left is ConstantExpression) || !(opExp.Right is ConstantExpression))
-                    return opExp;
-
-                var leftConstant = (ConstantExpression)opExp.Left;
-                var rightConstant = (ConstantExpression)opExp.Right;
-
-                if (leftConstant.Type != rightConstant.Type)
-                    return opExp;
-
-                object result;
-
-                MethodInfo mi;
-                mi = TryCalculateDirect(leftConstant.Type, opExp.NodeType);
-
-                if (mi == null)
-                {
-                    mi = GetProperOperator(leftConstant.Type, opExp.NodeType);
-                }
-
-                if (mi != null)
-                {
-                    if (mi.IsStatic)
-                    {
-                        result = mi.Invoke(null, new[] { leftConstant.Value, rightConstant.Value });
-                    }
-                    else
-                    {
-                        result = mi.Invoke(leftConstant.Value, new[] { rightConstant.Value });
-                    }
-                    return Expression.Constant(result, result.GetType());
-                }
-                else
-                {
-                    return opExp;
-                }
+                return ReduceBinaryExpression((BinaryExpression)operationExpression);
             }
             else if (operationExpression is UnaryExpression)
             {
-                return operationExpression;
+                return ReduceUnaryExpression((UnaryExpression)operationExpression);
             }
             else
             {
@@ -61,16 +25,123 @@ namespace IX.Math
             }
         }
 
-        private static MethodInfo TryCalculateDirect(Type type, ExpressionType nodeType)
+        private static Expression ReduceBinaryExpression(BinaryExpression operationExpression)
         {
-            return typeof(MathematicalOperationsAide)
+            var expLeft = operationExpression.Left;
+
+            if (!(expLeft is ConstantExpression))
+            {
+                expLeft = ReduceIfConstantOperation(expLeft);
+            }
+
+            var expRight = operationExpression.Right;
+
+            if (!(expRight is ConstantExpression))
+            {
+                expRight = ReduceIfConstantOperation(expRight);
+            }
+
+            if (!(expLeft is ConstantExpression) || !(expRight is ConstantExpression))
+            {
+                return operationExpression;
+            }
+
+            var leftConstant = (ConstantExpression)expLeft;
+            var rightConstant = (ConstantExpression)expRight;
+
+            if (leftConstant.Type != rightConstant.Type)
+            {
+                return operationExpression;
+            }
+
+            object result;
+
+            MethodInfo mi = TryCalculateBinaryDirect(leftConstant.Type, operationExpression.NodeType);
+
+            if (mi == null)
+            {
+                mi = GetProperOperator(leftConstant.Type, operationExpression.NodeType);
+            }
+
+            if (mi != null)
+            {
+                if (mi.IsStatic)
+                {
+                    result = mi.Invoke(null, new[] { leftConstant.Value, rightConstant.Value });
+                }
+                else
+                {
+                    result = mi.Invoke(leftConstant.Value, new[] { rightConstant.Value });
+                }
+
+                return Expression.Constant(result, result.GetType());
+            }
+            else
+            {
+                return operationExpression;
+            }
+        }
+
+        private static Expression ReduceUnaryExpression(UnaryExpression operationExpression)
+        {
+            var exp = operationExpression.Operand;
+
+            if (!(exp is ConstantExpression))
+            {
+                exp = ReduceIfConstantOperation(exp);
+            }
+
+            if (!(exp is ConstantExpression))
+            {
+                return exp;
+            }
+
+            var constant = (ConstantExpression)exp;
+
+            MethodInfo mi = TryCalculateUnaryDirect(constant.Type, operationExpression.NodeType);
+
+            if (mi != null)
+            {
+                var result = mi.Invoke(null, new[] { constant.Value });
+
+                return Expression.Constant(result, result.GetType());
+            }
+            else
+            {
+                return operationExpression;
+            }
+        }
+
+        private static MethodInfo TryCalculateUnaryDirect(Type type, ExpressionType nodeType)
+        {
+            return typeof(MathematicalUnaryOperationAide)
+                .GetTypeMethods()
+                .SingleOrDefault(p =>
+                {
+                    var pars = p.GetParameters();
+
+                    if (pars.Length != 1)
+                    {
+                        return false;
+                    }
+
+                    return p.Name == Enum.GetName(typeof(ExpressionType), nodeType) &&
+                        pars[0].ParameterType == type;
+                });
+        }
+
+        private static MethodInfo TryCalculateBinaryDirect(Type type, ExpressionType nodeType)
+        {
+            return typeof(MathematicalBinaryOperationsAide)
                 .GetTypeMethods()
                 .SingleOrDefault(p =>
                 {
                     var pars = p.GetParameters();
 
                     if (pars.Length != 2)
+                    {
                         return false;
+                    }
 
                     return p.Name == Enum.GetName(typeof(ExpressionType), nodeType) &&
                         pars[0].ParameterType == type &&
@@ -130,13 +201,17 @@ namespace IX.Math
                 }
 
                 if (opName != null)
+                {
                     mi = type.GetTypeMethods().SingleOrDefault(p =>
                             p.IsStatic &&
                             p.IsPublic &&
                             p.Name == opName &&
                             p.GetParameters().Select(q => q.ParameterType).SequenceEqual(typeParams));
+                }
                 else
+                {
                     mi = null;
+                }
             }
 
             return mi;

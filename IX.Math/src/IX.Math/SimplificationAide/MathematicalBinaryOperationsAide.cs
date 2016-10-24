@@ -3,9 +3,9 @@
 namespace IX.Math.SimplificationAide
 {
     /// <summary>
-    /// Named method aide for mathematical operations.
+    /// Named method aide for mathematical binary operations.
     /// </summary>
-    public static class MathematicalOperationsAide
+    public static class MathematicalBinaryOperationsAide
     {
         #region Add
         /// <summary>
