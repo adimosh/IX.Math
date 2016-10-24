@@ -36,4 +36,7 @@ Global
 		{5159F238-D854-4D1D-A494-1213F57D55DA} = {32A0E219-634F-419A-A9CF-CFE08E05E496}
 		{A7FB3107-43F7-4486-97D5-CE123AC8C20F} = {32A0E219-634F-419A-A9CF-CFE08E05E496}
 	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		RESX_PrefixTranslations = False
+	EndGlobalSection
 EndGlobal

@@ -118,12 +118,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="NotValidInternally" xml:space="preserve">
-    <value>Expresia este incorectă din punct de vedere logic, nu este validă sau invocarea a fost efectuată cu date incorecte.</value>
+    <value>L’expression est soit pas logiquement sonore, à l’interne valide ou son appel a été fait avec des données incorrectes.</value>
   </data>
   <data name="NumericTypeInvalid" xml:space="preserve">
-    <value>Tipul numeric sau nu este un tip numeric corect, sau inca nu este implementat.</value>
+    <value>Le type numérique n’est pas un type numérique, ou n’est pas encore supporté.</value>
   </data>
   <data name="NumericTypeMismatched" xml:space="preserve">
-    <value>Tipul numeric cerut este în neconcordanță cu parametrii.</value>
+    <value>Le type numérique demandé est incompatible en considérant les arguments donnés.</value>
   </data>
 </root>

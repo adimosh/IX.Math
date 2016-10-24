@@ -241,7 +241,48 @@ namespace IX.Math
 
         private object ExecuteExpression(string expressionToParse, Type requestedNumericalType, object[] arguments, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (arguments == null)
+            {
+                arguments = new object[0];
+            }
+
             IEnumerable<ParameterExpression> externalParameters;
+
+            int requestedTypeValue;
+            if (!NumericTypeAide.NumericTypesConversionDictionary.TryGetValue(requestedNumericalType, out requestedTypeValue))
+            {
+                throw new InvalidOperationException(Resources.NumericTypeInvalid);
+            }
+
+            object[] convertedArguments = new object[arguments.Length];
+
+            for (int i = 0; i < arguments.Length; i++)
+            {
+                object val = arguments[i];
+                Type argType = val.GetType();
+
+                int typeValue;
+                if (!NumericTypeAide.NumericTypesConversionDictionary.TryGetValue(argType, out typeValue))
+                {
+                    convertedArguments[i] = val;
+                    continue;
+                }
+
+                if (typeValue > requestedTypeValue)
+                {
+                    throw new ExpressionNotValidLogicallyException(Resources.NumericTypeMismatched);
+                }
+
+                if (typeValue < requestedTypeValue)
+                {
+                    convertedArguments[i] = Convert.ChangeType(val, requestedNumericalType);
+                }
+                else
+                {
+                    convertedArguments[i] = val;
+                }
+            }
+
             Expression body = CreateBody(expressionToParse, requestedNumericalType, out externalParameters, cancellationToken);
 
             if (body == null)
@@ -254,19 +295,14 @@ namespace IX.Math
                 return ((ConstantExpression)body).Value;
             }
 
-            if (arguments == null)
-            {
-                arguments = new object[0];
-            }
-
-            if (externalParameters.Count() != arguments.Length)
+            if (externalParameters.Count() != convertedArguments.Length)
             {
                 return expressionToParse;
             }
 
             try
             {
-                return Expression.Lambda(body, externalParameters).Compile()?.DynamicInvoke(arguments) ?? expressionToParse;
+                return Expression.Lambda(body, externalParameters).Compile()?.DynamicInvoke(convertedArguments) ?? expressionToParse;
             }
             catch (Exception ex)
             {

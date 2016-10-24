@@ -123,4 +123,7 @@
   <data name="NumericTypeInvalid" xml:space="preserve">
     <value>The numerical type is either not a numerical type, or is not yet supported.</value>
   </data>
+  <data name="NumericTypeMismatched" xml:space="preserve">
+    <value>The requested numerical type is mismatched considering the given arguments.</value>
+  </data>
 </root>

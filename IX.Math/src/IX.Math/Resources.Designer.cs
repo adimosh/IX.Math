@@ -76,5 +76,14 @@ namespace IX.Math {
                 return ResourceManager.GetString("NumericTypeInvalid", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to The requested numerical type is mismatched considering the given arguments..
+        /// </summary>
+        public static string NumericTypeMismatched {
+            get {
+                return ResourceManager.GetString("NumericTypeMismatched", resourceCulture);
+            }
+        }
     }
 }
