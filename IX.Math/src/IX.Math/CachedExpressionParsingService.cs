@@ -1,4 +1,5 @@
 ﻿#if !NETSTANDARD10
+using IX.Math.PlatformMitigation;
 using IX.Math.SimplificationAide;
 using System;
 using System.Collections.Concurrent;
@@ -82,13 +83,7 @@ namespace IX.Math
 
             var del = GetDelegateForExpression(expressionToParse, numericType, cancellationToken);
 
-            MethodInfo mi = del.Item1.GetType()
-#if NETSTANDARD11 || NETSTANDARD12
-                .GetRuntimeMethods()
-#else
-                .GetMethods()
-#endif
-                .Where(p => p.Name == "Invoke").FirstOrDefault();
+            MethodInfo mi = del.Item1.GetType().GetTypeMethods().Where(p => p.Name == "Invoke").FirstOrDefault();
 
             object[] convertedArguments = NumericTypeAide.GetValuesFromFinder(mi.GetParameters().Select(p => new Tuple<string, Type>(p.Name, p.ParameterType)), dataFinder);
 
