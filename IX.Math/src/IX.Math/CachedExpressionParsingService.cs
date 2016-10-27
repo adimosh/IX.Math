@@ -18,9 +18,9 @@ namespace IX.Math
     /// <para>Please note that directly accessing the <see cref="IExpressionParsingService.GenerateDelegate(string, CancellationToken)"/>
     /// explicitly-implemented method does not bypass the cache, but, due to the expression being unable to </para>
     /// </remarks>
-    public class CachedExpressionParsingService : IExpressionParsingService
+    public class CachedExpressionParsingService : IExpressionParsingService, IDisposable
     {
-        private readonly ExpressionParsingService eps;
+        private ExpressionParsingService eps;
         private ConcurrentDictionary<string, Tuple<Delegate, Type>> cachedDelegates;
 
         /// <summary>
@@ -41,8 +41,19 @@ namespace IX.Math
             eps = new ExpressionParsingService(definition);
         }
 
+        /// <summary>
+        /// Interprets a mathematical expression and executes it, returning the result.
+        /// </summary>
+        /// <param name="expressionToParse">The mathematical expression to parse.</param>
+        /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
+        /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
         public object ExecuteExpression(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (disposedValue)
+            {
+                throw new ObjectDisposedException(nameof(CachedExpressionParsingService));
+            }
+
             var del = GetDelegateForExpression(expressionToParse, WorkingConstants.defaultNumericType, cancellationToken);
             
             if (del == null)
@@ -53,8 +64,20 @@ namespace IX.Math
             return del.Item1.DynamicInvoke();
         }
 
+        /// <summary>
+        /// Interprets a mathematical expression and executes it, returning the result.
+        /// </summary>
+        /// <param name="expressionToParse">The mathematical expression to parse.</param>
+        /// <param name="dataFinder">A service instance that is used to find the data that the expression requires in order to execute.</param>
+        /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
+        /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
         public object ExecuteExpression(string expressionToParse, IDataFinder dataFinder, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (disposedValue)
+            {
+                throw new ObjectDisposedException(nameof(CachedExpressionParsingService));
+            }
+
             Type numericType = WorkingConstants.defaultNumericTypeWithFinder;
 
             var del = GetDelegateForExpression(expressionToParse, numericType, cancellationToken);
@@ -72,8 +95,20 @@ namespace IX.Math
             return del.Item1.DynamicInvoke(convertedArguments);
         }
 
+        /// <summary>
+        /// Interprets a mathematical expression and executes it, returning the result.
+        /// </summary>
+        /// <param name="expressionToParse">The mathematical expression to parse.</param>
+        /// <param name="arguments">The arguments to pass to the expression.</param>
+        /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
+        /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
         public object ExecuteExpression(string expressionToParse, object[] arguments, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (disposedValue)
+            {
+                throw new ObjectDisposedException(nameof(CachedExpressionParsingService));
+            }
+
             Type numericType = WorkingConstants.defaultNumericType;
 
             NumericTypeAide.GetProperRequestedNumericalType(arguments, ref numericType);
@@ -85,8 +120,19 @@ namespace IX.Math
             return del.Item1.DynamicInvoke(convertedArguments);
         }
 
+        /// <summary>
+        /// Generates a delegate from a mathematical expression.
+        /// </summary>
+        /// <param name="expressionToParse">The mathematical expression to parse.</param>
+        /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
+        /// <returns>A <see cref="Delegate"/> that can be used to calculate the result of the given expression.</returns>
         public Delegate GenerateDelegate(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (disposedValue)
+            {
+                throw new ObjectDisposedException(nameof(CachedExpressionParsingService));
+            }
+
             return GetDelegateForExpression(expressionToParse, WorkingConstants.defaultNumericType, cancellationToken)?.Item1;
         }
 
@@ -125,6 +171,44 @@ namespace IX.Math
 
             return del;
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        /// <inheritdoc />
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    cachedDelegates.Clear();
+                }
+
+                cachedDelegates = null;
+                eps = null;
+
+                disposedValue = true;
+            }
+        }
+
+        /// <summary>
+        /// Disposes of an instance of the <see cref="CachedExpressionParsingService"/> class.
+        /// </summary>
+        ~CachedExpressionParsingService()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(false);
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }
 #endif
