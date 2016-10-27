@@ -59,6 +59,16 @@ namespace IX.Math.UnitTests
                     "212",
                     212
                 },
+                new object[]
+                {
+                    "String is wonderful",
+                    "String is wonderful"
+                },
+                new object[]
+                {
+                    "212=String again",
+                    "212=String again"
+                },
             };
         }
     }
