@@ -1,4 +1,5 @@
 ﻿#if !NETSTANDARD10
+
 using IX.Math.PlatformMitigation;
 using IX.Math.SimplificationAide;
 using System;
@@ -7,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace IX.Math
 {
@@ -22,7 +22,7 @@ namespace IX.Math
     public class CachedExpressionParsingService : IExpressionParsingService, IDisposable
     {
         private ExpressionParsingService eps;
-        private ConcurrentDictionary<string, Tuple<Delegate, Type>> cachedDelegates;
+        private ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>>> cachedDelegates;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CachedExpressionParsingService"/> class.
@@ -30,7 +30,7 @@ namespace IX.Math
         public CachedExpressionParsingService()
         {
             eps = new ExpressionParsingService();
-            cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type>>();
+            cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>>>();
         }
 
         /// <summary>
@@ -40,6 +40,7 @@ namespace IX.Math
         public CachedExpressionParsingService(MathDefinition definition)
         {
             eps = new ExpressionParsingService(definition);
+            cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>>>();
         }
 
         /// <summary>
@@ -83,9 +84,7 @@ namespace IX.Math
 
             var del = GetDelegateForExpression(expressionToParse, numericType, cancellationToken);
 
-            MethodInfo mi = del.Item1.GetType().GetTypeMethods().Where(p => p.Name == "Invoke").FirstOrDefault();
-
-            object[] convertedArguments = NumericTypeAide.GetValuesFromFinder(mi.GetParameters().Select(p => new Tuple<string, Type>(p.Name, p.ParameterType)), dataFinder);
+            object[] convertedArguments = NumericTypeAide.GetValuesFromFinder(del.Item3, dataFinder);
 
             return del.Item1.DynamicInvoke(convertedArguments);
         }
@@ -131,16 +130,19 @@ namespace IX.Math
             return GetDelegateForExpression(expressionToParse, WorkingConstants.defaultNumericType, cancellationToken)?.Item1;
         }
 
-        private Tuple<Delegate, Type> GetDelegateForExpression(string expressionToParse, Type numericalType, CancellationToken cancellationToken)
+        private Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>> GetDelegateForExpression(
+            string expressionToParse,
+            Type numericalType,
+            CancellationToken cancellationToken)
         {
             var del = cachedDelegates.GetOrAdd(expressionToParse, (expr) =>
             {
-                Delegate d = eps.GenerateDelegate(expr, numericalType, cancellationToken);
+                var d = eps.GenerateDelegateInternal(expr, numericalType, cancellationToken);
                 if (d == null)
                 {
-                    return new Tuple<Delegate, Type>(new Func<object>(() => expr), numericalType);
+                    return new Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>>(new Func<object>(() => expr), numericalType, new Tuple<string, Type>[0]);
                 }
-                return new Tuple<Delegate, Type>(d, numericalType);
+                return new Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>>(d.Item1, numericalType, d.Item2);
             });
 
             int numTypeValue;
@@ -157,8 +159,8 @@ namespace IX.Math
 
             if (numReturnedTypeValue < numTypeValue)
             {
-                Delegate d = eps.GenerateDelegate(expressionToParse, numericalType, cancellationToken);
-                Tuple<Delegate, Type> newDel = new Tuple<Delegate, Type>(d == null ? (new Func<object>(() => expressionToParse)) : d, numericalType);
+                var d = eps.GenerateDelegateInternal(expressionToParse, numericalType, cancellationToken);
+                var newDel = new Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>>(d?.Item1 == null ? (new Func<object>(() => expressionToParse)) : d.Item1, numericalType, d.Item2);
                 cachedDelegates.TryUpdate(expressionToParse, newDel, del);
 
                 return newDel;

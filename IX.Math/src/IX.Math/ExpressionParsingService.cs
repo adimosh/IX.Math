@@ -148,7 +148,7 @@ namespace IX.Math
         /// <returns>A <see cref="Delegate"/> that can be used to calculate the result of the given expression, or <c>null</c> (<c>Nothing</c> in Visual Basic).</returns>
         public Delegate GenerateDelegate(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return GenerateDelegate(expressionToParse, WorkingConstants.defaultNumericType, cancellationToken);
+            return GenerateDelegateInternal(expressionToParse, WorkingConstants.defaultNumericType, cancellationToken)?.Item1;
         }
 
         /// <summary>
@@ -165,21 +165,7 @@ namespace IX.Math
         /// </remarks>
         public Delegate GenerateDelegate(string expressionToParse, Type numericalType, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (!NumericTypeAide.NumericTypesConversionDictionary.ContainsKey(numericalType))
-            {
-                throw new InvalidOperationException(Resources.NumericTypeInvalid);
-            }
-
-            IEnumerable<ParameterExpression> externalParameters;
-            Type resultingNumericType;
-            Expression body = CreateBody(expressionToParse, numericalType, out externalParameters, out resultingNumericType, cancellationToken);
-
-            if (body == null)
-            {
-                return null;
-            }
-
-            return Expression.Lambda(body, externalParameters).Compile();
+            return GenerateDelegateInternal(expressionToParse, numericalType, cancellationToken)?.Item1;
         }
 
         /// <summary>
@@ -276,6 +262,31 @@ namespace IX.Math
             {
                 throw new ExpressionNotValidLogicallyException(ex);
             }
+        }
+
+        internal Tuple<Delegate, IEnumerable<Tuple<string, Type>>> GenerateDelegateInternal(string expressionToParse, Type numericalType, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(expressionToParse))
+            {
+                return null;
+            }
+
+            if (!NumericTypeAide.NumericTypesConversionDictionary.ContainsKey(numericalType))
+            {
+                throw new InvalidOperationException(Resources.NumericTypeInvalid);
+            }
+
+            IEnumerable<ParameterExpression> externalParameters;
+            Type resultingNumericType;
+            Expression body = CreateBody(expressionToParse, numericalType, out externalParameters, out resultingNumericType, cancellationToken);
+
+            if (body == null)
+            {
+                return null;
+            }
+
+            return new Tuple<Delegate, IEnumerable<Tuple<string, Type>>>(Expression.Lambda(body, externalParameters).Compile(), externalParameters.Select(p => new Tuple<string, Type>(p.Name, p.Type)));
+
         }
 
         private object ExecuteExpression(string expressionToParse, Type requestedNumericType, object[] arguments, CancellationToken cancellationToken)
