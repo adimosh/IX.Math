@@ -46,6 +46,7 @@
         "portable-net45+netcore45+wpa81"
       ],
       "dependencies": {
+        "System.Collections.Concurrent": "4.0.12",
         "System.Reflection.Extensions": "4.0.1",
         "System.Runtime.InteropServices": "4.1.0"
       }
@@ -62,6 +63,7 @@
         "monomac"
       ],
       "dependencies": {
+        "System.Collections.Concurrent": "4.0.12",
         "System.Reflection.Extensions": "4.0.1",
         "System.Runtime.InteropServices": "4.1.0"
       }
@@ -74,6 +76,7 @@
         "net46"
       ],
       "dependencies": {
+        "System.Collections.Concurrent": "4.0.12",
         "System.Reflection.TypeExtensions": "4.1.0",
         "System.Runtime.InteropServices": "4.1.0"
       }
@@ -87,6 +90,7 @@
         "uap10"
       ],
       "dependencies": {
+        "System.Collections.Concurrent": "4.0.12",
         "System.Reflection.TypeExtensions": "4.1.0",
         "System.Runtime.InteropServices": "4.1.0"
       }
@@ -99,6 +103,7 @@
         "net462"
       ],
       "dependencies": {
+        "System.Collections.Concurrent": "4.0.12",
         "System.Reflection.TypeExtensions": "4.1.0",
         "System.Runtime.InteropServices": "4.1.0"
       }
@@ -121,6 +126,7 @@
         "xamarinxboxone"
       ],
       "dependencies": {
+        "System.Collections.Concurrent": "4.0.12",
         "System.Reflection.TypeExtensions": "4.1.0",
         "System.Runtime.InteropServices": "4.1.0"
       }

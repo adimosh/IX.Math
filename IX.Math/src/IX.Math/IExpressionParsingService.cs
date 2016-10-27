@@ -4,7 +4,7 @@ using System.Threading;
 namespace IX.Math
 {
     /// <summary>
-    /// A contract for aservice that is able to parse strings containing mathematical expressions and solve them.
+    /// A contract for a service that is able to parse strings containing mathematical expressions and solve them.
     /// </summary>
     public interface IExpressionParsingService
     {
@@ -24,6 +24,15 @@ namespace IX.Math
         /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
         /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
         object ExecuteExpression(string expressionToParse, object[] arguments, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Interprets a mathematical expression and executes it, returning the result.
+        /// </summary>
+        /// <param name="expressionToParse">The mathematical expression to parse.</param>
+        /// <param name="dataFinder">A service instance that is used to find the data that the expression requires in order to execute.</param>
+        /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
+        /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
+        object ExecuteExpression(string expressionToParse, IDataFinder dataFinder, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Generates a delegate from a mathematical expression.

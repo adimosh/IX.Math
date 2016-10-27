@@ -54,6 +54,11 @@ namespace IX.Math.UnitTests
                     "!4+4",
                     -1
                 },
+                new object[]
+                {
+                    "212",
+                    212
+                },
             };
         }
     }

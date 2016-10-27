@@ -148,15 +148,7 @@ namespace IX.Math
         /// <returns>A <see cref="Delegate"/> that can be used to calculate the result of the given expression, or <c>null</c> (<c>Nothing</c> in Visual Basic).</returns>
         public Delegate GenerateDelegate(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
-            IEnumerable<ParameterExpression> externalParameters;
-            Expression body = CreateBody(expressionToParse, typeof(int), out externalParameters, cancellationToken);
-
-            if (body == null)
-            {
-                return null;
-            }
-
-            return Expression.Lambda(body, externalParameters).Compile();
+            return GenerateDelegate(expressionToParse, WorkingConstants.defaultNumericType, cancellationToken);
         }
 
         /// <summary>
@@ -179,7 +171,8 @@ namespace IX.Math
             }
 
             IEnumerable<ParameterExpression> externalParameters;
-            Expression body = CreateBody(expressionToParse, numericalType, out externalParameters, cancellationToken);
+            Type resultingNumericType;
+            Expression body = CreateBody(expressionToParse, numericalType, out externalParameters, out resultingNumericType, cancellationToken);
 
             if (body == null)
             {
@@ -197,7 +190,7 @@ namespace IX.Math
         /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
         public object ExecuteExpression(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return ExecuteExpression(expressionToParse, typeof(int), null, cancellationToken);
+            return ExecuteExpression(expressionToParse, WorkingConstants.defaultNumericType, null, cancellationToken);
         }
 
         /// <summary>
@@ -230,60 +223,33 @@ namespace IX.Math
         /// </remarks>
         public object ExecuteExpression(string expressionToParse, object[] arguments, CancellationToken cancellationToken = default(CancellationToken))
         {
-            Type numericType = typeof(int);
-            foreach (var argument in arguments)
-            {
-                CheckNumericType(argument, ref numericType);
-            }
+            Type numericType = WorkingConstants.defaultNumericType;
+
+            NumericTypeAide.GetProperRequestedNumericalType(arguments, ref numericType);
 
             return ExecuteExpression(expressionToParse, numericType, arguments, cancellationToken);
         }
 
-        private object ExecuteExpression(string expressionToParse, Type requestedNumericalType, object[] arguments, CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        /// Interprets a mathematical expression, finds its data and executes it, returning the result.
+        /// </summary>
+        /// <param name="expressionToParse">The mathematical expression to parse.</param>
+        /// <param name="dataFinder">A service instance that is used to find the data that the expression requires in order to execute.</param>
+        /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
+        /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
+        /// <remarks>
+        /// <para>Due to the non-deterministic nature of the <see cref="IDataFinder"/>, it is impossible to properly evaluate the numeric type in concert with
+        /// all the values that might come from the injected finder, as well as the expression.</para>
+        /// <para>It is therefore implied that the numeric type is always <see cref="double"/>, since this data type has the biggest capacity to support
+        /// all possible input values.</para>
+        /// <para>Calling this method will attempt to automatically convert values returned by the finder to <see cref="double"/>.</para>
+        /// <para>Any other rule still applies, so, if you pass a <see cref="string"/> where a numeric value is required, the method will still fail.</para>
+        /// </remarks>
+        public object ExecuteExpression(string expressionToParse, IDataFinder dataFinder, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (arguments == null)
-            {
-                arguments = new object[0];
-            }
-
             IEnumerable<ParameterExpression> externalParameters;
-
-            int requestedTypeValue;
-            if (!NumericTypeAide.NumericTypesConversionDictionary.TryGetValue(requestedNumericalType, out requestedTypeValue))
-            {
-                throw new InvalidOperationException(Resources.NumericTypeInvalid);
-            }
-
-            object[] convertedArguments = new object[arguments.Length];
-
-            for (int i = 0; i < arguments.Length; i++)
-            {
-                object val = arguments[i];
-                Type argType = val.GetType();
-
-                int typeValue;
-                if (!NumericTypeAide.NumericTypesConversionDictionary.TryGetValue(argType, out typeValue))
-                {
-                    convertedArguments[i] = val;
-                    continue;
-                }
-
-                if (typeValue > requestedTypeValue)
-                {
-                    throw new ExpressionNotValidLogicallyException(Resources.NumericTypeMismatched);
-                }
-
-                if (typeValue < requestedTypeValue)
-                {
-                    convertedArguments[i] = Convert.ChangeType(val, requestedNumericalType);
-                }
-                else
-                {
-                    convertedArguments[i] = val;
-                }
-            }
-
-            Expression body = CreateBody(expressionToParse, requestedNumericalType, out externalParameters, cancellationToken);
+            Type resultingNumericType;
+            Expression body = CreateBody(expressionToParse, WorkingConstants.defaultNumericTypeWithFinder, out externalParameters, out resultingNumericType, cancellationToken);
 
             if (body == null)
             {
@@ -294,6 +260,41 @@ namespace IX.Math
             {
                 return ((ConstantExpression)body).Value;
             }
+
+            if (dataFinder == null)
+            {
+                throw new ArgumentNullException(nameof(dataFinder));
+            }
+
+            object[] parameterValues = NumericTypeAide.GetValuesFromFinder(externalParameters.Select(p => new Tuple<string, Type>(p.Name, p.Type)), dataFinder);
+
+            try
+            {
+                return Expression.Lambda(body, externalParameters).Compile()?.DynamicInvoke(parameterValues.ToArray()) ?? expressionToParse;
+            }
+            catch (Exception ex)
+            {
+                throw new ExpressionNotValidLogicallyException(ex);
+            }
+        }
+
+        private object ExecuteExpression(string expressionToParse, Type requestedNumericType, object[] arguments, CancellationToken cancellationToken)
+        {
+            Type resultingNumericType;
+            IEnumerable<ParameterExpression> externalParameters;
+            Expression body = CreateBody(expressionToParse, requestedNumericType, out externalParameters, out resultingNumericType, cancellationToken);
+
+            if (body == null)
+            {
+                return expressionToParse;
+            }
+
+            if (body is ConstantExpression && !externalParameters.Any())
+            {
+                return ((ConstantExpression)body).Value;
+            }
+
+            object[] convertedArguments = NumericTypeAide.GetProperNumericTypeValues(arguments, resultingNumericType);
 
             if (externalParameters.Count() != convertedArguments.Length)
             {
@@ -314,7 +315,8 @@ namespace IX.Math
             string expressionToParse,
             Type numericTypeToStart,
             out IEnumerable<ParameterExpression> externalParams,
-            CancellationToken cancellationToken = default(CancellationToken))
+            out Type resultingNumericType,
+            CancellationToken cancellationToken)
         {
             Dictionary<string, RawExpressionContainer> symbolTable = new Dictionary<string, RawExpressionContainer>();
             Dictionary<string, string> reverseSymbolTable = new Dictionary<string, string>();
@@ -331,6 +333,7 @@ namespace IX.Math
             catch
             {
                 externalParams = null;
+                resultingNumericType = null;
                 return null;
             }
 
@@ -339,14 +342,20 @@ namespace IX.Math
             // Generating constants and external parameters
             Type numericType;
             if (expression.Contains(definition.PowerSymbol))
-                numericType = typeof(double);
+            {
+                numericType = WorkingConstants.defaultNumericTypeWithFinder;
+            }
             else
+            {
                 numericType = numericTypeToStart;
+            }
 
             Dictionary<string, ParameterExpression> externalParameters = new Dictionary<string, ParameterExpression>();
             Dictionary<string, ConstantExpression> constants = new Dictionary<string, ConstantExpression>();
 
             symbolTable.Select(p => p.Value.Expression).ToList().ForEach(p => PopulateTables(p, externalParameters, constants, symbolTable, ref numericType));
+
+            resultingNumericType = numericType;
 
             Dictionary<string, ConstantExpression> typeChangers = new Dictionary<string, ConstantExpression>();
             foreach (var c in constants.Where(p => p.Value.Type != numericType))
@@ -373,6 +382,7 @@ namespace IX.Math
             catch
             {
                 externalParams = null;
+                resultingNumericType = null;
                 return null;
             }
 
@@ -396,12 +406,14 @@ namespace IX.Math
         private string BreakOneLevel(string source, Dictionary<string, RawExpressionContainer> symbolTable, Dictionary<string, string> reverseSymbolTable, ref int i)
         {
             if (string.IsNullOrWhiteSpace(source))
+            {
                 return string.Empty;
+            }
 
             int op = source.IndexOf(definition.Parantheses.Item1);
             int cp = source.IndexOf(definition.Parantheses.Item2);
 
-beginning:
+            beginning:
             if (op != -1)
             {
                 if (cp != -1)
@@ -429,14 +441,18 @@ beginning:
 
                                 i++;
                                 string expr2 = $"item{i}";
-                                var rec = new RawExpressionContainer { Expression = $"{expr6}(item{i-1})" };
+                                var rec = new RawExpressionContainer { Expression = $"{expr6}(item{i - 1})" };
                                 symbolTable.Add(expr2, rec);
                                 reverseSymbolTable.Add(rec.Expression, expr2);
 
                                 if (expr6 == expr4)
+                                {
                                     expr4 = string.Empty;
+                                }
                                 else
+                                {
                                     expr4 = expr4.Substring(0, expr4.Length - expr6.Length);
+                                }
 
                                 expr3 = expr3.Replace($"item{i - 1}", $"item{i}");
                             }
@@ -453,7 +469,9 @@ beginning:
                     return ProcessSubExpression(source, cp, symbolTable, reverseSymbolTable, ref i);
                 }
                 else
+                {
                     throw new InvalidOperationException();
+                }
             }
             else
             {
@@ -468,7 +486,12 @@ beginning:
             }
         }
 
-        private string ProcessSubExpression(string source, int cp, Dictionary<string, RawExpressionContainer> symbolTable, Dictionary<string, string> reverseSymbolTable, ref int i)
+        private string ProcessSubExpression(
+            string source,
+            int cp,
+            Dictionary<string, RawExpressionContainer> symbolTable,
+            Dictionary<string, string> reverseSymbolTable,
+            ref int i)
         {
             string expr1 = source.Substring(0, cp);
 
@@ -498,17 +521,23 @@ beginning:
             foreach (var exp in expressions)
             {
                 if (constants.ContainsKey(exp))
+                {
                     continue;
+                }
 
                 if (externalParameters.ContainsKey(exp))
+                {
                     continue;
+                }
 
                 if (symbolTable.ContainsKey(exp))
+                {
                     continue;
+                }
 
                 if (exp.Contains(definition.Parantheses.Item1))
                 {
-                    numericType = typeof(double);
+                    numericType = WorkingConstants.defaultNumericTypeWithFinder;
                     continue;
                 }
 
@@ -539,7 +568,9 @@ beginning:
                         return true;
                     }
                     else
+                    {
                         workingNumericType = typeof(int);
+                    }
                 }
 
                 if (workingNumericType == typeof(int))
@@ -551,7 +582,9 @@ beginning:
                         return true;
                     }
                     else
+                    {
                         workingNumericType = typeof(long);
+                    }
                 }
 
                 if (workingNumericType == typeof(long))
@@ -563,7 +596,9 @@ beginning:
                         return true;
                     }
                     else
+                    {
                         workingNumericType = typeof(float);
+                    }
                 }
 
                 if (workingNumericType == typeof(float))
@@ -575,7 +610,9 @@ beginning:
                         return true;
                     }
                     else
+                    {
                         workingNumericType = typeof(double);
+                    }
                 }
 
                 if (workingNumericType == typeof(double))
@@ -594,7 +631,9 @@ beginning:
             finally
             {
                 if (workingNumericType != numericType && result != null)
+                {
                     numericType = workingNumericType;
+                }
 
                 value = result;
             }
@@ -606,33 +645,43 @@ beginning:
             Dictionary<string, RawExpressionContainer> symbolTable,
             Dictionary<string, ConstantExpression> constants,
             Dictionary<string, ParameterExpression> externalParameters,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken)
         {
             // Check whether expression is constant
             ConstantExpression constantResult;
             if (constants.TryGetValue(s, out constantResult))
+            {
                 return constantResult;
+            }
 
             // Check whether expression is an external parameter
             ParameterExpression parameterResult;
             if (externalParameters.TryGetValue(s, out parameterResult))
+            {
                 return parameterResult;
+            }
 
             // Check whether the expression already exists in the symbols table
             RawExpressionContainer expression;
             if (symbolTable.TryGetValue(s, out expression))
+            {
                 return GenerateExpression(expression.Expression, numericType, symbolTable, constants, externalParameters, cancellationToken);
+            }
 
             // Check whether the expression is a function call
             if (s.Contains(definition.Parantheses.Item1))
+            {
                 return GenerateFunctionCallExpression(new RawExpressionContainer { Expression = s }.Expression, numericType, symbolTable, constants, externalParameters, cancellationToken);
+            }
 
             // Check whether the expression is a binary operator
             foreach (string op in binaryOperatorsInOrder)
             {
                 var exp = ExpressionByBinaryOperator(s, op, numericType, symbolTable, constants, externalParameters, cancellationToken);
                 if (exp != null)
+                {
                     return exp;
+                }
             }
 
             // Check whether the expression is a unary operator
@@ -640,7 +689,9 @@ beginning:
             {
                 var exp = ExpressionByUnaryOperator(s, op, numericType, symbolTable, constants, externalParameters, cancellationToken);
                 if (exp != null)
+                {
                     return exp;
+                }
             }
 
             return null;
@@ -652,7 +703,7 @@ beginning:
             Dictionary<string, RawExpressionContainer> symbolTable,
             Dictionary<string, ConstantExpression> constants,
             Dictionary<string, ParameterExpression> externalParameters,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken)
         {
             Match match = functionSupport.Match(expression);
 
@@ -685,7 +736,7 @@ beginning:
             Dictionary<string, RawExpressionContainer> symbolTable,
             Dictionary<string, ConstantExpression> constants,
             Dictionary<string, ParameterExpression> externalParameters,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -703,11 +754,15 @@ beginning:
                     {
                         Expression left = GenerateExpression(split[0], numericType, symbolTable, constants, externalParameters, cancellationToken);
                         if (left == null)
+                        {
                             return null;
+                        }
 
                         Expression right = GenerateExpression(string.Join(op, split.Skip(1).ToArray()), numericType, symbolTable, constants, externalParameters, cancellationToken);
                         if (right == null)
+                        {
                             return null;
+                        }
 
                         return (binaryExpressionGenerators[op](
                                 left,
@@ -730,7 +785,7 @@ beginning:
             Dictionary<string, RawExpressionContainer> symbolTable,
             Dictionary<string, ConstantExpression> constants,
             Dictionary<string, ParameterExpression> externalParameters,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -740,7 +795,9 @@ beginning:
                 {
                     Expression expr = GenerateExpression(s.Substring(op.Length), numericType, symbolTable, constants, externalParameters, cancellationToken);
                     if (expr == null)
+                    {
                         return null;
+                    }
 
                     return (unaryExpressionGenerators[op](
                         numericType,
@@ -754,33 +811,6 @@ beginning:
             }
 
             return null;
-        }
-
-        private static void CheckNumericType(object value, ref Type numericType)
-        {
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
-            int numericTypeInt;
-            if (!NumericTypeAide.NumericTypesConversionDictionary.TryGetValue(numericType, out numericTypeInt))
-            {
-                throw new InvalidOperationException(Resources.NumericTypeInvalid);
-            }
-
-            Type currentType = value.GetType();
-
-            int currentTypeInt;
-            if (!NumericTypeAide.NumericTypesConversionDictionary.TryGetValue(currentType, out currentTypeInt))
-            {
-                return;
-            }
-
-            if (currentTypeInt > numericTypeInt)
-            {
-                numericType = NumericTypeAide.InverseNumericTypesConversionDictionary[currentTypeInt];
-            }
         }
     }
 }
