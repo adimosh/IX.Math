@@ -11,7 +11,7 @@ namespace IX.Math
     {
         private static Regex functionSupport = new Regex(@"(?'functionName'.*?)\((?'expression'.*?)\)");
 
-        internal static Expression CreateBody(
+        internal static void CreateBody(
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
         {
@@ -28,10 +28,12 @@ namespace IX.Math
             }
             catch
             {
-                return null;
+                return;
             }
 
             workingSet.symbolTable.Add(string.Empty, new RawExpressionContainer { Expression = expression });
+
+            workingSet.cancellationToken.ThrowIfCancellationRequested();
 
             // Generating constants and external parameters
             if (expression.Contains(definition.Definition.PowerSymbol))
@@ -39,12 +41,14 @@ namespace IX.Math
                 workingSet.numericType = WorkingConstants.defaultNumericTypeWithFinder;
             }
 
-            workingSet.cancellationToken.ThrowIfCancellationRequested();
-
             workingSet.symbolTable.Select(p => p.Value.Expression).ToList().ForEach(p =>
                 PopulateTables(p, workingSet, definition, ref workingSet.numericType));
 
             Type numericType = workingSet.numericType;
+
+            workingSet.cancellationToken.ThrowIfCancellationRequested();
+
+            // Change all internal values to the specified type
             Dictionary<string, ConstantExpression> typeChangers = new Dictionary<string, ConstantExpression>();
             foreach (var c in workingSet.constants.Where(p => p.Value.Type != numericType))
             {
@@ -64,29 +68,47 @@ namespace IX.Math
             workingSet.cancellationToken.ThrowIfCancellationRequested();
 
             // Generate expressions
-            Expression body;
             try
             {
-                body = GenerateExpression(workingSet.symbolTable[string.Empty].Expression, workingSet, definition);
+                workingSet.body = GenerateExpression(workingSet.symbolTable[string.Empty].Expression, workingSet, definition);
             }
             catch
             {
-                return null;
+                workingSet.body = null;
             }
 
-            if (body == null)
+            if (workingSet.body == null)
             {
-                return null;
+                return;
             }
 
+            workingSet.cancellationToken.ThrowIfCancellationRequested();
+
+            // Reduce expression, if expression is reducible
             int reduceAttempt = 0;
-            while (body.CanReduce && reduceAttempt < 30)
+            while (workingSet.body.CanReduce && reduceAttempt < 30)
             {
-                body = body.Reduce();
+                workingSet.body = workingSet.body.Reduce();
                 reduceAttempt++;
             }
 
-            return body;
+            // Set success values and possibly constant values
+            if (workingSet.body is ConstantExpression)
+            {
+                if (workingSet.externalParams.Count > 0)
+                {
+                    // Cannot have external parameters if the expression is itself constant; something somewhere doesn't make sense
+                    return;
+                }
+                else
+                {
+                    workingSet.valueIfConstant = ((ConstantExpression)workingSet.body).Value;
+                    workingSet.Constant = true;
+                }
+            }
+
+            workingSet.InternallyValid = true;
+            workingSet.Success = true;
         }
 
         private static string BreakOneLevel(

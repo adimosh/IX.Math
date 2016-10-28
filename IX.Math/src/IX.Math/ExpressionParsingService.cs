@@ -149,16 +149,16 @@ namespace IX.Math
                 numericType = WorkingConstants.defaultNumericTypeWithFinder
             };
 
-            Expression body = ExpressionGenerator.CreateBody(workingSet, workingDefinition);
+            ExpressionGenerator.CreateBody(workingSet, workingDefinition);
 
-            if (body == null)
+            if (!workingSet.Success)
             {
                 return expressionToParse;
             }
 
-            if (body is ConstantExpression && !workingSet.externalParams.Any())
+            if (workingSet.Constant)
             {
-                return ((ConstantExpression)body).Value;
+                return workingSet.valueIfConstant;
             }
 
             if (dataFinder == null)
@@ -170,7 +170,7 @@ namespace IX.Math
 
             try
             {
-                return Expression.Lambda(body, workingSet.externalParams.Values).Compile()?.DynamicInvoke(parameterValues.ToArray()) ?? expressionToParse;
+                return Expression.Lambda(workingSet.body, workingSet.externalParams.Values).Compile()?.DynamicInvoke(parameterValues.ToArray()) ?? expressionToParse;
             }
             catch (Exception ex)
             {
@@ -195,14 +195,14 @@ namespace IX.Math
                 numericType = numericType
             };
 
-            Expression body = ExpressionGenerator.CreateBody(workingSet, workingDefinition);
+            ExpressionGenerator.CreateBody(workingSet, workingDefinition);
 
-            if (body == null)
+            if (!workingSet.Success)
             {
                 return null;
             }
 
-            return new Tuple<Delegate, IEnumerable<Tuple<string, Type>>>(Expression.Lambda(body, workingSet.externalParams.Values).Compile(), workingSet.externalParams.Select(p => new Tuple<string, Type>(p.Key, p.Value.Type)));
+            return new Tuple<Delegate, IEnumerable<Tuple<string, Type>>>(Expression.Lambda(workingSet.body, workingSet.externalParams.Values).Compile(), workingSet.externalParams.Select(p => new Tuple<string, Type>(p.Key, p.Value.Type)));
 
         }
 
@@ -213,16 +213,16 @@ namespace IX.Math
                 numericType = requestedNumericType
             };
 
-            Expression body = ExpressionGenerator.CreateBody(workingSet, workingDefinition);
+            ExpressionGenerator.CreateBody(workingSet, workingDefinition);
 
-            if (body == null)
+            if (!workingSet.Success)
             {
                 return expressionToParse;
             }
 
-            if (body is ConstantExpression && !workingSet.externalParams.Any())
+            if (workingSet.Constant)
             {
-                return ((ConstantExpression)body).Value;
+                return workingSet.valueIfConstant;
             }
 
             object[] convertedArguments = NumericTypeAide.GetProperNumericTypeValues(arguments, workingSet.numericType);
@@ -234,7 +234,7 @@ namespace IX.Math
 
             try
             {
-                return Expression.Lambda(body, workingSet.externalParams.Values).Compile()?.DynamicInvoke(convertedArguments) ?? expressionToParse;
+                return Expression.Lambda(workingSet.body, workingSet.externalParams.Values).Compile()?.DynamicInvoke(convertedArguments) ?? expressionToParse;
             }
             catch (Exception ex)
             {

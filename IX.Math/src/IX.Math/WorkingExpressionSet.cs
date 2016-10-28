@@ -27,5 +27,10 @@ namespace IX.Math
         internal Dictionary<string, ParameterExpression> externalParams;
         internal Dictionary<string, ConstantExpression> constants;
         internal Expression body;
+        internal object valueIfConstant;
+
+        internal bool Success = false;
+        internal bool InternallyValid = false;
+        internal bool Constant = false;
     }
 }
