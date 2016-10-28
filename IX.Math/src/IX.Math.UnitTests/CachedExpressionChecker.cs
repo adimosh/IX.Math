@@ -10,7 +10,7 @@ namespace IX.Math.UnitTests
 {
     public class CachedExpressionChecker
     {
-        [Fact(DisplayName = "Test cached exspressions with strings.")]
+        [Fact(DisplayName = "Test cached expressions with strings.")]
         public void TestStringString()
         {
             Mock<IDataFinder> dfMock = new Mock<IDataFinder>(MockBehavior.Strict);

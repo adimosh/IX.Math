@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace IX.Math
 {
@@ -13,15 +12,10 @@ namespace IX.Math
         private static Regex functionSupport = new Regex(@"(?'functionName'.*?)\((?'expression'.*?)\)");
 
         internal static Expression CreateBody(
-            string expressionToParse,
-            Type numericTypeToStart,
-            WorkingDefinition definition,
-            out IEnumerable<ParameterExpression> externalParams,
-            out Type resultingNumericType,
-            CancellationToken cancellationToken)
+            WorkingExpressionSet workingSet,
+            WorkingDefinition definition)
         {
-            Dictionary<string, RawExpressionContainer> symbolTable = new Dictionary<string, RawExpressionContainer>();
-            Dictionary<string, string> reverseSymbolTable = new Dictionary<string, string>();
+            workingSet.cancellationToken.ThrowIfCancellationRequested();
 
             // Break by parantheses
 
@@ -30,67 +24,58 @@ namespace IX.Math
             string expression;
             try
             {
-                expression = BreakOneLevel(expressionToParse, symbolTable, reverseSymbolTable, definition, ref i);
+                expression = BreakOneLevel(workingSet.initialExpression, workingSet, definition, ref i);
             }
             catch
             {
-                externalParams = null;
-                resultingNumericType = null;
                 return null;
             }
 
-            symbolTable.Add(string.Empty, new RawExpressionContainer { Expression = expression });
+            workingSet.symbolTable.Add(string.Empty, new RawExpressionContainer { Expression = expression });
 
             // Generating constants and external parameters
-            Type numericType;
             if (expression.Contains(definition.Definition.PowerSymbol))
             {
-                numericType = WorkingConstants.defaultNumericTypeWithFinder;
-            }
-            else
-            {
-                numericType = numericTypeToStart;
+                workingSet.numericType = WorkingConstants.defaultNumericTypeWithFinder;
             }
 
-            Dictionary<string, ParameterExpression> externalParameters = new Dictionary<string, ParameterExpression>();
-            Dictionary<string, ConstantExpression> constants = new Dictionary<string, ConstantExpression>();
+            workingSet.cancellationToken.ThrowIfCancellationRequested();
 
-            symbolTable.Select(p => p.Value.Expression).ToList().ForEach(p => PopulateTables(p, externalParameters, constants, symbolTable, definition, ref numericType));
+            workingSet.symbolTable.Select(p => p.Value.Expression).ToList().ForEach(p =>
+                PopulateTables(p, workingSet, definition, ref workingSet.numericType));
 
-            resultingNumericType = numericType;
-
+            Type numericType = workingSet.numericType;
             Dictionary<string, ConstantExpression> typeChangers = new Dictionary<string, ConstantExpression>();
-            foreach (var c in constants.Where(p => p.Value.Type != numericType))
+            foreach (var c in workingSet.constants.Where(p => p.Value.Type != numericType))
             {
                 typeChangers[c.Key] = Expression.Constant(Convert.ChangeType(c.Value.Value, numericType), numericType);
             }
 
             foreach (var c in typeChangers)
             {
-                constants[c.Key] = c.Value;
+                workingSet.constants[c.Key] = c.Value;
             }
 
-            foreach (var c in externalParameters.Where(p => p.Value.Type != numericType))
+            foreach (var c in workingSet.externalParams.Where(p => p.Value.Type != numericType))
             {
-                externalParameters[c.Key] = Expression.Parameter(numericType, c.Value.Name);
+                workingSet.externalParams[c.Key] = Expression.Parameter(numericType, c.Value.Name);
             }
+
+            workingSet.cancellationToken.ThrowIfCancellationRequested();
 
             // Generate expressions
             Expression body;
             try
             {
-                body = GenerateExpression(symbolTable[string.Empty].Expression, numericType, symbolTable, constants, externalParameters, definition, cancellationToken);
+                body = GenerateExpression(workingSet.symbolTable[string.Empty].Expression, workingSet, definition);
             }
             catch
             {
-                externalParams = null;
-                resultingNumericType = null;
                 return null;
             }
 
             if (body == null)
             {
-                externalParams = new ParameterExpression[0];
                 return null;
             }
 
@@ -101,14 +86,12 @@ namespace IX.Math
                 reduceAttempt++;
             }
 
-            externalParams = externalParameters.Values;
             return body;
         }
 
         private static string BreakOneLevel(
             string source,
-            Dictionary<string, RawExpressionContainer> symbolTable,
-            Dictionary<string, string> reverseSymbolTable,
+            WorkingExpressionSet workingSet,
             WorkingDefinition definition,
             ref int i)
         {
@@ -127,7 +110,7 @@ namespace IX.Math
                 {
                     if (op < cp)
                     {
-                        string expr3 = BreakOneLevel(source.Substring(op + definition.Definition.Parantheses.Item1.Length), symbolTable, reverseSymbolTable, definition, ref i);
+                        string expr3 = BreakOneLevel(source.Substring(op + definition.Definition.Parantheses.Item1.Length), workingSet, definition, ref i);
 
                         if (op == 0)
                         {
@@ -149,8 +132,8 @@ namespace IX.Math
                                 i++;
                                 string expr2 = $"item{i}";
                                 var rec = new RawExpressionContainer { Expression = $"{expr6}(item{i - 1})" };
-                                symbolTable.Add(expr2, rec);
-                                reverseSymbolTable.Add(rec.Expression, expr2);
+                                workingSet.symbolTable.Add(expr2, rec);
+                                workingSet.reverseSymbolTable.Add(rec.Expression, expr2);
 
                                 if (expr6 == expr4)
                                 {
@@ -173,7 +156,7 @@ namespace IX.Math
                         goto beginning;
                     }
 
-                    return ProcessSubExpression(source, cp, symbolTable, reverseSymbolTable, definition, ref i);
+                    return ProcessSubExpression(source, cp, workingSet, definition, ref i);
                 }
                 else
                 {
@@ -188,7 +171,7 @@ namespace IX.Math
                 }
                 else
                 {
-                    return ProcessSubExpression(source, cp, symbolTable, reverseSymbolTable, definition, ref i);
+                    return ProcessSubExpression(source, cp, workingSet, definition, ref i);
                 }
             }
         }
@@ -196,8 +179,7 @@ namespace IX.Math
         private static string ProcessSubExpression(
             string source,
             int cp,
-            Dictionary<string, RawExpressionContainer> symbolTable,
-            Dictionary<string, string> reverseSymbolTable,
+            WorkingExpressionSet workingSet,
             WorkingDefinition definition,
             ref int i)
         {
@@ -207,21 +189,19 @@ namespace IX.Math
             string expr2;
 
             int k = cp + definition.Definition.Parantheses.Item2.Length;
-            if (!reverseSymbolTable.TryGetValue(rec.Expression, out expr2))
+            if (!workingSet.reverseSymbolTable.TryGetValue(rec.Expression, out expr2))
             {
                 i++;
                 expr2 = $"item{i}";
-                symbolTable.Add(expr2, rec);
-                reverseSymbolTable.Add(rec.Expression, expr2);
+                workingSet.symbolTable.Add(expr2, rec);
+                workingSet.reverseSymbolTable.Add(rec.Expression, expr2);
             }
 
             return $"{expr2}{(source.Length == k ? string.Empty : source.Substring(k))}";
         }
 
         private static void PopulateTables(string p,
-            Dictionary<string, ParameterExpression> externalParameters,
-            Dictionary<string, ConstantExpression> constants,
-            Dictionary<string, RawExpressionContainer> symbolTable,
+            WorkingExpressionSet workingSet,
             WorkingDefinition definition,
             ref Type numericType)
         {
@@ -229,17 +209,17 @@ namespace IX.Math
 
             foreach (var exp in expressions)
             {
-                if (constants.ContainsKey(exp))
+                if (workingSet.constants.ContainsKey(exp))
                 {
                     continue;
                 }
 
-                if (externalParameters.ContainsKey(exp))
+                if (workingSet.externalParams.ContainsKey(exp))
                 {
                     continue;
                 }
 
-                if (symbolTable.ContainsKey(exp))
+                if (workingSet.symbolTable.ContainsKey(exp))
                 {
                     continue;
                 }
@@ -253,11 +233,11 @@ namespace IX.Math
                 object value;
                 if (TryGetNumericValue(exp, ref numericType, out value))
                 {
-                    constants.Add(exp, Expression.Constant(value, numericType));
+                    workingSet.constants.Add(exp, Expression.Constant(value, numericType));
                     continue;
                 }
 
-                externalParameters.Add(exp, Expression.Parameter(numericType, exp));
+                workingSet.externalParams.Add(exp, Expression.Parameter(numericType, exp));
             }
         }
 
@@ -350,32 +330,28 @@ namespace IX.Math
 
         private static Expression GenerateExpression(
             string s,
-            Type numericType,
-            Dictionary<string, RawExpressionContainer> symbolTable,
-            Dictionary<string, ConstantExpression> constants,
-            Dictionary<string, ParameterExpression> externalParameters,
-            WorkingDefinition definition,
-            CancellationToken cancellationToken)
+            WorkingExpressionSet workingSet,
+            WorkingDefinition definition)
         {
             // Check whether expression is constant
             ConstantExpression constantResult;
-            if (constants.TryGetValue(s, out constantResult))
+            if (workingSet.constants.TryGetValue(s, out constantResult))
             {
                 return constantResult;
             }
 
             // Check whether expression is an external parameter
             ParameterExpression parameterResult;
-            if (externalParameters.TryGetValue(s, out parameterResult))
+            if (workingSet.externalParams.TryGetValue(s, out parameterResult))
             {
                 return parameterResult;
             }
 
             // Check whether the expression already exists in the symbols table
             RawExpressionContainer expression;
-            if (symbolTable.TryGetValue(s, out expression))
+            if (workingSet.symbolTable.TryGetValue(s, out expression))
             {
-                return GenerateExpression(expression.Expression, numericType, symbolTable, constants, externalParameters, definition, cancellationToken);
+                return GenerateExpression(expression.Expression, workingSet, definition);
             }
 
             // Check whether the expression is a function call
@@ -383,18 +359,14 @@ namespace IX.Math
             {
                 return GenerateFunctionCallExpression(
                     new RawExpressionContainer { Expression = s }.Expression,
-                    numericType,
-                    symbolTable,
-                    constants,
-                    externalParameters,
-                    definition,
-                    cancellationToken);
+                    workingSet,
+                    definition);
             }
 
             // Check whether the expression is a binary operator
             foreach (string op in definition.BinaryOperatorsInOrder)
             {
-                var exp = ExpressionByBinaryOperator(s, op, numericType, symbolTable, constants, externalParameters, definition, cancellationToken);
+                var exp = ExpressionByBinaryOperator(s, op, workingSet, definition);
                 if (exp != null)
                 {
                     return exp;
@@ -404,7 +376,7 @@ namespace IX.Math
             // Check whether the expression is a unary operator
             foreach (string op in definition.UnaryOperatorsInOrder)
             {
-                var exp = ExpressionByUnaryOperator(s, op, numericType, symbolTable, constants, externalParameters, definition, cancellationToken);
+                var exp = ExpressionByUnaryOperator(s, op, workingSet, definition);
                 if (exp != null)
                 {
                     return exp;
@@ -416,12 +388,8 @@ namespace IX.Math
 
         private static Expression GenerateFunctionCallExpression(
             string expression,
-            Type numericType,
-            Dictionary<string, RawExpressionContainer> symbolTable,
-            Dictionary<string, ConstantExpression> constants,
-            Dictionary<string, ParameterExpression> externalParameters,
-            WorkingDefinition definition,
-            CancellationToken cancellationToken)
+            WorkingExpressionSet workingSet,
+            WorkingDefinition definition)
         {
             Match match = functionSupport.Match(expression);
 
@@ -430,39 +398,25 @@ namespace IX.Math
                 string functionName = match.Groups["functionName"].Value;
                 string expr = match.Groups["expression"].Value;
 
-                var body = GenerateExpression(expr, numericType, symbolTable, constants, externalParameters, definition, cancellationToken);
+                var body = GenerateExpression(expr, workingSet, definition);
 
                 if (body == null)
                 {
                     return null;
                 }
 
-                return GenerateInternalFunctionCallExpression(functionName, body, symbolTable, constants, externalParameters, cancellationToken);
+                return SupportedFunctionsLocator.LoadUnaryFunction(functionName, body);
             }
 
             return null;
         }
 
-        private static Expression GenerateInternalFunctionCallExpression(
-            string functionName,
-            Expression body, Dictionary<string, RawExpressionContainer> symbolTable,
-            Dictionary<string, ConstantExpression> constants,
-            Dictionary<string, ParameterExpression> externalParameters,
-            CancellationToken cancellationToken)
-        {
-            return SupportedFunctionsLocator.LoadUnaryFunction(functionName, body);
-        }
-
         private static Expression ExpressionByBinaryOperator(
             string s, string op,
-            Type numericType,
-            Dictionary<string, RawExpressionContainer> symbolTable,
-            Dictionary<string, ConstantExpression> constants,
-            Dictionary<string, ParameterExpression> externalParameters,
-            WorkingDefinition definition,
-            CancellationToken cancellationToken)
+            WorkingExpressionSet workingSet,
+            WorkingDefinition definition)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            workingSet.cancellationToken.ThrowIfCancellationRequested();
 
             var split = s.Split(new[] { op }, StringSplitOptions.None);
             if (split.Length > 1)
@@ -476,13 +430,13 @@ namespace IX.Math
                     // We are having a binary operator
                     try
                     {
-                        Expression left = GenerateExpression(split[0], numericType, symbolTable, constants, externalParameters, definition, cancellationToken);
+                        Expression left = GenerateExpression(split[0], workingSet, definition);
                         if (left == null)
                         {
                             return null;
                         }
 
-                        Expression right = GenerateExpression(string.Join(op, split.Skip(1).ToArray()), numericType, symbolTable, constants, externalParameters, definition, cancellationToken);
+                        Expression right = GenerateExpression(string.Join(op, split.Skip(1).ToArray()), workingSet, definition);
                         if (right == null)
                         {
                             return null;
@@ -505,27 +459,23 @@ namespace IX.Math
 
         private static Expression ExpressionByUnaryOperator(
             string s, string op,
-            Type numericType,
-            Dictionary<string, RawExpressionContainer> symbolTable,
-            Dictionary<string, ConstantExpression> constants,
-            Dictionary<string, ParameterExpression> externalParameters,
-            WorkingDefinition definition,
-            CancellationToken cancellationToken)
+            WorkingExpressionSet workingSet,
+            WorkingDefinition definition)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            workingSet.cancellationToken.ThrowIfCancellationRequested();
 
             if (s.StartsWith(op))
             {
                 try
                 {
-                    Expression expr = GenerateExpression(s.Substring(op.Length), numericType, symbolTable, constants, externalParameters, definition, cancellationToken);
+                    Expression expr = GenerateExpression(s.Substring(op.Length), workingSet, definition);
                     if (expr == null)
                     {
                         return null;
                     }
 
                     return (definition.UnaryExpressionGenerators[op](
-                        numericType,
+                        workingSet.numericType,
                         expr))
                         .ReduceIfConstantOperation();
                 }

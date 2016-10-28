@@ -144,16 +144,19 @@ namespace IX.Math
         /// </remarks>
         public object ExecuteExpression(string expressionToParse, IDataFinder dataFinder, CancellationToken cancellationToken = default(CancellationToken))
         {
-            IEnumerable<ParameterExpression> externalParameters;
-            Type resultingNumericType;
-            Expression body = ExpressionGenerator.CreateBody(expressionToParse, WorkingConstants.defaultNumericTypeWithFinder, workingDefinition, out externalParameters, out resultingNumericType, cancellationToken);
+            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, cancellationToken)
+            {
+                numericType = WorkingConstants.defaultNumericTypeWithFinder
+            };
+
+            Expression body = ExpressionGenerator.CreateBody(workingSet, workingDefinition);
 
             if (body == null)
             {
                 return expressionToParse;
             }
 
-            if (body is ConstantExpression && !externalParameters.Any())
+            if (body is ConstantExpression && !workingSet.externalParams.Any())
             {
                 return ((ConstantExpression)body).Value;
             }
@@ -163,11 +166,11 @@ namespace IX.Math
                 throw new ArgumentNullException(nameof(dataFinder));
             }
 
-            object[] parameterValues = NumericTypeAide.GetValuesFromFinder(externalParameters.Select(p => new Tuple<string, Type>(p.Name, p.Type)), dataFinder);
+            object[] parameterValues = NumericTypeAide.GetValuesFromFinder(workingSet.externalParams.Select(p => new Tuple<string, Type>(p.Key, p.Value.Type)), dataFinder);
 
             try
             {
-                return Expression.Lambda(body, externalParameters).Compile()?.DynamicInvoke(parameterValues.ToArray()) ?? expressionToParse;
+                return Expression.Lambda(body, workingSet.externalParams.Values).Compile()?.DynamicInvoke(parameterValues.ToArray()) ?? expressionToParse;
             }
             catch (Exception ex)
             {
@@ -175,57 +178,63 @@ namespace IX.Math
             }
         }
 
-        internal Tuple<Delegate, IEnumerable<Tuple<string, Type>>> GenerateDelegateInternal(string expressionToParse, Type numericalType, CancellationToken cancellationToken)
+        internal Tuple<Delegate, IEnumerable<Tuple<string, Type>>> GenerateDelegateInternal(string expressionToParse, Type numericType, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(expressionToParse))
             {
                 return null;
             }
 
-            if (!NumericTypeAide.NumericTypesConversionDictionary.ContainsKey(numericalType))
+            if (!NumericTypeAide.NumericTypesConversionDictionary.ContainsKey(numericType))
             {
                 throw new InvalidOperationException(Resources.NumericTypeInvalid);
             }
 
-            IEnumerable<ParameterExpression> externalParameters;
-            Type resultingNumericType;
-            Expression body = ExpressionGenerator.CreateBody(expressionToParse, numericalType, workingDefinition, out externalParameters, out resultingNumericType, cancellationToken);
+            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, cancellationToken)
+            {
+                numericType = numericType
+            };
+
+            Expression body = ExpressionGenerator.CreateBody(workingSet, workingDefinition);
 
             if (body == null)
             {
                 return null;
             }
 
-            return new Tuple<Delegate, IEnumerable<Tuple<string, Type>>>(Expression.Lambda(body, externalParameters).Compile(), externalParameters.Select(p => new Tuple<string, Type>(p.Name, p.Type)));
+            return new Tuple<Delegate, IEnumerable<Tuple<string, Type>>>(Expression.Lambda(body, workingSet.externalParams.Values).Compile(), workingSet.externalParams.Select(p => new Tuple<string, Type>(p.Key, p.Value.Type)));
 
         }
 
         private object ExecuteExpression(string expressionToParse, Type requestedNumericType, object[] arguments, CancellationToken cancellationToken)
         {
-            Type resultingNumericType;
-            IEnumerable<ParameterExpression> externalParameters;
-            Expression body = ExpressionGenerator.CreateBody(expressionToParse, requestedNumericType, workingDefinition, out externalParameters, out resultingNumericType, cancellationToken);
+            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, cancellationToken)
+            {
+                numericType = requestedNumericType
+            };
+
+            Expression body = ExpressionGenerator.CreateBody(workingSet, workingDefinition);
 
             if (body == null)
             {
                 return expressionToParse;
             }
 
-            if (body is ConstantExpression && !externalParameters.Any())
+            if (body is ConstantExpression && !workingSet.externalParams.Any())
             {
                 return ((ConstantExpression)body).Value;
             }
 
-            object[] convertedArguments = NumericTypeAide.GetProperNumericTypeValues(arguments, resultingNumericType);
+            object[] convertedArguments = NumericTypeAide.GetProperNumericTypeValues(arguments, workingSet.numericType);
 
-            if (externalParameters.Count() != convertedArguments.Length)
+            if (workingSet.externalParams.Count != convertedArguments.Length)
             {
                 return expressionToParse;
             }
 
             try
             {
-                return Expression.Lambda(body, externalParameters).Compile()?.DynamicInvoke(convertedArguments) ?? expressionToParse;
+                return Expression.Lambda(body, workingSet.externalParams.Values).Compile()?.DynamicInvoke(convertedArguments) ?? expressionToParse;
             }
             catch (Exception ex)
             {
