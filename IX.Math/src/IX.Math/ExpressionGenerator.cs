@@ -15,7 +15,7 @@ namespace IX.Math
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
         {
-            workingSet.cancellationToken.ThrowIfCancellationRequested();
+            workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Break by parantheses
 
@@ -24,85 +24,85 @@ namespace IX.Math
             string expression;
             try
             {
-                expression = BreakOneLevel(workingSet.initialExpression, workingSet, definition, ref i);
+                expression = BreakOneLevel(workingSet.InitialExpression, workingSet, definition, ref i);
             }
             catch
             {
                 return;
             }
 
-            workingSet.symbolTable.Add(string.Empty, new RawExpressionContainer { Expression = expression });
+            workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer { Expression = expression });
 
-            workingSet.cancellationToken.ThrowIfCancellationRequested();
+            workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Generating constants and external parameters
             if (expression.Contains(definition.Definition.PowerSymbol))
             {
-                workingSet.numericType = WorkingConstants.defaultNumericTypeWithFinder;
+                workingSet.NumericType = WorkingConstants.defaultNumericTypeWithFinder;
             }
 
-            workingSet.symbolTable.Select(p => p.Value.Expression).ToList().ForEach(p =>
-                PopulateTables(p, workingSet, definition, ref workingSet.numericType));
+            workingSet.SymbolTable.Select(p => p.Value.Expression).ToList().ForEach(p =>
+                PopulateTables(p, workingSet, definition, ref workingSet.NumericType));
 
-            Type numericType = workingSet.numericType;
+            Type numericType = workingSet.NumericType;
 
-            workingSet.cancellationToken.ThrowIfCancellationRequested();
+            workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Change all internal values to the specified type
             Dictionary<string, ConstantExpression> typeChangers = new Dictionary<string, ConstantExpression>();
-            foreach (var c in workingSet.constants.Where(p => p.Value.Type != numericType))
+            foreach (var c in workingSet.Constants.Where(p => p.Value.Type != numericType))
             {
                 typeChangers[c.Key] = Expression.Constant(Convert.ChangeType(c.Value.Value, numericType), numericType);
             }
 
             foreach (var c in typeChangers)
             {
-                workingSet.constants[c.Key] = c.Value;
+                workingSet.Constants[c.Key] = c.Value;
             }
 
-            foreach (var c in workingSet.externalParams.Where(p => p.Value.Type != numericType))
+            foreach (var c in workingSet.ExternalParameters.Where(p => p.Value.Type != numericType))
             {
-                workingSet.externalParams[c.Key] = Expression.Parameter(numericType, c.Value.Name);
+                workingSet.ExternalParameters[c.Key] = Expression.Parameter(numericType, c.Value.Name);
             }
 
-            workingSet.cancellationToken.ThrowIfCancellationRequested();
+            workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Generate expressions
             try
             {
-                workingSet.body = GenerateExpression(workingSet.symbolTable[string.Empty].Expression, workingSet, definition);
+                workingSet.Body = GenerateExpression(workingSet.SymbolTable[string.Empty].Expression, workingSet, definition);
             }
             catch
             {
-                workingSet.body = null;
+                workingSet.Body = null;
             }
 
-            if (workingSet.body == null)
+            if (workingSet.Body == null)
             {
                 return;
             }
 
-            workingSet.cancellationToken.ThrowIfCancellationRequested();
+            workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Reduce expression, if expression is reducible
             int reduceAttempt = 0;
-            while (workingSet.body.CanReduce && reduceAttempt < 30)
+            while (workingSet.Body.CanReduce && reduceAttempt < 30)
             {
-                workingSet.body = workingSet.body.Reduce();
+                workingSet.Body = workingSet.Body.Reduce();
                 reduceAttempt++;
             }
 
             // Set success values and possibly constant values
-            if (workingSet.body is ConstantExpression)
+            if (workingSet.Body is ConstantExpression)
             {
-                if (workingSet.externalParams.Count > 0)
+                if (workingSet.ExternalParameters.Count > 0)
                 {
                     // Cannot have external parameters if the expression is itself constant; something somewhere doesn't make sense
                     return;
                 }
                 else
                 {
-                    workingSet.valueIfConstant = ((ConstantExpression)workingSet.body).Value;
+                    workingSet.ValueIfConstant = ((ConstantExpression)workingSet.Body).Value;
                     workingSet.Constant = true;
                 }
             }
@@ -154,8 +154,8 @@ namespace IX.Math
                                 i++;
                                 string expr2 = $"item{i}";
                                 var rec = new RawExpressionContainer { Expression = $"{expr6}(item{i - 1})" };
-                                workingSet.symbolTable.Add(expr2, rec);
-                                workingSet.reverseSymbolTable.Add(rec.Expression, expr2);
+                                workingSet.SymbolTable.Add(expr2, rec);
+                                workingSet.ReverseSymbolTable.Add(rec.Expression, expr2);
 
                                 if (expr6 == expr4)
                                 {
@@ -211,12 +211,12 @@ namespace IX.Math
             string expr2;
 
             int k = cp + definition.Definition.Parantheses.Item2.Length;
-            if (!workingSet.reverseSymbolTable.TryGetValue(rec.Expression, out expr2))
+            if (!workingSet.ReverseSymbolTable.TryGetValue(rec.Expression, out expr2))
             {
                 i++;
                 expr2 = $"item{i}";
-                workingSet.symbolTable.Add(expr2, rec);
-                workingSet.reverseSymbolTable.Add(rec.Expression, expr2);
+                workingSet.SymbolTable.Add(expr2, rec);
+                workingSet.ReverseSymbolTable.Add(rec.Expression, expr2);
             }
 
             return $"{expr2}{(source.Length == k ? string.Empty : source.Substring(k))}";
@@ -231,17 +231,17 @@ namespace IX.Math
 
             foreach (var exp in expressions)
             {
-                if (workingSet.constants.ContainsKey(exp))
+                if (workingSet.Constants.ContainsKey(exp))
                 {
                     continue;
                 }
 
-                if (workingSet.externalParams.ContainsKey(exp))
+                if (workingSet.ExternalParameters.ContainsKey(exp))
                 {
                     continue;
                 }
 
-                if (workingSet.symbolTable.ContainsKey(exp))
+                if (workingSet.SymbolTable.ContainsKey(exp))
                 {
                     continue;
                 }
@@ -255,11 +255,11 @@ namespace IX.Math
                 object value;
                 if (TryGetNumericValue(exp, ref numericType, out value))
                 {
-                    workingSet.constants.Add(exp, Expression.Constant(value, numericType));
+                    workingSet.Constants.Add(exp, Expression.Constant(value, numericType));
                     continue;
                 }
 
-                workingSet.externalParams.Add(exp, Expression.Parameter(numericType, exp));
+                workingSet.ExternalParameters.Add(exp, Expression.Parameter(numericType, exp));
             }
         }
 
@@ -357,21 +357,21 @@ namespace IX.Math
         {
             // Check whether expression is constant
             ConstantExpression constantResult;
-            if (workingSet.constants.TryGetValue(s, out constantResult))
+            if (workingSet.Constants.TryGetValue(s, out constantResult))
             {
                 return constantResult;
             }
 
             // Check whether expression is an external parameter
             ParameterExpression parameterResult;
-            if (workingSet.externalParams.TryGetValue(s, out parameterResult))
+            if (workingSet.ExternalParameters.TryGetValue(s, out parameterResult))
             {
                 return parameterResult;
             }
 
             // Check whether the expression already exists in the symbols table
             RawExpressionContainer expression;
-            if (workingSet.symbolTable.TryGetValue(s, out expression))
+            if (workingSet.SymbolTable.TryGetValue(s, out expression))
             {
                 return GenerateExpression(expression.Expression, workingSet, definition);
             }
@@ -438,7 +438,7 @@ namespace IX.Math
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
         {
-            workingSet.cancellationToken.ThrowIfCancellationRequested();
+            workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             var split = s.Split(new[] { op }, StringSplitOptions.None);
             if (split.Length > 1)
@@ -484,7 +484,7 @@ namespace IX.Math
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
         {
-            workingSet.cancellationToken.ThrowIfCancellationRequested();
+            workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             if (s.StartsWith(op))
             {
@@ -497,7 +497,7 @@ namespace IX.Math
                     }
 
                     return (definition.UnaryExpressionGenerators[op](
-                        workingSet.numericType,
+                        workingSet.NumericType,
                         expr))
                         .ReduceIfConstantOperation();
                 }
