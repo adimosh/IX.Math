@@ -60,6 +60,15 @@ namespace IX.Math {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to The requested function cannot be called with the specified operands, either because their number doesn&apos;t match the required number of operands, or because they have mismatched types..
+        /// </summary>
+        public static string FunctionCallNotValid {
+            get {
+                return ResourceManager.GetString("FunctionCallNotValid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to The expression is either not logically sound, internally valid or its invocation was done with incorrect data..
         /// </summary>
         public static string NotValidInternally {

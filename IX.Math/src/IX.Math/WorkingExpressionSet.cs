@@ -15,7 +15,7 @@ namespace IX.Math
             Constants = new Dictionary<string, ConstantExpression>();
             NumericType = WorkingConstants.defaultNumericType;
             InitialExpression = expression;
-            this.CancellationToken = cancellationToken;
+            CancellationToken = cancellationToken;
         }
 
         internal Dictionary<string, RawExpressionContainer> SymbolTable;
