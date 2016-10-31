@@ -129,4 +129,7 @@
   <data name="NumericTypeMismatched" xml:space="preserve">
     <value>The requested numerical type is mismatched considering the given arguments.</value>
   </data>
+  <data name="OperandMismatchInFunctionCall" xml:space="preserve">
+    <value>The operands required for this function call are mismatched with the given operand expressions.</value>
+  </data>
 </root>

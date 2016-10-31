@@ -340,12 +340,14 @@ namespace IX.Math
 
                 var body = GenerateExpression(expr, workingSet, definition);
 
-                if (body == null)
+                if (body != null)
                 {
-                    return null;
+                    SupportedFunction sf;
+                    if (SupportedFunctionsLocator.builtInSupportedFunctions.TryGetValue(functionName, out sf))
+                    {
+                        return sf.GenerateExpression(body);
+                    }
                 }
-
-                return SupportedFunctionsLocator.LoadUnaryFunction(functionName, body);
             }
 
             return null;

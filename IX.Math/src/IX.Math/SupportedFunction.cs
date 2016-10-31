@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace IX.Math
 {
@@ -40,7 +37,7 @@ namespace IX.Math
         /// <para>The expression operands that are not of a predictable type (such as <see cref="ConstantExpression"/> or <see cref="ParameterExpression"/>) are not
         /// checked in any way. This might lead to an expression that is inconsistent.</para>
         /// </remarks>
-        public Expression GenerateExpression(Expression[] operandExpressions)
+        public Expression GenerateExpression(params Expression[] operandExpressions)
         {
             SupportedValueType[] operandTypes = OperandTypes;
 

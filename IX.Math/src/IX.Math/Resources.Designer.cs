@@ -94,5 +94,14 @@ namespace IX.Math {
                 return ResourceManager.GetString("NumericTypeMismatched", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to The operands required for this function call are mismatched with the given operand expressions..
+        /// </summary>
+        public static string OperandMismatchInFunctionCall {
+            get {
+                return ResourceManager.GetString("OperandMismatchInFunctionCall", resourceCulture);
+            }
+        }
     }
 }

@@ -1,94 +1,38 @@
-﻿using IX.Math.PlatformMitigation;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
+﻿using IX.Math.SupportedFunctions;
+using System.Collections.Generic;
 
 namespace IX.Math
 {
-    internal class SupportedFunctionsLocator
+    internal static class SupportedFunctionsLocator
     {
-        internal static Expression LoadUnaryFunction(string functionName, Expression body)
+        internal static Dictionary<string, SupportedFunction> builtInSupportedFunctions;
+
+        static SupportedFunctionsLocator()
         {
-            MethodInfo method;
-            switch (functionName)
+            builtInSupportedFunctions = new Dictionary<string, SupportedFunction>
             {
-                case "abs":
-                    method = LoadMathMethod(nameof(System.Math.Abs));
-                    break;
-                case "acos":
-                    method = LoadMathMethod(nameof(System.Math.Acos));
-                    break;
-                case "asin":
-                    method = LoadMathMethod(nameof(System.Math.Asin));
-                    break;
-                case "atan":
-                    method = LoadMathMethod(nameof(System.Math.Atan));
-                    break;
-                case "ceiling":
-                    method = LoadMathMethod(nameof(System.Math.Ceiling));
-                    break;
-                case "cos":
-                    method = LoadMathMethod(nameof(System.Math.Cos));
-                    break;
-                case "cosh":
-                    method = LoadMathMethod(nameof(System.Math.Cosh));
-                    break;
-                case "exp":
-                    method = LoadMathMethod(nameof(System.Math.Exp));
-                    break;
-                case "floor":
-                    method = LoadMathMethod(nameof(System.Math.Floor));
-                    break;
-                case "ln":
-                    method = LoadMathMethod(nameof(System.Math.Log));
-                    break;
-                case "lg":
-                    method = LoadMathMethod(nameof(System.Math.Log10));
-                    break;
-                case "round":
-                    method = LoadMathMethod(nameof(System.Math.Round));
-                    break;
-                case "sin":
-                    method = LoadMathMethod(nameof(System.Math.Sin));
-                    break;
-                case "sinh":
-                    method = LoadMathMethod(nameof(System.Math.Sinh));
-                    break;
-                case "sqrt":
-                    method = LoadMathMethod(nameof(System.Math.Sqrt));
-                    break;
-                case "tan":
-                    method = LoadMathMethod(nameof(System.Math.Tan));
-                    break;
-                case "tanh":
-                    method = LoadMathMethod(nameof(System.Math.Tanh));
-                    break;
-                case "trun":
-                    method = LoadMathMethod(nameof(System.Math.Truncate));
-                    break;
-                default:
-                    return null;
-            }
-
-            if (method == null)
-                return null;
-            return Expression.Call(method, body);
-        }
-
-        private static MethodInfo LoadMathMethod(string methodName)
-        {
-            return typeof(System.Math).GetTypeMethods().SingleOrDefault(p =>
-            {
-                if (p.Name != methodName)
-                    return false;
-
-                var pars = p.GetParameters();
-
-                if (pars == null || pars.Length != 1)
-                    return false;
-
-                return p.ReturnType == typeof(double) && pars[0].ParameterType == typeof(double);
-            });
+                ["abs"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Abs)),
+                ["acos"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Acos)),
+                ["asin"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Asin)),
+                ["atan"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Atan)),
+                ["ceiling"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Ceiling)),
+                ["cos"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Cos)),
+                ["cosh"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Cosh)),
+                ["exp"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Exp)),
+                ["floor"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Floor)),
+                ["ln"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Log)),
+                ["lg"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Log10)),
+                ["round"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Round)),
+                ["sin"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Sin)),
+                ["sinh"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Sinh)),
+                ["sqrt"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Sqrt)),
+                ["tan"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Tan)),
+                ["tanh"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Tanh)),
+                ["trun"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Truncate)),
+                ["abs"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Abs)),
+                ["abs"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Abs)),
+                ["abs"] = new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Abs)),
+            };
         }
     }
 }
