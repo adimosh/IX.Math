@@ -69,6 +69,11 @@ namespace IX.Math.UnitTests
                     "212=String again",
                     "212=String again"
                 },
+                new object[]
+                {
+                    "0x10+26",
+                    42
+                }
             };
         }
     }

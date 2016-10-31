@@ -22,7 +22,9 @@ namespace IX.Math.UnitTests
             }
 
             if (del == null)
+            {
                 throw new InvalidOperationException("No delegate was generated!");
+            }
 
             object result;
             try

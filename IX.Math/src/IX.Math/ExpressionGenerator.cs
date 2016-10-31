@@ -1,4 +1,5 @@
 ﻿using IX.Math.PlatformMitigation;
+using IX.Math.SimplificationAide;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -253,100 +254,13 @@ namespace IX.Math
                 }
 
                 object value;
-                if (TryGetNumericValue(exp, ref numericType, out value))
+                if (NumericTypeParsingAide.Parse(exp, ref numericType, out value))
                 {
                     workingSet.Constants.Add(exp, Expression.Constant(value, numericType));
                     continue;
                 }
 
                 workingSet.ExternalParameters.Add(exp, Expression.Parameter(numericType, exp));
-            }
-        }
-
-        private static bool TryGetNumericValue(string s, ref Type numericType, out object value)
-        {
-            Type workingNumericType = numericType;
-            object result = null;
-
-            try
-            {
-                if (workingNumericType == typeof(short))
-                {
-                    short shortVal;
-                    if (short.TryParse(s, out shortVal))
-                    {
-                        result = shortVal;
-                        return true;
-                    }
-                    else
-                    {
-                        workingNumericType = typeof(int);
-                    }
-                }
-
-                if (workingNumericType == typeof(int))
-                {
-                    int intVal;
-                    if (int.TryParse(s, out intVal))
-                    {
-                        result = intVal;
-                        return true;
-                    }
-                    else
-                    {
-                        workingNumericType = typeof(long);
-                    }
-                }
-
-                if (workingNumericType == typeof(long))
-                {
-                    long longVal;
-                    if (long.TryParse(s, out longVal))
-                    {
-                        result = longVal;
-                        return true;
-                    }
-                    else
-                    {
-                        workingNumericType = typeof(float);
-                    }
-                }
-
-                if (workingNumericType == typeof(float))
-                {
-                    float floatVal;
-                    if (float.TryParse(s, out floatVal))
-                    {
-                        result = floatVal;
-                        return true;
-                    }
-                    else
-                    {
-                        workingNumericType = typeof(double);
-                    }
-                }
-
-                if (workingNumericType == typeof(double))
-                {
-                    double doubleVal;
-                    if (double.TryParse(s, out doubleVal))
-                    {
-                        result = doubleVal;
-                        return true;
-                    }
-                }
-
-                value = null;
-                return false;
-            }
-            finally
-            {
-                if (workingNumericType != numericType && result != null)
-                {
-                    numericType = workingNumericType;
-                }
-
-                value = result;
             }
         }
 
