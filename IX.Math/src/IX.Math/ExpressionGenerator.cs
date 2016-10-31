@@ -107,6 +107,10 @@ namespace IX.Math
                     workingSet.Constant = true;
                 }
             }
+            else if (workingSet.Body is ParameterExpression)
+            {
+                workingSet.PossibleString = true;
+            }
 
             workingSet.InternallyValid = true;
             workingSet.Success = true;

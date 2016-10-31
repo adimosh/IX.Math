@@ -32,5 +32,6 @@ namespace IX.Math
         internal bool Success = false;
         internal bool InternallyValid = false;
         internal bool Constant = false;
+        internal bool PossibleString = false;
     }
 }

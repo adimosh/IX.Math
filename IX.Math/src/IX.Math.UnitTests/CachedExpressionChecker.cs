@@ -16,6 +16,9 @@ namespace IX.Math.UnitTests
             Mock<IDataFinder> dfMock = new Mock<IDataFinder>(MockBehavior.Strict);
             string input = "This is fine";
 
+            object dontCare;
+            dfMock.Setup(p => p.TryGetData(It.Is<string>(q => q == "Thisisfine"), out dontCare)).Returns(false);
+
             using (CachedExpressionParsingService service = new CachedExpressionParsingService())
             {
                 object result = service.ExecuteExpression(input, dfMock.Object);
