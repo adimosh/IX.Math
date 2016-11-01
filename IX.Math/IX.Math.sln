@@ -12,7 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "IX.Math", "src\IX.Math\IX.Math.xproj", "{5159F238-D854-4D1D-A494-1213F57D55DA}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "IX.Math.UnitTests", "src\IX.Math.UnitTests\IX.Math.UnitTests.xproj", "{A7FB3107-43F7-4486-97D5-CE123AC8C20F}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "IX.Math.UnitTests", "test\IX.Math.UnitTests\IX.Math.UnitTests.xproj", "{A7FB3107-43F7-4486-97D5-CE123AC8C20F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{5015DD7D-51D9-4F7E-869B-21FF015C06B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,7 +36,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5159F238-D854-4D1D-A494-1213F57D55DA} = {32A0E219-634F-419A-A9CF-CFE08E05E496}
-		{A7FB3107-43F7-4486-97D5-CE123AC8C20F} = {32A0E219-634F-419A-A9CF-CFE08E05E496}
+		{A7FB3107-43F7-4486-97D5-CE123AC8C20F} = {5015DD7D-51D9-4F7E-869B-21FF015C06B6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		RESX_PrefixTranslations = False
