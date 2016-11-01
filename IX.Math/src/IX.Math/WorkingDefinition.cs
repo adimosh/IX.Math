@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IX.Math.BuiltIn;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
@@ -90,6 +91,23 @@ namespace IX.Math
                 [definition.NotSymbol] = (type, expr) => Expression.Negate(expr)
             };
 
+            // New expression tree implementation
+            NumericBinaryOperators = new Dictionary<string, ExpressionTreeNodeBase>
+            {
+                [definition.AddSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Add),
+                [definition.DivideSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Divide),
+                [definition.MultiplySymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Multiply),
+                [definition.SubtractSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Subtract),
+                [definition.AndSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.And),
+                [definition.OrSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Or),
+                [definition.XorSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.ExclusiveOr),
+                [definition.DoesNotEqualSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.NotEqual),
+                [definition.EqualsSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.Equal),
+                [definition.GreaterThanOrEqualSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThanOrEqual),
+                [definition.GreaterThanSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThan),
+                [definition.LessThanOrEqualSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThanOrEqual),
+                [definition.LessThanSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThan),
+            };
         }
 
         internal readonly MathDefinition Definition;
@@ -100,5 +118,8 @@ namespace IX.Math
         internal readonly string[] AllOperatorsInOrder;
         internal readonly Dictionary<string, Func<Expression, Expression, Expression>> BinaryExpressionGenerators;
         internal readonly Dictionary<string, Func<Type, Expression, Expression>> UnaryExpressionGenerators;
+
+        // New expression tree implementation
+        internal readonly Dictionary<string, ExpressionTreeNodeBase> NumericBinaryOperators;
     }
 }

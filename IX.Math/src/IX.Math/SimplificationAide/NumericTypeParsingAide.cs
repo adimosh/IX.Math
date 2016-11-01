@@ -53,21 +53,6 @@ namespace IX.Math.SimplificationAide
                 }
                 else
                 {
-                    tempNumericType = typeof(uint);
-                }
-            }
-
-            if (tempNumericType == typeof(uint))
-            {
-                uint intVal;
-                if (uint.TryParse(expression, UnsignedIntegerNumberStyle, formatProvider, out intVal))
-                {
-                    numericType = tempNumericType;
-                    result = intVal;
-                    return true;
-                }
-                else
-                {
                     tempNumericType = typeof(long);
                 }
             }
@@ -76,21 +61,6 @@ namespace IX.Math.SimplificationAide
             {
                 long intVal;
                 if (long.TryParse(expression, IntegerNumberStyle, formatProvider, out intVal))
-                {
-                    numericType = tempNumericType;
-                    result = intVal;
-                    return true;
-                }
-                else
-                {
-                    tempNumericType = typeof(ulong);
-                }
-            }
-
-            if (tempNumericType == typeof(ulong))
-            {
-                ulong intVal;
-                if (ulong.TryParse(expression, UnsignedIntegerNumberStyle, formatProvider, out intVal))
                 {
                     numericType = tempNumericType;
                     result = intVal;
@@ -147,21 +117,6 @@ namespace IX.Math.SimplificationAide
                 }
                 else
                 {
-                    tempNumericType = typeof(uint);
-                }
-            }
-
-            if (tempNumericType == typeof(uint))
-            {
-                uint intVal;
-                if (uint.TryParse(expression, HexNumberStyle, formatProvider, out intVal))
-                {
-                    numericType = tempNumericType;
-                    result = intVal;
-                    return true;
-                }
-                else
-                {
                     tempNumericType = typeof(long);
                 }
             }
@@ -174,25 +129,6 @@ namespace IX.Math.SimplificationAide
                     numericType = tempNumericType;
                     result = intVal;
                     return true;
-                }
-                else
-                {
-                    tempNumericType = typeof(ulong);
-                }
-            }
-
-            if (tempNumericType == typeof(ulong))
-            {
-                ulong intVal;
-                if (ulong.TryParse(expression, HexNumberStyle, formatProvider, out intVal))
-                {
-                    numericType = tempNumericType;
-                    result = intVal;
-                    return true;
-                }
-                else
-                {
-                    tempNumericType = typeof(float);
                 }
             }
 

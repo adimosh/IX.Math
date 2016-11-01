@@ -8,19 +8,19 @@ namespace IX.Math
     /// <summary>
     /// A container base class for an expression tree item.
     /// </summary>
-    public abstract class ExpressionTreeContainer
+    public abstract class ExpressionTreeNodeBase
     {
         private readonly Type minimalRequiredNumericType;
         private readonly int minimalRequiredNumericTypeValue;
 
         private bool operandsSet;
 
-        private ExpressionTreeContainer[] operands;
+        private ExpressionTreeNodeBase[] operands;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExpressionTreeContainer"/> class.
+        /// Initializes a new instance of the <see cref="ExpressionTreeNodeBase"/> class.
         /// </summary>
-        protected ExpressionTreeContainer(Type minimalRequiredNumericType)
+        protected ExpressionTreeNodeBase(Type minimalRequiredNumericType)
         {
             if (minimalRequiredNumericType == null)
             {
@@ -36,25 +36,31 @@ namespace IX.Math
         }
 
         /// <summary>
-        /// The return type.
+        /// Gets the return type.
         /// </summary>
         public abstract SupportedValueType ReturnType { get; }
 
         /// <summary>
-        /// The type of the operands that this function accepts.
+        /// Gets the type of the operands that this function accepts.
         /// </summary>
         public abstract SupportedValueType[] OperandTypes { get; }
 
         /// <summary>
         /// Gets the actual type of numeric data that is required for this function to work.
         /// </summary>
-        public abstract Type ActualMinimalNumericTypeRequired { get; }
+        public Type ActualMinimalNumericTypeRequired
+        {
+            get
+            {
+                return minimalRequiredNumericType;
+            }
+        }
 
         /// <summary>
         /// Sets the operands to use in the expression.
         /// </summary>
         /// <param name="operandExpressions"></param>
-        public void SetOperands(params ExpressionTreeContainer[] operandExpressions)
+        public void SetOperands(params ExpressionTreeNodeBase[] operandExpressions)
         {
             if (operandExpressions == null)
             {
@@ -136,7 +142,7 @@ namespace IX.Math
                 minimalNumericType = computedNumericType;
             }
 
-            return GenerateExpressionWithOperands(operands.Select(p => p.GenerateExpression(minimalNumericType)).ToArray(), minimalNumericType);
+            return GenerateExpressionWithOperands(operands, minimalNumericType);
         }
 
         /// <summary>
@@ -147,7 +153,7 @@ namespace IX.Math
         {
             int computedNumericType = ComputeResultingNumericTypeValue();
 
-            return GenerateExpressionWithOperands(operands.Select(p => p.GenerateExpression(computedNumericType)).ToArray(), computedNumericType);
+            return GenerateExpressionWithOperands(operands, computedNumericType);
         }
 
         /// <summary>
@@ -156,6 +162,6 @@ namespace IX.Math
         /// <param name="operandExpressions">The expressions for the operands.</param>
         /// <param name="numericTypeValue">The numeric type value to use.</param>
         /// <returns>The resulting <see cref="Expression"/>.</returns>
-        protected abstract Expression GenerateExpressionWithOperands(Expression[] operandExpressions, int numericTypeValue);
+        protected abstract Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue);
     }
 }

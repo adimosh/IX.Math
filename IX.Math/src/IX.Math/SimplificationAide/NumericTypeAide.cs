@@ -14,17 +14,10 @@ namespace IX.Math.SimplificationAide
         {
             NumericTypesConversionDictionary = new Dictionary<Type, int>
             {
-                [typeof(sbyte)] = 1,
-                [typeof(byte)] = 2,
-                [typeof(char)] = 3,
-                [typeof(short)] = 4,
-                [typeof(ushort)] = 5,
-                [typeof(int)] = 6,
-                [typeof(uint)] = 7,
-                [typeof(long)] = 8,
-                [typeof(ulong)] = 9,
-                [typeof(float)] = 10,
-                [typeof(double)] = 11,
+                [typeof(int)] = 1,
+                [typeof(long)] = 2,
+                [typeof(float)] = 3,
+                [typeof(double)] = 4,
             };
 
             InverseNumericTypesConversionDictionary = NumericTypesConversionDictionary.ToDictionary(p => p.Value, p => p.Key);

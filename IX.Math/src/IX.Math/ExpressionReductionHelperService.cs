@@ -9,6 +9,22 @@ namespace IX.Math
 {
     internal static class ExpressionReductionHelperService
     {
+        internal static Expression ReduceIfConstantOperation(this Expression operationExpression, Type numericType)
+        {
+            if (operationExpression is BinaryExpression)
+            {
+                return ReduceBinaryExpression((BinaryExpression)operationExpression, numericType);
+            }
+            else if (operationExpression is UnaryExpression)
+            {
+                return ReduceUnaryExpression((UnaryExpression)operationExpression);
+            }
+            else
+            {
+                return operationExpression;
+            }
+        }
+
         internal static Expression ReduceIfConstantOperation(this Expression operationExpression)
         {
             if (operationExpression is BinaryExpression)
@@ -25,7 +41,7 @@ namespace IX.Math
             }
         }
 
-        private static Expression ReduceBinaryExpression(BinaryExpression operationExpression)
+        private static Expression ReduceBinaryExpression(BinaryExpression operationExpression, Type numericType = null)
         {
             var expLeft = operationExpression.Left;
 
@@ -49,29 +65,29 @@ namespace IX.Math
             var leftConstant = (ConstantExpression)expLeft;
             var rightConstant = (ConstantExpression)expRight;
 
-            if (leftConstant.Type != rightConstant.Type)
+            if (numericType == null)
             {
-                return operationExpression;
+                numericType = leftConstant.Type;
             }
 
             object result;
 
-            MethodInfo mi = TryCalculateBinaryDirect(leftConstant.Type, operationExpression.NodeType);
+            MethodInfo mi = TryCalculateBinaryDirect(numericType, operationExpression.NodeType);
 
             if (mi == null)
             {
-                mi = GetProperOperator(leftConstant.Type, operationExpression.NodeType);
+                mi = GetProperOperator(numericType, operationExpression.NodeType);
             }
 
             if (mi != null)
             {
                 if (mi.IsStatic)
                 {
-                    result = mi.Invoke(null, new[] { leftConstant.Value, rightConstant.Value });
+                    result = mi.Invoke(null, new[] { Convert.ChangeType(leftConstant.Value, numericType), Convert.ChangeType(rightConstant.Value, numericType) });
                 }
                 else
                 {
-                    result = mi.Invoke(leftConstant.Value, new[] { rightConstant.Value });
+                    result = mi.Invoke(Convert.ChangeType(leftConstant.Value, numericType), new[] { Convert.ChangeType(rightConstant.Value, numericType) });
                 }
 
                 return Expression.Constant(result, result.GetType());
