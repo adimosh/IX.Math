@@ -1,4 +1,5 @@
-﻿using IX.Math.PlatformMitigation;
+﻿using IX.Math.BuiltIn;
+using IX.Math.PlatformMitigation;
 using IX.Math.SimplificationAide;
 using System;
 using System.Collections.Generic;
@@ -289,7 +290,7 @@ namespace IX.Math
             WorkingDefinition definition)
         {
             // Check whether expression is special symbol
-            SpecialSymbol ss;
+            ExpressionTreeNodeMathematicSpecialSymbol ss;
             if (s.StartsWith(definition.Definition.SpecialSymbolIndicators.Item1) && s.EndsWith(definition.Definition.SpecialSymbolIndicators.Item2))
             {
                 string actualSymbol;
