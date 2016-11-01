@@ -222,7 +222,7 @@ namespace IX.Math.SimplificationAide
         /// <returns>The result.</returns>
         public static int LeftShift(int left, int right)
         {
-            return left << (int)Convert.ChangeType(right, typeof(int));
+            return left << right;
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace IX.Math.SimplificationAide
         /// <returns>The result.</returns>
         public static long LeftShift(long left, long right)
         {
-            return left << (int)Convert.ChangeType(right, typeof(int));
+            return left << (right > int.MaxValue ? int.MaxValue : (int)right);
         }
         #endregion
 
@@ -246,7 +246,7 @@ namespace IX.Math.SimplificationAide
         /// <returns>The result.</returns>
         public static int RightShift(int left, int right)
         {
-            return left >> (int)Convert.ChangeType(right, typeof(int));
+            return left >> right;
         }
 
         /// <summary>
@@ -257,7 +257,7 @@ namespace IX.Math.SimplificationAide
         /// <returns>The result.</returns>
         public static long RightShift(long left, long right)
         {
-            return left >> (int)Convert.ChangeType(right, typeof(int));
+            return left >> (right > int.MaxValue ? int.MaxValue : (int)right);
         }
         #endregion
 

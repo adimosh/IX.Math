@@ -101,12 +101,23 @@ namespace IX.Math
                 [definition.AndSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.And),
                 [definition.OrSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Or),
                 [definition.XorSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.ExclusiveOr),
+                [definition.ShiftLeftSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.LeftShift),
+                [definition.ShiftRightSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.RightShift),
+                [definition.PowerSymbol] = new ExpressionTreeNodeNumericBinaryOperator(),
                 [definition.DoesNotEqualSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.NotEqual),
                 [definition.EqualsSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.Equal),
                 [definition.GreaterThanOrEqualSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThanOrEqual),
                 [definition.GreaterThanSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThan),
                 [definition.LessThanOrEqualSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThanOrEqual),
                 [definition.LessThanSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThan),
+            };
+            BooleanBinaryOperators = new Dictionary<string, ExpressionTreeNodeBase>
+            {
+                [definition.AndSymbol] = new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.And),
+                [definition.OrSymbol] = new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.Or),
+                [definition.XorSymbol] = new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.ExclusiveOr),
+                [definition.DoesNotEqualSymbol] = new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.NotEqual),
+                [definition.EqualsSymbol] = new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.Equal),
             };
         }
 
@@ -121,5 +132,6 @@ namespace IX.Math
 
         // New expression tree implementation
         internal readonly Dictionary<string, ExpressionTreeNodeBase> NumericBinaryOperators;
+        internal readonly Dictionary<string, ExpressionTreeNodeBase> BooleanBinaryOperators;
     }
 }

@@ -15,6 +15,12 @@ namespace IX.Math.BuiltIn
             this.type = type;
         }
 
+        public ExpressionTreeNodeNumericBinaryOperator()
+            : base(typeof(double))
+        {
+            type = ExpressionType.Power;
+        }
+
         public override SupportedValueType[] OperandTypes
         {
             get

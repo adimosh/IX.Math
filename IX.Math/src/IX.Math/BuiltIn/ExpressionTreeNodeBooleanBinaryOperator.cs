@@ -1,10 +1,7 @@
 ﻿using IX.Math.PlatformMitigation;
 using IX.Math.SimplificationAide;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace IX.Math.BuiltIn
 {
