@@ -60,18 +60,18 @@ namespace IX.Math
         /// Sets the operands to use in the expression.
         /// </summary>
         /// <param name="operandExpressions"></param>
-        public void SetOperands(params ExpressionTreeNodeBase[] operandExpressions)
+        public ExpressionTreeNodeBase SetOperands(params ExpressionTreeNodeBase[] operandExpressions)
         {
             if (operandExpressions == null)
             {
-                throw new ArgumentNullException(nameof(operandExpressions));
+                return null;
             }
 
             SupportedValueType[] operandTypes = OperandTypes;
 
             if (operandTypes.Length != operandExpressions.Length)
             {
-                throw new FunctionCallNotValidLogicallyException();
+                return null;
             }
 
             for (int i = 0; i < operandTypes.Length; i++)
@@ -89,18 +89,29 @@ namespace IX.Math
                 // Although a specific type is required, it cannot be readily evaluated
                 if (operandExpression.ReturnType == SupportedValueType.Unknown)
                 {
+                    if (operandExpression is BuiltIn.ExpressionTreeNodeParameter)
+                    {
+                        if (!((BuiltIn.ExpressionTreeNodeParameter)operandExpression).SetConcreteParameterType(requiredType))
+                        {
+                            // The parameter has already been set to something that is incompatible with this
+                            return null;
+                        }
+                    }
+
                     continue;
                 }
 
                 // Operand is of a totally different type
                 if (operandExpression.ReturnType != requiredType)
                 {
-                    throw new FunctionCallNotValidLogicallyException();
+                    return null;
                 }
             }
 
             operands = operandExpressions;
             operandsSet = true;
+
+            return this;
         }
 
         /// <summary>

@@ -42,5 +42,27 @@ namespace IX.Math.PlatformMitigation
                 return true;
             });
         }
+
+        internal static MethodInfo GetTypeMethod(this Type type, string name, Type returnType, Type[] parameters)
+        {
+            return type.GetTypeMethods().SingleOrDefault(p =>
+            {
+                if (p.Name != name || p.ReturnType != returnType)
+                    return false;
+
+                var pars = p.GetParameters();
+
+                if (pars.Length != parameters.Length)
+                    return false;
+
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    if (pars[i].ParameterType != parameters[i])
+                        return false;
+                }
+
+                return true;
+            });
+        }
     }
 }

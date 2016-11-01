@@ -145,10 +145,7 @@ namespace IX.Math
         /// </remarks>
         public object ExecuteExpression(string expressionToParse, IDataFinder dataFinder, CancellationToken cancellationToken = default(CancellationToken))
         {
-            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, cancellationToken)
-            {
-                NumericType = WorkingConstants.defaultNumericTypeWithFinder
-            };
+            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, cancellationToken);
 
             ExpressionGenerator.CreateBody(workingSet, workingDefinition);
 
@@ -167,11 +164,22 @@ namespace IX.Math
                 throw new ArgumentNullException(nameof(dataFinder));
             }
 
-            object[] parameterValues = NumericTypeAide.GetValuesFromFinder(workingSet.ExternalParameters.Select(p => new Tuple<string, Type>(p.Key, p.Value.Type)), dataFinder);
+            int numericTypeValue = NumericTypeAide.NumericTypesConversionDictionary[WorkingConstants.defaultNumericTypeWithFinder];
+
+            object[] parameterValues = NumericTypeAide.GetValuesFromFinder(
+                workingSet.ExternalParameters.Select(p => new Tuple<string, Type>(p.Key, p.Value.GetConcreteType(numericTypeValue))), dataFinder);
 
             try
             {
-                return Expression.Lambda(workingSet.Body, workingSet.ExternalParameters.Values).Compile()?.DynamicInvoke(parameterValues.ToArray()) ?? expressionToParse;
+                var body = workingSet.Body.GenerateExpression();
+
+                if (body == null)
+                {
+                    return expressionToParse;
+                }
+
+                return Expression.Lambda(body, workingSet.ExternalParameters.Values.Select(p => (ParameterExpression)p.GenerateExpression(numericTypeValue)))
+                    .Compile()?.DynamicInvoke(parameterValues.ToArray()) ?? expressionToParse;
             }
             catch (Exception ex)
             {
@@ -186,15 +194,13 @@ namespace IX.Math
                 return null;
             }
 
-            if (!NumericTypeAide.NumericTypesConversionDictionary.ContainsKey(numericType))
+            int numericTypeValue;
+            if (!NumericTypeAide.NumericTypesConversionDictionary.TryGetValue(numericType, out numericTypeValue))
             {
                 throw new InvalidOperationException(Resources.NumericTypeInvalid);
             }
 
-            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, cancellationToken)
-            {
-                NumericType = numericType
-            };
+            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, cancellationToken);
 
             ExpressionGenerator.CreateBody(workingSet, workingDefinition);
 
@@ -203,16 +209,28 @@ namespace IX.Math
                 return null;
             }
 
-            return new Tuple<Delegate, IEnumerable<Tuple<string, Type>>>(Expression.Lambda(workingSet.Body, workingSet.ExternalParameters.Values).Compile(), workingSet.ExternalParameters.Select(p => new Tuple<string, Type>(p.Key, p.Value.Type)));
+            try
+            {
+                var body = workingSet.Body.GenerateExpression(numericTypeValue);
 
+                if (body == null)
+                {
+                    return null;
+                }
+
+                return new Tuple<Delegate, IEnumerable<Tuple<string, Type>>>(
+                    Expression.Lambda(body, workingSet.ExternalParameters.Values.Select(p => ((ParameterExpression)p.GenerateExpression(numericTypeValue))))
+                        .Compile(), workingSet.ExternalParameters.Select(p => new Tuple<string, Type>(p.Key, p.Value.GetConcreteType(numericTypeValue))));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         private object ExecuteExpression(string expressionToParse, Type requestedNumericType, object[] arguments, CancellationToken cancellationToken)
         {
-            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, cancellationToken)
-            {
-                NumericType = requestedNumericType
-            };
+            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, cancellationToken);
 
             ExpressionGenerator.CreateBody(workingSet, workingDefinition);
 
@@ -226,7 +244,15 @@ namespace IX.Math
                 return workingSet.ValueIfConstant;
             }
 
-            object[] convertedArguments = NumericTypeAide.GetProperNumericTypeValues(arguments, workingSet.NumericType);
+            int bodyTypeValue = workingSet.Body.ComputeResultingNumericTypeValue();
+            int reqTypeValue = NumericTypeAide.NumericTypesConversionDictionary[requestedNumericType];
+
+            if (bodyTypeValue > reqTypeValue)
+            {
+                reqTypeValue = bodyTypeValue;
+            }
+
+            object[] convertedArguments = NumericTypeAide.GetProperNumericTypeValues(arguments, NumericTypeAide.InverseNumericTypesConversionDictionary[reqTypeValue]);
 
             if (workingSet.ExternalParameters.Count != convertedArguments.Length)
             {
@@ -235,7 +261,15 @@ namespace IX.Math
 
             try
             {
-                return Expression.Lambda(workingSet.Body, workingSet.ExternalParameters.Values).Compile()?.DynamicInvoke(convertedArguments) ?? expressionToParse;
+                var body = workingSet.Body.GenerateExpression(reqTypeValue);
+
+                if (body == null)
+                {
+                    return null;
+                }
+
+                return Expression.Lambda(body, workingSet.ExternalParameters.Values.Select(p => (ParameterExpression)p.GenerateExpression(reqTypeValue)))
+                    .Compile()?.DynamicInvoke(convertedArguments) ?? expressionToParse;
             }
             catch (Exception ex)
             {

@@ -92,41 +92,41 @@ namespace IX.Math
             };
 
             // New expression tree implementation
-            NumericBinaryOperators = new Dictionary<string, ExpressionTreeNodeBase>
+            NumericBinaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
             {
-                [definition.AddSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Add),
-                [definition.DivideSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Divide),
-                [definition.MultiplySymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Multiply),
-                [definition.SubtractSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Subtract),
-                [definition.AndSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.And),
-                [definition.OrSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Or),
-                [definition.XorSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.ExclusiveOr),
-                [definition.ShiftLeftSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.LeftShift),
-                [definition.ShiftRightSymbol] = new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.RightShift),
-                [definition.PowerSymbol] = new ExpressionTreeNodeNumericBinaryOperator(),
-                [definition.DoesNotEqualSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.NotEqual),
-                [definition.EqualsSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.Equal),
-                [definition.GreaterThanOrEqualSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThanOrEqual),
-                [definition.GreaterThanSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThan),
-                [definition.LessThanOrEqualSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThanOrEqual),
-                [definition.LessThanSymbol] = new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThan),
+                [definition.AddSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Add),
+                [definition.DivideSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Divide),
+                [definition.MultiplySymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Multiply),
+                [definition.SubtractSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Subtract),
+                [definition.AndSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.And),
+                [definition.OrSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Or),
+                [definition.XorSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.ExclusiveOr),
+                [definition.ShiftLeftSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.LeftShift),
+                [definition.ShiftRightSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.RightShift),
+                [definition.PowerSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(),
+                [definition.DoesNotEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.NotEqual),
+                [definition.EqualsSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.Equal),
+                [definition.GreaterThanOrEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThanOrEqual),
+                [definition.GreaterThanSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThan),
+                [definition.LessThanOrEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThanOrEqual),
+                [definition.LessThanSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThan),
             };
-            BooleanBinaryOperators = new Dictionary<string, ExpressionTreeNodeBase>
+            BooleanBinaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
             {
-                [definition.AndSymbol] = new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.And),
-                [definition.OrSymbol] = new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.Or),
-                [definition.XorSymbol] = new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.ExclusiveOr),
-                [definition.DoesNotEqualSymbol] = new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.NotEqual),
-                [definition.EqualsSymbol] = new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.Equal),
+                [definition.AndSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.And),
+                [definition.OrSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.Or),
+                [definition.XorSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.ExclusiveOr),
+                [definition.DoesNotEqualSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.NotEqual),
+                [definition.EqualsSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.Equal),
             };
-            NumericUnaryOperators = new Dictionary<string, ExpressionTreeNodeBase>
+            NumericUnaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
             {
-                [definition.NotSymbol] = new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Not),
-                [definition.SubtractSymbol] = new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Not),
+                [definition.NotSymbol] = () => new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Not),
+                [definition.SubtractSymbol] = () => new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Not),
             };
-            BooleanUnaryOperators = new Dictionary<string, ExpressionTreeNodeBase>
+            BooleanUnaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
             {
-                [definition.NotSymbol] = new ExpressionTreeNodeBooleanUnaryOperator(ExpressionType.Not),
+                [definition.NotSymbol] = () => new ExpressionTreeNodeBooleanUnaryOperator(ExpressionType.Not),
             };
         }
 
@@ -140,9 +140,9 @@ namespace IX.Math
         internal readonly Dictionary<string, Func<Type, Expression, Expression>> UnaryExpressionGenerators;
 
         // New expression tree implementation
-        internal readonly Dictionary<string, ExpressionTreeNodeBase> NumericBinaryOperators;
-        internal readonly Dictionary<string, ExpressionTreeNodeBase> BooleanBinaryOperators;
-        internal readonly Dictionary<string, ExpressionTreeNodeBase> NumericUnaryOperators;
-        internal readonly Dictionary<string, ExpressionTreeNodeBase> BooleanUnaryOperators;
+        internal readonly Dictionary<string, Func<ExpressionTreeNodeBase>> NumericBinaryOperators;
+        internal readonly Dictionary<string, Func<ExpressionTreeNodeBase>> BooleanBinaryOperators;
+        internal readonly Dictionary<string, Func<ExpressionTreeNodeBase>> NumericUnaryOperators;
+        internal readonly Dictionary<string, Func<ExpressionTreeNodeBase>> BooleanUnaryOperators;
     }
 }

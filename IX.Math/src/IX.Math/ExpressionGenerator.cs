@@ -1,10 +1,7 @@
 ﻿using IX.Math.BuiltIn;
 using IX.Math.PlatformMitigation;
-using IX.Math.SimplificationAide;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
 namespace IX.Math
@@ -37,37 +34,9 @@ namespace IX.Math
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
-            // Generating constants and external parameters
-            if (expression.Contains(definition.Definition.PowerSymbol))
-            {
-                // Cannot properly work with powers unless the type is double
-                workingSet.NumericType = WorkingConstants.defaultNumericTypeWithFinder;
-            }
-
             // Trying to determine the proper numeric type
             workingSet.SymbolTable.Select(p => p.Value.Expression).ToList().ForEach(p =>
-                PopulateTables(p, workingSet, definition, ref workingSet.NumericType));
-
-            Type numericType = workingSet.NumericType;
-
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
-
-            // Change all internal values to the specified type
-            Dictionary<string, ConstantExpression> typeChangers = new Dictionary<string, ConstantExpression>();
-            foreach (var c in workingSet.Constants.Where(p => p.Value.Type != numericType))
-            {
-                typeChangers[c.Key] = Expression.Constant(Convert.ChangeType(c.Value.Value, numericType), numericType);
-            }
-
-            foreach (var c in typeChangers)
-            {
-                workingSet.Constants[c.Key] = c.Value;
-            }
-
-            foreach (var c in workingSet.ExternalParameters.Where(p => p.Value.Type != numericType))
-            {
-                workingSet.ExternalParameters[c.Key] = Expression.Parameter(numericType, c.Value.Name);
-            }
+                PopulateTables(p, workingSet, definition));
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
@@ -88,16 +57,8 @@ namespace IX.Math
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
-            // Reduce expression, if expression is reducible
-            int reduceAttempt = 0;
-            while (workingSet.Body.CanReduce && reduceAttempt < 30)
-            {
-                workingSet.Body = workingSet.Body.Reduce();
-                reduceAttempt++;
-            }
-
             // Set success values and possibly constant values
-            if (workingSet.Body is ConstantExpression)
+            if (workingSet.Body is ExpressionTreeNodeConstant)
             {
                 if (workingSet.ExternalParameters.Count > 0)
                 {
@@ -106,11 +67,11 @@ namespace IX.Math
                 }
                 else
                 {
-                    workingSet.ValueIfConstant = ((ConstantExpression)workingSet.Body).Value;
+                    workingSet.ValueIfConstant = ((ExpressionTreeNodeConstant)workingSet.Body).Value;
                     workingSet.Constant = true;
                 }
             }
-            else if (workingSet.Body is ParameterExpression)
+            else if (workingSet.Body is ExpressionTreeNodeParameter)
             {
                 workingSet.PossibleString = true;
             }
@@ -232,8 +193,7 @@ namespace IX.Math
 
         private static void PopulateTables(string p,
             WorkingExpressionSet workingSet,
-            WorkingDefinition definition,
-            ref Type numericType)
+            WorkingDefinition definition)
         {
             var expressions = p.Split(definition.AllOperatorsInOrder, StringSplitOptions.RemoveEmptyEntries);
 
@@ -269,22 +229,39 @@ namespace IX.Math
 
                 if (exp.Contains(definition.Definition.Parantheses.Item1))
                 {
-                    numericType = WorkingConstants.defaultNumericTypeWithFinder;
                     continue;
                 }
 
-                object value;
-                if (NumericTypeParsingAide.Parse(exp, ref numericType, out value))
+                if (workingSet.Constants.ParseNumeric(exp) != null)
                 {
-                    workingSet.Constants.Add(exp, Expression.Constant(value, numericType));
                     continue;
                 }
 
-                workingSet.ExternalParameters.Add(exp, Expression.Parameter(numericType, exp));
+                workingSet.ExternalParameters.Add(exp, new ExpressionTreeNodeParameter(exp));
             }
         }
 
-        private static Expression GenerateExpression(
+        private static ExpressionTreeNodeBase[] GenerateExpression(
+            string[] s,
+            WorkingExpressionSet workingSet,
+            WorkingDefinition definition)
+        {
+            ExpressionTreeNodeBase[] nodes = new ExpressionTreeNodeBase[s.Length];
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                var res = GenerateExpression(s[i], workingSet, definition);
+                if (res == null)
+                {
+                    return null;
+                }
+                nodes[i] = res;
+            }
+
+            return nodes;
+        }
+
+        private static ExpressionTreeNodeBase GenerateExpression(
             string s,
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
@@ -296,24 +273,24 @@ namespace IX.Math
                 string actualSymbol;
                 if (SpecialSymbolsLocator.BuiltInSpecialSymbolsAlternateWriting.TryGetValue(s.Substring(1, s.Length-2), out actualSymbol))
                 {
-                    return SpecialSymbolsLocator.BuiltInSpecialSymbols[actualSymbol].GenerateExpression();
+                    return SpecialSymbolsLocator.BuiltInSpecialSymbols[actualSymbol];
                 }
             }
             
             if (SpecialSymbolsLocator.BuiltInSpecialSymbols.TryGetValue(s, out ss))
             {
-                return ss.GenerateExpression();
+                return ss;
             }
 
             // Check whether expression is constant
-            ConstantExpression constantResult;
+            ExpressionTreeNodeBase constantResult;
             if (workingSet.Constants.TryGetValue(s, out constantResult))
             {
                 return constantResult;
             }
 
             // Check whether expression is an external parameter
-            ParameterExpression parameterResult;
+            ExpressionTreeNodeParameter parameterResult;
             if (workingSet.ExternalParameters.TryGetValue(s, out parameterResult))
             {
                 return parameterResult;
@@ -358,34 +335,41 @@ namespace IX.Math
             return null;
         }
 
-        private static Expression GenerateFunctionCallExpression(
+        private static ExpressionTreeNodeBase GenerateFunctionCallExpression(
             string expression,
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
         {
             Match match = functionSupport.Match(expression);
 
-            if (match.Success)
+            try
             {
-                string functionName = match.Groups["functionName"].Value;
-                string expr = match.Groups["expression"].Value;
-
-                var body = GenerateExpression(expr, workingSet, definition);
-
-                if (body != null)
+                if (match.Success)
                 {
-                    SupportedFunction sf;
-                    if (SupportedFunctionsLocator.builtInSupportedFunctions.TryGetValue(functionName, out sf))
+                    string functionName = match.Groups["functionName"].Value;
+                    string[] expr = match.Groups["expression"].Value.Split(',');
+
+                    var body = GenerateExpression(expr, workingSet, definition);
+
+                    if (body != null)
                     {
-                        return sf.GenerateExpression(body);
+                        Func<ExpressionTreeNodeBase> n;
+                        if (SupportedFunctionsLocator.BuiltInFunctions.TryGetValue(functionName, out n))
+                        {
+                            return n().SetOperands(body);
+                        }
                     }
                 }
+            }
+            catch (Exception)
+            {
+                return null;
             }
 
             return null;
         }
 
-        private static Expression ExpressionByBinaryOperator(
+        private static ExpressionTreeNodeBase ExpressionByBinaryOperator(
             string s, string op,
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
@@ -404,22 +388,32 @@ namespace IX.Math
                     // We are having a binary operator
                     try
                     {
-                        Expression left = GenerateExpression(split[0], workingSet, definition);
+                        ExpressionTreeNodeBase left = GenerateExpression(split[0], workingSet, definition);
                         if (left == null)
                         {
                             return null;
                         }
 
-                        Expression right = GenerateExpression(string.Join(op, split.Skip(1).ToArray()), workingSet, definition);
+                        ExpressionTreeNodeBase right = GenerateExpression(string.Join(op, split.Skip(1).ToArray()), workingSet, definition);
                         if (right == null)
                         {
                             return null;
                         }
 
-                        return (definition.BinaryExpressionGenerators[op](
-                                left,
-                                right))
-                            .ReduceIfConstantOperation();
+                        if ((left.ReturnType == SupportedValueType.Numeric && right.ReturnType == SupportedValueType.Numeric) ||
+                            (left.ReturnType == SupportedValueType.Unknown && right.ReturnType == SupportedValueType.Unknown))
+                        {
+                            return definition.NumericBinaryOperators[op]().SetOperands(left, right);
+                        }
+                        else if (left.ReturnType == SupportedValueType.Boolean && right.ReturnType == SupportedValueType.Boolean)
+                        {
+                            return definition.NumericBinaryOperators[op]().SetOperands(left, right);
+                        }
+                        else
+                        {
+
+                            return null;
+                        }
                     }
                     catch
                     {
@@ -431,7 +425,7 @@ namespace IX.Math
             return null;
         }
 
-        private static Expression ExpressionByUnaryOperator(
+        private static ExpressionTreeNodeBase ExpressionByUnaryOperator(
             string s, string op,
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
@@ -442,16 +436,22 @@ namespace IX.Math
             {
                 try
                 {
-                    Expression expr = GenerateExpression(s.Substring(op.Length), workingSet, definition);
+                    ExpressionTreeNodeBase expr = GenerateExpression(s.Substring(op.Length), workingSet, definition);
                     if (expr == null)
                     {
                         return null;
                     }
 
-                    return (definition.UnaryExpressionGenerators[op](
-                        workingSet.NumericType,
-                        expr))
-                        .ReduceIfConstantOperation();
+                    switch (expr.ReturnType)
+                    {
+                        case SupportedValueType.Numeric:
+                        case SupportedValueType.Unknown:
+                            return definition.NumericUnaryOperators[op]().SetOperands(expr);
+                        case SupportedValueType.Boolean:
+                            return definition.BooleanUnaryOperators[op]().SetOperands(expr);
+                        default:
+                            return null;
+                    }
                 }
                 catch
                 {
