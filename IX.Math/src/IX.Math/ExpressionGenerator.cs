@@ -43,6 +43,7 @@ namespace IX.Math
                 workingSet.NumericType = WorkingConstants.defaultNumericTypeWithFinder;
             }
 
+            // Trying to determine the proper numeric type
             workingSet.SymbolTable.Select(p => p.Value.Expression).ToList().ForEach(p =>
                 PopulateTables(p, workingSet, definition, ref workingSet.NumericType));
 

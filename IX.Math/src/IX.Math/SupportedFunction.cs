@@ -48,6 +48,34 @@ namespace IX.Math
 
             for (int i = 0; i < operandTypes.Length; i++)
             {
+                var requiredType = operandTypes[i];
+
+                if (requiredType == SupportedValueType.Unknown)
+                {
+                    continue;
+                }
+
+                var operandExpression = operandExpressions[i];
+
+                Type constantType = null;
+                if (operandExpression is ConstantExpression)
+                {
+                    constantType = ((ConstantExpression)operandExpression).Type;
+                }
+                else if (operandExpression is ParameterExpression)
+                {
+                    constantType = ((ParameterExpression)operandExpression).Type;
+                }
+
+                if (constantType == null ||
+                    (requiredType == SupportedValueType.Boolean && constantType == typeof(bool)) ||
+                    (requiredType == SupportedValueType.String && constantType == typeof(string)) ||
+                    (requiredType == SupportedValueType.Numeric && SimplificationAide.NumericTypeAide.NumericTypesConversionDictionary.ContainsKey(constantType)))
+                {
+                    continue;
+                }
+
+                return null;
             }
 
             return GenerateExpressionWithOperands(operandExpressions);

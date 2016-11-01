@@ -83,7 +83,12 @@ namespace IX.Math.UnitTests
                 {
                     "[pi]",
                     System.Math.PI
-                }
+                },
+                new object[]
+                {
+                    "e*[pi]",
+                    System.Math.E * System.Math.PI
+                },
             };
         }
     }
