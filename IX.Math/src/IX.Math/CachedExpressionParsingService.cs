@@ -1,12 +1,11 @@
 ﻿#if !NETSTANDARD10
 
-using IX.Math.PlatformMitigation;
+using IX.Math.BuiltIn;
 using IX.Math.SimplificationAide;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 
 namespace IX.Math
@@ -22,7 +21,7 @@ namespace IX.Math
     public class CachedExpressionParsingService : IExpressionParsingService, IDisposable
     {
         private ExpressionParsingService eps;
-        private ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>>> cachedDelegates;
+        private ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>> cachedDelegates;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CachedExpressionParsingService"/> class.
@@ -30,7 +29,7 @@ namespace IX.Math
         public CachedExpressionParsingService()
         {
             eps = new ExpressionParsingService();
-            cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>>>();
+            cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>>();
         }
 
         /// <summary>
@@ -40,7 +39,7 @@ namespace IX.Math
         public CachedExpressionParsingService(MathDefinition definition)
         {
             eps = new ExpressionParsingService(definition);
-            cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>>>();
+            cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>>();
         }
 
         /// <summary>
@@ -63,7 +62,14 @@ namespace IX.Math
                 return expressionToParse;
             }
 
-            return del.Item1.DynamicInvoke();
+            try
+            {
+                return del.Item1.DynamicInvoke();
+            }
+            catch (Exception)
+            {
+                return expressionToParse;
+            }
         }
 
         /// <summary>
@@ -84,9 +90,21 @@ namespace IX.Math
 
             var del = GetDelegateForExpression(expressionToParse, numericType, cancellationToken);
 
-            object[] convertedArguments = NumericTypeAide.GetValuesFromFinder(del.Item3, dataFinder);
+            try
+            {
+                object[] convertedArguments = NumericTypeAide.GetValuesFromFinder(del.Item3, dataFinder);
 
-            return del.Item1.DynamicInvoke(convertedArguments);
+                if (convertedArguments.Any(p => p == null))
+                {
+                    return expressionToParse;
+                }
+
+                return del.Item1.DynamicInvoke(convertedArguments);
+            }
+            catch (Exception)
+            {
+                return expressionToParse;
+            }
         }
 
         /// <summary>
@@ -130,7 +148,7 @@ namespace IX.Math
             return GetDelegateForExpression(expressionToParse, WorkingConstants.defaultNumericType, cancellationToken)?.Item1;
         }
 
-        private Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>> GetDelegateForExpression(
+        private Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>> GetDelegateForExpression(
             string expressionToParse,
             Type numericalType,
             CancellationToken cancellationToken)
@@ -140,9 +158,9 @@ namespace IX.Math
                 var d = eps.GenerateDelegateInternal(expr, numericalType, cancellationToken);
                 if (d == null)
                 {
-                    return new Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>>(new Func<object>(() => expr), numericalType, new Tuple<string, Type>[0]);
+                    return new Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>(new Func<object>(() => expr), numericalType, new ExpressionTreeNodeParameter[0]);
                 }
-                return new Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>>(d.Item1, numericalType, d.Item2);
+                return new Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>(d.Item1, numericalType, d.Item2);
             });
 
             int numTypeValue;
@@ -160,7 +178,7 @@ namespace IX.Math
             if (numReturnedTypeValue < numTypeValue)
             {
                 var d = eps.GenerateDelegateInternal(expressionToParse, numericalType, cancellationToken);
-                var newDel = new Tuple<Delegate, Type, IEnumerable<Tuple<string, Type>>>(d?.Item1 == null ? (new Func<object>(() => expressionToParse)) : d.Item1, numericalType, d.Item2);
+                var newDel = new Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>(d?.Item1 == null ? (new Func<object>(() => expressionToParse)) : d.Item1, numericalType, d.Item2);
                 cachedDelegates.TryUpdate(expressionToParse, newDel, del);
 
                 return newDel;

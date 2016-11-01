@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using IX.Math.SimplificationAide;
+using IX.Math.BuiltIn;
 
 namespace IX.Math
 {
@@ -166,11 +167,15 @@ namespace IX.Math
 
             int numericTypeValue = NumericTypeAide.NumericTypesConversionDictionary[WorkingConstants.defaultNumericTypeWithFinder];
 
-            object[] parameterValues = NumericTypeAide.GetValuesFromFinder(
-                workingSet.ExternalParameters.Select(p => new Tuple<string, Type>(p.Key, p.Value.GetConcreteType(numericTypeValue))), dataFinder);
-
             try
             {
+                object[] parameterValues = NumericTypeAide.GetValuesFromFinder(workingSet.ExternalParameters.Values, dataFinder);
+
+                if (parameterValues.Any(p => p == null))
+                {
+                    return expressionToParse;
+                }
+
                 var body = workingSet.Body.GenerateExpression();
 
                 if (body == null)
@@ -187,7 +192,7 @@ namespace IX.Math
             }
         }
 
-        internal Tuple<Delegate, IEnumerable<Tuple<string, Type>>> GenerateDelegateInternal(string expressionToParse, Type numericType, CancellationToken cancellationToken)
+        internal Tuple<Delegate, IEnumerable<ExpressionTreeNodeParameter>> GenerateDelegateInternal(string expressionToParse, Type numericType, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(expressionToParse))
             {
@@ -218,9 +223,9 @@ namespace IX.Math
                     return null;
                 }
 
-                return new Tuple<Delegate, IEnumerable<Tuple<string, Type>>>(
+                return new Tuple<Delegate, IEnumerable<ExpressionTreeNodeParameter>>(
                     Expression.Lambda(body, workingSet.ExternalParameters.Values.Select(p => p.GeneratedExpression))
-                        .Compile(), workingSet.ExternalParameters.Select(p => new Tuple<string, Type>(p.Key, p.Value.GetConcreteType(numericTypeValue))));
+                        .Compile(), workingSet.ExternalParameters.Values);
             }
             catch (Exception)
             {

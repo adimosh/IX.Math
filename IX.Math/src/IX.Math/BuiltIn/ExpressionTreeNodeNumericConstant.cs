@@ -27,7 +27,7 @@ namespace IX.Math.BuiltIn
         {
             var numericType = NumericTypeAide.InverseNumericTypesConversionDictionary[numericTypeValue];
 
-            return Expression.Constant(Value, numericType);
+            return Expression.Constant(Convert.ChangeType(Value, numericType), numericType);
         }
 
         internal object GetValueSpecific(int numericTypeValue)

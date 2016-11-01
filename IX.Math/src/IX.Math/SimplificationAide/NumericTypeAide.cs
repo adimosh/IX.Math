@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IX.Math.BuiltIn;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -98,32 +99,69 @@ namespace IX.Math.SimplificationAide
             }
         }
 
-        internal static object[] GetValuesFromFinder(IEnumerable<Tuple<string, Type>> externalParameters, IDataFinder dataFinder)
+        internal static object[] GetValuesFromFinder(IEnumerable<ExpressionTreeNodeParameter> externalParameters, IDataFinder dataFinder)
         {
             List<object> parameterValues = new List<object>();
 
             foreach (var v in externalParameters)
             {
                 object data;
-                if (dataFinder.TryGetData(v.Item1, out data))
+                if (dataFinder.TryGetData(v.Name, out data))
                 {
-                    try
+                    if (v.ReturnType == SupportedValueType.String)
                     {
-                        if (v.Item2 != data.GetType())
+                        parameterValues.Add(data.ToString());
+                        continue;
+                    }
+                    else if (v.ReturnType == SupportedValueType.Boolean)
+                    {
+                        if (data is bool)
                         {
-                            data = Convert.ChangeType(data, v.Item2);
+                            parameterValues.Add((bool)data);
+                            continue;
+                        }
+                        else if (data is string)
+                        {
+                            bool val;
+                            if (bool.TryParse((string)data, out val))
+                            {
+                                parameterValues.Add(val);
+                                continue;
+                            }
                         }
 
-                        parameterValues.Add(data);
+                        parameterValues.Add(null);
+                        continue;
                     }
-                    catch
+                    else
                     {
-                        parameterValues.Add(v.Item1);
+                        Type dataType = data.GetType();
+                        if (NumericTypesConversionDictionary.ContainsKey(dataType))
+                        {
+                            parameterValues.Add(Convert.ChangeType(data, WorkingConstants.defaultNumericTypeWithFinder));
+                            continue;
+                        }
+                        else
+                        {
+                            if (data is string)
+                            {
+                                double val;
+                                if (double.TryParse((string)data, out val))
+                                {
+                                    parameterValues.Add(val);
+                                    continue;
+                                }
+                            }
+
+                            parameterValues.Add(null);
+                            continue;
+                        }
                     }
                 }
                 else
                 {
-                    parameterValues.Add(v.Item1);
+                    parameterValues.Add(null);
+                    continue;
                 }
             }
 

@@ -34,6 +34,14 @@ namespace IX.Math.BuiltIn
             }
         }
 
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+        }
+
         private ParameterExpression generatedExpression;
         public ParameterExpression GeneratedExpression
         {
