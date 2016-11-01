@@ -45,9 +45,12 @@ namespace IX.Math.BuiltIn
 
                 var mi = typeof(MathematicalBinaryOperationsAide).GetTypeMethod(Enum.GetName(typeof(ExpressionType), type), new Type[2] { numericType, numericType });
 
-                var result = mi.Invoke(null, new[] { leftConverted.GetValueSpecific(numericTypeValue), rightConverted.GetValueSpecific(numericTypeValue) });
+                if (mi != null)
+                {
+                    var result = mi.Invoke(null, new[] { leftConverted.GetValueSpecific(numericTypeValue), rightConverted.GetValueSpecific(numericTypeValue) });
 
-                return Expression.Constant(result, typeof(bool));
+                    return Expression.Constant(result, typeof(bool));
+                }
             }
 
             return Expression.MakeBinary(type, left.GenerateExpression(numericTypeValue), right.GenerateExpression(numericTypeValue));

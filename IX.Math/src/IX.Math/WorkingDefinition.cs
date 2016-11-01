@@ -119,6 +119,15 @@ namespace IX.Math
                 [definition.DoesNotEqualSymbol] = new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.NotEqual),
                 [definition.EqualsSymbol] = new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.Equal),
             };
+            NumericUnaryOperators = new Dictionary<string, ExpressionTreeNodeBase>
+            {
+                [definition.NotSymbol] = new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Not),
+                [definition.SubtractSymbol] = new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Not),
+            };
+            BooleanUnaryOperators = new Dictionary<string, ExpressionTreeNodeBase>
+            {
+                [definition.NotSymbol] = new ExpressionTreeNodeBooleanUnaryOperator(ExpressionType.Not),
+            };
         }
 
         internal readonly MathDefinition Definition;
@@ -133,5 +142,7 @@ namespace IX.Math
         // New expression tree implementation
         internal readonly Dictionary<string, ExpressionTreeNodeBase> NumericBinaryOperators;
         internal readonly Dictionary<string, ExpressionTreeNodeBase> BooleanBinaryOperators;
+        internal readonly Dictionary<string, ExpressionTreeNodeBase> NumericUnaryOperators;
+        internal readonly Dictionary<string, ExpressionTreeNodeBase> BooleanUnaryOperators;
     }
 }
