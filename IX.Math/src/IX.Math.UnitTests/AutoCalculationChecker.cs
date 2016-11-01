@@ -73,6 +73,16 @@ namespace IX.Math.UnitTests
                 {
                     "0x10+26",
                     42
+                },
+                new object[]
+                {
+                    "e",
+                    System.Math.E
+                },
+                new object[]
+                {
+                    "[pi]",
+                    System.Math.PI
                 }
             };
         }

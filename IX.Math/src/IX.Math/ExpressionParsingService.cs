@@ -21,6 +21,7 @@ namespace IX.Math
             : this(new MathDefinition
             {
                 Parantheses = new Tuple<string, string>("(", ")"),
+                SpecialSymbolIndicators = new Tuple<string, string>("[", "]"),
                 AddSymbol = "+",
                 AndSymbol = "&",
                 DivideSymbol = "/",

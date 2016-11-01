@@ -18,6 +18,15 @@ namespace IX.Math
         [DataMember]
         public Tuple<string, string> Parantheses { get; set; }
 
+        /// <summary>
+        /// What should be interpreted as special symbols.
+        /// </summary>
+        /// <remarks>
+        /// <para>The first item in the tuple represents the opening of the special symbol marker, whereas the second represents its closing.</para>
+        /// </remarks>
+        [DataMember]
+        public Tuple<string, string> SpecialSymbolIndicators { get; set; }
+
         #region Mathematical symbols
         /// <summary>
         /// A symbol for the addition operation.

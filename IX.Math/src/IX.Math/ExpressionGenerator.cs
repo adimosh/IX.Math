@@ -39,6 +39,7 @@ namespace IX.Math
             // Generating constants and external parameters
             if (expression.Contains(definition.Definition.PowerSymbol))
             {
+                // Cannot properly work with powers unless the type is double
                 workingSet.NumericType = WorkingConstants.defaultNumericTypeWithFinder;
             }
 
@@ -236,6 +237,19 @@ namespace IX.Math
 
             foreach (var exp in expressions)
             {
+                if (exp.StartsWith(definition.Definition.SpecialSymbolIndicators.Item1) && exp.EndsWith(definition.Definition.SpecialSymbolIndicators.Item2))
+                {
+                    if (SpecialSymbolsLocator.BuiltInSpecialSymbolsAlternateWriting.ContainsKey(exp.Substring(1, exp.Length - 2)))
+                    {
+                        continue;
+                    }
+                }
+
+                if (SpecialSymbolsLocator.BuiltInSpecialSymbols.ContainsKey(exp))
+                {
+                    continue;
+                }
+
                 if (workingSet.Constants.ContainsKey(exp))
                 {
                     continue;
@@ -273,6 +287,22 @@ namespace IX.Math
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
         {
+            // Check whether expression is special symbol
+            SpecialSymbol ss;
+            if (s.StartsWith(definition.Definition.SpecialSymbolIndicators.Item1) && s.EndsWith(definition.Definition.SpecialSymbolIndicators.Item2))
+            {
+                string actualSymbol;
+                if (SpecialSymbolsLocator.BuiltInSpecialSymbolsAlternateWriting.TryGetValue(s.Substring(1, s.Length-2), out actualSymbol))
+                {
+                    return SpecialSymbolsLocator.BuiltInSpecialSymbols[actualSymbol].GenerateExpression();
+                }
+            }
+            
+            if (SpecialSymbolsLocator.BuiltInSpecialSymbols.TryGetValue(s, out ss))
+            {
+                return ss.GenerateExpression();
+            }
+
             // Check whether expression is constant
             ConstantExpression constantResult;
             if (workingSet.Constants.TryGetValue(s, out constantResult))
