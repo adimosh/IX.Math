@@ -178,7 +178,7 @@ namespace IX.Math
                     return expressionToParse;
                 }
 
-                return Expression.Lambda(body, workingSet.ExternalParameters.Values.Select(p => (ParameterExpression)p.GenerateExpression(numericTypeValue)))
+                return Expression.Lambda(body, workingSet.ExternalParameters.Values.Select(p => p.GeneratedExpression))
                     .Compile()?.DynamicInvoke(parameterValues.ToArray()) ?? expressionToParse;
             }
             catch (Exception ex)
@@ -219,7 +219,7 @@ namespace IX.Math
                 }
 
                 return new Tuple<Delegate, IEnumerable<Tuple<string, Type>>>(
-                    Expression.Lambda(body, workingSet.ExternalParameters.Values.Select(p => ((ParameterExpression)p.GenerateExpression(numericTypeValue))))
+                    Expression.Lambda(body, workingSet.ExternalParameters.Values.Select(p => p.GeneratedExpression))
                         .Compile(), workingSet.ExternalParameters.Select(p => new Tuple<string, Type>(p.Key, p.Value.GetConcreteType(numericTypeValue))));
             }
             catch (Exception)
@@ -268,7 +268,7 @@ namespace IX.Math
                     return null;
                 }
 
-                return Expression.Lambda(body, workingSet.ExternalParameters.Values.Select(p => (ParameterExpression)p.GenerateExpression(reqTypeValue)))
+                return Expression.Lambda(body, workingSet.ExternalParameters.Values.Select(p => p.GeneratedExpression))
                     .Compile()?.DynamicInvoke(convertedArguments) ?? expressionToParse;
             }
             catch (Exception ex)

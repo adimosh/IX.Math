@@ -122,7 +122,7 @@ namespace IX.Math
             NumericUnaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
             {
                 [definition.NotSymbol] = () => new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Not),
-                [definition.SubtractSymbol] = () => new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Not),
+                [definition.SubtractSymbol] = () => new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Negate),
             };
             BooleanUnaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
             {

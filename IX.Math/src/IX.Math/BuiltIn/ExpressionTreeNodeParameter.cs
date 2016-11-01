@@ -34,16 +34,35 @@ namespace IX.Math.BuiltIn
             }
         }
 
+        private ParameterExpression generatedExpression;
+        public ParameterExpression GeneratedExpression
+        {
+            get
+            {
+                if (generatedExpression == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                return generatedExpression;
+            }
+        }
+
         protected override Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue)
         {
-            Type concreteType = GetConcreteType(numericTypeValue);
-
-            if (concreteType == null)
+            if (generatedExpression == null)
             {
-                return null;
+                Type concreteType = GetConcreteType(numericTypeValue);
+
+                if (concreteType == null)
+                {
+                    return null;
+                }
+
+                generatedExpression = Expression.Parameter(concreteType, name);
             }
 
-            return Expression.Parameter(concreteType, name);
+            return generatedExpression;
         }
 
         internal bool SetConcreteParameterType(SupportedValueType type)

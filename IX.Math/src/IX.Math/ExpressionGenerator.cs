@@ -401,17 +401,20 @@ namespace IX.Math
                         }
 
                         if ((left.ReturnType == SupportedValueType.Numeric && right.ReturnType == SupportedValueType.Numeric) ||
-                            (left.ReturnType == SupportedValueType.Unknown && right.ReturnType == SupportedValueType.Unknown))
+                            (left.ReturnType == SupportedValueType.Unknown && right.ReturnType == SupportedValueType.Unknown) ||
+                            (left.ReturnType == SupportedValueType.Numeric && right.ReturnType == SupportedValueType.Unknown) ||
+                            (left.ReturnType == SupportedValueType.Unknown && right.ReturnType == SupportedValueType.Numeric))
                         {
                             return definition.NumericBinaryOperators[op]().SetOperands(left, right);
                         }
-                        else if (left.ReturnType == SupportedValueType.Boolean && right.ReturnType == SupportedValueType.Boolean)
+                        else if ((left.ReturnType == SupportedValueType.Boolean && right.ReturnType == SupportedValueType.Boolean) ||
+                            (left.ReturnType == SupportedValueType.Boolean && right.ReturnType == SupportedValueType.Unknown) ||
+                            (left.ReturnType == SupportedValueType.Unknown && right.ReturnType == SupportedValueType.Boolean))
                         {
                             return definition.NumericBinaryOperators[op]().SetOperands(left, right);
                         }
                         else
                         {
-
                             return null;
                         }
                     }

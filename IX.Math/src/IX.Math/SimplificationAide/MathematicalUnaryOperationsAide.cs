@@ -6,27 +6,27 @@
     public static class MathematicalUnaryOperationsAide
     {
         /// <summary>
-        /// Negates the value (bitwise).
+        /// Negates the value.
         /// </summary>
         /// <param name="value">The value to negate.</param>
         /// <returns>The negated value.</returns>
         public static int Negate(int value)
         {
-            return ~value;
+            return -value;
         }
 
         /// <summary>
-        /// Negates the value (bitwise).
+        /// Negates the value.
         /// </summary>
         /// <param name="value">The value to negate.</param>
         /// <returns>The negated value.</returns>
         public static long Negate(long value)
         {
-            return ~value;
+            return -value;
         }
 
         /// <summary>
-        /// Negates the value (bitwise).
+        /// Negates the value.
         /// </summary>
         /// <param name="value">The value to negate.</param>
         /// <returns>The negated value.</returns>
@@ -36,7 +36,7 @@
         }
 
         /// <summary>
-        /// Negates the value (bitwise).
+        /// Negates the value.
         /// </summary>
         /// <param name="value">The value to negate.</param>
         /// <returns>The negated value.</returns>
@@ -46,11 +46,41 @@
         }
 
         /// <summary>
-        /// Negates the value (bitwise).
+        /// Negates the value.
         /// </summary>
         /// <param name="value">The value to negate.</param>
         /// <returns>The negated value.</returns>
         public static bool Negate(bool value)
+        {
+            return !value;
+        }
+
+        /// <summary>
+        /// Negates the value (bitwise).
+        /// </summary>
+        /// <param name="value">The value to negate.</param>
+        /// <returns>The negated value.</returns>
+        public static int Not(int value)
+        {
+            return ~value;
+        }
+
+        /// <summary>
+        /// Negates the value (bitwise).
+        /// </summary>
+        /// <param name="value">The value to negate.</param>
+        /// <returns>The negated value.</returns>
+        public static long Not(long value)
+        {
+            return ~value;
+        }
+
+        /// <summary>
+        /// Negates the value (bitwise).
+        /// </summary>
+        /// <param name="value">The value to negate.</param>
+        /// <returns>The negated value.</returns>
+        public static bool Not(bool value)
         {
             return !value;
         }
