@@ -14,6 +14,12 @@ namespace IX.Math
         {
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
+            PrepareMathDefinitionAndExpression(workingSet, definition);
+
+            definition.Initialize();
+
+            workingSet.CancellationToken.ThrowIfCancellationRequested();
+
             workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer { Expression = workingSet.InitialExpression });
 
             // Break expression based on function calls
@@ -70,6 +76,114 @@ namespace IX.Math
 
             workingSet.InternallyValid = true;
             workingSet.Success = true;
+        }
+
+        private static void PrepareMathDefinitionAndExpression(WorkingExpressionSet workingSet, WorkingDefinition definition)
+        {
+            var operators = definition.AllOperatorsInOrder.OrderByDescending(p => p.Length).Where(p => definition.AllOperatorsInOrder.Any(q => q.Length < p.Length && p.Contains(q)));
+
+            int i = 1;
+            foreach (var op in operators.OrderByDescending(p => p.Length))
+            {
+                var s = $"@op{i}@";
+
+                workingSet.InitialExpression = workingSet.InitialExpression.Replace(op, s);
+
+                var allIndex = Array.IndexOf(definition.AllOperatorsInOrder, op);
+                if (allIndex != -1)
+                {
+                    definition.AllOperatorsInOrder[allIndex] = s;
+                }
+
+                allIndex = Array.IndexOf(definition.BinaryOperatorsInOrder, op);
+                if (allIndex != -1)
+                {
+                    definition.BinaryOperatorsInOrder[allIndex] = s;
+                }
+
+                allIndex = Array.IndexOf(definition.UnaryOperatorsInOrder, op);
+                if (allIndex != -1)
+                {
+                    definition.UnaryOperatorsInOrder[allIndex] = s;
+                }
+
+                allIndex = Array.IndexOf(definition.AllSymbols, op);
+                if (allIndex != -1)
+                {
+                    definition.AllSymbols[allIndex] = s;
+                }
+
+                if (definition.Definition.AddSymbol == op)
+                {
+                    definition.Definition.AddSymbol = s;
+                }
+                if (definition.Definition.AndSymbol == op)
+                {
+                    definition.Definition.AndSymbol = s;
+                }
+                if (definition.Definition.DivideSymbol == op)
+                {
+                    definition.Definition.DivideSymbol = s;
+                }
+                if (definition.Definition.DoesNotEqualSymbol == op)
+                {
+                    definition.Definition.DoesNotEqualSymbol = s;
+                }
+                if (definition.Definition.EqualsSymbol == op)
+                {
+                    definition.Definition.EqualsSymbol = s;
+                }
+                if (definition.Definition.GreaterThanOrEqualSymbol == op)
+                {
+                    definition.Definition.GreaterThanOrEqualSymbol = s;
+                }
+                if (definition.Definition.GreaterThanSymbol == op)
+                {
+                    definition.Definition.GreaterThanSymbol = s;
+                }
+                if (definition.Definition.LessThanOrEqualSymbol == op)
+                {
+                    definition.Definition.LessThanOrEqualSymbol = s;
+                }
+                if (definition.Definition.LessThanSymbol == op)
+                {
+                    definition.Definition.LessThanSymbol = s;
+                }
+                if (definition.Definition.MultiplySymbol == op)
+                {
+                    definition.Definition.MultiplySymbol = s;
+                }
+                if (definition.Definition.NotSymbol == op)
+                {
+                    definition.Definition.NotSymbol = s;
+                }
+                if (definition.Definition.OrSymbol == op)
+                {
+                    definition.Definition.OrSymbol = s;
+                }
+                if (definition.Definition.PowerSymbol == op)
+                {
+                    definition.Definition.PowerSymbol = s;
+                }
+                if (definition.Definition.ShiftLeftSymbol == op)
+                {
+                    definition.Definition.ShiftLeftSymbol = s;
+                }
+                if (definition.Definition.ShiftRightSymbol == op)
+                {
+                    definition.Definition.ShiftRightSymbol = s;
+                }
+                if (definition.Definition.SubtractSymbol == op)
+                {
+                    definition.Definition.SubtractSymbol = s;
+                }
+                if (definition.Definition.XorSymbol == op)
+                {
+                    definition.Definition.XorSymbol = s;
+                }
+
+                i++;
+            }
         }
 
         private static void PopulateTables(string p,
