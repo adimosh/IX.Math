@@ -23,6 +23,8 @@ namespace IX.Math
             {
                 Parantheses = new Tuple<string, string>("(", ")"),
                 SpecialSymbolIndicators = new Tuple<string, string>("[", "]"),
+                StringIndicator = "\"",
+                ParameterSeparator= ",",
                 AddSymbol = "+",
                 AndSymbol = "&",
                 DivideSymbol = "/",

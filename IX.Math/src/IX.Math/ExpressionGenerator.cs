@@ -34,7 +34,7 @@ namespace IX.Math
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
-            // Trying to determine the proper numeric type
+            // Populating symbol tables
             workingSet.SymbolTable.Select(p => p.Value.Expression).ToList().ForEach(p =>
                 PopulateTables(p, workingSet, definition));
 
@@ -91,25 +91,25 @@ namespace IX.Math
                 return string.Empty;
             }
 
-            int op = source.IndexOf(definition.Definition.Parantheses.Item1);
-            int cp = source.IndexOf(definition.Definition.Parantheses.Item2);
+            int openingParanthesisLocation = source.IndexOf(definition.Definition.Parantheses.Item1);
+            int closingParanthesisLocation = source.IndexOf(definition.Definition.Parantheses.Item2);
 
             beginning:
-            if (op != -1)
+            if (openingParanthesisLocation != -1)
             {
-                if (cp != -1)
+                if (closingParanthesisLocation != -1)
                 {
-                    if (op < cp)
+                    if (openingParanthesisLocation < closingParanthesisLocation)
                     {
-                        string expr3 = BreakOneLevel(source.Substring(op + definition.Definition.Parantheses.Item1.Length), workingSet, definition, ref i);
+                        string resultingSubExpression = BreakOneLevel(source.Substring(openingParanthesisLocation + definition.Definition.Parantheses.Item1.Length), workingSet, definition, ref i);
 
-                        if (op == 0)
+                        if (openingParanthesisLocation == 0)
                         {
-                            source = expr3;
+                            source = resultingSubExpression;
                         }
                         else
                         {
-                            string expr4 = op == 0 ? string.Empty : source.Substring(0, op);
+                            string expr4 = openingParanthesisLocation == 0 ? string.Empty : source.Substring(0, openingParanthesisLocation);
 
                             if (!definition.AllOperatorsInOrder.Any(p => expr4.EndsWith(p)))
                             {
@@ -122,7 +122,10 @@ namespace IX.Math
 
                                 i++;
                                 string expr2 = $"item{i}";
-                                var rec = new RawExpressionContainer { Expression = $"{expr6}(item{i - 1})" };
+                                var rec = new RawExpressionContainer
+                                {
+                                    Expression = $"{expr6}{definition.Definition.Parantheses.Item1}item{i - 1}{definition.Definition.Parantheses.Item2}"
+                                };
                                 workingSet.SymbolTable.Add(expr2, rec);
                                 workingSet.ReverseSymbolTable.Add(rec.Expression, expr2);
 
@@ -135,19 +138,19 @@ namespace IX.Math
                                     expr4 = expr4.Substring(0, expr4.Length - expr6.Length);
                                 }
 
-                                expr3 = expr3.Replace($"item{i - 1}", $"item{i}");
+                                resultingSubExpression = resultingSubExpression.Replace($"item{i - 1}", $"item{i}");
                             }
 
-                            source = $"{expr4}{expr3}";
+                            source = $"{expr4}{resultingSubExpression}";
                         }
 
-                        op = source.IndexOf(definition.Definition.Parantheses.Item1);
-                        cp = source.IndexOf(definition.Definition.Parantheses.Item2);
+                        openingParanthesisLocation = source.IndexOf(definition.Definition.Parantheses.Item1);
+                        closingParanthesisLocation = source.IndexOf(definition.Definition.Parantheses.Item2);
 
                         goto beginning;
                     }
 
-                    return ProcessSubExpression(source, cp, workingSet, definition, ref i);
+                    return ProcessSubExpression(source, closingParanthesisLocation, workingSet, definition, ref i);
                 }
                 else
                 {
@@ -156,13 +159,13 @@ namespace IX.Math
             }
             else
             {
-                if (cp == -1)
+                if (closingParanthesisLocation == -1)
                 {
                     return source;
                 }
                 else
                 {
-                    return ProcessSubExpression(source, cp, workingSet, definition, ref i);
+                    return ProcessSubExpression(source, closingParanthesisLocation, workingSet, definition, ref i);
                 }
             }
         }

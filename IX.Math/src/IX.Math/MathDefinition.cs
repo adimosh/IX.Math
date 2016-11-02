@@ -27,6 +27,18 @@ namespace IX.Math
         [DataMember]
         public Tuple<string, string> SpecialSymbolIndicators { get; set; }
 
+        /// <summary>
+        /// What should be interpreted as string markers.
+        /// </summary>
+        [DataMember]
+        public string StringIndicator { get; set; }
+
+        /// <summary>
+        /// What should be interpreted as parameter separators in multi-parameter function calls.
+        /// </summary>
+        [DataMember]
+        public string ParameterSeparator { get; set; }
+
         #region Mathematical symbols
         /// <summary>
         /// A symbol for the addition operation.
