@@ -4,7 +4,7 @@
 
   "dependencies": {
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
-    "IX.Math": "0.3.7",
+    "IX.Math": "0.3.8",
     "Moq": "4.6.38-alpha",
     "NETStandard.Library": "1.6.0",
     "System.Runtime.Extensions": "4.1.0",
