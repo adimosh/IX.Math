@@ -6,13 +6,13 @@ using System.Reflection;
 
 namespace IX.Math.BuiltIn
 {
-    internal class BuiltInMathematicUnarySupportedFunction : ExpressionTreeNodeBase
+    internal class ExpressionTreeNodeMathematicUnarySupportedFunction : ExpressionTreeNodeBase
     {
         private static readonly Type mathUnaryFunctionType = typeof(double);
 
         private readonly string name;
 
-        internal BuiltInMathematicUnarySupportedFunction(string name)
+        internal ExpressionTreeNodeMathematicUnarySupportedFunction(string name)
             : base(mathUnaryFunctionType)
         {
             this.name = name;
