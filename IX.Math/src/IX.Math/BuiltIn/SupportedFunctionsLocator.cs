@@ -29,9 +29,10 @@ namespace IX.Math.BuiltIn
                 ["tan"] = () => new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Tan)),
                 ["tanh"] = () => new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Tanh)),
                 ["trun"] = () => new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Truncate)),
-                ["abs"] = () => new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Abs)),
-                ["abs"] = () => new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Abs)),
-                ["abs"] = () => new BuiltInMathematicUnarySupportedFunction(nameof(System.Math.Abs)),
+                ["log"] = () => new BuiltInMathematicBinarySupportedFunction(nameof(System.Math.Log)),
+                ["pow"] = () => new BuiltInMathematicBinarySupportedFunction(nameof(System.Math.Pow)),
+                ["min"] = () => new BuiltInMathematicBinarySupportedFunction(nameof(System.Math.Min)),
+                ["max"] = () => new BuiltInMathematicBinarySupportedFunction(nameof(System.Math.Max)),
             };
         }
     }

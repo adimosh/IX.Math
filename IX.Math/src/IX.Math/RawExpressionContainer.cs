@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 
 namespace IX.Math
 {
@@ -20,6 +19,8 @@ namespace IX.Math
                     expression = value.Replace(" ", string.Empty);
             }
         }
+
+        public bool IsFunctionCall { get; set; }
 
         public bool Equals(RawExpressionContainer other)
         {

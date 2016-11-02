@@ -8,34 +8,26 @@ namespace IX.Math
 {
     internal static class ExpressionGenerator
     {
-        private static Regex functionSupport = new Regex(@"(?'functionName'.*?)\((?'expression'.*?)\)");
-
         internal static void CreateBody(
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
         {
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
+            workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer { Expression = workingSet.InitialExpression });
+
+            // Break expression based on function calls
+            FunctionExpressionGenerator.ReplaceFunctions(workingSet, definition);
+
+            workingSet.CancellationToken.ThrowIfCancellationRequested();
+
             // Break by parantheses
-
-            // Algorithm determines multiple imbricated parantheses
-            int i = 0;
-            string expression;
-            try
-            {
-                expression = BreakOneLevel(workingSet.InitialExpression, workingSet, definition, ref i);
-            }
-            catch
-            {
-                return;
-            }
-
-            workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer { Expression = expression });
+            ParanthesesExpressionGenerator.FormatParantheses(workingSet, definition);
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Populating symbol tables
-            workingSet.SymbolTable.Select(p => p.Value.Expression).ToList().ForEach(p =>
+            workingSet.SymbolTable.Where(p => !p.Value.IsFunctionCall).Select(p => p.Value.Expression).ToList().ForEach(p =>
                 PopulateTables(p, workingSet, definition));
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
@@ -78,120 +70,6 @@ namespace IX.Math
 
             workingSet.InternallyValid = true;
             workingSet.Success = true;
-        }
-
-        private static string BreakOneLevel(
-            string source,
-            WorkingExpressionSet workingSet,
-            WorkingDefinition definition,
-            ref int i)
-        {
-            if (string.IsNullOrWhiteSpace(source))
-            {
-                return string.Empty;
-            }
-
-            int openingParanthesisLocation = source.IndexOf(definition.Definition.Parantheses.Item1);
-            int closingParanthesisLocation = source.IndexOf(definition.Definition.Parantheses.Item2);
-
-            beginning:
-            if (openingParanthesisLocation != -1)
-            {
-                if (closingParanthesisLocation != -1)
-                {
-                    if (openingParanthesisLocation < closingParanthesisLocation)
-                    {
-                        string resultingSubExpression = BreakOneLevel(source.Substring(openingParanthesisLocation + definition.Definition.Parantheses.Item1.Length), workingSet, definition, ref i);
-
-                        if (openingParanthesisLocation == 0)
-                        {
-                            source = resultingSubExpression;
-                        }
-                        else
-                        {
-                            string expr4 = openingParanthesisLocation == 0 ? string.Empty : source.Substring(0, openingParanthesisLocation);
-
-                            if (!definition.AllOperatorsInOrder.Any(p => expr4.EndsWith(p)))
-                            {
-                                // We have a function call
-
-                                int inx = definition.AllOperatorsInOrder.Max(p => expr4.LastIndexOf(p));
-                                var expr5 = inx == -1 ? expr4 : expr4.Substring(inx);
-                                string op1 = definition.AllOperatorsInOrder.OrderByDescending(p => p.Length).FirstOrDefault(p => expr5.StartsWith(p));
-                                var expr6 = op1 == null ? expr5 : expr5.Substring(op1.Length);
-
-                                i++;
-                                string expr2 = $"item{i}";
-                                var rec = new RawExpressionContainer
-                                {
-                                    Expression = $"{expr6}{definition.Definition.Parantheses.Item1}item{i - 1}{definition.Definition.Parantheses.Item2}"
-                                };
-                                workingSet.SymbolTable.Add(expr2, rec);
-                                workingSet.ReverseSymbolTable.Add(rec.Expression, expr2);
-
-                                if (expr6 == expr4)
-                                {
-                                    expr4 = string.Empty;
-                                }
-                                else
-                                {
-                                    expr4 = expr4.Substring(0, expr4.Length - expr6.Length);
-                                }
-
-                                resultingSubExpression = resultingSubExpression.Replace($"item{i - 1}", $"item{i}");
-                            }
-
-                            source = $"{expr4}{resultingSubExpression}";
-                        }
-
-                        openingParanthesisLocation = source.IndexOf(definition.Definition.Parantheses.Item1);
-                        closingParanthesisLocation = source.IndexOf(definition.Definition.Parantheses.Item2);
-
-                        goto beginning;
-                    }
-
-                    return ProcessSubExpression(source, closingParanthesisLocation, workingSet, definition, ref i);
-                }
-                else
-                {
-                    throw new InvalidOperationException();
-                }
-            }
-            else
-            {
-                if (closingParanthesisLocation == -1)
-                {
-                    return source;
-                }
-                else
-                {
-                    return ProcessSubExpression(source, closingParanthesisLocation, workingSet, definition, ref i);
-                }
-            }
-        }
-
-        private static string ProcessSubExpression(
-            string source,
-            int cp,
-            WorkingExpressionSet workingSet,
-            WorkingDefinition definition,
-            ref int i)
-        {
-            string expr1 = source.Substring(0, cp);
-
-            RawExpressionContainer rec = new RawExpressionContainer { Expression = expr1 };
-            string expr2;
-
-            int k = cp + definition.Definition.Parantheses.Item2.Length;
-            if (!workingSet.ReverseSymbolTable.TryGetValue(rec.Expression, out expr2))
-            {
-                i++;
-                expr2 = $"item{i}";
-                workingSet.SymbolTable.Add(expr2, rec);
-                workingSet.ReverseSymbolTable.Add(rec.Expression, expr2);
-            }
-
-            return $"{expr2}{(source.Length == k ? string.Empty : source.Substring(k))}";
         }
 
         private static void PopulateTables(string p,
@@ -343,14 +221,14 @@ namespace IX.Math
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
         {
-            Match match = functionSupport.Match(expression);
+            Match match = definition.FunctionRegex.Match(expression);
 
             try
             {
                 if (match.Success)
                 {
                     string functionName = match.Groups["functionName"].Value;
-                    string[] expr = match.Groups["expression"].Value.Split(',');
+                    string[] expr = match.Groups["expression"].Value.Split(new[] { definition.Definition.ParameterSeparator }, StringSplitOptions.None);
 
                     var body = GenerateExpression(expr, workingSet, definition);
 
@@ -391,13 +269,13 @@ namespace IX.Math
                     // We are having a binary operator
                     try
                     {
-                        ExpressionTreeNodeBase left = GenerateExpression(split[0], workingSet, definition);
+                        ExpressionTreeNodeBase left = GenerateExpression(string.Join(op, split.Take(split.Length - 1).ToArray()), workingSet, definition);
                         if (left == null)
                         {
                             return null;
                         }
 
-                        ExpressionTreeNodeBase right = GenerateExpression(string.Join(op, split.Skip(1).ToArray()), workingSet, definition);
+                        ExpressionTreeNodeBase right = GenerateExpression(split.Last(), workingSet, definition);
                         if (right == null)
                         {
                             return null;

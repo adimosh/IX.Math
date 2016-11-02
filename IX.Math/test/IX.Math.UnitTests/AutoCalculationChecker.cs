@@ -89,6 +89,31 @@ namespace IX.Math.UnitTests
                     "e*[pi]",
                     System.Math.E * System.Math.PI
                 },
+                new object[]
+                {
+                    "min(2,17)",
+                    2D
+                },
+                new object[]
+                {
+                    "max(2,17)+1",
+                    18D
+                },
+                new object[]
+                {
+                    "(max(2,17)+1)/2",
+                    9D
+                },
+                new object[]
+                {
+                    "max(2,17)+max(3,1)",
+                    20D
+                },
+                new object[]
+                {
+                    "(sqrt(16)+1)*4-max(20,13)+(27*5-27*4 - sqrt(49))",
+                    20D
+                },
             };
         }
     }

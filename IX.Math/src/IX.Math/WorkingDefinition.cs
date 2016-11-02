@@ -1,6 +1,7 @@
 ﻿using IX.Math.BuiltIn;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 
@@ -64,6 +65,14 @@ namespace IX.Math
                 definition.ShiftRightSymbol,
                 definition.NotSymbol
             };
+            AllSymbols = AllOperatorsInOrder
+                .Union(new[]
+                {
+                    definition.ParameterSeparator,
+                    definition.Parantheses.Item1,
+                    definition.Parantheses.Item2
+                })
+                .ToArray();
 
             BinaryExpressionGenerators = new Dictionary<string, Func<Expression, Expression, Expression>>
             {
@@ -90,6 +99,8 @@ namespace IX.Math
                 [definition.SubtractSymbol] = (type, expr) => Expression.Subtract(Expression.Constant(Convert.ChangeType(0, type), type), expr),
                 [definition.NotSymbol] = (type, expr) => Expression.Negate(expr)
             };
+
+            FunctionRegex = new Regex($@"(?'functionName'.*?){Regex.Escape(definition.Parantheses.Item1)}(?'expression'.*?){Regex.Escape(definition.Parantheses.Item2)}");
 
             // New expression tree implementation
             NumericBinaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
@@ -136,8 +147,10 @@ namespace IX.Math
         internal readonly string[] BinaryOperatorsInOrder;
         internal readonly string[] UnaryOperatorsInOrder;
         internal readonly string[] AllOperatorsInOrder;
+        internal readonly string[] AllSymbols;
         internal readonly Dictionary<string, Func<Expression, Expression, Expression>> BinaryExpressionGenerators;
         internal readonly Dictionary<string, Func<Type, Expression, Expression>> UnaryExpressionGenerators;
+        internal readonly Regex FunctionRegex;
 
         // New expression tree implementation
         internal readonly Dictionary<string, Func<ExpressionTreeNodeBase>> NumericBinaryOperators;
