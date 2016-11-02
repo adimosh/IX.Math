@@ -2,32 +2,42 @@
 
 namespace IX.Math
 {
-    internal class RawExpressionContainer : IEquatable<RawExpressionContainer>
+    internal sealed class RawExpressionContainer : IEquatable<RawExpressionContainer>
     {
-        private string expression;
-        public string Expression
+        internal RawExpressionContainer(string expression, bool isFunction = false, bool isString = false)
         {
-            get
+            if (string.IsNullOrWhiteSpace(expression))
             {
-                return expression;
+                Expression = null;
             }
-            set
+            else
             {
-                if (string.IsNullOrWhiteSpace(value))
-                    expression = null;
+                if (isString)
+                {
+                    Expression = expression;
+                }
                 else
-                    expression = value.Replace(" ", string.Empty);
+                {
+                    Expression = expression.Replace(" ", string.Empty);
+                }
             }
+
         }
 
-        public bool IsFunctionCall { get; set; }
+        public string Expression { get; private set; }
+
+        public bool IsFunctionCall { get; private set; }
+
+        public bool IsString { get; private set; }
 
         public bool Equals(RawExpressionContainer other)
         {
             if (other == null)
                 return false;
 
-            return expression == other.expression;
+            return Expression == other.Expression &&
+                IsFunctionCall == other.IsFunctionCall &&
+                IsString == other.IsString;
         }
     }
 }

@@ -17,16 +17,17 @@ namespace IX.Math
 
         private static void FormatParanthesis(string key, WorkingExpressionSet workingSet, WorkingDefinition definition)
         {
-            if (workingSet.SymbolTable[key].IsFunctionCall)
+            var symbol = workingSet.SymbolTable[key];
+            if (symbol.IsFunctionCall || symbol.IsString)
             {
                 return;
             }
 
             string replacedPreviously = string.Empty;
-            string replaced = workingSet.SymbolTable[key].Expression;
+            string replaced = symbol.Expression;
             while (replaced != replacedPreviously)
             {
-                workingSet.SymbolTable[key] = new RawExpressionContainer { Expression = replaced };
+                workingSet.SymbolTable[key] = new RawExpressionContainer(replaced);
                 replacedPreviously = replaced;
                 replaced = ReplaceParanthesis(replaced, workingSet, definition);
             }
@@ -71,13 +72,10 @@ namespace IX.Math
                                 string op1 = definition.AllOperatorsInOrder.OrderByDescending(p => p.Length).FirstOrDefault(p => expr5.StartsWith(p));
                                 var expr6 = op1 == null ? expr5 : expr5.Substring(op1.Length);
 
-                                string expr2 = $"item{workingSet.SymbolTable.Count}";
-                                var rec = new RawExpressionContainer
-                                {
-                                    Expression = $"{expr6}{definition.Definition.Parantheses.Item1}item{workingSet.SymbolTable.Count - 1}{definition.Definition.Parantheses.Item2}"
-                                };
-                                workingSet.SymbolTable.Add(expr2, rec);
-                                workingSet.ReverseSymbolTable.Add(rec.Expression, expr2);
+                                string expr2 = SymbolExpressionGenerator.GenerateSymbolExpression(
+                                    workingSet,
+                                    $"{expr6}{definition.Definition.Parantheses.Item1}item{workingSet.SymbolTable.Count - 1}{definition.Definition.Parantheses.Item2}"
+                                    );
 
                                 if (expr6 == expr4)
                                 {
@@ -133,16 +131,7 @@ namespace IX.Math
             List<string> parSymbols = new List<string>();
             foreach (string s in parameters)
             {
-                RawExpressionContainer rec = new RawExpressionContainer { Expression = s };
-                string expr2;
-
-                if (!workingSet.ReverseSymbolTable.TryGetValue(rec.Expression, out expr2))
-                {
-                    expr2 = $"item{workingSet.SymbolTable.Count}";
-                    workingSet.SymbolTable.Add(expr2, rec);
-                    workingSet.ReverseSymbolTable.Add(rec.Expression, expr2);
-                }
-
+                string expr2 = SymbolExpressionGenerator.GenerateSymbolExpression(workingSet, s);
                 parSymbols.Add(expr2);
             }
 

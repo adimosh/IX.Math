@@ -17,15 +17,16 @@ namespace IX.Math
 
         private static void ReplaceOneFunction(string key, WorkingExpressionSet workingSet, WorkingDefinition definition)
         {
-            if (workingSet.SymbolTable[key].IsFunctionCall)
+            var symbol = workingSet.SymbolTable[key];
+            if (symbol.IsFunctionCall)
             {
                 return;
             }
 
-            string replaced = workingSet.SymbolTable[key].Expression;
+            string replaced = symbol.Expression;
             while (replaced != null)
             {
-                workingSet.SymbolTable[key] = new RawExpressionContainer { Expression = replaced };
+                workingSet.SymbolTable[key] = new RawExpressionContainer(replaced);
                 replaced = ReplaceFunctions(replaced, workingSet, definition);
             }
         }
@@ -76,15 +77,13 @@ namespace IX.Math
                 List<string> argPlaceholders = new List<string>();
                 foreach (var s in arguments.Split(new[] { definition.Definition.ParameterSeparator }, StringSplitOptions.None))
                 {
-                    string sa = $"item{workingSet.SymbolTable.Count}";
-                    workingSet.SymbolTable.Add(sa, new RawExpressionContainer { Expression = s });
+                    string sa = SymbolExpressionGenerator.GenerateSymbolExpression(workingSet, s);
                     argPlaceholders.Add(sa);
                 }
 
                 string functionCallBody = $"{functionHeader}{definition.Definition.Parantheses.Item1}{string.Join(definition.Definition.ParameterSeparator, argPlaceholders)}{definition.Definition.Parantheses.Item2}";
                 string functionCallToReplace = $"{functionHeader}{definition.Definition.Parantheses.Item1}{arguments}{definition.Definition.Parantheses.Item2}";
-                string functionCallItem = $"item{workingSet.SymbolTable.Count}";
-                workingSet.SymbolTable.Add(functionCallItem, new RawExpressionContainer { Expression = functionCallBody, IsFunctionCall = true });
+                string functionCallItem = SymbolExpressionGenerator.GenerateSymbolExpression(workingSet, functionCallBody, isFunction: true);
 
                 return source.Replace(
                     functionCallToReplace,

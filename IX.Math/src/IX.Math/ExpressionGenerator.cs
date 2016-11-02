@@ -14,13 +14,19 @@ namespace IX.Math
         {
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
+            // Strings
+            StringExpressionGenerator.ReplaceStrings(workingSet, definition);
+
+            workingSet.CancellationToken.ThrowIfCancellationRequested();
+
+            // Prepares expression and takes care of operators to ensure that they are all OK and usable
             PrepareMathDefinitionAndExpression(workingSet, definition);
 
             definition.Initialize();
 
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
+            workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer(workingSet.InitialExpression));
 
-            workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer { Expression = workingSet.InitialExpression });
+            workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Break expression based on function calls
             FunctionExpressionGenerator.ReplaceFunctions(workingSet, definition);
@@ -33,7 +39,7 @@ namespace IX.Math
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Populating symbol tables
-            workingSet.SymbolTable.Where(p => !p.Value.IsFunctionCall).Select(p => p.Value.Expression).ToList().ForEach(p =>
+            workingSet.SymbolTable.Where(p => !p.Value.IsFunctionCall && !p.Value.IsString).Select(p => p.Value.Expression).ToList().ForEach(p =>
                 PopulateTables(p, workingSet, definition));
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
@@ -41,7 +47,7 @@ namespace IX.Math
             // Generate expressions
             try
             {
-                workingSet.Body = GenerateExpression(workingSet.SymbolTable[string.Empty].Expression, workingSet, definition);
+                workingSet.Body = GenerateExpression(workingSet.SymbolTable[string.Empty], workingSet, definition);
             }
             catch
             {
@@ -237,7 +243,7 @@ namespace IX.Math
         }
 
         private static ExpressionTreeNodeBase[] GenerateExpression(
-            string[] s,
+            RawExpressionContainer[] s,
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
         {
@@ -257,10 +263,25 @@ namespace IX.Math
         }
 
         private static ExpressionTreeNodeBase GenerateExpression(
-            string s,
+            RawExpressionContainer expression,
             WorkingExpressionSet workingSet,
             WorkingDefinition definition)
         {
+            if (expression.IsString)
+            {
+                return new ExpressionTreeNodeStringConstant(expression.Expression);
+            }
+
+            if (expression.IsFunctionCall)
+            {
+                return GenerateFunctionCallExpression(
+                    expression.Expression,
+                    workingSet,
+                    definition);
+            }
+
+            string s = expression.Expression;
+
             // Check whether expression is special symbol
             ExpressionTreeNodeMathematicSpecialSymbol ss;
             if (s.StartsWith(definition.Definition.SpecialSymbolIndicators.Item1) && s.EndsWith(definition.Definition.SpecialSymbolIndicators.Item2))
@@ -292,17 +313,16 @@ namespace IX.Math
             }
 
             // Check whether the expression already exists in the symbols table
-            RawExpressionContainer expression;
             if (workingSet.SymbolTable.TryGetValue(s, out expression))
             {
-                return GenerateExpression(expression.Expression, workingSet, definition);
+                return GenerateExpression(expression, workingSet, definition);
             }
 
             // Check whether the expression is a function call
             if (s.Contains(definition.Definition.Parantheses.Item1))
             {
                 return GenerateFunctionCallExpression(
-                    new RawExpressionContainer { Expression = s }.Expression,
+                    new RawExpressionContainer(s).Expression,
                     workingSet,
                     definition);
             }
@@ -342,7 +362,10 @@ namespace IX.Math
                 if (match.Success)
                 {
                     string functionName = match.Groups["functionName"].Value;
-                    string[] expr = match.Groups["expression"].Value.Split(new[] { definition.Definition.ParameterSeparator }, StringSplitOptions.None);
+                    var expr = match.Groups["expression"].Value
+                        .Split(new[] { definition.Definition.ParameterSeparator }, StringSplitOptions.None)
+                        .Select(p => new RawExpressionContainer(p))
+                        .ToArray();
 
                     var body = GenerateExpression(expr, workingSet, definition);
 
@@ -383,13 +406,13 @@ namespace IX.Math
                     // We are having a binary operator
                     try
                     {
-                        ExpressionTreeNodeBase left = GenerateExpression(string.Join(op, split.Take(split.Length - 1).ToArray()), workingSet, definition);
+                        ExpressionTreeNodeBase left = GenerateExpression(new RawExpressionContainer(string.Join(op, split.Take(split.Length - 1).ToArray())), workingSet, definition);
                         if (left == null)
                         {
                             return null;
                         }
 
-                        ExpressionTreeNodeBase right = GenerateExpression(split.Last(), workingSet, definition);
+                        ExpressionTreeNodeBase right = GenerateExpression(new RawExpressionContainer(split.Last()), workingSet, definition);
                         if (right == null)
                         {
                             return null;
@@ -434,7 +457,7 @@ namespace IX.Math
             {
                 try
                 {
-                    ExpressionTreeNodeBase expr = GenerateExpression(s.Substring(op.Length), workingSet, definition);
+                    ExpressionTreeNodeBase expr = GenerateExpression(new RawExpressionContainer(s.Substring(op.Length)), workingSet, definition);
                     if (expr == null)
                     {
                         return null;
