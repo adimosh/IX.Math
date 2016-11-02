@@ -36,10 +36,13 @@ namespace IX.Math.BuiltIn
             var left = operandExpressions[0];
             var right = operandExpressions[1];
 
-            if (left is ExpressionTreeNodeBooleanConstant && right is ExpressionTreeNodeBooleanConstant)
+            var leftExpression = left.GenerateExpression(numericTypeValue);
+            var rightExpression = right.GenerateExpression(numericTypeValue);
+
+            if (leftExpression is ConstantExpression && rightExpression is ConstantExpression)
             {
-                var leftConverted = (ExpressionTreeNodeBooleanConstant)left;
-                var rightConverted = (ExpressionTreeNodeBooleanConstant)right;
+                var leftConverted = (ConstantExpression)leftExpression;
+                var rightConverted = (ConstantExpression)rightExpression;
 
                 var mi = typeof(MathematicalBinaryOperationsAide).GetTypeMethod(Enum.GetName(typeof(ExpressionType), type), new Type[2] { typeof(bool), typeof(bool) });
 
@@ -48,7 +51,7 @@ namespace IX.Math.BuiltIn
                 return Expression.Constant(result, typeof(bool));
             }
 
-            return Expression.MakeBinary(type, left.GenerateExpression(numericTypeValue), right.GenerateExpression(numericTypeValue));
+            return Expression.MakeBinary(type, leftExpression, rightExpression);
         }
     }
 }

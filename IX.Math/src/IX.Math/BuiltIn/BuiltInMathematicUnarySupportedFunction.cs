@@ -1,7 +1,6 @@
 ﻿using IX.Math.PlatformMitigation;
 using IX.Math.SimplificationAide;
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -9,10 +8,12 @@ namespace IX.Math.BuiltIn
 {
     internal class BuiltInMathematicUnarySupportedFunction : ExpressionTreeNodeBase
     {
+        private static readonly Type mathUnaryFunctionType = typeof(double);
+
         private readonly string name;
 
         internal BuiltInMathematicUnarySupportedFunction(string name)
-            : base(typeof(double))
+            : base(mathUnaryFunctionType)
         {
             this.name = name;
         }
@@ -43,21 +44,22 @@ namespace IX.Math.BuiltIn
 
         protected override Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue)
         {
-            MethodInfo mi = typeof(System.Math).GetTypeMethod(name, typeof(double), new[] { typeof(double) });
+            MethodInfo mi = typeof(System.Math).GetTypeMethod(name, mathUnaryFunctionType, new[] { mathUnaryFunctionType });
             if (mi == null)
             {
                 throw new InvalidOperationException();
             }
 
             var operand = operandExpressions[0];
+            var operandExpression = operand.GenerateExpression(NumericTypeAide.NumericTypesConversionDictionary[mathUnaryFunctionType]);
 
-            if (operand is ExpressionTreeNodeNumericConstant)
+            if (operandExpression is ConstantExpression)
             {
-                var value = mi.Invoke(null, new[] { ((ExpressionTreeNodeNumericConstant)operand).GetValueSpecific(NumericTypeAide.NumericTypesConversionDictionary[typeof(double)]) });
-                return Expression.Constant(value, typeof(double));
+                var value = mi.Invoke(null, new[] { ((ConstantExpression)operandExpression).Value });
+                return Expression.Constant(value, mathUnaryFunctionType);
             }
 
-            return Expression.Call(mi, operand.GenerateExpression());
+            return Expression.Call(mi, operandExpression);
         }
     }
 }

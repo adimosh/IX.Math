@@ -8,10 +8,12 @@ namespace IX.Math.BuiltIn
 {
     internal sealed class BuiltInMathematicBinarySupportedFunction : ExpressionTreeNodeBase
     {
+        private static readonly Type mathBinaryFunctionType = typeof(double);
+
         private readonly string name;
 
         internal BuiltInMathematicBinarySupportedFunction(string name)
-            : base(typeof(double))
+            : base(mathBinaryFunctionType)
         {
             this.name = name;
         }
@@ -42,26 +44,28 @@ namespace IX.Math.BuiltIn
 
         protected override Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue)
         {
-            MethodInfo mi = typeof(System.Math).GetTypeMethod(name, typeof(double), new[] { typeof(double), typeof(double) });
+            MethodInfo mi = typeof(System.Math).GetTypeMethod(name, mathBinaryFunctionType, new[] { mathBinaryFunctionType, mathBinaryFunctionType });
             if (mi == null)
             {
                 throw new InvalidOperationException();
             }
 
             var operand1 = operandExpressions[0];
+            var operandExpression1 = operand1.GenerateExpression(NumericTypeAide.NumericTypesConversionDictionary[mathBinaryFunctionType]);
             var operand2 = operandExpressions[1];
+            var operandExpression2 = operand2.GenerateExpression(NumericTypeAide.NumericTypesConversionDictionary[mathBinaryFunctionType]);
 
-            if (operand1 is ExpressionTreeNodeNumericConstant && operand2 is ExpressionTreeNodeNumericConstant)
+            if (operandExpression1 is ConstantExpression && operandExpression2 is ConstantExpression)
             {
                 var value = mi.Invoke(null, new[]
                 {
-                    ((ExpressionTreeNodeNumericConstant)operand1).GetValueSpecific(NumericTypeAide.NumericTypesConversionDictionary[typeof(double)]),
-                    ((ExpressionTreeNodeNumericConstant)operand2).GetValueSpecific(NumericTypeAide.NumericTypesConversionDictionary[typeof(double)])
+                    ((ConstantExpression)operandExpression1).Value,
+                    ((ConstantExpression)operandExpression2).Value,
                 });
-                return Expression.Constant(value, typeof(double));
+                return Expression.Constant(value, mathBinaryFunctionType);
             }
 
-            return Expression.Call(mi, operand1.GenerateExpression(), operand2.GenerateExpression());
+            return Expression.Call(mi, operandExpression1, operandExpression2);
         }
     }
 }

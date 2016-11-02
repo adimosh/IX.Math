@@ -42,10 +42,13 @@ namespace IX.Math.BuiltIn
             var left = operandExpressions[0];
             var right = operandExpressions[1];
 
-            if (left is ExpressionTreeNodeNumericConstant && right is ExpressionTreeNodeNumericConstant)
+            var leftExpression = left.GenerateExpression(numericTypeValue);
+            var rightExpression = right.GenerateExpression(numericTypeValue);
+
+            if (leftExpression is ConstantExpression && rightExpression is ConstantExpression)
             {
-                var leftConverted = (ExpressionTreeNodeNumericConstant)left;
-                var rightConverted = (ExpressionTreeNodeNumericConstant)right;
+                var leftConverted = (ConstantExpression)leftExpression;
+                var rightConverted = (ConstantExpression)rightExpression;
 
                 Type numericType = NumericTypeAide.InverseNumericTypesConversionDictionary[numericTypeValue];
 
@@ -53,13 +56,13 @@ namespace IX.Math.BuiltIn
 
                 if (mi != null)
                 {
-                    var result = mi.Invoke(null, new[] { leftConverted.GetValueSpecific(numericTypeValue), rightConverted.GetValueSpecific(numericTypeValue) });
+                    var result = mi.Invoke(null, new[] { leftConverted.Value, rightConverted.Value });
 
                     return Expression.Constant(result, numericType);
                 }
             }
 
-            return Expression.MakeBinary(type, left.GenerateExpression(numericTypeValue), right.GenerateExpression(numericTypeValue));
+            return Expression.MakeBinary(type, leftExpression, rightExpression);
         }
     }
 }

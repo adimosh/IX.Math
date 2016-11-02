@@ -184,6 +184,10 @@ namespace IX.Math
                 {
                     return expressionToParse;
                 }
+                if (body is ConstantExpression)
+                {
+                    return ((ConstantExpression)body).Value;
+                }
 
                 return Expression.Lambda(body, workingSet.ExternalParameters.Values.Select(p => p.GeneratedExpression))
                     .Compile()?.DynamicInvoke(parameterValues.ToArray()) ?? expressionToParse;
@@ -273,6 +277,10 @@ namespace IX.Math
                 if (body == null)
                 {
                     return null;
+                }
+                if (body is ConstantExpression)
+                {
+                    return ((ConstantExpression)body).Value;
                 }
 
                 return Expression.Lambda(body, workingSet.ExternalParameters.Values.Select(p => p.GeneratedExpression))

@@ -34,10 +34,11 @@ namespace IX.Math.BuiltIn
         protected override Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue)
         {
             var operand = operandExpressions[0];
+            var operandExpression = operand.GenerateExpression(numericTypeValue);
 
-            if (operand is ExpressionTreeNodeNumericConstant)
+            if (operandExpression is ConstantExpression)
             {
-                var convertedOperand = (ExpressionTreeNodeNumericConstant)operand;
+                var convertedOperand = (ConstantExpression)operandExpression;
 
                 var numericType = NumericTypeAide.InverseNumericTypesConversionDictionary[numericTypeValue];
 
@@ -45,13 +46,13 @@ namespace IX.Math.BuiltIn
 
                 if (mi != null)
                 {
-                    var result = mi.Invoke(null, new[] { convertedOperand.GetValueSpecific(numericTypeValue) });
+                    var result = mi.Invoke(null, new[] { convertedOperand.Value });
 
                     return Expression.Constant(result, numericType);
                 }
             }
 
-            return Expression.MakeUnary(type, operand.GenerateExpression(numericTypeValue), null);
+            return Expression.MakeUnary(type, operandExpression, null);
         }
     }
 }
