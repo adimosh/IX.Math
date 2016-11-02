@@ -114,6 +114,16 @@ namespace IX.Math.UnitTests
                     "(sqrt(16)+1)*4-max(20,13)+(27*5-27*4 - sqrt(49))",
                     20D
                 },
+                new object[]
+                {
+                    "strlen(\"This that those\")",
+                    15
+                },
+                new object[]
+                {
+                    "5+strlen(\"This that those\")-10",
+                    10
+                },
             };
         }
     }

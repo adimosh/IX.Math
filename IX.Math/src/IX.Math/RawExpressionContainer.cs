@@ -22,6 +22,8 @@ namespace IX.Math
                 }
             }
 
+            IsFunctionCall = isFunction;
+            IsString = isString;
         }
 
         public string Expression { get; private set; }

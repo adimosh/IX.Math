@@ -18,7 +18,7 @@ namespace IX.Math
         private static void ReplaceOneFunction(string key, WorkingExpressionSet workingSet, WorkingDefinition definition)
         {
             var symbol = workingSet.SymbolTable[key];
-            if (symbol.IsFunctionCall)
+            if (symbol.IsFunctionCall || symbol.IsString)
             {
                 return;
             }

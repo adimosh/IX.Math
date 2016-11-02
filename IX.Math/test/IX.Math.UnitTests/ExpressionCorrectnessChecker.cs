@@ -168,6 +168,12 @@ namespace IX.Math.UnitTests
                     "!x",
                     new object[] { 32768 },
                     -32769
+                },
+                new object[]
+                {
+                    "strlen(x)",
+                    new object[] { "alabala" },
+                    7
                 }
             };
         }

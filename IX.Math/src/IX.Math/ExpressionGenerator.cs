@@ -15,6 +15,8 @@ namespace IX.Math
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Strings
+            workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer(workingSet.InitialExpression));
+
             StringExpressionGenerator.ReplaceStrings(workingSet, definition);
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
@@ -24,7 +26,7 @@ namespace IX.Math
 
             definition.Initialize();
 
-            workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer(workingSet.InitialExpression));
+            workingSet.SymbolTable[string.Empty] = new RawExpressionContainer(workingSet.InitialExpression);
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
