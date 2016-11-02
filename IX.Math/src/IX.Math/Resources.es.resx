@@ -126,4 +126,10 @@
   <data name="NumericTypeMismatched" xml:space="preserve">
     <value>El tipo numérico solicitado se unió mal teniendo en cuenta los argumentos especificados.</value>
   </data>
+  <data name="FunctionCallNotValid" xml:space="preserve">
+    <value>La función solicitada no se puede llamar con los operandos especificados, ya que su número no coincide con el número de operandos, o porque han unida mal tipos.!</value>
+  </data>
+  <data name="OperandMismatchInFunctionCall" xml:space="preserve">
+    <value>Los operandos requeridos para esta llamada de función se unió mal con las expresiones de operando dado.!</value>
+  </data>
 </root>
