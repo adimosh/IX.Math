@@ -10,6 +10,40 @@ namespace IX.Math
     public class MathDefinition
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="MathDefinition"/> class.
+        /// </summary>
+        public MathDefinition()
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MathDefinition"/> class.
+        /// </summary>
+        public MathDefinition(MathDefinition definition)
+        {
+            Parantheses = new Tuple<string, string>(definition.Parantheses.Item1, definition.Parantheses.Item2);
+            SpecialSymbolIndicators = new Tuple<string, string>(definition.SpecialSymbolIndicators.Item1, definition.SpecialSymbolIndicators.Item2);
+            StringIndicator = definition.StringIndicator;
+            ParameterSeparator = definition.ParameterSeparator;
+            AddSymbol = definition.AddSymbol;
+            AndSymbol = definition.AndSymbol;
+            DivideSymbol = definition.DivideSymbol;
+            DoesNotEqualSymbol = definition.DoesNotEqualSymbol;
+            EqualsSymbol = definition.EqualsSymbol;
+            GreaterThanOrEqualSymbol = definition.GreaterThanOrEqualSymbol;
+            GreaterThanSymbol = definition.GreaterThanSymbol;
+            LessThanOrEqualSymbol = definition.LessThanOrEqualSymbol;
+            LessThanSymbol = definition.LessThanSymbol;
+            MultiplySymbol = definition.MultiplySymbol;
+            NotSymbol = definition.NotSymbol;
+            OrSymbol = definition.OrSymbol;
+            PowerSymbol = definition.PowerSymbol;
+            ShiftLeftSymbol = definition.ShiftLeftSymbol;
+            ShiftRightSymbol = definition.ShiftRightSymbol;
+            SubtractSymbol = definition.SubtractSymbol;
+            XorSymbol = definition.XorSymbol;
+        }
+
+        /// <summary>
         /// What should be interpreted as parantheses.
         /// </summary>
         /// <remarks>

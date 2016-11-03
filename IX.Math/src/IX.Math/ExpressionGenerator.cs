@@ -13,6 +13,7 @@ namespace IX.Math
             WorkingDefinition definition)
         {
             workingSet.CancellationToken.ThrowIfCancellationRequested();
+            definition.Definition = new MathDefinition(definition.OriginalDefinition);
 
             // Strings
             workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer(workingSet.InitialExpression));

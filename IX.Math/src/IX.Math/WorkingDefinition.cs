@@ -9,9 +9,24 @@ namespace IX.Math
 {
     internal class WorkingDefinition
     {
+        internal readonly MathDefinition OriginalDefinition;
+        internal readonly string[] BinaryOperatorsInOrder;
+        internal readonly string[] UnaryOperatorsInOrder;
+        internal readonly string[] AllOperatorsInOrder;
+        internal readonly string[] AllSymbols;
+        internal readonly Regex FunctionRegex;
+
+        // New expression tree implementation
+        internal MathDefinition Definition;
+        internal Dictionary<string, Func<ExpressionTreeNodeBase>> NumericBinaryOperators;
+        internal Dictionary<string, Func<ExpressionTreeNodeBase>> BooleanBinaryOperators;
+        internal Dictionary<string, Func<ExpressionTreeNodeBase>> NumericUnaryOperators;
+        internal Dictionary<string, Func<ExpressionTreeNodeBase>> BooleanUnaryOperators;
+
         internal WorkingDefinition(MathDefinition definition)
         {
-            Definition = definition;
+            OriginalDefinition = definition;
+            Definition = new MathDefinition(definition);
 
             BinaryOperatorsInOrder = new[]
             {
@@ -72,19 +87,6 @@ namespace IX.Math
 
             // New expression tree implementation
         }
-
-        internal readonly MathDefinition Definition;
-        internal readonly string[] BinaryOperatorsInOrder;
-        internal readonly string[] UnaryOperatorsInOrder;
-        internal readonly string[] AllOperatorsInOrder;
-        internal readonly string[] AllSymbols;
-        internal readonly Regex FunctionRegex;
-
-        // New expression tree implementation
-        internal Dictionary<string, Func<ExpressionTreeNodeBase>> NumericBinaryOperators;
-        internal Dictionary<string, Func<ExpressionTreeNodeBase>> BooleanBinaryOperators;
-        internal Dictionary<string, Func<ExpressionTreeNodeBase>> NumericUnaryOperators;
-        internal Dictionary<string, Func<ExpressionTreeNodeBase>> BooleanUnaryOperators;
 
         internal void Initialize()
         {
