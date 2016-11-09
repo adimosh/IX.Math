@@ -124,6 +124,11 @@ namespace IX.Math.UnitTests
                     "5+strlen(\"This that those\")-10",
                     10
                 },
+                new object[]
+                {
+                    "min(max(10,5),max(25,10))",
+                    10D
+                },
             };
         }
     }

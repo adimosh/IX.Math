@@ -73,6 +73,14 @@ namespace IX.Math
                 }
 
                 string arguments = source.Substring(op + definition.Definition.Parantheses.Item1.Length, cp - op - definition.Definition.Parantheses.Item1.Length);
+                string originalArguments = arguments;
+
+                string q = arguments;
+                while (q != null)
+                {
+                    arguments = q;
+                    q = ReplaceFunctions(q, workingSet, definition);
+                }
 
                 List<string> argPlaceholders = new List<string>();
                 foreach (var s in arguments.Split(new[] { definition.Definition.ParameterSeparator }, StringSplitOptions.None))
@@ -82,7 +90,7 @@ namespace IX.Math
                 }
 
                 string functionCallBody = $"{functionHeader}{definition.Definition.Parantheses.Item1}{string.Join(definition.Definition.ParameterSeparator, argPlaceholders)}{definition.Definition.Parantheses.Item2}";
-                string functionCallToReplace = $"{functionHeader}{definition.Definition.Parantheses.Item1}{arguments}{definition.Definition.Parantheses.Item2}";
+                string functionCallToReplace = $"{functionHeader}{definition.Definition.Parantheses.Item1}{originalArguments}{definition.Definition.Parantheses.Item2}";
                 string functionCallItem = SymbolExpressionGenerator.GenerateSymbolExpression(workingSet, functionCallBody, isFunction: true);
 
                 return source.Replace(

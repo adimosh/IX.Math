@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace IX.Math
 {
+    [DebuggerDisplay("{Expression}")]
     internal sealed class RawExpressionContainer : IEquatable<RawExpressionContainer>
     {
         internal RawExpressionContainer(string expression, bool isFunction = false, bool isString = false)
