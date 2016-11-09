@@ -129,6 +129,11 @@ namespace IX.Math.UnitTests
                     "min(max(10,5),max(25,10))",
                     10D
                 },
+                new object[]
+                {
+                    "min(max(10,5)+40,3*max(25,10))",
+                    50D
+                },
             };
         }
     }
