@@ -2,43 +2,44 @@
 {
     internal static class StringExpressionGenerator
     {
-        internal static void ReplaceStrings(WorkingExpressionSet workingSet, WorkingDefinition definition)
+        internal static void ReplaceStrings(WorkingExpressionSet workingSet)
         {
-            string process = workingSet.InitialExpression;
+            string process = workingSet.Expression;
+            string stringIndicator = workingSet.Definition.StringIndicator;
 
             while (true)
             {
-                int op = process.IndexOf(definition.Definition.StringIndicator);
+                int op = process.IndexOf(stringIndicator);
 
                 if (op == -1)
                 {
                     break;
                 }
 
-                int cp = process.IndexOf(definition.Definition.StringIndicator, op + definition.Definition.StringIndicator.Length);
+                int cp = process.IndexOf(stringIndicator, op + stringIndicator.Length);
 
                 escapeRoute:
-                if (cp == -1 || (cp + definition.Definition.StringIndicator.Length) >= process.Length)
+                if (cp == -1 || (cp + stringIndicator.Length) >= process.Length)
                 {
                     break;
                 }
 
-                if (process.Substring(cp + definition.Definition.StringIndicator.Length).StartsWith(definition.Definition.StringIndicator))
+                if (process.Substring(cp + stringIndicator.Length).StartsWith(stringIndicator))
                 {
-                    cp = process.IndexOf(definition.Definition.StringIndicator, cp + definition.Definition.StringIndicator.Length * 2);
+                    cp = process.IndexOf(stringIndicator, cp + stringIndicator.Length * 2);
                     goto escapeRoute;
                 }
 
                 string itemName = SymbolExpressionGenerator.GenerateSymbolExpression(
                     workingSet,
-                    process.Substring(op + definition.Definition.StringIndicator.Length, cp - op - definition.Definition.StringIndicator.Length),
+                    process.Substring(op + stringIndicator.Length, cp - op - stringIndicator.Length),
                     isString: true
                     );
 
-                process = $"{process.Substring(0, op)}{itemName}{process.Substring(cp + definition.Definition.StringIndicator.Length)}";
+                process = $"{process.Substring(0, op)}{itemName}{process.Substring(cp + stringIndicator.Length)}";
             }
 
-            workingSet.InitialExpression = process;
+            workingSet.Expression = process;
         }
     }
 }

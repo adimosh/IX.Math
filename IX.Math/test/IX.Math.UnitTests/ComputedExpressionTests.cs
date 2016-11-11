@@ -3,7 +3,7 @@ using Xunit;
 
 namespace IX.Math.UnitTests
 {
-    public class ExpressionCorrectnessChecker
+    public class ComputedExpressionTests
     {
         [Theory(DisplayName = "Expression")]
         [MemberData(nameof(ProvideDataForTheory))]
@@ -11,10 +11,10 @@ namespace IX.Math.UnitTests
         {
             ExpressionParsingService service = new ExpressionParsingService();
 
-            Delegate del;
+            ComputedExpression del;
             try
             {
-                del = service.GenerateDelegate(expression);
+                del = service.Interpret(expression);
             }
             catch (Exception ex)
             {
@@ -29,7 +29,7 @@ namespace IX.Math.UnitTests
             object result;
             try
             {
-                result = del.DynamicInvoke(parameters);
+                result = del.Compute(parameters);
             }
             catch (Exception ex)
             {
@@ -60,6 +60,12 @@ namespace IX.Math.UnitTests
                     "3+(6-2)*2",
                     new object[0],
                     11
+                },
+                new object[]
+                {
+                    "1<<2",
+                    new object[0],
+                    4
                 },
                 new object[]
                 {
@@ -174,7 +180,139 @@ namespace IX.Math.UnitTests
                     "strlen(x)",
                     new object[] { "alabala" },
                     7
-                }
+                },
+                new object[]
+                {
+                    "3+6",
+                    new object[0],
+                    9
+                },
+                new object[]
+                {
+                    "21*3-17",
+                    new object[0],
+                    46
+                },
+                new object[]
+                {
+                    "(1+1)*2-3",
+                    new object[0],
+                    1
+                },
+                new object[]
+                {
+                    "sqrt(4)",
+                    new object[0],
+                    2.0
+                },
+                new object[]
+                {
+                    "!4+4",
+                    new object[0],
+                    -1
+                },
+                new object[]
+                {
+                    "212",
+                    new object[0],
+                    212
+                },
+                new object[]
+                {
+                    "String is wonderful",
+                    new object[0],
+                    "String is wonderful"
+                },
+                new object[]
+                {
+                    "212=String again",
+                    new object[0],
+                    "212=String again"
+                },
+                new object[]
+                {
+                    "0x10+26",
+                    new object[0],
+                    42
+                },
+                new object[]
+                {
+                    "e",
+                    new object[0],
+                    System.Math.E
+                },
+                new object[]
+                {
+                    "[pi]",
+                    new object[0],
+                    System.Math.PI
+                },
+                new object[]
+                {
+                    "e*[pi]",
+                    new object[0],
+                    System.Math.E * System.Math.PI
+                },
+                new object[]
+                {
+                    "min(2,17)",
+                    new object[0],
+                    2D
+                },
+                new object[]
+                {
+                    "max(2,17)+1",
+                    new object[0],
+                    18D
+                },
+                new object[]
+                {
+                    "(max(2,17)+1)/2",
+                    new object[0],
+                    9D
+                },
+                new object[]
+                {
+                    "max(2,17)+max(3,1)",
+                    new object[0],
+                    20D
+                },
+                new object[]
+                {
+                    "(sqrt(16)+1)*4-max(20,13)+(27*5-27*4 - sqrt(49))",
+                    new object[0],
+                    20D
+                },
+                new object[]
+                {
+                    "strlen(\"This that those\")",
+                    new object[0],
+                    15
+                },
+                new object[]
+                {
+                    "5+strlen(\"This that those\")-10",
+                    new object[0],
+                    10
+                },
+                new object[]
+                {
+                    "min(max(10,5),max(25,10))",
+                    new object[0],
+                    10D
+                },
+                new object[]
+                {
+                    "min(max(10,5)+40,3*max(25,10))",
+                    new object[0],
+                    50D
+                },
+                new object[]
+                {
+                    "min(max(5+strlen(\"This that those\")-10,5)+40,3*max(25,10))",
+                    new object[0],
+                    50D
+                },
             };
         }
     }

@@ -22,6 +22,8 @@ namespace IX.Math
     {
         private ExpressionParsingService eps;
         private ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>> cachedDelegates;
+        private ConcurrentDictionary<string, ComputedExpression> cachedComputedExpressions;
+        private bool disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CachedExpressionParsingService"/> class.
@@ -30,6 +32,7 @@ namespace IX.Math
         {
             eps = new ExpressionParsingService();
             cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>>();
+            cachedComputedExpressions = new ConcurrentDictionary<string, ComputedExpression>();
         }
 
         /// <summary>
@@ -40,6 +43,22 @@ namespace IX.Math
         {
             eps = new ExpressionParsingService(definition);
             cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>>();
+            cachedComputedExpressions = new ConcurrentDictionary<string, ComputedExpression>();
+        }
+
+        /// <summary>
+        /// Disposes of an instance of the <see cref="CachedExpressionParsingService"/> class.
+        /// </summary>
+        ~CachedExpressionParsingService()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(false);
+        }
+
+        /// <inheritDoc />
+        public ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return cachedComputedExpressions.GetOrAdd(expression, expr => eps.Interpret(expr, cancellationToken));
         }
 
         /// <summary>
@@ -48,6 +67,7 @@ namespace IX.Math
         /// <param name="expressionToParse">The mathematical expression to parse.</param>
         /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
         /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
+        [Obsolete("This method will be removed in 0.4.0, please use Interpret instead.")]
         public object ExecuteExpression(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (disposedValue)
@@ -79,6 +99,7 @@ namespace IX.Math
         /// <param name="dataFinder">A service instance that is used to find the data that the expression requires in order to execute.</param>
         /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
         /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
+        [Obsolete("This method will be removed in 0.4.0, please use Interpret instead.")]
         public object ExecuteExpression(string expressionToParse, IDataFinder dataFinder, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (disposedValue)
@@ -114,6 +135,7 @@ namespace IX.Math
         /// <param name="arguments">The arguments to pass to the expression.</param>
         /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
         /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
+        [Obsolete("This method will be removed in 0.4.0, please use Interpret instead.")]
         public object ExecuteExpression(string expressionToParse, object[] arguments, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (disposedValue)
@@ -138,6 +160,7 @@ namespace IX.Math
         /// <param name="expressionToParse">The mathematical expression to parse.</param>
         /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
         /// <returns>A <see cref="Delegate"/> that can be used to calculate the result of the given expression.</returns>
+        [Obsolete("This method will be removed in 0.4.0, please use Interpret instead.")]
         public Delegate GenerateDelegate(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (disposedValue)
@@ -146,6 +169,33 @@ namespace IX.Math
             }
 
             return GetDelegateForExpression(expressionToParse, WorkingConstants.defaultNumericType, cancellationToken)?.Item1;
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <inheritdoc />
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    cachedDelegates.Clear();
+                    cachedComputedExpressions.Clear();
+                }
+
+                cachedDelegates = null;
+                cachedComputedExpressions = null;
+                eps = null;
+
+                disposedValue = true;
+            }
         }
 
         private Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>> GetDelegateForExpression(
@@ -186,44 +236,6 @@ namespace IX.Math
 
             return del;
         }
-
-        #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
-        /// <inheritdoc />
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    cachedDelegates.Clear();
-                }
-
-                cachedDelegates = null;
-                eps = null;
-
-                disposedValue = true;
-            }
-        }
-
-        /// <summary>
-        /// Disposes of an instance of the <see cref="CachedExpressionParsingService"/> class.
-        /// </summary>
-        ~CachedExpressionParsingService()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(false);
-        }
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        #endregion
     }
 }
 #endif

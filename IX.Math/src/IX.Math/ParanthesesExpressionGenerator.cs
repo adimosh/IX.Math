@@ -6,16 +6,16 @@ namespace IX.Math
 {
     internal static class ParanthesesExpressionGenerator
     {
-        internal static void FormatParantheses(WorkingExpressionSet workingSet, WorkingDefinition definition)
+        internal static void FormatParantheses(WorkingExpressionSet workingSet)
         {
-            FormatParanthesis(string.Empty, workingSet, definition);
+            FormatParanthesis(string.Empty, workingSet);
             for (int i = 1; i < workingSet.SymbolTable.Count; i++)
             {
-                FormatParanthesis($"item{i}", workingSet, definition);
+                FormatParanthesis($"item{i}", workingSet);
             }
         }
 
-        private static void FormatParanthesis(string key, WorkingExpressionSet workingSet, WorkingDefinition definition)
+        private static void FormatParanthesis(string key, WorkingExpressionSet workingSet)
         {
             var symbol = workingSet.SymbolTable[key];
             if (symbol.IsFunctionCall || symbol.IsString)
@@ -29,19 +29,19 @@ namespace IX.Math
             {
                 workingSet.SymbolTable[key] = new RawExpressionContainer(replaced);
                 replacedPreviously = replaced;
-                replaced = ReplaceParanthesis(replaced, workingSet, definition);
+                replaced = ReplaceParanthesis(replaced, workingSet);
             }
         }
 
-        private static string ReplaceParanthesis(string source, WorkingExpressionSet workingSet, WorkingDefinition definition)
+        private static string ReplaceParanthesis(string source, WorkingExpressionSet workingSet)
         {
             if (string.IsNullOrWhiteSpace(source))
             {
                 return string.Empty;
             }
 
-            int openingParanthesisLocation = source.IndexOf(definition.Definition.Parantheses.Item1);
-            int closingParanthesisLocation = source.IndexOf(definition.Definition.Parantheses.Item2);
+            int openingParanthesisLocation = source.IndexOf(workingSet.Definition.Parantheses.Item1);
+            int closingParanthesisLocation = source.IndexOf(workingSet.Definition.Parantheses.Item2);
 
             beginning:
             if (openingParanthesisLocation != -1)
@@ -51,9 +51,8 @@ namespace IX.Math
                     if (openingParanthesisLocation < closingParanthesisLocation)
                     {
                         string resultingSubExpression = ReplaceParanthesis(
-                            source.Substring(openingParanthesisLocation + definition.Definition.Parantheses.Item1.Length),
-                            workingSet,
-                            definition);
+                            source.Substring(openingParanthesisLocation + workingSet.Definition.Parantheses.Item1.Length),
+                            workingSet);
 
                         if (openingParanthesisLocation == 0)
                         {
@@ -63,18 +62,18 @@ namespace IX.Math
                         {
                             string expr4 = openingParanthesisLocation == 0 ? string.Empty : source.Substring(0, openingParanthesisLocation);
 
-                            if (!definition.AllOperatorsInOrder.Any(p => expr4.EndsWith(p)))
+                            if (!workingSet.AllOperatorsInOrder.Any(p => expr4.EndsWith(p)))
                             {
                                 // We have a function call
 
-                                int inx = definition.AllOperatorsInOrder.Max(p => expr4.LastIndexOf(p));
+                                int inx = workingSet.AllOperatorsInOrder.Max(p => expr4.LastIndexOf(p));
                                 var expr5 = inx == -1 ? expr4 : expr4.Substring(inx);
-                                string op1 = definition.AllOperatorsInOrder.OrderByDescending(p => p.Length).FirstOrDefault(p => expr5.StartsWith(p));
+                                string op1 = workingSet.AllOperatorsInOrder.OrderByDescending(p => p.Length).FirstOrDefault(p => expr5.StartsWith(p));
                                 var expr6 = op1 == null ? expr5 : expr5.Substring(op1.Length);
 
                                 string expr2 = SymbolExpressionGenerator.GenerateSymbolExpression(
                                     workingSet,
-                                    $"{expr6}{definition.Definition.Parantheses.Item1}item{workingSet.SymbolTable.Count - 1}{definition.Definition.Parantheses.Item2}"
+                                    $"{expr6}{workingSet.Definition.Parantheses.Item1}item{workingSet.SymbolTable.Count - 1}{workingSet.Definition.Parantheses.Item2}"
                                     );
 
                                 if (expr6 == expr4)
@@ -92,13 +91,13 @@ namespace IX.Math
                             source = $"{expr4}{resultingSubExpression}";
                         }
 
-                        openingParanthesisLocation = source.IndexOf(definition.Definition.Parantheses.Item1);
-                        closingParanthesisLocation = source.IndexOf(definition.Definition.Parantheses.Item2);
+                        openingParanthesisLocation = source.IndexOf(workingSet.Definition.Parantheses.Item1);
+                        closingParanthesisLocation = source.IndexOf(workingSet.Definition.Parantheses.Item2);
 
                         goto beginning;
                     }
 
-                    return ProcessSubExpression(source, closingParanthesisLocation, workingSet, definition);
+                    return ProcessSubExpression(source, closingParanthesisLocation, workingSet);
                 }
                 else
                 {
@@ -113,7 +112,7 @@ namespace IX.Math
                 }
                 else
                 {
-                    return ProcessSubExpression(source, closingParanthesisLocation, workingSet, definition);
+                    return ProcessSubExpression(source, closingParanthesisLocation, workingSet);
                 }
             }
         }
@@ -121,12 +120,11 @@ namespace IX.Math
         private static string ProcessSubExpression(
             string source,
             int cp,
-            WorkingExpressionSet workingSet,
-            WorkingDefinition definition)
+            WorkingExpressionSet workingSet)
         {
             string expr1 = source.Substring(0, cp);
 
-            string[] parameters = expr1.Split(new string[] { definition.Definition.ParameterSeparator }, StringSplitOptions.None);
+            string[] parameters = expr1.Split(new string[] { workingSet.Definition.ParameterSeparator }, StringSplitOptions.None);
 
             List<string> parSymbols = new List<string>();
             foreach (string s in parameters)
@@ -135,8 +133,8 @@ namespace IX.Math
                 parSymbols.Add(expr2);
             }
 
-            int k = cp + definition.Definition.Parantheses.Item2.Length;
-            return $"{string.Join(definition.Definition.ParameterSeparator, parSymbols)}{(source.Length == k ? string.Empty : source.Substring(k))}";
+            int k = cp + workingSet.Definition.Parantheses.Item2.Length;
+            return $"{string.Join(workingSet.Definition.ParameterSeparator, parSymbols)}{(source.Length == k ? string.Empty : source.Substring(k))}";
         }
     }
 }

@@ -13,7 +13,7 @@ namespace IX.Math
     /// </summary>
     public sealed class ExpressionParsingService : IExpressionParsingService
     {
-        private readonly WorkingDefinition workingDefinition;
+        private readonly MathDefinition workingDefinition;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionParsingService"/> class with a standard math definition object.
@@ -52,7 +52,29 @@ namespace IX.Math
         /// <param name="definition">The math definition to use.</param>
         public ExpressionParsingService(MathDefinition definition)
         {
-            workingDefinition = new WorkingDefinition(definition);
+            workingDefinition = definition;
+        }
+
+        ///<inheritDoc/>
+        public ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (string.IsNullOrWhiteSpace(expression))
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
+            WorkingExpressionSet workingSet = new WorkingExpressionSet(expression, workingDefinition, cancellationToken);
+
+            ExpressionGenerator.CreateBody(workingSet);
+
+            if (!workingSet.Success)
+            {
+                return new ComputedExpression(expression, null, null, false);
+            }
+            else
+            {
+                return new ComputedExpression(expression, workingSet.Body, workingSet.ExternalParameters.Values.ToArray(), true);
+            }
         }
 
         /// <summary>
@@ -61,6 +83,7 @@ namespace IX.Math
         /// <param name="expressionToParse">The mathematical expression to parse.</param>
         /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
         /// <returns>A <see cref="Delegate"/> that can be used to calculate the result of the given expression, or <c>null</c> (<c>Nothing</c> in Visual Basic).</returns>
+        [Obsolete("This method will be removed in 0.4.0, please use Interpret instead.")]
         public Delegate GenerateDelegate(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
             return GenerateDelegateInternal(expressionToParse, WorkingConstants.defaultNumericType, cancellationToken)?.Item1;
@@ -78,6 +101,7 @@ namespace IX.Math
         /// <para>For instance, if type <see cref="int"/> is requested, but a <see cref="double"/> value is found anywhere in the expression, the resulting type will be
         /// <see cref="double"/>.</para>
         /// </remarks>
+        [Obsolete("This method will be removed in 0.4.0, please use Interpret instead.")]
         public Delegate GenerateDelegate(string expressionToParse, Type numericalType, CancellationToken cancellationToken = default(CancellationToken))
         {
             return GenerateDelegateInternal(expressionToParse, numericalType, cancellationToken)?.Item1;
@@ -89,6 +113,7 @@ namespace IX.Math
         /// <param name="expressionToParse">The mathematical expression to parse.</param>
         /// <param name="cancellationToken">The cancellation token to use for this operation.</param>
         /// <returns>The result of the expression, if calculable, whatever it might be.</returns>
+        [Obsolete("This method will be removed in 0.4.0, please use Interpret instead.")]
         public object ExecuteExpression(string expressionToParse, CancellationToken cancellationToken = default(CancellationToken))
         {
             return ExecuteExpression(expressionToParse, WorkingConstants.defaultNumericType, null, cancellationToken);
@@ -106,6 +131,7 @@ namespace IX.Math
         /// <para>For instance, if type <see cref="int"/> is requested, but a <see cref="double"/> value is found anywhere in the expression, the resulting type will be
         /// <see cref="double"/>.</para>
         /// </remarks>
+        [Obsolete("This method will be removed in 0.4.0, please use Interpret instead.")]
         public object ExecuteExpression(string expressionToParse, Type numericalType, CancellationToken cancellationToken = default(CancellationToken))
         {
             return ExecuteExpression(expressionToParse, numericalType, null, cancellationToken);
@@ -122,6 +148,7 @@ namespace IX.Math
         /// <para>The numerical type that will be used will be the type with the highest capacity between the used types.</para>
         /// <para>All numerical arguments will have been converted to the numerical type before being used as parameters.</para>
         /// </remarks>
+        [Obsolete("This method will be removed in 0.4.0, please use Interpret instead.")]
         public object ExecuteExpression(string expressionToParse, object[] arguments, CancellationToken cancellationToken = default(CancellationToken))
         {
             Type numericType = WorkingConstants.defaultNumericType;
@@ -146,11 +173,12 @@ namespace IX.Math
         /// <para>Calling this method will attempt to automatically convert values returned by the finder to <see cref="double"/>.</para>
         /// <para>Any other rule still applies, so, if you pass a <see cref="string"/> where a numeric value is required, the method will still fail.</para>
         /// </remarks>
+        [Obsolete("This method will be removed in 0.4.0, please use Interpret instead.")]
         public object ExecuteExpression(string expressionToParse, IDataFinder dataFinder, CancellationToken cancellationToken = default(CancellationToken))
         {
-            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, cancellationToken);
+            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, workingDefinition, cancellationToken);
 
-            ExpressionGenerator.CreateBody(workingSet, workingDefinition);
+            ExpressionGenerator.CreateBody(workingSet);
 
             if (!workingSet.Success)
             {
@@ -211,9 +239,9 @@ namespace IX.Math
                 throw new InvalidOperationException(Resources.NumericTypeInvalid);
             }
 
-            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, cancellationToken);
+            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, workingDefinition, cancellationToken);
 
-            ExpressionGenerator.CreateBody(workingSet, workingDefinition);
+            ExpressionGenerator.CreateBody(workingSet);
 
             if (!workingSet.Success)
             {
@@ -241,9 +269,9 @@ namespace IX.Math
 
         private object ExecuteExpression(string expressionToParse, Type requestedNumericType, object[] arguments, CancellationToken cancellationToken)
         {
-            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, cancellationToken);
+            WorkingExpressionSet workingSet = new WorkingExpressionSet(expressionToParse, workingDefinition, cancellationToken);
 
-            ExpressionGenerator.CreateBody(workingSet, workingDefinition);
+            ExpressionGenerator.CreateBody(workingSet);
 
             if (!workingSet.Success)
             {

@@ -117,7 +117,7 @@ namespace IX.Math
         /// <summary>
         /// Calculates a resulting minimal numeric type value out of this expression container and its sub-contained operands.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A minimal numeric type value for this and all sub-expressions.</returns>
         public int ComputeResultingNumericTypeValue()
         {
             if (!operandsSet)
@@ -127,7 +127,24 @@ namespace IX.Math
 
             var val = operands.Max(p => p.ComputeResultingNumericTypeValue());
 
-            return minimalRequiredNumericTypeValue > val ? minimalRequiredNumericTypeValue : val;
+            return System.Math.Max(minimalRequiredNumericTypeValue, val);
+        }
+
+        /// <summary>
+        /// Calculates a resulting minimal numeric type value out of this expression container and its sub-contained operands.
+        /// </summary>
+        /// <param name="minimalType">The minimal type that is required by the outside.</param>
+        /// <returns>A minimal numeric type value for this and all sub-expressions.</returns>
+        public int ComputeResultingNumericTypeValue(int minimalType)
+        {
+            if (!operandsSet)
+            {
+                return minimalRequiredNumericTypeValue;
+            }
+
+            var val = operands.Max(p => p.ComputeResultingNumericTypeValue(minimalType));
+
+            return System.Math.Max(System.Math.Max(minimalRequiredNumericTypeValue, val), minimalType);
         }
 
         /// <summary>

@@ -103,5 +103,10 @@ namespace IX.Math.BuiltIn
                     return null;
             }
         }
+
+        internal void Reset()
+        {
+            generatedExpression = null;
+        }
     }
 }
