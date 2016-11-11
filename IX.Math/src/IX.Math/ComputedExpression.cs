@@ -27,6 +27,7 @@ namespace IX.Math
             locker = new object();
             computedBodies = new Dictionary<int, Delegate>();
             this.parameters = parameters;
+            ParameterNames = parameters.Select(p => p.Name).ToArray();
         }
 
         /// <summary>
@@ -42,6 +43,11 @@ namespace IX.Math
         /// Gets a value indicating whether or not the expression was actually recognized. <c>true</c> can possibly return an actual 
         /// </summary>
         public bool RecognizedCorrectly { get; private set; }
+
+        /// <summary>
+        /// Gets the names of the parameters this expression requires, if any.
+        /// </summary>
+        public string[] ParameterNames { get; private set; }
 
         /// <summary>
         /// Disposes an instance of the <see cref="ComputedExpression"/> class.

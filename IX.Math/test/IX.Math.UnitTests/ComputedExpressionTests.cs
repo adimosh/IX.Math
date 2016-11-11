@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Moq;
+using System;
 using Xunit;
 
 namespace IX.Math.UnitTests
 {
     public class ComputedExpressionTests
     {
-        [Theory(DisplayName = "Expression")]
+        [Theory(DisplayName = "Para")]
         [MemberData(nameof(ProvideDataForTheory))]
-        public void ExpressionCorrectnessCheckerTest(string expression, object[] parameters, object expectedResult)
+        public void ComputedExpressionWithParameters(string expression, object[] parameters, object expectedResult)
         {
             ExpressionParsingService service = new ExpressionParsingService();
 
@@ -23,13 +24,56 @@ namespace IX.Math.UnitTests
 
             if (del == null)
             {
-                throw new InvalidOperationException("No delegate was generated!");
+                throw new InvalidOperationException("No computed expression was generated!");
             }
 
             object result;
             try
             {
                 result = del.Compute(parameters);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"The method should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
+            }
+
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Theory(DisplayName = "Findr")]
+        [MemberData(nameof(ProvideDataForTheory))]
+        public void ComputedExpressionWithFinder(string expression, object[] parameters, object expectedResult)
+        {
+            ExpressionParsingService service = new ExpressionParsingService();
+            Mock<IDataFinder> finder = new Mock<IDataFinder>(MockBehavior.Loose);
+
+            ComputedExpression del;
+            try
+            {
+                del = service.Interpret(expression);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"The generation process should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
+            }
+
+            if (del == null)
+            {
+                throw new InvalidOperationException("No computed expression was generated!");
+            }
+
+            for (int i = 0; i < System.Math.Min(del.ParameterNames.Length, parameters.Length); i++)
+            {
+                string valueName = del.ParameterNames[i];
+                object outValue = parameters[i];
+
+                finder.Setup(p => p.TryGetData(valueName, out outValue)).Returns(true);
+            }
+
+            object result;
+            try
+            {
+                result = del.Compute(finder.Object);
             }
             catch (Exception ex)
             {
@@ -165,12 +209,6 @@ namespace IX.Math.UnitTests
                 },
                 new object[]
                 {
-                    "2*x-7*y",
-                    new object[] { 12, 2 },
-                    10
-                },
-                new object[]
-                {
                     "!x",
                     new object[] { 32768 },
                     -32769
@@ -180,12 +218,6 @@ namespace IX.Math.UnitTests
                     "strlen(x)",
                     new object[] { "alabala" },
                     7
-                },
-                new object[]
-                {
-                    "3+6",
-                    new object[0],
-                    9
                 },
                 new object[]
                 {
