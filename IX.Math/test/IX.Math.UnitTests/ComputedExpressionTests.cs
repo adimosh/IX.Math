@@ -325,6 +325,18 @@ namespace IX.Math.UnitTests
                     new object[0],
                     3
                 },
+                new object[]
+                {
+                    "x+y",
+                    new object[2] { 1, -2 },
+                    -1
+                },
+                new object[]
+                {
+                    "1*-2",
+                    new object[0],
+                    -2
+                },
             };
         }
     }
