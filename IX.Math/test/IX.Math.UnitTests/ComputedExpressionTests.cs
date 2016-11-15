@@ -185,6 +185,12 @@ namespace IX.Math.UnitTests
                 },
                 new object[]
                 {
+                    "1<<1 + 2 << 1",
+                    new object[0],
+                    6
+                },
+                new object[]
+                {
                     "((1+1)-(1-1))+((1-1)-(1+1))",
                     new object[0],
                     0
@@ -344,6 +350,12 @@ namespace IX.Math.UnitTests
                     "min(max(5+strlen(\"This that those\")-10,5)+40,3*max(25,10))",
                     new object[0],
                     50D
+                },
+                new object[]
+                {
+                    "1--2",
+                    new object[0],
+                    3
                 },
             };
         }

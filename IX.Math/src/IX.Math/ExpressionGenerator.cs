@@ -21,8 +21,6 @@ namespace IX.Math
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Prepares expression and takes care of operators to ensure that they are all OK and usable
-            PrepareMathDefinitionAndExpression(workingSet);
-
             workingSet.Initialize();
 
             workingSet.SymbolTable[string.Empty] = new RawExpressionContainer(workingSet.Expression);
@@ -83,29 +81,6 @@ namespace IX.Math
 
             workingSet.InternallyValid = true;
             workingSet.Success = true;
-        }
-
-        private static void PrepareMathDefinitionAndExpression(WorkingExpressionSet workingSet)
-        {
-            var operators = workingSet.AllOperatorsInOrder
-                .OrderByDescending(p => p.Length)
-                .Where(p => workingSet.AllOperatorsInOrder.Any(q => q.Length < p.Length && p.Contains(q)));
-
-            int i = 1;
-            foreach (var op in operators.OrderByDescending(p => p.Length))
-            {
-                var s = $"@op{i}@";
-
-                workingSet.InitialExpression = workingSet.InitialExpression.Replace(op, s);
-
-                var allIndex = Array.IndexOf(workingSet.AllOperatorsInOrder, op);
-                if (allIndex != -1)
-                {
-                    workingSet.AllOperatorsInOrder[allIndex] = s;
-                }
-
-                i++;
-            }
         }
 
         private static void PopulateTables(string p,
@@ -308,6 +283,7 @@ namespace IX.Math
             {
                 if (string.IsNullOrWhiteSpace(split[0]))
                 {
+                    return null;
                     // We are having a unary operator - until this is treated differently, let's simply return null
                 }
                 else
@@ -315,16 +291,37 @@ namespace IX.Math
                     // We are having a binary operator
                     try
                     {
-                        ExpressionTreeNodeBase left = GenerateExpression(new RawExpressionContainer(string.Join(op, split.Take(split.Length - 1).ToArray())), workingSet);
-                        if (left == null)
-                        {
-                            return null;
-                        }
+                        ExpressionTreeNodeBase left;
+                        ExpressionTreeNodeBase right;
 
-                        ExpressionTreeNodeBase right = GenerateExpression(new RawExpressionContainer(split.Last()), workingSet);
-                        if (right == null)
+                        if (split.Length >= 3 && string.IsNullOrWhiteSpace(split.Take(split.Length-1).Last()) && !string.IsNullOrWhiteSpace(split.Last()))
                         {
-                            return null;
+                            // We have a doubling of an operator, probably because a unary operator (like -) is used in conjunction with a binary operator of the same kind
+                            left = GenerateExpression(new RawExpressionContainer(string.Join(op, split.Take(split.Length - 2).ToArray())), workingSet);
+                            if (left == null)
+                            {
+                                return null;
+                            }
+                            right = GenerateExpression(new RawExpressionContainer($"{op}{split.Last()}"), workingSet);
+                            if (right == null)
+                            {
+                                return null;
+                            }
+                        }
+                        else
+                        {
+                            // We have a normal, regular binary
+                            left = GenerateExpression(new RawExpressionContainer(string.Join(op, split.Take(split.Length - 1).ToArray())), workingSet);
+                            if (left == null)
+                            {
+                                return null;
+                            }
+
+                            right = GenerateExpression(new RawExpressionContainer(split.Last()), workingSet);
+                            if (right == null)
+                            {
+                                return null;
+                            }
                         }
 
                         if ((left.ReturnType == SupportedValueType.Numeric && right.ReturnType == SupportedValueType.Numeric) ||

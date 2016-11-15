@@ -78,6 +78,95 @@ namespace IX.Math
 
         internal void Initialize()
         {
+            var operators = AllOperatorsInOrder
+                .OrderByDescending(p => p.Length)
+                .Where(p => AllOperatorsInOrder.Any(q => q.Length < p.Length && p.Contains(q)));
+
+            int i = 1;
+            foreach (var op in operators.OrderByDescending(p => p.Length))
+            {
+                var s = $"@op{i}@";
+
+                Expression = Expression.Replace(op, s);
+
+                var allIndex = Array.IndexOf(AllOperatorsInOrder, op);
+                if (allIndex != -1)
+                {
+                    AllOperatorsInOrder[allIndex] = s;
+                }
+
+                if (Definition.AddSymbol == op)
+                {
+                    Definition.AddSymbol = s;
+                }
+                if (Definition.AndSymbol == op)
+                {
+                    Definition.AndSymbol = s;
+                }
+                if (Definition.DivideSymbol == op)
+                {
+                    Definition.DivideSymbol = s;
+                }
+                if (Definition.DoesNotEqualSymbol == op)
+                {
+                    Definition.DoesNotEqualSymbol = s;
+                }
+                if (Definition.EqualsSymbol == op)
+                {
+                    Definition.EqualsSymbol = s;
+                }
+                if (Definition.GreaterThanOrEqualSymbol == op)
+                {
+                    Definition.GreaterThanOrEqualSymbol = s;
+                }
+                if (Definition.GreaterThanSymbol == op)
+                {
+                    Definition.GreaterThanSymbol = s;
+                }
+                if (Definition.LessThanOrEqualSymbol == op)
+                {
+                    Definition.LessThanOrEqualSymbol = s;
+                }
+                if (Definition.LessThanSymbol == op)
+                {
+                    Definition.LessThanSymbol = s;
+                }
+                if (Definition.MultiplySymbol == op)
+                {
+                    Definition.MultiplySymbol = s;
+                }
+                if (Definition.NotSymbol == op)
+                {
+                    Definition.NotSymbol = s;
+                }
+                if (Definition.OrSymbol == op)
+                {
+                    Definition.OrSymbol = s;
+                }
+                if (Definition.PowerSymbol == op)
+                {
+                    Definition.PowerSymbol = s;
+                }
+                if (Definition.ShiftLeftSymbol == op)
+                {
+                    Definition.ShiftLeftSymbol = s;
+                }
+                if (Definition.ShiftRightSymbol == op)
+                {
+                    Definition.ShiftRightSymbol = s;
+                }
+                if (Definition.SubtractSymbol == op)
+                {
+                    Definition.SubtractSymbol = s;
+                }
+                if (Definition.XorSymbol == op)
+                {
+                    Definition.XorSymbol = s;
+                }
+
+                i++;
+            }
+
             // Operator and function support
             NumericBinaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
             {
