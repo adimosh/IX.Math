@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26020.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{32A0E219-634F-419A-A9CF-CFE08E05E496}"
 EndProject
@@ -10,11 +10,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "IX.Math", "src\IX.Math\IX.Math.xproj", "{5159F238-D854-4D1D-A494-1213F57D55DA}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "IX.Math.UnitTests", "test\IX.Math.UnitTests\IX.Math.UnitTests.xproj", "{A7FB3107-43F7-4486-97D5-CE123AC8C20F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{5015DD7D-51D9-4F7E-869B-21FF015C06B6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IX.Math", "src\IX.Math\IX.Math.csproj", "{5159F238-D854-4D1D-A494-1213F57D55DA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IX.Math.UnitTests", "test\IX.Math.UnitTests\IX.Math.UnitTests.csproj", "{A7FB3107-43F7-4486-97D5-CE123AC8C20F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

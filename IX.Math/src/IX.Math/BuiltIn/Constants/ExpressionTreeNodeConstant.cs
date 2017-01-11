@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IX.Math.BuiltIn
+namespace IX.Math.BuiltIn.Constants
 {
     internal abstract class ExpressionTreeNodeConstant : ExpressionTreeNodeBase
     {

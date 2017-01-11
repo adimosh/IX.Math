@@ -1,4 +1,4 @@
-﻿using IX.Math.BuiltIn;
+﻿using IX.Math.BuiltIn.Constants;
 using IX.Math.SimplificationAide;
 using System;
 using System.Collections;

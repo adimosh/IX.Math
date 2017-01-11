@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace IX.Math.BuiltIn
+namespace IX.Math.BuiltIn.Constants
 {
     internal sealed class ExpressionTreeNodeStringConstant : ExpressionTreeNodeConstant
     {

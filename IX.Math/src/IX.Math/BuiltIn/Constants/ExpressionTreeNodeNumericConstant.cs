@@ -2,7 +2,7 @@
 using System;
 using System.Linq.Expressions;
 
-namespace IX.Math.BuiltIn
+namespace IX.Math.BuiltIn.Constants
 {
     internal abstract class ExpressionTreeNodeNumericConstant : ExpressionTreeNodeConstant
     {
