@@ -9,11 +9,13 @@ namespace IX.Math.PlatformMitigation
     {
         internal static IEnumerable<MethodInfo> GetTypeMethods(this Type type)
         {
-#if !(NETSTANDARD12 || NETSTANDARD10 || NETSTANDARD11)
-            return type.GetMethods();
+            return type.
+#if !(NETSTANDARD10 || NETSTANDARD11)
+                GetMethods
 #else
-            return type.GetRuntimeMethods();
+                GetRuntimeMethods
 #endif
+                ();
         }
 
         internal static MethodInfo GetTypeMethod(this Type type, string name)

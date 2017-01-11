@@ -1,10 +1,9 @@
-﻿using System;
+﻿#if NETSTANDARD10 || NETSTANDARD11
+using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace IX.Math.PlatformMitigation
 {
-#if NETSTANDARD10 || NETSTANDARD11 || NETSTANDARD12
     internal static class MissingListExtensions
     {
         internal static void ForEach<T>(this List<T> listToForEach, Action<T> forEach)
@@ -20,5 +19,5 @@ namespace IX.Math.PlatformMitigation
                 forEach(element);
         }
     }
-#endif
 }
+#endif

@@ -2,22 +2,35 @@
   <PropertyGroup>
     <Description>A library for transforming text expressions containing mathematical operations into executable delegates.</Description>
     <Copyright>Adrian Mos, 2016</Copyright>
+    <AssemblyName>IX.Math</AssemblyName>
     <AssemblyTitle>IX.Math</AssemblyTitle>
     <VersionPrefix>0.4.0</VersionPrefix>
     <Authors>Adrian Mos</Authors>
-    <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard1.3</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyName>IX.Math</AssemblyName>
     <PackageProjectUrl>https://github.com/adimosh/IX.Math/</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/adimosh/IX.Math/blob/master/LICENSE.md</PackageLicenseUrl>
+    <WarningLevel>4</WarningLevel>
+    <WarningsAsErrors>true</WarningsAsErrors>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>false</DefineTrace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />
     <EmbeddedResource Include="**\*.resx" />
-    <EmbeddedResource Include="compiler\resources\**\*" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Collections" Version="4.0.11" />
@@ -38,10 +51,7 @@
     <PackageReference Include="System.Reflection.Extensions" Version="4.0.1" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <PackageReference Include="System.Collections.Concurrent" Version="4.0.12" />
-    <PackageReference Include="System.Runtime.InteropServices" Version="4.1.0" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.2' ">
+    <PackageReference Include="System.Reflection.Extensions" Version="4.0.1" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.0.12" />
     <PackageReference Include="System.Runtime.InteropServices" Version="4.1.0" />
   </ItemGroup>
@@ -84,13 +94,7 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
     <DefineConstants>$(DefineConstants);NETSTANDARD11</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.2' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD12</DefineConstants>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <DefineConstants>$(DefineConstants);NETSTANDARD13</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
 </Project>
