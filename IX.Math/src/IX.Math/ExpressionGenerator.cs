@@ -169,33 +169,25 @@ namespace IX.Math
             }
 
             string s = expression.Expression;
-
-            // Check whether expression is special symbol
-            ExpressionTreeNodeMathematicSpecialSymbol ss;
-            if (s.StartsWith(workingSet.Definition.SpecialSymbolIndicators.Item1) && s.EndsWith(workingSet.Definition.SpecialSymbolIndicators.Item2))
+            if (s.StartsWith(workingSet.Definition.SpecialSymbolIndicators.Item1)
+                && s.EndsWith(workingSet.Definition.SpecialSymbolIndicators.Item2)
+                && SpecialSymbolsLocator.BuiltInSpecialSymbolsAlternateWriting.TryGetValue(s.Substring(1, s.Length - 2), out string actualSymbol))
             {
-                string actualSymbol;
-                if (SpecialSymbolsLocator.BuiltInSpecialSymbolsAlternateWriting.TryGetValue(s.Substring(1, s.Length-2), out actualSymbol))
-                {
-                    return SpecialSymbolsLocator.BuiltInSpecialSymbols[actualSymbol];
-                }
+                return SpecialSymbolsLocator.BuiltInSpecialSymbols[actualSymbol];
             }
-            
-            if (SpecialSymbolsLocator.BuiltInSpecialSymbols.TryGetValue(s, out ss))
+            // Check whether expression is special symbol
+
+            if (SpecialSymbolsLocator.BuiltInSpecialSymbols.TryGetValue(s, out var ss))
             {
                 return ss;
             }
-
             // Check whether expression is constant
-            ExpressionTreeNodeBase constantResult;
-            if (workingSet.Constants.TryGetValue(s, out constantResult))
+            if (workingSet.Constants.TryGetValue(s, out var constantResult))
             {
                 return constantResult;
             }
-
             // Check whether expression is an external parameter
-            ExpressionTreeNodeParameter parameterResult;
-            if (workingSet.ExternalParameters.TryGetValue(s, out parameterResult))
+            if (workingSet.ExternalParameters.TryGetValue(s, out var parameterResult))
             {
                 return parameterResult;
             }
@@ -255,13 +247,10 @@ namespace IX.Math
 
                     var body = GenerateExpression(expr, workingSet);
 
-                    if (body != null)
+                    if (body != null
+                        && SupportedFunctionsLocator.BuiltInFunctions.TryGetValue(functionName, out var n))
                     {
-                        Func<ExpressionTreeNodeBase> n;
-                        if (SupportedFunctionsLocator.BuiltInFunctions.TryGetValue(functionName, out n))
-                        {
-                            return n().SetOperands(body);
-                        }
+                        return n().SetOperands(body);
                     }
                 }
             }
@@ -295,7 +284,7 @@ namespace IX.Math
                         ExpressionTreeNodeBase left;
                         ExpressionTreeNodeBase right;
 
-                        if (split.Length >= 3 && string.IsNullOrWhiteSpace(split.Take(split.Length-1).Last()) && !string.IsNullOrWhiteSpace(split.Last()))
+                        if (split.Length >= 3 && string.IsNullOrWhiteSpace(split.Take(split.Length - 1).Last()) && !string.IsNullOrWhiteSpace(split.Last()))
                         {
                             // We have a doubling of an operator, probably because a unary operator (like -) is used in conjunction with a binary operator of the same kind
                             left = GenerateExpression(new RawExpressionContainer(string.Join(op, split.Take(split.Length - 2).ToArray())), workingSet);

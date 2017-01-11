@@ -12,15 +12,13 @@ namespace IX.Math
 
         public ExpressionTreeNodeBase ParseNumeric(string value)
         {
-            ExpressionTreeNodeBase etnb;
-            if (constants.TryGetValue(value, out etnb))
+            if (constants.TryGetValue(value, out var etnb))
             {
                 return etnb;
             }
 
             Type nt = WorkingConstants.defaultNumericType;
-            object val;
-            if (!NumericTypeParsingAide.Parse(value, ref nt, out val))
+            if (!NumericTypeParsingAide.Parse(value, ref nt, out object val))
             {
                 return null;
             }
