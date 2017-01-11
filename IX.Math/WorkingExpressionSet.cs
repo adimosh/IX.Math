@@ -1,16 +1,21 @@
-﻿using IX.Math.BuiltIn;
+﻿// <copyright file="WorkingExpressionSet.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
+using IX.Math.BuiltIn;
 
 namespace IX.Math
 {
     internal class WorkingExpressionSet
     {
         // Definition
+#pragma warning disable SA1401 // Fields must be private
         internal MathDefinition Definition;
         internal Dictionary<string, Func<ExpressionTreeNodeBase>> NumericBinaryOperators;
         internal Dictionary<string, Func<ExpressionTreeNodeBase>> BooleanBinaryOperators;
@@ -40,204 +45,221 @@ namespace IX.Math
         internal bool InternallyValid = false;
         internal bool Constant = false;
         internal bool PossibleString = false;
+#pragma warning restore SA1401 // Fields must be private
 
         internal WorkingExpressionSet(string expression, MathDefinition mathDefinition, CancellationToken cancellationToken)
         {
-            SymbolTable = new Dictionary<string, RawExpressionContainer>();
-            ReverseSymbolTable = new Dictionary<string, string>();
-            ExternalParameters = new Dictionary<string, ExpressionTreeNodeParameter>();
-            Constants = new ConstantsContainer();
-            InitialExpression = expression;
-            CancellationToken = cancellationToken;
-            Expression = expression;
-            Definition = new MathDefinition(mathDefinition);
+            this.SymbolTable = new Dictionary<string, RawExpressionContainer>();
+            this.ReverseSymbolTable = new Dictionary<string, string>();
+            this.ExternalParameters = new Dictionary<string, ExpressionTreeNodeParameter>();
+            this.Constants = new ConstantsContainer();
+            this.InitialExpression = expression;
+            this.CancellationToken = cancellationToken;
+            this.Expression = expression;
+            this.Definition = new MathDefinition(mathDefinition);
 
-            AllOperatorsInOrder = new[]
+            this.AllOperatorsInOrder = new[]
             {
-                Definition.GreaterThanOrEqualSymbol,
-                Definition.LessThanOrEqualSymbol,
-                Definition.GreaterThanSymbol,
-                Definition.LessThanSymbol,
-                Definition.DoesNotEqualSymbol,
-                Definition.EqualsSymbol,
-                Definition.XorSymbol,
-                Definition.OrSymbol,
-                Definition.AndSymbol,
-                Definition.AddSymbol,
-                Definition.SubtractSymbol,
-                Definition.DivideSymbol,
-                Definition.MultiplySymbol,
-                Definition.PowerSymbol,
-                Definition.ShiftLeftSymbol,
-                Definition.ShiftRightSymbol,
-                Definition.NotSymbol
+                this.Definition.GreaterThanOrEqualSymbol,
+                this.Definition.LessThanOrEqualSymbol,
+                this.Definition.GreaterThanSymbol,
+                this.Definition.LessThanSymbol,
+                this.Definition.DoesNotEqualSymbol,
+                this.Definition.EqualsSymbol,
+                this.Definition.XorSymbol,
+                this.Definition.OrSymbol,
+                this.Definition.AndSymbol,
+                this.Definition.AddSymbol,
+                this.Definition.SubtractSymbol,
+                this.Definition.DivideSymbol,
+                this.Definition.MultiplySymbol,
+                this.Definition.PowerSymbol,
+                this.Definition.ShiftLeftSymbol,
+                this.Definition.ShiftRightSymbol,
+                this.Definition.NotSymbol
             };
 
-            FunctionRegex = new Regex($@"(?'functionName'.*?){Regex.Escape(Definition.Parantheses.Item1)}(?'expression'.*?){Regex.Escape(Definition.Parantheses.Item2)}");
+            this.FunctionRegex = new Regex($@"(?'functionName'.*?){Regex.Escape(this.Definition.Parantheses.Item1)}(?'expression'.*?){Regex.Escape(this.Definition.Parantheses.Item2)}");
         }
 
         internal void Initialize()
         {
-            var operators = AllOperatorsInOrder
+            var operators = this.AllOperatorsInOrder
                 .OrderByDescending(p => p.Length)
-                .Where(p => AllOperatorsInOrder.Any(q => q.Length < p.Length && p.Contains(q)));
+                .Where(p => this.AllOperatorsInOrder.Any(q => q.Length < p.Length && p.Contains(q)));
 
             int i = 1;
             foreach (var op in operators.OrderByDescending(p => p.Length))
             {
                 var s = $"@op{i}@";
 
-                Expression = Expression.Replace(op, s);
+                this.Expression = this.Expression.Replace(op, s);
 
-                var allIndex = Array.IndexOf(AllOperatorsInOrder, op);
+                var allIndex = Array.IndexOf(this.AllOperatorsInOrder, op);
                 if (allIndex != -1)
                 {
-                    AllOperatorsInOrder[allIndex] = s;
+                    this.AllOperatorsInOrder[allIndex] = s;
                 }
 
-                if (Definition.AddSymbol == op)
+                if (this.Definition.AddSymbol == op)
                 {
-                    Definition.AddSymbol = s;
+                    this.Definition.AddSymbol = s;
                 }
-                if (Definition.AndSymbol == op)
+
+                if (this.Definition.AndSymbol == op)
                 {
-                    Definition.AndSymbol = s;
+                    this.Definition.AndSymbol = s;
                 }
-                if (Definition.DivideSymbol == op)
+
+                if (this.Definition.DivideSymbol == op)
                 {
-                    Definition.DivideSymbol = s;
+                    this.Definition.DivideSymbol = s;
                 }
-                if (Definition.DoesNotEqualSymbol == op)
+
+                if (this.Definition.DoesNotEqualSymbol == op)
                 {
-                    Definition.DoesNotEqualSymbol = s;
+                    this.Definition.DoesNotEqualSymbol = s;
                 }
-                if (Definition.EqualsSymbol == op)
+
+                if (this.Definition.EqualsSymbol == op)
                 {
-                    Definition.EqualsSymbol = s;
+                    this.Definition.EqualsSymbol = s;
                 }
-                if (Definition.GreaterThanOrEqualSymbol == op)
+
+                if (this.Definition.GreaterThanOrEqualSymbol == op)
                 {
-                    Definition.GreaterThanOrEqualSymbol = s;
+                    this.Definition.GreaterThanOrEqualSymbol = s;
                 }
-                if (Definition.GreaterThanSymbol == op)
+
+                if (this.Definition.GreaterThanSymbol == op)
                 {
-                    Definition.GreaterThanSymbol = s;
+                    this.Definition.GreaterThanSymbol = s;
                 }
-                if (Definition.LessThanOrEqualSymbol == op)
+
+                if (this.Definition.LessThanOrEqualSymbol == op)
                 {
-                    Definition.LessThanOrEqualSymbol = s;
+                    this.Definition.LessThanOrEqualSymbol = s;
                 }
-                if (Definition.LessThanSymbol == op)
+
+                if (this.Definition.LessThanSymbol == op)
                 {
-                    Definition.LessThanSymbol = s;
+                    this.Definition.LessThanSymbol = s;
                 }
-                if (Definition.MultiplySymbol == op)
+
+                if (this.Definition.MultiplySymbol == op)
                 {
-                    Definition.MultiplySymbol = s;
+                    this.Definition.MultiplySymbol = s;
                 }
-                if (Definition.NotSymbol == op)
+
+                if (this.Definition.NotSymbol == op)
                 {
-                    Definition.NotSymbol = s;
+                    this.Definition.NotSymbol = s;
                 }
-                if (Definition.OrSymbol == op)
+
+                if (this.Definition.OrSymbol == op)
                 {
-                    Definition.OrSymbol = s;
+                    this.Definition.OrSymbol = s;
                 }
-                if (Definition.PowerSymbol == op)
+
+                if (this.Definition.PowerSymbol == op)
                 {
-                    Definition.PowerSymbol = s;
+                    this.Definition.PowerSymbol = s;
                 }
-                if (Definition.ShiftLeftSymbol == op)
+
+                if (this.Definition.ShiftLeftSymbol == op)
                 {
-                    Definition.ShiftLeftSymbol = s;
+                    this.Definition.ShiftLeftSymbol = s;
                 }
-                if (Definition.ShiftRightSymbol == op)
+
+                if (this.Definition.ShiftRightSymbol == op)
                 {
-                    Definition.ShiftRightSymbol = s;
+                    this.Definition.ShiftRightSymbol = s;
                 }
-                if (Definition.SubtractSymbol == op)
+
+                if (this.Definition.SubtractSymbol == op)
                 {
-                    Definition.SubtractSymbol = s;
+                    this.Definition.SubtractSymbol = s;
                 }
-                if (Definition.XorSymbol == op)
+
+                if (this.Definition.XorSymbol == op)
                 {
-                    Definition.XorSymbol = s;
+                    this.Definition.XorSymbol = s;
                 }
 
                 i++;
             }
 
             // Operator and function support
-            NumericBinaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
+            this.NumericBinaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
             {
-                [Definition.AddSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Add),
-                [Definition.DivideSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Divide),
-                [Definition.MultiplySymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Multiply),
-                [Definition.SubtractSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Subtract),
-                [Definition.AndSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.And),
-                [Definition.OrSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Or),
-                [Definition.XorSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.ExclusiveOr),
-                [Definition.ShiftLeftSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.LeftShift),
-                [Definition.ShiftRightSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.RightShift),
-                [Definition.PowerSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(),
-                [Definition.DoesNotEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.NotEqual),
-                [Definition.EqualsSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.Equal),
-                [Definition.GreaterThanOrEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThanOrEqual),
-                [Definition.GreaterThanSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThan),
-                [Definition.LessThanOrEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThanOrEqual),
-                [Definition.LessThanSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThan),
+                [this.Definition.AddSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Add),
+                [this.Definition.DivideSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Divide),
+                [this.Definition.MultiplySymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Multiply),
+                [this.Definition.SubtractSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Subtract),
+                [this.Definition.AndSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.And),
+                [this.Definition.OrSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Or),
+                [this.Definition.XorSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.ExclusiveOr),
+                [this.Definition.ShiftLeftSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.LeftShift),
+                [this.Definition.ShiftRightSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.RightShift),
+                [this.Definition.PowerSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(),
+                [this.Definition.DoesNotEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.NotEqual),
+                [this.Definition.EqualsSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.Equal),
+                [this.Definition.GreaterThanOrEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThanOrEqual),
+                [this.Definition.GreaterThanSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThan),
+                [this.Definition.LessThanOrEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThanOrEqual),
+                [this.Definition.LessThanSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThan),
             };
-            BooleanBinaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
+            this.BooleanBinaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
             {
-                [Definition.AndSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.And),
-                [Definition.OrSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.Or),
-                [Definition.XorSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.ExclusiveOr),
-                [Definition.DoesNotEqualSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.NotEqual),
-                [Definition.EqualsSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.Equal),
+                [this.Definition.AndSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.And),
+                [this.Definition.OrSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.Or),
+                [this.Definition.XorSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.ExclusiveOr),
+                [this.Definition.DoesNotEqualSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.NotEqual),
+                [this.Definition.EqualsSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.Equal),
             };
-            NumericUnaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
+            this.NumericUnaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
             {
-                [Definition.NotSymbol] = () => new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Not),
-                [Definition.SubtractSymbol] = () => new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Negate),
+                [this.Definition.NotSymbol] = () => new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Not),
+                [this.Definition.SubtractSymbol] = () => new ExpressionTreeNodeNumericUnaryOperator(ExpressionType.Negate),
             };
-            BooleanUnaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
+            this.BooleanUnaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
             {
-                [Definition.NotSymbol] = () => new ExpressionTreeNodeBooleanUnaryOperator(ExpressionType.Not),
+                [this.Definition.NotSymbol] = () => new ExpressionTreeNodeBooleanUnaryOperator(ExpressionType.Not),
             };
 
             // Operator string interpretation support
-            BinaryOperatorsInOrder = new[]
+            this.BinaryOperatorsInOrder = new[]
             {
-                Definition.GreaterThanOrEqualSymbol,
-                Definition.LessThanOrEqualSymbol,
-                Definition.GreaterThanSymbol,
-                Definition.LessThanSymbol,
-                Definition.DoesNotEqualSymbol,
-                Definition.EqualsSymbol,
-                Definition.XorSymbol,
-                Definition.OrSymbol,
-                Definition.AndSymbol,
-                Definition.AddSymbol,
-                Definition.SubtractSymbol,
-                Definition.DivideSymbol,
-                Definition.MultiplySymbol,
-                Definition.PowerSymbol,
-                Definition.ShiftLeftSymbol,
-                Definition.ShiftRightSymbol,
+                this.Definition.GreaterThanOrEqualSymbol,
+                this.Definition.LessThanOrEqualSymbol,
+                this.Definition.GreaterThanSymbol,
+                this.Definition.LessThanSymbol,
+                this.Definition.DoesNotEqualSymbol,
+                this.Definition.EqualsSymbol,
+                this.Definition.XorSymbol,
+                this.Definition.OrSymbol,
+                this.Definition.AndSymbol,
+                this.Definition.AddSymbol,
+                this.Definition.SubtractSymbol,
+                this.Definition.DivideSymbol,
+                this.Definition.MultiplySymbol,
+                this.Definition.PowerSymbol,
+                this.Definition.ShiftLeftSymbol,
+                this.Definition.ShiftRightSymbol,
             };
 
-            UnaryOperatorsInOrder = new[]
+            this.UnaryOperatorsInOrder = new[]
             {
-                Definition.SubtractSymbol,
-                Definition.NotSymbol
+                this.Definition.SubtractSymbol,
+                this.Definition.NotSymbol
             };
 
-            AllSymbols = AllOperatorsInOrder
+            this.AllSymbols = this.AllOperatorsInOrder
                 .Union(new[]
                 {
-                    Definition.ParameterSeparator,
-                    Definition.Parantheses.Item1,
-                    Definition.Parantheses.Item2
+                    this.Definition.ParameterSeparator,
+                    this.Definition.Parantheses.Item1,
+                    this.Definition.Parantheses.Item2
                 })
                 .ToArray();
         }

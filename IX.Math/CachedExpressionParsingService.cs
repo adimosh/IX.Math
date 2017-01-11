@@ -1,10 +1,14 @@
-﻿#if !NETSTANDARD10
+﻿// <copyright file="CachedExpressionParsingService.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
 
-using IX.Math.BuiltIn;
+#if !NETSTANDARD10
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using IX.Math.BuiltIn;
 
 namespace IX.Math
 {

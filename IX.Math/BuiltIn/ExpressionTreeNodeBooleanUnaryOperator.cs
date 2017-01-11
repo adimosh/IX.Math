@@ -1,7 +1,11 @@
-﻿using IX.Math.PlatformMitigation;
-using IX.Math.SimplificationAide;
+﻿// <copyright file="ExpressionTreeNodeBooleanUnaryOperator.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Linq.Expressions;
+using IX.Math.PlatformMitigation;
+using IX.Math.SimplificationAide;
 
 namespace IX.Math.BuiltIn
 {
@@ -10,7 +14,7 @@ namespace IX.Math.BuiltIn
         private readonly ExpressionType type;
 
         public ExpressionTreeNodeBooleanUnaryOperator(ExpressionType type)
-            : base(WorkingConstants.defaultNumericType)
+            : base(WorkingConstants.DefaultNumericType)
         {
             this.type = type;
         }
@@ -40,7 +44,7 @@ namespace IX.Math.BuiltIn
             {
                 var convertedOperand = (ConstantExpression)operandExpression;
 
-                var mi = typeof(MathematicalUnaryOperationsAide).GetTypeMethod(Enum.GetName(typeof(ExpressionType), type), new Type[1] { typeof(bool) });
+                var mi = typeof(MathematicalUnaryOperationsAide).GetTypeMethod(Enum.GetName(typeof(ExpressionType), this.type), new Type[1] { typeof(bool) });
 
                 if (mi != null)
                 {
@@ -50,7 +54,7 @@ namespace IX.Math.BuiltIn
                 }
             }
 
-            return Expression.MakeUnary(type, operandExpression, null);
+            return Expression.MakeUnary(this.type, operandExpression, null);
         }
     }
 }

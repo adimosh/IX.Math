@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="MathematicalBinaryOperationsAide.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 
 namespace IX.Math.SimplificationAide
 {
@@ -7,7 +11,6 @@ namespace IX.Math.SimplificationAide
     /// </summary>
     public static class MathematicalBinaryOperationsAide
     {
-        #region Add
         /// <summary>
         /// Adds two numbers.
         /// </summary>
@@ -62,9 +65,7 @@ namespace IX.Math.SimplificationAide
         {
             return left + right;
         }
-        #endregion
 
-        #region Subtract
         /// <summary>
         /// Subtracts two numbers.
         /// </summary>
@@ -119,9 +120,7 @@ namespace IX.Math.SimplificationAide
         {
             return left - right;
         }
-        #endregion
 
-        #region Multiply
         /// <summary>
         /// Multiplies two numbers.
         /// </summary>
@@ -165,9 +164,7 @@ namespace IX.Math.SimplificationAide
         {
             return left * right;
         }
-        #endregion
 
-        #region Divide
         /// <summary>
         /// Divides two numbers.
         /// </summary>
@@ -211,9 +208,7 @@ namespace IX.Math.SimplificationAide
         {
             return left / right;
         }
-        #endregion
 
-        #region LeftShift
         /// <summary>
         /// Shifts a number left by another number.
         /// </summary>
@@ -235,9 +230,7 @@ namespace IX.Math.SimplificationAide
         {
             return left << (right > int.MaxValue ? int.MaxValue : (int)right);
         }
-        #endregion
 
-        #region RightShift
         /// <summary>
         /// Shifts a number right by another number.
         /// </summary>
@@ -259,9 +252,7 @@ namespace IX.Math.SimplificationAide
         {
             return left >> (right > int.MaxValue ? int.MaxValue : (int)right);
         }
-        #endregion
 
-        #region And
         /// <summary>
         /// Bitwise masks two numbers.
         /// </summary>
@@ -294,9 +285,7 @@ namespace IX.Math.SimplificationAide
         {
             return left & right;
         }
-        #endregion
 
-        #region Or
         /// <summary>
         /// Bitwise combines two numbers.
         /// </summary>
@@ -329,9 +318,7 @@ namespace IX.Math.SimplificationAide
         {
             return left | right;
         }
-        #endregion
 
-        #region Xor
         /// <summary>
         /// Bitwise exclusively combines two numbers.
         /// </summary>
@@ -364,9 +351,7 @@ namespace IX.Math.SimplificationAide
         {
             return left ^ right;
         }
-        #endregion
 
-        #region Equal
         /// <summary>
         /// Determines whether or not two numbers are equal.
         /// </summary>
@@ -432,9 +417,7 @@ namespace IX.Math.SimplificationAide
         {
             return left == right;
         }
-        #endregion
 
-        #region NotEqual
         /// <summary>
         /// Determines whether or not two numbers are not equal.
         /// </summary>
@@ -500,9 +483,7 @@ namespace IX.Math.SimplificationAide
         {
             return left != right;
         }
-        #endregion
 
-        #region GreaterThan
         /// <summary>
         /// Determines whether or not two numbers are greater than.
         /// </summary>
@@ -557,9 +538,7 @@ namespace IX.Math.SimplificationAide
         {
             return left > right;
         }
-        #endregion
 
-        #region GreaterThanOrEqual
         /// <summary>
         /// Determines whether or not two numbers are greater than or equal to one another.
         /// </summary>
@@ -614,9 +593,7 @@ namespace IX.Math.SimplificationAide
         {
             return left >= right;
         }
-        #endregion
 
-        #region LessThan
         /// <summary>
         /// Determines whether or not two numbers are less than.
         /// </summary>
@@ -671,9 +648,7 @@ namespace IX.Math.SimplificationAide
         {
             return left < right;
         }
-        #endregion
 
-        #region LessThanOrEqual
         /// <summary>
         /// Determines whether or not two numbers are less than or equal to one another.
         /// </summary>
@@ -728,6 +703,5 @@ namespace IX.Math.SimplificationAide
         {
             return left <= right;
         }
-        #endregion
     }
 }

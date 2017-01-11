@@ -1,6 +1,10 @@
-﻿using IX.Math.SimplificationAide;
+﻿// <copyright file="ExpressionTreeNodeParameter.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Linq.Expressions;
+using IX.Math.SimplificationAide;
 
 namespace IX.Math.BuiltIn
 {
@@ -9,13 +13,14 @@ namespace IX.Math.BuiltIn
         private readonly string name;
 
         private SupportedValueType setType;
+        private ParameterExpression generatedExpression;
 
         internal ExpressionTreeNodeParameter(string name)
-            : base(WorkingConstants.defaultNumericType)
+            : base(WorkingConstants.DefaultNumericType)
         {
             this.name = name;
 
-            setType = SupportedValueType.Unknown;
+            this.setType = SupportedValueType.Unknown;
         }
 
         public override SupportedValueType[] OperandTypes
@@ -30,7 +35,7 @@ namespace IX.Math.BuiltIn
         {
             get
             {
-                return setType;
+                return this.setType;
             }
         }
 
@@ -38,51 +43,35 @@ namespace IX.Math.BuiltIn
         {
             get
             {
-                return name;
+                return this.name;
             }
         }
 
-        private ParameterExpression generatedExpression;
         public ParameterExpression GeneratedExpression
         {
             get
             {
-                if (generatedExpression == null)
+                if (this.generatedExpression == null)
                 {
                     throw new InvalidOperationException();
                 }
 
-                return generatedExpression;
+                return this.generatedExpression;
             }
-        }
-
-        protected override Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue)
-        {
-            if (generatedExpression == null)
-            {
-                Type concreteType = GetConcreteType(numericTypeValue);
-
-                if (concreteType == null)
-                {
-                    return null;
-                }
-
-                generatedExpression = Expression.Parameter(concreteType, name);
-            }
-
-            return generatedExpression;
         }
 
         internal bool SetConcreteParameterType(SupportedValueType type)
         {
-            if (setType == SupportedValueType.Unknown)
+            if (this.setType == SupportedValueType.Unknown)
             {
-                setType = type;
+                this.setType = type;
             }
             else
             {
-                if (setType != type)
+                if (this.setType != type)
+                {
                     return false;
+                }
             }
 
             return true;
@@ -90,7 +79,7 @@ namespace IX.Math.BuiltIn
 
         internal Type GetConcreteType(int numericTypeValue)
         {
-            switch (setType)
+            switch (this.setType)
             {
                 case SupportedValueType.Numeric:
                 case SupportedValueType.Unknown:
@@ -106,7 +95,24 @@ namespace IX.Math.BuiltIn
 
         internal void Reset()
         {
-            generatedExpression = null;
+            this.generatedExpression = null;
+        }
+
+        protected override Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue)
+        {
+            if (this.generatedExpression == null)
+            {
+                Type concreteType = this.GetConcreteType(numericTypeValue);
+
+                if (concreteType == null)
+                {
+                    return null;
+                }
+
+                this.generatedExpression = Expression.Parameter(concreteType, this.name);
+            }
+
+            return this.generatedExpression;
         }
     }
 }

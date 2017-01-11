@@ -1,6 +1,10 @@
-﻿using IX.Math.SimplificationAide;
+﻿// <copyright file="ExpressionTreeNodeNumericConstant.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Linq.Expressions;
+using IX.Math.SimplificationAide;
 
 namespace IX.Math.BuiltIn.Constants
 {
@@ -23,18 +27,18 @@ namespace IX.Math.BuiltIn.Constants
             }
         }
 
-        protected override Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue)
-        {
-            var numericType = NumericTypeAide.InverseNumericTypesConversionDictionary[numericTypeValue];
-
-            return Expression.Constant(Convert.ChangeType(Value, numericType), numericType);
-        }
-
         internal object GetValueSpecific(int numericTypeValue)
         {
             var numericType = NumericTypeAide.InverseNumericTypesConversionDictionary[numericTypeValue];
 
-            return Convert.ChangeType(Value, numericType);
+            return Convert.ChangeType(this.Value, numericType);
+        }
+
+        protected override Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue)
+        {
+            var numericType = NumericTypeAide.InverseNumericTypesConversionDictionary[numericTypeValue];
+
+            return Expression.Constant(Convert.ChangeType(this.Value, numericType), numericType);
         }
     }
 }

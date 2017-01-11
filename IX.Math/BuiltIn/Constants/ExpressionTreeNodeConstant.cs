@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="ExpressionTreeNodeConstant.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 
 namespace IX.Math.BuiltIn.Constants
 {
@@ -9,20 +13,7 @@ namespace IX.Math.BuiltIn.Constants
         internal ExpressionTreeNodeConstant(Type minimalRequiredNumericType, object value)
             : base(minimalRequiredNumericType)
         {
-            if (value == null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
-            this.value = value;
-        }
-
-        internal object Value
-        {
-            get
-            {
-                return value;
-            }
+            this.value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         public override SupportedValueType[] OperandTypes
@@ -30,6 +21,14 @@ namespace IX.Math.BuiltIn.Constants
             get
             {
                 return new SupportedValueType[0];
+            }
+        }
+
+        internal object Value
+        {
+            get
+            {
+                return this.value;
             }
         }
     }

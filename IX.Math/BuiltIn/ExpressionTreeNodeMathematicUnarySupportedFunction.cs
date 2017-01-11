@@ -1,19 +1,23 @@
-﻿using IX.Math.PlatformMitigation;
-using IX.Math.SimplificationAide;
+﻿// <copyright file="ExpressionTreeNodeMathematicUnarySupportedFunction.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Math.PlatformMitigation;
+using IX.Math.SimplificationAide;
 
 namespace IX.Math.BuiltIn
 {
     internal class ExpressionTreeNodeMathematicUnarySupportedFunction : ExpressionTreeNodeBase
     {
-        private static readonly Type mathUnaryFunctionType = typeof(double);
+        private static readonly Type MathUnaryFunctionType = typeof(double);
 
         private readonly string name;
 
         internal ExpressionTreeNodeMathematicUnarySupportedFunction(string name)
-            : base(mathUnaryFunctionType)
+            : base(MathUnaryFunctionType)
         {
             this.name = name;
         }
@@ -22,7 +26,7 @@ namespace IX.Math.BuiltIn
         {
             get
             {
-                return name;
+                return this.name;
             }
         }
 
@@ -44,19 +48,19 @@ namespace IX.Math.BuiltIn
 
         protected override Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue)
         {
-            MethodInfo mi = typeof(System.Math).GetTypeMethod(name, mathUnaryFunctionType, new[] { mathUnaryFunctionType });
+            MethodInfo mi = typeof(System.Math).GetTypeMethod(this.name, MathUnaryFunctionType, new[] { MathUnaryFunctionType });
             if (mi == null)
             {
                 throw new InvalidOperationException();
             }
 
             var operand = operandExpressions[0];
-            var operandExpression = operand.GenerateExpression(NumericTypeAide.NumericTypesConversionDictionary[mathUnaryFunctionType]);
+            var operandExpression = operand.GenerateExpression(NumericTypeAide.NumericTypesConversionDictionary[MathUnaryFunctionType]);
 
             if (operandExpression is ConstantExpression)
             {
                 var value = mi.Invoke(null, new[] { ((ConstantExpression)operandExpression).Value });
-                return Expression.Constant(value, mathUnaryFunctionType);
+                return Expression.Constant(value, MathUnaryFunctionType);
             }
 
             return Expression.Call(mi, operandExpression);

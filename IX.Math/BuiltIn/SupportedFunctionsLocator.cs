@@ -1,11 +1,17 @@
-﻿using System;
+﻿// <copyright file="SupportedFunctionsLocator.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 
 namespace IX.Math.BuiltIn
 {
     internal static class SupportedFunctionsLocator
     {
+#pragma warning disable SA1401 // Fields must be private
         internal static Dictionary<string, Func<ExpressionTreeNodeBase>> BuiltInFunctions;
+#pragma warning restore SA1401 // Fields must be private
 
         static SupportedFunctionsLocator()
         {

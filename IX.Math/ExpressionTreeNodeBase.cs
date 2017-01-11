@@ -1,7 +1,11 @@
-﻿using IX.Math.SimplificationAide;
+﻿// <copyright file="ExpressionTreeNodeBase.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using IX.Math.SimplificationAide;
 
 namespace IX.Math
 {
@@ -20,6 +24,7 @@ namespace IX.Math
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTreeNodeBase"/> class.
         /// </summary>
+        /// <param name="minimalRequiredNumericType">The minimal required numeric type.</param>
         protected ExpressionTreeNodeBase(Type minimalRequiredNumericType)
         {
             if (minimalRequiredNumericType == null)
@@ -27,7 +32,7 @@ namespace IX.Math
                 throw new ArgumentNullException(nameof(minimalRequiredNumericType));
             }
 
-            if (!NumericTypeAide.NumericTypesConversionDictionary.TryGetValue(minimalRequiredNumericType, out minimalRequiredNumericTypeValue))
+            if (!NumericTypeAide.NumericTypesConversionDictionary.TryGetValue(minimalRequiredNumericType, out this.minimalRequiredNumericTypeValue))
             {
                 throw new ArgumentException(Resources.NumericTypeInvalid, nameof(minimalRequiredNumericType));
             }
@@ -52,14 +57,15 @@ namespace IX.Math
         {
             get
             {
-                return minimalRequiredNumericType;
+                return this.minimalRequiredNumericType;
             }
         }
 
         /// <summary>
         /// Sets the operands to use in the expression.
         /// </summary>
-        /// <param name="operandExpressions"></param>
+        /// <param name="operandExpressions">The operand expressions.</param>
+        /// <returns>A <see cref="ExpressionTreeNodeBase"/> containing the set operands.</returns>
         public ExpressionTreeNodeBase SetOperands(params ExpressionTreeNodeBase[] operandExpressions)
         {
             if (operandExpressions == null)
@@ -67,7 +73,7 @@ namespace IX.Math
                 return null;
             }
 
-            SupportedValueType[] operandTypes = OperandTypes;
+            SupportedValueType[] operandTypes = this.OperandTypes;
 
             if (operandTypes.Length != operandExpressions.Length)
             {
@@ -108,8 +114,8 @@ namespace IX.Math
                 }
             }
 
-            operands = operandExpressions;
-            operandsSet = true;
+            this.operands = operandExpressions;
+            this.operandsSet = true;
 
             return this;
         }
@@ -120,14 +126,14 @@ namespace IX.Math
         /// <returns>A minimal numeric type value for this and all sub-expressions.</returns>
         public int ComputeResultingNumericTypeValue()
         {
-            if (!operandsSet)
+            if (!this.operandsSet)
             {
-                return minimalRequiredNumericTypeValue;
+                return this.minimalRequiredNumericTypeValue;
             }
 
-            var val = operands.Max(p => p.ComputeResultingNumericTypeValue());
+            var val = this.operands.Max(p => p.ComputeResultingNumericTypeValue());
 
-            return System.Math.Max(minimalRequiredNumericTypeValue, val);
+            return System.Math.Max(this.minimalRequiredNumericTypeValue, val);
         }
 
         /// <summary>
@@ -137,14 +143,14 @@ namespace IX.Math
         /// <returns>A minimal numeric type value for this and all sub-expressions.</returns>
         public int ComputeResultingNumericTypeValue(int minimalType)
         {
-            if (!operandsSet)
+            if (!this.operandsSet)
             {
-                return minimalRequiredNumericTypeValue;
+                return this.minimalRequiredNumericTypeValue;
             }
 
-            var val = operands.Max(p => p.ComputeResultingNumericTypeValue(minimalType));
+            var val = this.operands.Max(p => p.ComputeResultingNumericTypeValue(minimalType));
 
-            return System.Math.Max(System.Math.Max(minimalRequiredNumericTypeValue, val), minimalType);
+            return System.Math.Max(System.Math.Max(this.minimalRequiredNumericTypeValue, val), minimalType);
         }
 
         /// <summary>
@@ -163,14 +169,14 @@ namespace IX.Math
                 throw new ArgumentException(Resources.NumericTypeMismatched, nameof(minimalNumericType));
             }
 
-            int computedNumericType = ComputeResultingNumericTypeValue();
+            int computedNumericType = this.ComputeResultingNumericTypeValue();
 
             if (minimalNumericType < computedNumericType)
             {
                 minimalNumericType = computedNumericType;
             }
 
-            return GenerateExpressionWithOperands(operands, minimalNumericType);
+            return this.GenerateExpressionWithOperands(this.operands, minimalNumericType);
         }
 
         /// <summary>
@@ -179,9 +185,9 @@ namespace IX.Math
         /// <returns>The resulting <see cref="Expression"/>.</returns>
         public Expression GenerateExpression()
         {
-            int computedNumericType = ComputeResultingNumericTypeValue();
+            int computedNumericType = this.ComputeResultingNumericTypeValue();
 
-            return GenerateExpressionWithOperands(operands, computedNumericType);
+            return this.GenerateExpressionWithOperands(this.operands, computedNumericType);
         }
 
         /// <summary>

@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="TypeExtensionsMitigation.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -15,7 +19,11 @@ namespace IX.Math.PlatformMitigation
 #else
                 GetRuntimeMethods
 #endif
+#pragma warning disable SA1110 // Opening parenthesis or bracket must be on declaration line
+#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
                 ();
+#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
+#pragma warning restore SA1110 // Opening parenthesis or bracket must be on declaration line
         }
 
         internal static MethodInfo GetTypeMethod(this Type type, string name)
@@ -28,17 +36,23 @@ namespace IX.Math.PlatformMitigation
             return type.GetTypeMethods().SingleOrDefault(p =>
             {
                 if (p.Name != name)
+                {
                     return false;
+                }
 
                 var pars = p.GetParameters();
 
                 if (pars.Length != parameters.Length)
+                {
                     return false;
+                }
 
                 for (int i = 0; i < parameters.Length; i++)
                 {
                     if (pars[i].ParameterType != parameters[i])
+                    {
                         return false;
+                    }
                 }
 
                 return true;
@@ -50,17 +64,23 @@ namespace IX.Math.PlatformMitigation
             return type.GetTypeMethods().SingleOrDefault(p =>
             {
                 if (p.Name != name || p.ReturnType != returnType)
+                {
                     return false;
+                }
 
                 var pars = p.GetParameters();
 
                 if (pars.Length != parameters.Length)
+                {
                     return false;
+                }
 
                 for (int i = 0; i < parameters.Length; i++)
                 {
                     if (pars[i].ParameterType != parameters[i])
+                    {
                         return false;
+                    }
                 }
 
                 return true;

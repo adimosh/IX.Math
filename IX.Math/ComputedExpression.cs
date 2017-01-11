@@ -1,9 +1,13 @@
-﻿using IX.Math.BuiltIn;
-using IX.Math.SimplificationAide;
+﻿// <copyright file="ComputedExpression.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using IX.Math.BuiltIn;
+using IX.Math.SimplificationAide;
 
 namespace IX.Math
 {
@@ -23,11 +27,11 @@ namespace IX.Math
         {
             this.initialExpression = initialExpression;
             this.body = body;
-            RecognizedCorrectly = isRecognized;
-            locker = new object();
-            computedBodies = new Dictionary<int, Delegate>();
+            this.RecognizedCorrectly = isRecognized;
+            this.locker = new object();
+            this.computedBodies = new Dictionary<int, Delegate>();
             this.parameters = parameters;
-            ParameterNames = parameters.Select(p => p.Name).ToArray();
+            this.ParameterNames = parameters.Select(p => p.Name).ToArray();
         }
 
         /// <summary>
@@ -36,11 +40,11 @@ namespace IX.Math
         ~ComputedExpression()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing).
-            Dispose(false);
+            this.Dispose(false);
         }
 
         /// <summary>
-        /// Gets a value indicating whether or not the expression was actually recognized. <c>true</c> can possibly return an actual 
+        /// Gets a value indicating whether or not the expression was actually recognized. <c>true</c> can possibly return an actual expression or a static value.
         /// </summary>
         public bool RecognizedCorrectly { get; private set; }
 
@@ -55,7 +59,7 @@ namespace IX.Math
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing).
-            Dispose(true);
+            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -66,28 +70,28 @@ namespace IX.Math
         /// <returns>The computed result, or, if the expression is not recognized correctly, the expression as a <see cref="string"/>.</returns>
         public object Compute(params object[] arguments)
         {
-            if (disposedValue)
+            if (this.disposedValue)
             {
                 throw new ObjectDisposedException(nameof(ComputedExpression));
             }
 
-            if (!RecognizedCorrectly)
+            if (!this.RecognizedCorrectly)
             {
-                return initialExpression;
+                return this.initialExpression;
             }
 
-            Type numericType = WorkingConstants.defaultNumericType;
+            Type numericType = WorkingConstants.DefaultNumericType;
             NumericTypeAide.GetProperRequestedNumericalType(arguments, ref numericType);
 
-            int numericTypeValue = body.ComputeResultingNumericTypeValue(NumericTypeAide.NumericTypesConversionDictionary[numericType]);
+            int numericTypeValue = this.body.ComputeResultingNumericTypeValue(NumericTypeAide.NumericTypesConversionDictionary[numericType]);
 
             var convertedArguments = NumericTypeAide.GetProperNumericTypeValues(arguments, NumericTypeAide.InverseNumericTypesConversionDictionary[numericTypeValue]);
 
-            Delegate del = GetDelegate(numericTypeValue);
+            Delegate del = this.GetDelegate(numericTypeValue);
 
             if (del == null)
             {
-                return initialExpression;
+                return this.initialExpression;
             }
 
             try
@@ -96,7 +100,7 @@ namespace IX.Math
             }
             catch
             {
-                return initialExpression;
+                return this.initialExpression;
             }
         }
 
@@ -107,34 +111,34 @@ namespace IX.Math
         /// <returns>The computed result, or, if the expression is not recognized correctly, the expression as a <see cref="string"/>.</returns>
         public object Compute(IDataFinder dataFinder)
         {
-            if (disposedValue)
+            if (this.disposedValue)
             {
                 throw new ObjectDisposedException(nameof(ComputedExpression));
             }
 
-            if (!RecognizedCorrectly)
+            if (!this.RecognizedCorrectly)
             {
-                return initialExpression;
+                return this.initialExpression;
             }
 
             List<object> pars = new List<object>();
 
-            foreach (var p in parameters)
+            foreach (var p in this.parameters)
             {
-                object data;
-                if (!dataFinder.TryGetData(p.Name, out data))
+                if (!dataFinder.TryGetData(p.Name, out object data))
                 {
                     data = null;
                 }
+
                 pars.Add(data);
-            };
+            }
 
             if (pars.Any(p => p == null))
             {
-                return initialExpression;
+                return this.initialExpression;
             }
 
-            return Compute(pars.ToArray());
+            return this.Compute(pars.ToArray());
         }
 
         /// <summary>
@@ -143,35 +147,34 @@ namespace IX.Math
         /// <param name="disposing">Indicates whether or not disposal is a result of a normal dispose usage.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!this.disposedValue)
             {
                 if (disposing)
                 {
-                    lock (locker)
+                    lock (this.locker)
                     {
-                        computedBodies.Clear();
+                        this.computedBodies.Clear();
                     }
                 }
 
-                computedBodies = null;
-                body = null;
-                parameters = null;
+                this.computedBodies = null;
+                this.body = null;
+                this.parameters = null;
 
-                disposedValue = true;
+                this.disposedValue = true;
             }
         }
 
         private Delegate GetDelegate(int numericTypeValue)
         {
-            Delegate result;
-            if (computedBodies.TryGetValue(numericTypeValue, out result))
+            if (this.computedBodies.TryGetValue(numericTypeValue, out var result))
             {
                 return result;
             }
 
-            lock (locker)
+            lock (this.locker)
             {
-                if (computedBodies.TryGetValue(numericTypeValue, out result))
+                if (this.computedBodies.TryGetValue(numericTypeValue, out result))
                 {
                     return result;
                 }
@@ -179,17 +182,17 @@ namespace IX.Math
                 Expression bodyExpression;
                 try
                 {
-                    bodyExpression = body.GenerateExpression(numericTypeValue);
+                    bodyExpression = this.body.GenerateExpression(numericTypeValue);
                 }
                 catch
                 {
                     return null;
                 }
 
-                result = Expression.Lambda(bodyExpression, parameters.Select(p => (ParameterExpression)p.GenerateExpression(numericTypeValue)))
+                result = Expression.Lambda(bodyExpression, this.parameters.Select(p => (ParameterExpression)p.GenerateExpression(numericTypeValue)))
                     ?.Compile();
 
-                foreach (var parameterExpression in parameters)
+                foreach (var parameterExpression in this.parameters)
                 {
                     parameterExpression.Reset();
                 }
@@ -199,7 +202,7 @@ namespace IX.Math
                     return null;
                 }
 
-                computedBodies.Add(numericTypeValue, result);
+                this.computedBodies.Add(numericTypeValue, result);
             }
 
             return result;

@@ -1,4 +1,8 @@
-﻿namespace IX.Math
+﻿// <copyright file="SupportedValueType.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+namespace IX.Math
 {
     /// <summary>
     /// An enumeration of supported value types.

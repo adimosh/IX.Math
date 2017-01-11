@@ -1,4 +1,8 @@
-﻿using Moq;
+﻿// <copyright file="ComputedExpressionTests.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+using Moq;
 using System;
 using Xunit;
 

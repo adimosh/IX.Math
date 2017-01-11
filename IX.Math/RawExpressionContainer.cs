@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="RawExpressionContainer.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Diagnostics;
 
 namespace IX.Math
@@ -10,22 +14,22 @@ namespace IX.Math
         {
             if (string.IsNullOrWhiteSpace(expression))
             {
-                Expression = null;
+                this.Expression = null;
             }
             else
             {
                 if (isString)
                 {
-                    Expression = expression;
+                    this.Expression = expression;
                 }
                 else
                 {
-                    Expression = expression.Replace(" ", string.Empty);
+                    this.Expression = expression.Replace(" ", string.Empty);
                 }
             }
 
-            IsFunctionCall = isFunction;
-            IsString = isString;
+            this.IsFunctionCall = isFunction;
+            this.IsString = isString;
         }
 
         public string Expression { get; private set; }
@@ -37,11 +41,13 @@ namespace IX.Math
         public bool Equals(RawExpressionContainer other)
         {
             if (other == null)
+            {
                 return false;
+            }
 
-            return Expression == other.Expression &&
-                IsFunctionCall == other.IsFunctionCall &&
-                IsString == other.IsString;
+            return this.Expression == other.Expression &&
+                this.IsFunctionCall == other.IsFunctionCall &&
+                this.IsString == other.IsString;
         }
     }
 }

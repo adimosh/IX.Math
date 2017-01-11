@@ -1,11 +1,17 @@
-﻿using System.Collections.Generic;
+﻿// <copyright file="SpecialSymbolsLocator.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System.Collections.Generic;
 
 namespace IX.Math.BuiltIn
 {
     internal static class SpecialSymbolsLocator
     {
+#pragma warning disable SA1401 // Fields must be private
         internal static Dictionary<string, ExpressionTreeNodeMathematicSpecialSymbol> BuiltInSpecialSymbols;
         internal static Dictionary<string, string> BuiltInSpecialSymbolsAlternateWriting;
+#pragma warning restore SA1401 // Fields must be private
 
         static SpecialSymbolsLocator()
         {

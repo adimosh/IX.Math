@@ -1,7 +1,11 @@
-﻿using IX.Math.PlatformMitigation;
-using IX.Math.SimplificationAide;
+﻿// <copyright file="ExpressionTreeNodeNumericBinaryOperator.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Linq.Expressions;
+using IX.Math.PlatformMitigation;
+using IX.Math.SimplificationAide;
 
 namespace IX.Math.BuiltIn
 {
@@ -10,7 +14,7 @@ namespace IX.Math.BuiltIn
         private readonly ExpressionType type;
 
         public ExpressionTreeNodeNumericBinaryOperator(ExpressionType type)
-            : base(WorkingConstants.defaultNumericType)
+            : base(WorkingConstants.DefaultNumericType)
         {
             this.type = type;
         }
@@ -18,7 +22,7 @@ namespace IX.Math.BuiltIn
         public ExpressionTreeNodeNumericBinaryOperator()
             : base(typeof(double))
         {
-            type = ExpressionType.Power;
+            this.type = ExpressionType.Power;
         }
 
         public override SupportedValueType[] OperandTypes
@@ -52,7 +56,7 @@ namespace IX.Math.BuiltIn
 
                 Type numericType = NumericTypeAide.InverseNumericTypesConversionDictionary[numericTypeValue];
 
-                var mi = typeof(MathematicalBinaryOperationsAide).GetTypeMethod(Enum.GetName(typeof(ExpressionType), type), new Type[2] { numericType, numericType });
+                var mi = typeof(MathematicalBinaryOperationsAide).GetTypeMethod(Enum.GetName(typeof(ExpressionType), this.type), new Type[2] { numericType, numericType });
 
                 if (mi != null)
                 {
@@ -62,7 +66,7 @@ namespace IX.Math.BuiltIn
                 }
             }
 
-            return Expression.MakeBinary(type, leftExpression, rightExpression);
+            return Expression.MakeBinary(this.type, leftExpression, rightExpression);
         }
     }
 }

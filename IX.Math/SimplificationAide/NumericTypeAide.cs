@@ -1,15 +1,20 @@
-﻿using IX.Math.BuiltIn;
+﻿// <copyright file="NumericTypeAide.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IX.Math.BuiltIn;
 
 namespace IX.Math.SimplificationAide
 {
     internal static class NumericTypeAide
     {
+#pragma warning disable SA1401 // Fields must be private
         internal static Dictionary<Type, int> NumericTypesConversionDictionary;
-
         internal static Dictionary<int, Type> InverseNumericTypesConversionDictionary;
+#pragma warning restore SA1401 // Fields must be private
 
         static NumericTypeAide()
         {
@@ -31,8 +36,7 @@ namespace IX.Math.SimplificationAide
                 return new object[0];
             }
 
-            int requestedTypeValue;
-            if (!NumericTypesConversionDictionary.TryGetValue(numericType, out requestedTypeValue))
+            if (!NumericTypesConversionDictionary.TryGetValue(numericType, out int requestedTypeValue))
             {
                 throw new InvalidOperationException(Resources.NumericTypeInvalid);
             }
@@ -43,9 +47,7 @@ namespace IX.Math.SimplificationAide
             {
                 object val = arguments[i];
                 Type argType = val.GetType();
-
-                int typeValue;
-                if (!NumericTypesConversionDictionary.TryGetValue(argType, out typeValue))
+                if (!NumericTypesConversionDictionary.TryGetValue(argType, out int typeValue))
                 {
                     convertedArguments[i] = val;
                     continue;
@@ -78,16 +80,13 @@ namespace IX.Math.SimplificationAide
                     throw new ArgumentNullException(nameof(arguments));
                 }
 
-                int numericTypeInt;
-                if (!NumericTypesConversionDictionary.TryGetValue(numericType, out numericTypeInt))
+                if (!NumericTypesConversionDictionary.TryGetValue(numericType, out int numericTypeInt))
                 {
                     throw new InvalidOperationException(Resources.NumericTypeInvalid);
                 }
 
                 Type currentType = argument.GetType();
-
-                int currentTypeInt;
-                if (!NumericTypesConversionDictionary.TryGetValue(currentType, out currentTypeInt))
+                if (!NumericTypesConversionDictionary.TryGetValue(currentType, out int currentTypeInt))
                 {
                     return;
                 }
@@ -105,8 +104,7 @@ namespace IX.Math.SimplificationAide
 
             foreach (var v in externalParameters)
             {
-                object data;
-                if (dataFinder.TryGetData(v.Name, out data))
+                if (dataFinder.TryGetData(v.Name, out object data))
                 {
                     if (v.ReturnType == SupportedValueType.String)
                     {
@@ -122,8 +120,7 @@ namespace IX.Math.SimplificationAide
                         }
                         else if (data is string)
                         {
-                            bool val;
-                            if (bool.TryParse((string)data, out val))
+                            if (bool.TryParse((string)data, out bool val))
                             {
                                 parameterValues.Add(val);
                                 continue;
@@ -138,15 +135,14 @@ namespace IX.Math.SimplificationAide
                         Type dataType = data.GetType();
                         if (NumericTypesConversionDictionary.ContainsKey(dataType))
                         {
-                            parameterValues.Add(Convert.ChangeType(data, WorkingConstants.defaultNumericTypeWithFinder));
+                            parameterValues.Add(Convert.ChangeType(data, WorkingConstants.DefaultNumericTypeWithFinder));
                             continue;
                         }
                         else
                         {
                             if (data is string)
                             {
-                                double val;
-                                if (double.TryParse((string)data, out val))
+                                if (double.TryParse((string)data, out double val))
                                 {
                                     parameterValues.Add(val);
                                     continue;

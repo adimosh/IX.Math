@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="ExpressionTreeNodeBooleanConstant.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Linq.Expressions;
 
 namespace IX.Math.BuiltIn.Constants
@@ -20,7 +24,7 @@ namespace IX.Math.BuiltIn.Constants
 
         protected override Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue)
         {
-            return Expression.Constant(Value, typeof(bool));
+            return Expression.Constant(this.Value, typeof(bool));
         }
     }
 }

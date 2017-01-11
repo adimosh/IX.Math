@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="MathDefinition.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Runtime.Serialization;
 
 namespace IX.Math
@@ -13,38 +17,40 @@ namespace IX.Math
         /// Initializes a new instance of the <see cref="MathDefinition"/> class.
         /// </summary>
         public MathDefinition()
-        { }
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MathDefinition"/> class.
         /// </summary>
+        /// <param name="definition">The definition to use.</param>
         public MathDefinition(MathDefinition definition)
         {
-            Parantheses = new Tuple<string, string>(definition.Parantheses.Item1, definition.Parantheses.Item2);
-            SpecialSymbolIndicators = new Tuple<string, string>(definition.SpecialSymbolIndicators.Item1, definition.SpecialSymbolIndicators.Item2);
-            StringIndicator = definition.StringIndicator;
-            ParameterSeparator = definition.ParameterSeparator;
-            AddSymbol = definition.AddSymbol;
-            AndSymbol = definition.AndSymbol;
-            DivideSymbol = definition.DivideSymbol;
-            DoesNotEqualSymbol = definition.DoesNotEqualSymbol;
-            EqualsSymbol = definition.EqualsSymbol;
-            GreaterThanOrEqualSymbol = definition.GreaterThanOrEqualSymbol;
-            GreaterThanSymbol = definition.GreaterThanSymbol;
-            LessThanOrEqualSymbol = definition.LessThanOrEqualSymbol;
-            LessThanSymbol = definition.LessThanSymbol;
-            MultiplySymbol = definition.MultiplySymbol;
-            NotSymbol = definition.NotSymbol;
-            OrSymbol = definition.OrSymbol;
-            PowerSymbol = definition.PowerSymbol;
-            ShiftLeftSymbol = definition.ShiftLeftSymbol;
-            ShiftRightSymbol = definition.ShiftRightSymbol;
-            SubtractSymbol = definition.SubtractSymbol;
-            XorSymbol = definition.XorSymbol;
+            this.Parantheses = new Tuple<string, string>(definition.Parantheses.Item1, definition.Parantheses.Item2);
+            this.SpecialSymbolIndicators = new Tuple<string, string>(definition.SpecialSymbolIndicators.Item1, definition.SpecialSymbolIndicators.Item2);
+            this.StringIndicator = definition.StringIndicator;
+            this.ParameterSeparator = definition.ParameterSeparator;
+            this.AddSymbol = definition.AddSymbol;
+            this.AndSymbol = definition.AndSymbol;
+            this.DivideSymbol = definition.DivideSymbol;
+            this.DoesNotEqualSymbol = definition.DoesNotEqualSymbol;
+            this.EqualsSymbol = definition.EqualsSymbol;
+            this.GreaterThanOrEqualSymbol = definition.GreaterThanOrEqualSymbol;
+            this.GreaterThanSymbol = definition.GreaterThanSymbol;
+            this.LessThanOrEqualSymbol = definition.LessThanOrEqualSymbol;
+            this.LessThanSymbol = definition.LessThanSymbol;
+            this.MultiplySymbol = definition.MultiplySymbol;
+            this.NotSymbol = definition.NotSymbol;
+            this.OrSymbol = definition.OrSymbol;
+            this.PowerSymbol = definition.PowerSymbol;
+            this.ShiftLeftSymbol = definition.ShiftLeftSymbol;
+            this.ShiftRightSymbol = definition.ShiftRightSymbol;
+            this.SubtractSymbol = definition.SubtractSymbol;
+            this.XorSymbol = definition.XorSymbol;
         }
 
         /// <summary>
-        /// What should be interpreted as parantheses.
+        /// Gets or sets what should be interpreted as parantheses.
         /// </summary>
         /// <remarks>
         /// <para>The first item in the tuple represents the opening paranthesis, whereas the second represents the closing paranthesis.</para>
@@ -53,7 +59,7 @@ namespace IX.Math
         public Tuple<string, string> Parantheses { get; set; }
 
         /// <summary>
-        /// What should be interpreted as special symbols.
+        /// Gets or sets what should be interpreted as special symbols.
         /// </summary>
         /// <remarks>
         /// <para>The first item in the tuple represents the opening of the special symbol marker, whereas the second represents its closing.</para>
@@ -62,125 +68,117 @@ namespace IX.Math
         public Tuple<string, string> SpecialSymbolIndicators { get; set; }
 
         /// <summary>
-        /// What should be interpreted as string markers.
+        /// Gets or sets what should be interpreted as string markers.
         /// </summary>
         [DataMember]
         public string StringIndicator { get; set; }
 
         /// <summary>
-        /// What should be interpreted as parameter separators in multi-parameter function calls.
+        /// Gets or sets what should be interpreted as parameter separators in multi-parameter function calls.
         /// </summary>
         [DataMember]
         public string ParameterSeparator { get; set; }
 
-        #region Mathematical symbols
         /// <summary>
-        /// A symbol for the addition operation.
+        /// Gets or sets a symbol for the addition operation.
         /// </summary>
         [DataMember]
         public string AddSymbol { get; set; }
 
         /// <summary>
-        /// A symbol for the subtraction operation.
+        /// Gets or sets a symbol for the subtraction operation.
         /// </summary>
         [DataMember]
         public string SubtractSymbol { get; set; }
 
         /// <summary>
-        /// A symbol for the multiplication operation.
+        /// Gets or sets a symbol for the multiplication operation.
         /// </summary>
         [DataMember]
         public string MultiplySymbol { get; set; }
 
         /// <summary>
-        /// A symbol for the division operation.
+        /// Gets or sets a symbol for the division operation.
         /// </summary>
         [DataMember]
         public string DivideSymbol { get; set; }
 
         /// <summary>
-        /// A symbol for the power operation.
+        /// Gets or sets a symbol for the power operation.
         /// </summary>
         [DataMember]
         public string PowerSymbol { get; set; }
-        #endregion
 
-        #region Logical symbols
         /// <summary>
-        /// A symbol for the &quot;and&quot; logical operation.
+        /// Gets or sets a symbol for the &quot;and&quot; logical operation.
         /// </summary>
         [DataMember]
         public string AndSymbol { get; set; }
 
         /// <summary>
-        /// A symbol for the &quot;or&quot; logical operation.
+        /// Gets or sets a symbol for the &quot;or&quot; logical operation.
         /// </summary>
         [DataMember]
         public string OrSymbol { get; set; }
 
         /// <summary>
-        /// A symbol for the &quot;xor&quot; logical operation.
+        /// Gets or sets a symbol for the &quot;xor&quot; logical operation.
         /// </summary>
         [DataMember]
         public string XorSymbol { get; set; }
 
         /// <summary>
-        /// A symbol for the &quot;not&quot; logical operation.
+        /// Gets or sets a symbol for the &quot;not&quot; logical operation.
         /// </summary>
         [DataMember]
         public string NotSymbol { get; set; }
-        #endregion
 
-        #region Comparison symbols
         /// <summary>
-        /// A symbol for a comparison of equality.
+        /// Gets or sets a symbol for a comparison of equality.
         /// </summary>
         [DataMember]
         public string EqualsSymbol { get; set; }
 
         /// <summary>
-        /// A symbol for a comparison of inequality.
+        /// Gets or sets a symbol for a comparison of inequality.
         /// </summary>
         [DataMember]
         public string DoesNotEqualSymbol { get; set; }
 
         /// <summary>
-        /// A symbol for a comparison of greater than.
+        /// Gets or sets a symbol for a comparison of greater than.
         /// </summary>
         [DataMember]
         public string GreaterThanSymbol { get; set; }
 
         /// <summary>
-        /// A symbol for a comparison of greater than or equal.
+        /// Gets or sets a symbol for a comparison of greater than or equal.
         /// </summary>
         [DataMember]
         public string GreaterThanOrEqualSymbol { get; set; }
 
         /// <summary>
-        /// A symbol for a comparison of less than.
+        /// Gets or sets a symbol for a comparison of less than.
         /// </summary>
         [DataMember]
         public string LessThanSymbol { get; set; }
 
         /// <summary>
-        /// A symbol for a comparison of less than or equal.
+        /// Gets or sets a symbol for a comparison of less than or equal.
         /// </summary>
         [DataMember]
         public string LessThanOrEqualSymbol { get; set; }
-        #endregion
 
-        #region Bitwise symbols
         /// <summary>
-        /// A symbol for a comparison of less than or equal.
+        /// Gets or sets a symbol for a comparison of less than or equal.
         /// </summary>
         [DataMember]
         public string ShiftRightSymbol { get; set; }
 
         /// <summary>
-        /// A symbol for a comparison of less than or equal.
+        /// Gets or sets a symbol for a comparison of less than or equal.
         /// </summary>
         [DataMember]
         public string ShiftLeftSymbol { get; set; }
-        #endregion
     }
 }

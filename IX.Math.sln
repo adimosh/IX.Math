@@ -7,6 +7,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IX.Math", "IX.Math\IX.Math.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IX.Math.UnitTests", "IX.Math.UnitTests\IX.Math.UnitTests.csproj", "{A7FB3107-43F7-4486-97D5-CE123AC8C20F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{47BB4DFA-CE37-43E8-BB2D-46AF70599405}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,10 +32,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{5159F238-D854-4D1D-A494-1213F57D55DA} = {32A0E219-634F-419A-A9CF-CFE08E05E496}
-		{A7FB3107-43F7-4486-97D5-CE123AC8C20F} = {5015DD7D-51D9-4F7E-869B-21FF015C06B6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		RESX_PrefixTranslations = False

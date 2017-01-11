@@ -1,8 +1,12 @@
-﻿using IX.Math.BuiltIn.Constants;
-using IX.Math.SimplificationAide;
+﻿// <copyright file="ConstantsContainer.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using IX.Math.BuiltIn.Constants;
+using IX.Math.SimplificationAide;
 
 namespace IX.Math
 {
@@ -10,14 +14,51 @@ namespace IX.Math
     {
         private Dictionary<string, ExpressionTreeNodeBase> constants = new Dictionary<string, ExpressionTreeNodeBase>();
 
+        public int Count
+        {
+            get
+            {
+                return this.constants.Count;
+            }
+        }
+
+        public IEnumerable<string> Keys
+        {
+            get
+            {
+                return this.constants.Keys;
+            }
+        }
+
+        public IEnumerable<ExpressionTreeNodeBase> Values
+        {
+            get
+            {
+                return this.constants.Values;
+            }
+        }
+
+        public ExpressionTreeNodeBase this[string key]
+        {
+            get
+            {
+                return this.constants[key];
+            }
+        }
+
+        public bool ContainsKey(string key)
+        {
+            return this.constants.ContainsKey(key);
+        }
+
         public ExpressionTreeNodeBase ParseNumeric(string value)
         {
-            if (constants.TryGetValue(value, out var etnb))
+            if (this.constants.TryGetValue(value, out var etnb))
             {
                 return etnb;
             }
 
-            Type nt = WorkingConstants.defaultNumericType;
+            Type nt = WorkingConstants.DefaultNumericType;
             if (!NumericTypeParsingAide.Parse(value, ref nt, out object val))
             {
                 return null;
@@ -45,60 +86,23 @@ namespace IX.Math
                 return null;
             }
 
-            constants.Add(value, result);
+            this.constants.Add(value, result);
             return result;
-        }
-
-        public ExpressionTreeNodeBase this[string key]
-        {
-            get
-            {
-                return constants[key];
-            }
-        }
-
-        public int Count
-        {
-            get
-            {
-                return constants.Count;
-            }
-        }
-
-        public IEnumerable<string> Keys
-        {
-            get
-            {
-                return constants.Keys;
-            }
-        }
-
-        public IEnumerable<ExpressionTreeNodeBase> Values
-        {
-            get
-            {
-                return constants.Values;
-            }
-        }
-
-        public bool ContainsKey(string key)
-        {
-            return constants.ContainsKey(key);
         }
 
         public IEnumerator<KeyValuePair<string, ExpressionTreeNodeBase>> GetEnumerator()
         {
-            return constants.GetEnumerator();
+            return this.constants.GetEnumerator();
         }
 
         public bool TryGetValue(string key, out ExpressionTreeNodeBase value)
         {
-            return constants.TryGetValue(key, out value);
+            return this.constants.TryGetValue(key, out value);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return constants.GetEnumerator();
+            return this.constants.GetEnumerator();
         }
     }
 }

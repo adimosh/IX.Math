@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// <copyright file="ExpressionParsingService.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
-using IX.Math.SimplificationAide;
-using IX.Math.BuiltIn;
 
 namespace IX.Math
 {
@@ -24,7 +24,7 @@ namespace IX.Math
                 Parantheses = new Tuple<string, string>("(", ")"),
                 SpecialSymbolIndicators = new Tuple<string, string>("[", "]"),
                 StringIndicator = "\"",
-                ParameterSeparator= ",",
+                ParameterSeparator = ",",
                 AddSymbol = "+",
                 AndSymbol = "&",
                 DivideSymbol = "/",
@@ -52,10 +52,16 @@ namespace IX.Math
         /// <param name="definition">The math definition to use.</param>
         public ExpressionParsingService(MathDefinition definition)
         {
-            workingDefinition = definition;
+            this.workingDefinition = definition;
         }
 
-        ///<inheritDoc/>
+        /// <summary>
+        /// Interprets the mathematical expression and returns a container that can be invoked for solving using specific mathematical types.
+        /// </summary>
+        /// <param name="expression">The expression to interpret.</param>
+        /// <param name="cancellationToken">The cancellation token for this operation.</param>
+        /// <returns>A <see cref="ComputedExpression"/> that represent</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="expression"/> is either null, empty or whitespace-only.</exception>
         public ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (string.IsNullOrWhiteSpace(expression))
@@ -63,7 +69,7 @@ namespace IX.Math
                 throw new ArgumentNullException(nameof(expression));
             }
 
-            WorkingExpressionSet workingSet = new WorkingExpressionSet(expression, workingDefinition, cancellationToken);
+            WorkingExpressionSet workingSet = new WorkingExpressionSet(expression, this.workingDefinition, cancellationToken);
 
             ExpressionGenerator.CreateBody(workingSet);
 

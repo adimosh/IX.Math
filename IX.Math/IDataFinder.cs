@@ -1,4 +1,8 @@
-﻿namespace IX.Math
+﻿// <copyright file="IDataFinder.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+namespace IX.Math
 {
     /// <summary>
     /// A contract for an external service that fetches data based on data keys.

@@ -1,4 +1,8 @@
-﻿namespace IX.Math
+﻿// <copyright file="StringExpressionGenerator.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+namespace IX.Math
 {
     internal static class StringExpressionGenerator
     {
@@ -26,15 +30,14 @@
 
                 if (process.Substring(cp + stringIndicator.Length).StartsWith(stringIndicator))
                 {
-                    cp = process.IndexOf(stringIndicator, cp + stringIndicator.Length * 2);
+                    cp = process.IndexOf(stringIndicator, cp + (stringIndicator.Length * 2));
                     goto escapeRoute;
                 }
 
                 string itemName = SymbolExpressionGenerator.GenerateSymbolExpression(
                     workingSet,
                     process.Substring(op + stringIndicator.Length, cp - op - stringIndicator.Length),
-                    isString: true
-                    );
+                    isString: true);
 
                 process = $"{process.Substring(0, op)}{itemName}{process.Substring(cp + stringIndicator.Length)}";
             }

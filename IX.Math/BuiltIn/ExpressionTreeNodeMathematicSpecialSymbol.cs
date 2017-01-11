@@ -1,4 +1,8 @@
-﻿using System.Linq.Expressions;
+﻿// <copyright file="ExpressionTreeNodeMathematicSpecialSymbol.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System.Linq.Expressions;
 
 namespace IX.Math.BuiltIn
 {
@@ -12,14 +16,6 @@ namespace IX.Math.BuiltIn
         {
             this.name = name;
             this.value = value;
-        }
-
-        internal string Name
-        {
-            get
-            {
-                return name;
-            }
         }
 
         public override SupportedValueType[] OperandTypes
@@ -38,9 +34,17 @@ namespace IX.Math.BuiltIn
             }
         }
 
+        internal string Name
+        {
+            get
+            {
+                return this.name;
+            }
+        }
+
         protected override Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue)
         {
-            return Expression.Constant(value, typeof(double));
+            return Expression.Constant(this.value, typeof(double));
         }
     }
 }

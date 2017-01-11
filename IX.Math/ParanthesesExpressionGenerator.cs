@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="ParanthesesExpressionGenerator.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -65,7 +69,6 @@ namespace IX.Math
                             if (!workingSet.AllOperatorsInOrder.Any(p => expr4.EndsWith(p)))
                             {
                                 // We have a function call
-
                                 int inx = workingSet.AllOperatorsInOrder.Max(p => expr4.LastIndexOf(p));
                                 var expr5 = inx == -1 ? expr4 : expr4.Substring(inx);
                                 string op1 = workingSet.AllOperatorsInOrder.OrderByDescending(p => p.Length).FirstOrDefault(p => expr5.StartsWith(p));
@@ -73,8 +76,7 @@ namespace IX.Math
 
                                 string expr2 = SymbolExpressionGenerator.GenerateSymbolExpression(
                                     workingSet,
-                                    $"{expr6}{workingSet.Definition.Parantheses.Item1}item{workingSet.SymbolTable.Count - 1}{workingSet.Definition.Parantheses.Item2}"
-                                    );
+                                    $"{expr6}{workingSet.Definition.Parantheses.Item1}item{workingSet.SymbolTable.Count - 1}{workingSet.Definition.Parantheses.Item2}");
 
                                 if (expr6 == expr4)
                                 {

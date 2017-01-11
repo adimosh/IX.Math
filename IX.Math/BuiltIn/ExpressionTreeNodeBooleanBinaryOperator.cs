@@ -1,7 +1,11 @@
-﻿using IX.Math.PlatformMitigation;
-using IX.Math.SimplificationAide;
+﻿// <copyright file="ExpressionTreeNodeBooleanBinaryOperator.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Linq.Expressions;
+using IX.Math.PlatformMitigation;
+using IX.Math.SimplificationAide;
 
 namespace IX.Math.BuiltIn
 {
@@ -10,7 +14,7 @@ namespace IX.Math.BuiltIn
         private readonly ExpressionType type;
 
         public ExpressionTreeNodeBooleanBinaryOperator(ExpressionType type)
-            : base(WorkingConstants.defaultNumericType)
+            : base(WorkingConstants.DefaultNumericType)
         {
             this.type = type;
         }
@@ -44,14 +48,14 @@ namespace IX.Math.BuiltIn
                 var leftConverted = (ConstantExpression)leftExpression;
                 var rightConverted = (ConstantExpression)rightExpression;
 
-                var mi = typeof(MathematicalBinaryOperationsAide).GetTypeMethod(Enum.GetName(typeof(ExpressionType), type), new Type[2] { typeof(bool), typeof(bool) });
+                var mi = typeof(MathematicalBinaryOperationsAide).GetTypeMethod(Enum.GetName(typeof(ExpressionType), this.type), new Type[2] { typeof(bool), typeof(bool) });
 
                 var result = mi.Invoke(null, new[] { leftConverted.Value, rightConverted.Value });
 
                 return Expression.Constant(result, typeof(bool));
             }
 
-            return Expression.MakeBinary(type, leftExpression, rightExpression);
+            return Expression.MakeBinary(this.type, leftExpression, rightExpression);
         }
     }
 }

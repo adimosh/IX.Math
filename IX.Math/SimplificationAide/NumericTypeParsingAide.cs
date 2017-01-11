@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="NumericTypeParsingAide.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System;
 using System.Globalization;
 
 namespace IX.Math.SimplificationAide
@@ -7,10 +11,13 @@ namespace IX.Math.SimplificationAide
     {
         private const NumberStyles IntegerNumberStyle =
             NumberStyles.AllowLeadingSign | NumberStyles.AllowThousands | NumberStyles.AllowExponent | NumberStyles.AllowExponent;
+
         private const NumberStyles UnsignedIntegerNumberStyle =
             NumberStyles.AllowThousands | NumberStyles.AllowExponent | NumberStyles.AllowExponent;
+
         private const NumberStyles FloatNumberStyle =
             NumberStyles.AllowLeadingSign | NumberStyles.AllowThousands | NumberStyles.AllowExponent | NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint;
+
         private const NumberStyles HexNumberStyle = NumberStyles.AllowHexSpecifier;
 
         internal static bool Parse(string expression, ref Type numericType, out object result)
@@ -45,8 +52,7 @@ namespace IX.Math.SimplificationAide
 
             if (tempNumericType == typeof(int))
             {
-                int intVal;
-                if (int.TryParse(expression, IntegerNumberStyle, formatProvider, out intVal))
+                if (int.TryParse(expression, IntegerNumberStyle, formatProvider, out int intVal))
                 {
                     result = intVal;
                     return true;
@@ -59,8 +65,7 @@ namespace IX.Math.SimplificationAide
 
             if (tempNumericType == typeof(long))
             {
-                long intVal;
-                if (long.TryParse(expression, IntegerNumberStyle, formatProvider, out intVal))
+                if (long.TryParse(expression, IntegerNumberStyle, formatProvider, out long intVal))
                 {
                     numericType = tempNumericType;
                     result = intVal;
@@ -74,8 +79,7 @@ namespace IX.Math.SimplificationAide
 
             if (tempNumericType == typeof(float))
             {
-                float floatVal;
-                if (float.TryParse(expression, FloatNumberStyle, formatProvider, out floatVal))
+                if (float.TryParse(expression, FloatNumberStyle, formatProvider, out float floatVal))
                 {
                     numericType = tempNumericType;
                     result = floatVal;
@@ -89,8 +93,7 @@ namespace IX.Math.SimplificationAide
 
             if (tempNumericType == typeof(double))
             {
-                double doubleVal;
-                if (double.TryParse(expression, FloatNumberStyle, formatProvider, out doubleVal))
+                if (double.TryParse(expression, FloatNumberStyle, formatProvider, out double doubleVal))
                 {
                     numericType = tempNumericType;
                     result = doubleVal;
@@ -109,8 +112,7 @@ namespace IX.Math.SimplificationAide
 
             if (tempNumericType == typeof(int))
             {
-                int intVal;
-                if (int.TryParse(expression, HexNumberStyle, formatProvider, out intVal))
+                if (int.TryParse(expression, HexNumberStyle, formatProvider, out int intVal))
                 {
                     result = intVal;
                     return true;
@@ -123,8 +125,7 @@ namespace IX.Math.SimplificationAide
 
             if (tempNumericType == typeof(long))
             {
-                long intVal;
-                if (long.TryParse(expression, HexNumberStyle, formatProvider, out intVal))
+                if (long.TryParse(expression, HexNumberStyle, formatProvider, out long intVal))
                 {
                     numericType = tempNumericType;
                     result = intVal;

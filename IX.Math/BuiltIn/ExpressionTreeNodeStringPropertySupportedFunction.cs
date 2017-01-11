@@ -1,17 +1,21 @@
-﻿using IX.Math.SimplificationAide;
+﻿// <copyright file="ExpressionTreeNodeStringPropertySupportedFunction.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Math.SimplificationAide;
 
 namespace IX.Math.BuiltIn
 {
     internal sealed class ExpressionTreeNodeStringPropertySupportedFunction : ExpressionTreeNodeBase
     {
         public ExpressionTreeNodeStringPropertySupportedFunction(string name)
-            : base(WorkingConstants.defaultNumericType)
+            : base(WorkingConstants.DefaultNumericType)
         {
-            Name = name;
+            this.Name = name;
         }
 
         public string Name { get; private set; }
@@ -34,7 +38,7 @@ namespace IX.Math.BuiltIn
 
         protected override Expression GenerateExpressionWithOperands(ExpressionTreeNodeBase[] operandExpressions, int numericTypeValue)
         {
-            var pi = typeof(string).GetTypeInfo().DeclaredProperties.SingleOrDefault(p => p.Name == Name);
+            var pi = typeof(string).GetTypeInfo().DeclaredProperties.SingleOrDefault(p => p.Name == this.Name);
 
             ExpressionTreeNodeBase op = operandExpressions[0];
             var opExpression = op.GenerateExpression(numericTypeValue);

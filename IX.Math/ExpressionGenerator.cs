@@ -1,9 +1,13 @@
-﻿using IX.Math.BuiltIn;
-using IX.Math.BuiltIn.Constants;
-using IX.Math.PlatformMitigation;
+﻿// <copyright file="ExpressionGenerator.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using IX.Math.BuiltIn;
+using IX.Math.BuiltIn.Constants;
+using IX.Math.PlatformMitigation;
 
 namespace IX.Math
 {
@@ -84,7 +88,8 @@ namespace IX.Math
             workingSet.Success = true;
         }
 
-        private static void PopulateTables(string p,
+        private static void PopulateTables(
+            string p,
             WorkingExpressionSet workingSet)
         {
             var expressions = p.Split(workingSet.AllOperatorsInOrder, StringSplitOptions.RemoveEmptyEntries);
@@ -146,6 +151,7 @@ namespace IX.Math
                 {
                     return null;
                 }
+
                 nodes[i] = res;
             }
 
@@ -175,17 +181,19 @@ namespace IX.Math
             {
                 return SpecialSymbolsLocator.BuiltInSpecialSymbols[actualSymbol];
             }
-            // Check whether expression is special symbol
 
+            // Check whether expression is special symbol
             if (SpecialSymbolsLocator.BuiltInSpecialSymbols.TryGetValue(s, out var ss))
             {
                 return ss;
             }
+
             // Check whether expression is constant
             if (workingSet.Constants.TryGetValue(s, out var constantResult))
             {
                 return constantResult;
             }
+
             // Check whether expression is an external parameter
             if (workingSet.ExternalParameters.TryGetValue(s, out var parameterResult))
             {
@@ -263,7 +271,8 @@ namespace IX.Math
         }
 
         private static ExpressionTreeNodeBase ExpressionByBinaryOperator(
-            string s, string op,
+            string s,
+            string op,
             WorkingExpressionSet workingSet)
         {
             workingSet.CancellationToken.ThrowIfCancellationRequested();
@@ -273,8 +282,8 @@ namespace IX.Math
             {
                 if (string.IsNullOrWhiteSpace(split[0]))
                 {
-                    return null;
                     // We are having a unary operator - until this is treated differently, let's simply return null
+                    return null;
                 }
                 else
                 {
@@ -292,6 +301,7 @@ namespace IX.Math
                             {
                                 return null;
                             }
+
                             right = GenerateExpression(new RawExpressionContainer($"{op}{split.Last()}"), workingSet);
                             if (right == null)
                             {
@@ -343,7 +353,8 @@ namespace IX.Math
         }
 
         private static ExpressionTreeNodeBase ExpressionByUnaryOperator(
-            string s, string op,
+            string s,
+            string op,
             WorkingExpressionSet workingSet)
         {
             workingSet.CancellationToken.ThrowIfCancellationRequested();
