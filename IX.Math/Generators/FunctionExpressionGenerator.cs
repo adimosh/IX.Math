@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace IX.Math
+namespace IX.Math.Generators
 {
     internal static class FunctionExpressionGenerator
     {

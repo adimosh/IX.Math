@@ -30,9 +30,9 @@ namespace IX.Math
         /// </summary>
         public CachedExpressionParsingService()
         {
-            eps = new ExpressionParsingService();
-            cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>>();
-            cachedComputedExpressions = new ConcurrentDictionary<string, ComputedExpression>();
+            this.eps = new ExpressionParsingService();
+            this.cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>>();
+            this.cachedComputedExpressions = new ConcurrentDictionary<string, ComputedExpression>();
         }
 
         /// <summary>
@@ -41,50 +41,58 @@ namespace IX.Math
         /// <param name="definition">The math definition to use.</param>
         public CachedExpressionParsingService(MathDefinition definition)
         {
-            eps = new ExpressionParsingService(definition);
-            cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>>();
-            cachedComputedExpressions = new ConcurrentDictionary<string, ComputedExpression>();
+            this.eps = new ExpressionParsingService(definition);
+            this.cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>>();
+            this.cachedComputedExpressions = new ConcurrentDictionary<string, ComputedExpression>();
         }
 
         /// <summary>
-        /// Disposes of an instance of the <see cref="CachedExpressionParsingService"/> class.
+        /// Finalizes an instance of the <see cref="CachedExpressionParsingService"/> class.
         /// </summary>
         ~CachedExpressionParsingService()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(false);
+            this.Dispose(false);
         }
 
-        /// <inheritDoc />
+        /// <summary>
+        /// Interprets the mathematical expression and returns a container that can be invoked for solving using specific mathematical types.
+        /// </summary>
+        /// <param name="expression">The expression to interpret.</param>
+        /// <param name="cancellationToken">The cancellation token for this operation.</param>
+        /// <returns>A <see cref="ComputedExpression"/> that represents the interpreted expression.</returns>
         public ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default(CancellationToken))
         {
-            return cachedComputedExpressions.GetOrAdd(expression, expr => eps.Interpret(expr, cancellationToken));
+            return this.cachedComputedExpressions.GetOrAdd(expression, expr => this.eps.Interpret(expr, cancellationToken));
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
+            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Releases unmanaged and - optionally - managed resources.
+        /// </summary>
+        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!this.disposedValue)
             {
                 if (disposing)
                 {
-                    cachedDelegates.Clear();
-                    cachedComputedExpressions.Clear();
+                    this.cachedDelegates.Clear();
+                    this.cachedComputedExpressions.Clear();
                 }
 
-                cachedDelegates = null;
-                cachedComputedExpressions = null;
-                eps = null;
+                this.cachedDelegates = null;
+                this.cachedComputedExpressions = null;
+                this.eps = null;
 
-                disposedValue = true;
+                this.disposedValue = true;
             }
         }
     }

@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using IX.Math.BuiltIn.Functions;
 
 namespace IX.Math.BuiltIn
 {
