@@ -8,7 +8,7 @@ using System.Reflection;
 using IX.Math.PlatformMitigation;
 using IX.Math.SimplificationAide;
 
-namespace IX.Math.BuiltIn
+namespace IX.Math.BuiltIn.Functions
 {
     internal class ExpressionTreeNodeMathematicUnarySupportedFunction : ExpressionTreeNodeBase
     {

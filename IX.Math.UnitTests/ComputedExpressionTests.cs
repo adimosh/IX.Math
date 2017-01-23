@@ -1,9 +1,9 @@
-﻿// <copyright file="ComputedExpressionTests.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
+﻿// <copyright file="ComputedExpressionTests.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using Moq;
 using System;
+using Moq;
 using Xunit;
 
 namespace IX.Math.UnitTests

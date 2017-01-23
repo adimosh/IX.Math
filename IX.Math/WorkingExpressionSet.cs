@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using IX.Math.BuiltIn;
+using IX.Math.BuiltIn.Operators;
 
 namespace IX.Math
 {

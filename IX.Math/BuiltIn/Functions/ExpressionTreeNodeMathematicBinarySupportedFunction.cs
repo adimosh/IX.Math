@@ -8,7 +8,7 @@ using System.Reflection;
 using IX.Math.PlatformMitigation;
 using IX.Math.SimplificationAide;
 
-namespace IX.Math.BuiltIn
+namespace IX.Math.BuiltIn.Functions
 {
     internal sealed class ExpressionTreeNodeMathematicBinarySupportedFunction : ExpressionTreeNodeBase
     {
@@ -55,11 +55,9 @@ namespace IX.Math.BuiltIn
 
             if (operandExpression1 is ConstantExpression && operandExpression2 is ConstantExpression)
             {
-                var value = mi.Invoke(null, new[]
-                {
-                    ((ConstantExpression)operandExpression1).Value,
-                    ((ConstantExpression)operandExpression2).Value,
-                });
+                var value = mi.Invoke(
+                    null,
+                    new[] { ((ConstantExpression)operandExpression1).Value, ((ConstantExpression)operandExpression2).Value, });
                 return Expression.Constant(value, MathBinaryFunctionType);
             }
 

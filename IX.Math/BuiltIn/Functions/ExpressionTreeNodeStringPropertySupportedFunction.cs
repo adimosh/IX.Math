@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.SimplificationAide;
 
-namespace IX.Math.BuiltIn
+namespace IX.Math.BuiltIn.Functions
 {
     internal sealed class ExpressionTreeNodeStringPropertySupportedFunction : ExpressionTreeNodeBase
     {

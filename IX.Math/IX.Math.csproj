@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <Description>A library for transforming text expressions containing mathematical operations into executable delegates.</Description>
     <Copyright>Adrian Mos, 2016</Copyright>
     <AssemblyName>IX.Math</AssemblyName>
     <AssemblyTitle>IX.Math</AssemblyTitle>
-    <VersionPrefix>0.4.0</VersionPrefix>
+    <VersionPrefix>0.4.1-alpha1</VersionPrefix>
     <Authors>Adrian Mos</Authors>
     <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard1.3</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

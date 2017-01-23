@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using IX.Math.PlatformMitigation;
 using IX.Math.SimplificationAide;
 
-namespace IX.Math.BuiltIn
+namespace IX.Math.BuiltIn.Operators
 {
     internal sealed class ExpressionTreeNodeBooleanBinaryOperator : ExpressionTreeNodeBase
     {
