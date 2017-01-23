@@ -30,6 +30,26 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public SubtractNode(NumericNode left, OperationNodeBase right)
+            : base(left, right?.Simplify())
+        {
+        }
+
+        public SubtractNode(OperationNodeBase left, NumericNode right)
+            : base(left?.Simplify(), right)
+        {
+        }
+
+        public SubtractNode(NumericParameterNode left, OperationNodeBase right)
+            : base(left, right?.Simplify())
+        {
+        }
+
+        public SubtractNode(OperationNodeBase left, NumericParameterNode right)
+            : base(left?.Simplify(), right)
+        {
+        }
+
         public override NodeBase Simplify()
         {
             if (this.Left is NumericNode && this.Right is NumericNode)

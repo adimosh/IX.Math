@@ -30,6 +30,26 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public RightShiftNode(NumericNode left, OperationNodeBase right)
+            : base(left, right?.Simplify())
+        {
+        }
+
+        public RightShiftNode(OperationNodeBase left, NumericNode right)
+            : base(left?.Simplify(), right)
+        {
+        }
+
+        public RightShiftNode(NumericParameterNode left, OperationNodeBase right)
+            : base(left, right?.Simplify())
+        {
+        }
+
+        public RightShiftNode(OperationNodeBase left, NumericParameterNode right)
+            : base(left?.Simplify(), right)
+        {
+        }
+
         public override NodeBase Simplify()
         {
             if (this.Right is NumericNode && this.Right is NumericNode)

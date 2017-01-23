@@ -13,9 +13,13 @@ namespace IX.Math.Nodes.Parameters
         {
         }
 
+        public bool RequireFloat { get; set; }
+
         protected override Expression GenerateExpressionInternal()
         {
-            return null;
+            return this.RequireFloat ?
+                Expression.Parameter(typeof(double), this.ParameterName) :
+                Expression.Parameter(typeof(long), this.ParameterName);
         }
     }
 }

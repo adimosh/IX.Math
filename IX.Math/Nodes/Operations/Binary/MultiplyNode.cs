@@ -30,6 +30,26 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public MultiplyNode(NumericNode left, OperationNodeBase right)
+            : base(left, right?.Simplify())
+        {
+        }
+
+        public MultiplyNode(OperationNodeBase left, NumericNode right)
+            : base(left?.Simplify(), right)
+        {
+        }
+
+        public MultiplyNode(NumericParameterNode left, OperationNodeBase right)
+            : base(left, right?.Simplify())
+        {
+        }
+
+        public MultiplyNode(OperationNodeBase left, NumericParameterNode right)
+            : base(left?.Simplify(), right)
+        {
+        }
+
         public override NodeBase Simplify()
         {
             if (this.Left is NumericNode && this.Right is NumericNode)

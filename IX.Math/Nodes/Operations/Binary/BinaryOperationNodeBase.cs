@@ -6,7 +6,7 @@ using System;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
-    internal abstract class BinaryOperationNodeBase : NodeBase
+    internal abstract class BinaryOperationNodeBase : OperationNodeBase
     {
         protected BinaryOperationNodeBase(NodeBase left, NodeBase right)
         {
@@ -17,7 +17,5 @@ namespace IX.Math.Nodes.Operations.Binary
         public NodeBase Left { get; private set; }
 
         public NodeBase Right { get; private set; }
-
-        public abstract NodeBase Simplify();
     }
 }

@@ -6,5 +6,6 @@ namespace IX.Math.Nodes.Operations
 {
     internal abstract class OperationNodeBase : NodeBase
     {
+        public abstract NodeBase Simplify();
     }
 }
