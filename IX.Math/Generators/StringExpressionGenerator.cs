@@ -2,7 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-namespace IX.Math
+namespace IX.Math.Generators
 {
     internal static class StringExpressionGenerator
     {

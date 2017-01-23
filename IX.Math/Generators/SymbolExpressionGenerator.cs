@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace IX.Math
+namespace IX.Math.Generators
 {
     internal static class SymbolExpressionGenerator
     {
