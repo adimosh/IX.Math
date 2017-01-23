@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <AssemblyName>IX.Math.UnitTests</AssemblyName>
@@ -23,11 +23,13 @@
     <PackageReference Include="Microsoft.NETCore.App" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta001" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\IX.Math\IX.Math.csproj" />
   </ItemGroup>
   <PropertyGroup Label="Configuration">
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
