@@ -3,15 +3,20 @@
 // </copyright>
 
 using IX.Math.Generators;
+using IX.Math.Nodes.Constants;
+using System.Collections.Generic;
 
 namespace IX.Math.Extraction
 {
     internal static class StringExtractor
     {
-        internal static void ReplaceStrings(WorkingExpressionSet workingSet)
+        internal static string ExtractStringConstants(
+            IDictionary<string, ConstantNodeBase> constantsTable,
+            IDictionary<string, string> reverseConstantsTable,
+            string originalExpression,
+            string stringIndicator)
         {
-            string process = workingSet.Expression;
-            string stringIndicator = workingSet.Definition.StringIndicator;
+            string process = originalExpression;
 
             while (true)
             {
@@ -37,13 +42,16 @@ namespace IX.Math.Extraction
                 }
 
                 string itemName = ConstantsGenerator.GenerateStringConstant(
-                    workingSet,
+                    constantsTable,
+                    reverseConstantsTable,
+                    process,
+                    stringIndicator,
                     process.Substring(op, cp - op));
 
                 process = $"{process.Substring(0, op)}{itemName}{process.Substring(cp + stringIndicator.Length)}";
             }
 
-            workingSet.Expression = process;
+            return process;
         }
     }
 }

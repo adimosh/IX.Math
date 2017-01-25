@@ -2,36 +2,77 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Collections.Generic;
 using System.Linq;
+using IX.Math.Formatters;
 using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Generators
 {
     internal static class ConstantsGenerator
     {
-        public static string GenerateStringConstant(WorkingExpressionSet set, string content)
+        public static string GenerateStringConstant(
+            IDictionary<string, ConstantNodeBase> constantsTable,
+            IDictionary<string, string> reverseConstantsTable,
+            string originalExpression,
+            string stringIndicator,
+            string content)
         {
-            if (set.ReverseConstantsTable.TryGetValue(content, out string key))
+            if (reverseConstantsTable.TryGetValue(content, out string key))
             {
                 return key;
             }
             else
             {
-                string name = GenerateName(set);
-                set.ConstantsTable.Add(name, new StringNode(content.Substring(set.Definition.StringIndicator.Length, content.Length - set.Definition.StringIndicator.Length)));
+                string name = GenerateName(constantsTable.Keys, originalExpression);
+                constantsTable.Add(name, new StringNode(content.Substring(stringIndicator.Length, content.Length - stringIndicator.Length)));
+                reverseConstantsTable.Add(content, name);
                 return name;
             }
         }
 
-        private static string GenerateName(WorkingExpressionSet set)
+        public static string CheckAndAdd(
+            IDictionary<string, ConstantNodeBase> constantsTable,
+            IDictionary<string, string> reverseConstantsTable,
+            string originalExpression,
+            string content)
         {
-            int index = int.Parse(set.ConstantsTable.Keys.LastOrDefault()?.Substring(4) ?? "0");
+            if (reverseConstantsTable.TryGetValue(content, out string key))
+            {
+                return key;
+            }
+            else
+            {
+                if (NumericParsingFormatter.Parse(content, out object n))
+                {
+                    string name = GenerateName(constantsTable.Keys, originalExpression);
+                    constantsTable.Add(name, new NumericNode(n));
+                    reverseConstantsTable.Add(content, name);
+                    return name;
+                }
+                else if (bool.TryParse(content, out bool b))
+                {
+                    string name = GenerateName(constantsTable.Keys, originalExpression);
+                    constantsTable.Add(name, new BoolNode(b));
+                    reverseConstantsTable.Add(content, name);
+                    return name;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        private static string GenerateName(IEnumerable<string> keys, string originalExpression)
+        {
+            int index = int.Parse(keys.LastOrDefault()?.Substring(4) ?? "0");
 
             do
             {
                 index++;
             }
-            while (set.Expression.Contains($"Const{index}"));
+            while (originalExpression.Contains($"Const{index}"));
 
             return $"Const{index}";
         }

@@ -21,11 +21,15 @@ namespace IX.Math
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Strings
-            workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer(workingSet.Expression));
-
-            StringExtractor.ReplaceStrings(workingSet);
+            workingSet.Expression = StringExtractor.ExtractStringConstants(
+                workingSet.ConstantsTable,
+                workingSet.ReverseConstantsTable,
+                workingSet.Expression,
+                workingSet.Definition.StringIndicator);
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
+
+            workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer(workingSet.Expression));
 
             // Prepares expression and takes care of operators to ensure that they are all OK and usable
             workingSet.Initialize();
@@ -111,7 +115,7 @@ namespace IX.Math
                     continue;
                 }
 
-                if (workingSet.Constants.ContainsKey(exp))
+                if (workingSet.ConstantsTable.ContainsKey(exp))
                 {
                     continue;
                 }
@@ -131,7 +135,7 @@ namespace IX.Math
                     continue;
                 }
 
-                if (workingSet.Constants.ParseNumeric(exp) != null)
+                if (ConstantsGenerator.CheckAndAdd(workingSet.ConstantsTable, workingSet.ReverseConstantsTable, workingSet.Expression, exp) != null)
                 {
                     continue;
                 }
@@ -191,7 +195,7 @@ namespace IX.Math
             }
 
             // Check whether expression is constant
-            if (workingSet.Constants.TryGetValue(s, out var constantResult))
+            if (workingSet.ConstantsTable.TryGetValue(s, out var constantResult))
             {
                 return constantResult;
             }

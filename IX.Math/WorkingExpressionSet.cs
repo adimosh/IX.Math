@@ -34,16 +34,13 @@ namespace IX.Math
         internal CancellationToken CancellationToken;
 
         // Working domain
-
         internal Dictionary<string, ConstantNodeBase> ConstantsTable;
         internal Dictionary<string, string> ReverseConstantsTable;
-
 
         internal Dictionary<string, RawExpressionContainer> SymbolTable;
         internal Dictionary<string, string> ReverseSymbolTable;
         internal string Expression;
         internal Dictionary<string, ExpressionTreeNodeParameter> ExternalParameters;
-        internal ConstantsContainer Constants;
         internal ExpressionTreeNodeBase Body;
         internal object ValueIfConstant;
 
@@ -62,7 +59,6 @@ namespace IX.Math
             this.SymbolTable = new Dictionary<string, RawExpressionContainer>();
             this.ReverseSymbolTable = new Dictionary<string, string>();
             this.ExternalParameters = new Dictionary<string, ExpressionTreeNodeParameter>();
-            this.Constants = new ConstantsContainer();
             this.InitialExpression = expression;
             this.CancellationToken = cancellationToken;
             this.Expression = expression;

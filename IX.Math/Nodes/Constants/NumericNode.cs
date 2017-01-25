@@ -9,27 +9,32 @@ namespace IX.Math.Nodes.Constants
 {
     internal sealed class NumericNode : ConstantNodeBase
     {
-        private readonly long integerValue;
-        private readonly double floatValue;
-        private readonly bool isFloat;
+        private long integerValue;
+        private double floatValue;
+        private bool isFloat;
 
         public NumericNode(long value)
         {
-            this.integerValue = value;
-            this.isFloat = false;
+            this.Initialize(value);
         }
 
         public NumericNode(double value)
         {
-            if (System.Math.Floor(value) == value)
+            this.Initialize(value);
+        }
+
+        public NumericNode(object value)
+        {
+            switch (value)
             {
-                this.integerValue = Convert.ToInt64(value);
-                this.isFloat = false;
-            }
-            else
-            {
-                this.floatValue = value;
-                this.isFloat = true;
+                case double d:
+                    this.Initialize(d);
+                    break;
+                case long l:
+                    this.Initialize(l);
+                    break;
+                default:
+                    throw new ArgumentException(Resources.NumericTypeInvalid, nameof(value));
             }
         }
 
@@ -204,6 +209,26 @@ namespace IX.Math.Nodes.Constants
             }
 
             return Convert.ToInt32(this.integerValue);
+        }
+
+        private void Initialize(long value)
+        {
+            this.integerValue = value;
+            this.isFloat = false;
+        }
+
+        private void Initialize(double value)
+        {
+            if (System.Math.Floor(value) == value)
+            {
+                this.integerValue = Convert.ToInt64(value);
+                this.isFloat = false;
+            }
+            else
+            {
+                this.floatValue = value;
+                this.isFloat = true;
+            }
         }
     }
 }
