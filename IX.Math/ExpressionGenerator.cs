@@ -10,6 +10,7 @@ using IX.Math.BuiltIn.Constants;
 using IX.Math.Extraction;
 using IX.Math.Generators;
 using IX.Math.PlatformMitigation;
+using IX.Math.Formatters;
 
 namespace IX.Math
 {
@@ -28,6 +29,8 @@ namespace IX.Math
                 workingSet.Definition.StringIndicator);
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
+
+            workingSet.Expression = SubExpressionFormatter.Cleanup(workingSet.Expression);
 
             workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer(workingSet.Expression));
 

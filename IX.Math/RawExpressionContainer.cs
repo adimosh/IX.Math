@@ -18,14 +18,7 @@ namespace IX.Math
             }
             else
             {
-                if (isString)
-                {
-                    this.Expression = expression;
-                }
-                else
-                {
-                    this.Expression = expression.Replace(" ", string.Empty);
-                }
+                this.Expression = expression;
             }
 
             this.IsFunctionCall = isFunction;

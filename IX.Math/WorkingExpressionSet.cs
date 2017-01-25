@@ -11,6 +11,8 @@ using System.Threading;
 using IX.Math.BuiltIn;
 using IX.Math.BuiltIn.Operators;
 using IX.Math.Nodes.Constants;
+using IX.Math.Nodes.Operations.Binary;
+using IX.Math.Nodes;
 
 namespace IX.Math
 {
@@ -36,7 +38,6 @@ namespace IX.Math
         // Working domain
         internal Dictionary<string, ConstantNodeBase> ConstantsTable;
         internal Dictionary<string, string> ReverseConstantsTable;
-
         internal Dictionary<string, RawExpressionContainer> SymbolTable;
         internal Dictionary<string, string> ReverseSymbolTable;
         internal string Expression;
@@ -196,25 +197,25 @@ namespace IX.Math
             }
 
             // Operator and function support
-            this.NumericBinaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
-            {
-                [this.Definition.AddSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Add),
-                [this.Definition.DivideSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Divide),
-                [this.Definition.MultiplySymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Multiply),
-                [this.Definition.SubtractSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Subtract),
-                [this.Definition.AndSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.And),
-                [this.Definition.OrSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Or),
-                [this.Definition.XorSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.ExclusiveOr),
-                [this.Definition.ShiftLeftSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.LeftShift),
-                [this.Definition.ShiftRightSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.RightShift),
-                [this.Definition.PowerSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(),
-                [this.Definition.DoesNotEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.NotEqual),
-                [this.Definition.EqualsSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.Equal),
-                [this.Definition.GreaterThanOrEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThanOrEqual),
-                [this.Definition.GreaterThanSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThan),
-                [this.Definition.LessThanOrEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThanOrEqual),
-                [this.Definition.LessThanSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThan),
-            };
+            //this.NumericBinaryOperators = new Dictionary<string, Func<NodeBase, NodeBase, BinaryOperationNodeBase>>
+            //{
+            //    [this.Definition.AddSymbol] = (left, right) => new AddNode(left, right),
+            //    [this.Definition.DivideSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Divide),
+            //    [this.Definition.MultiplySymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Multiply),
+            //    [this.Definition.SubtractSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Subtract),
+            //    [this.Definition.AndSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.And),
+            //    [this.Definition.OrSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.Or),
+            //    [this.Definition.XorSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.ExclusiveOr),
+            //    [this.Definition.ShiftLeftSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.LeftShift),
+            //    [this.Definition.ShiftRightSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(ExpressionType.RightShift),
+            //    [this.Definition.PowerSymbol] = () => new ExpressionTreeNodeNumericBinaryOperator(),
+            //    [this.Definition.DoesNotEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.NotEqual),
+            //    [this.Definition.EqualsSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.Equal),
+            //    [this.Definition.GreaterThanOrEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThanOrEqual),
+            //    [this.Definition.GreaterThanSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.GreaterThan),
+            //    [this.Definition.LessThanOrEqualSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThanOrEqual),
+            //    [this.Definition.LessThanSymbol] = () => new ExpressionTreeNodeNumericLogicalBinaryOperator(ExpressionType.LessThan),
+            //};
             this.BooleanBinaryOperators = new Dictionary<string, Func<ExpressionTreeNodeBase>>
             {
                 [this.Definition.AndSymbol] = () => new ExpressionTreeNodeBooleanBinaryOperator(ExpressionType.And),

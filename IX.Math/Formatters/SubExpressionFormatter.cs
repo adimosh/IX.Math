@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// <copyright file="SubExpressionFormatter.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
 
 namespace IX.Math.Formatters
 {
@@ -8,7 +8,7 @@ namespace IX.Math.Formatters
     {
         internal static string Cleanup(string expression)
         {
-            return expression.Trim();
+            return expression.Trim().Replace(" ", string.Empty);
         }
     }
 }
