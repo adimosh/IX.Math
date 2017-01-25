@@ -123,7 +123,7 @@ namespace IX.Math.Nodes.Constants
             return new NumericNode(data >> by);
         }
 
-        private static Tuple<double, double> ExtractFloats(NumericNode left, NumericNode right)
+        internal static Tuple<double, double> ExtractFloats(NumericNode left, NumericNode right)
         {
             if (left.isFloat && right.isFloat)
             {
