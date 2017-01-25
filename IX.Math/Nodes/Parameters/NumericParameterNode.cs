@@ -13,11 +13,11 @@ namespace IX.Math.Nodes.Parameters
         {
         }
 
-        public bool RequireFloat { get; set; }
+        public bool? RequireFloat { get; set; }
 
         protected override Expression GenerateExpressionInternal()
         {
-            return this.RequireFloat ?
+            return (this.RequireFloat ?? false) ?
                 Expression.Parameter(typeof(double), this.ParameterName) :
                 Expression.Parameter(typeof(long), this.ParameterName);
         }

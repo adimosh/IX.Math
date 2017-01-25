@@ -1,4 +1,4 @@
-﻿// <copyright file="RightShiftNode.cs" company="Adrian Mos">
+﻿// <copyright file="PowerNode.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -8,58 +8,58 @@ using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
-    internal sealed class RightShiftNode : BinaryOperationNodeBase
+    internal sealed class PowerNode : BinaryOperationNodeBase
     {
-        public RightShiftNode(NumericNode left, NumericNode right)
+        public PowerNode(NumericNode left, NumericNode right)
             : base(left, right)
         {
         }
 
-        public RightShiftNode(NumericNode left, NumericParameterNode right)
+        public PowerNode(NumericNode left, NumericParameterNode right)
             : base(left, right)
         {
         }
 
-        public RightShiftNode(NumericParameterNode left, NumericNode right)
+        public PowerNode(NumericParameterNode left, NumericNode right)
             : base(left, right)
         {
         }
 
-        public RightShiftNode(NumericParameterNode left, NumericParameterNode right)
+        public PowerNode(NumericParameterNode left, NumericParameterNode right)
             : base(left, right)
         {
         }
 
-        public RightShiftNode(NumericNode left, OperationNodeBase right)
+        public PowerNode(NumericNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
         }
 
-        public RightShiftNode(OperationNodeBase left, NumericNode right)
+        public PowerNode(OperationNodeBase left, NumericNode right)
             : base(left?.Simplify(), right)
         {
         }
 
-        public RightShiftNode(NumericParameterNode left, OperationNodeBase right)
+        public PowerNode(NumericParameterNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
         }
 
-        public RightShiftNode(OperationNodeBase left, NumericParameterNode right)
+        public PowerNode(OperationNodeBase left, NumericParameterNode right)
             : base(left?.Simplify(), right)
         {
         }
 
-        public RightShiftNode(OperationNodeBase left, OperationNodeBase right)
+        public PowerNode(OperationNodeBase left, OperationNodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
         }
 
         public override NodeBase Simplify()
         {
-            if (this.Right is NumericNode && this.Right is NumericNode)
+            if (this.Left is NumericNode && this.Right is NumericNode)
             {
-                return NumericNode.RightShift((NumericNode)this.Right, (NumericNode)this.Right);
+                return NumericNode.Power((NumericNode)this.Left, (NumericNode)this.Right);
             }
 
             return this;
@@ -75,7 +75,7 @@ namespace IX.Math.Nodes.Operations.Binary
             }
             else
             {
-                return Expression.RightShift(this.Right.GenerateExpression(), this.Right.GenerateExpression());
+                return Expression.Power(this.Left.GenerateExpression(), this.Right.GenerateExpression());
             }
         }
     }

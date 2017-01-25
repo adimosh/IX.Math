@@ -21,8 +21,16 @@ namespace IX.Math.Nodes.Constants
 
         public NumericNode(double value)
         {
-            this.floatValue = value;
-            this.isFloat = true;
+            if (System.Math.Floor(value) == value)
+            {
+                this.integerValue = Convert.ToInt64(value);
+                this.isFloat = false;
+            }
+            else
+            {
+                this.floatValue = value;
+                this.isFloat = true;
+            }
         }
 
         public object Value => this.isFloat ? this.floatValue : this.integerValue;
@@ -89,22 +97,14 @@ namespace IX.Math.Nodes.Constants
 
         public static NumericNode Divide(NumericNode left, NumericNode right)
         {
-            if (left.isFloat && right.isFloat)
-            {
-                return new NumericNode(left.floatValue / right.floatValue);
-            }
-            else if (left.isFloat && !right.isFloat)
-            {
-                return new NumericNode(left.floatValue / Convert.ToDouble(right.integerValue));
-            }
-            else if (!left.isFloat && right.isFloat)
-            {
-                return new NumericNode(Convert.ToDouble(left.integerValue) / right.floatValue);
-            }
-            else
-            {
-                return new NumericNode(Convert.ToDouble(left.integerValue) / Convert.ToDouble(right.integerValue));
-            }
+            var floats = ExtractFloats(left, right);
+            return new NumericNode(floats.Item1 / floats.Item2);
+        }
+
+        public static NumericNode Power(NumericNode left, NumericNode right)
+        {
+            var floats = ExtractFloats(left, right);
+            return new NumericNode(System.Math.Pow(floats.Item1, floats.Item2));
         }
 
         public static NumericNode LeftShift(NumericNode left, NumericNode right)
@@ -121,6 +121,26 @@ namespace IX.Math.Nodes.Constants
             long data = left.ExtractInteger();
 
             return new NumericNode(data >> by);
+        }
+
+        private static Tuple<double, double> ExtractFloats(NumericNode left, NumericNode right)
+        {
+            if (left.isFloat && right.isFloat)
+            {
+                return new Tuple<double, double>(left.floatValue, right.floatValue);
+            }
+            else if (left.isFloat && !right.isFloat)
+            {
+                return new Tuple<double, double>(left.floatValue, Convert.ToDouble(right.integerValue));
+            }
+            else if (!left.isFloat && right.isFloat)
+            {
+                return new Tuple<double, double>(Convert.ToDouble(left.integerValue), right.floatValue);
+            }
+            else
+            {
+                return new Tuple<double, double>(Convert.ToDouble(left.integerValue), Convert.ToDouble(right.integerValue));
+            }
         }
 
         public override Expression GenerateExpression() => this.isFloat ?

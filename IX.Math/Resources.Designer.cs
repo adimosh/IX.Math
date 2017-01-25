@@ -8,12 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace IX.Math
-{
+namespace IX.Math {
     using System;
-    using System.Reflection;
-
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -24,104 +22,104 @@ namespace IX.Math
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources
-    {
-
+    internal class Resources {
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources()
-        {
+        internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if (object.ReferenceEquals(resourceMan, null))
-                {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IX.Math.Resources", Assembly.Load(new AssemblyName(typeof(Resources).AssemblyQualifiedName)));
+        internal static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager(typeof(Resources));
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture
-        {
-            get
-            {
+        internal static global::System.Globalization.CultureInfo Culture {
+            get {
                 return resourceCulture;
             }
-            set
-            {
+            set {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The requested function cannot be called with the specified operands, either because their number doesn&apos;t match the required number of operands, or because they have mismatched types..
         /// </summary>
-        internal static string FunctionCallNotValid
-        {
-            get
-            {
+        internal static string FunctionCallNotValid {
+            get {
                 return ResourceManager.GetString("FunctionCallNotValid", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The expression is either not logically sound, internally valid or its invocation was done with incorrect data..
         /// </summary>
-        internal static string NotValidInternally
-        {
-            get
-            {
+        internal static string NotValidInternally {
+            get {
                 return ResourceManager.GetString("NotValidInternally", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The numerical type is either not a numerical type, or is not yet supported..
         /// </summary>
-        internal static string NumericTypeInvalid
-        {
-            get
-            {
+        internal static string NumericTypeInvalid {
+            get {
                 return ResourceManager.GetString("NumericTypeInvalid", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The requested numerical type is mismatched considering the given arguments..
         /// </summary>
-        internal static string NumericTypeMismatched
-        {
-            get
-            {
+        internal static string NumericTypeMismatched {
+            get {
                 return ResourceManager.GetString("NumericTypeMismatched", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The operands required for this function call are mismatched with the given operand expressions..
         /// </summary>
-        internal static string OperandMismatchInFunctionCall
-        {
-            get
-            {
+        internal static string OperandMismatchInFunctionCall {
+            get {
                 return ResourceManager.GetString("OperandMismatchInFunctionCall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The parameter {0} should be an float value lest the expression makes no sense, but it is already defined as obligatory integer..
+        /// </summary>
+        internal static string ParameterMustBeFloatButAlreadyRequiredToBeInteger {
+            get {
+                return ResourceManager.GetString("ParameterMustBeFloatButAlreadyRequiredToBeInteger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The parameter {0} should be an integer value lest the expression makes no sense, but it is already defined as obligatory float..
+        /// </summary>
+        internal static string ParameterMustBeIntegerButAlreadyRequiredToBeFloat {
+            get {
+                return ResourceManager.GetString("ParameterMustBeIntegerButAlreadyRequiredToBeFloat", resourceCulture);
             }
         }
     }

@@ -50,6 +50,11 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public LeftShiftNode(OperationNodeBase left, OperationNodeBase right)
+            : base(left?.Simplify(), right?.Simplify())
+        {
+        }
+
         public override NodeBase Simplify()
         {
             if (this.Left is NumericNode && this.Right is NumericNode)

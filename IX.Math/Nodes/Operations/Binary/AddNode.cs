@@ -140,6 +140,11 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public AddNode(OperationNodeBase left, OperationNodeBase right)
+            : base(left?.Simplify(), right?.Simplify())
+        {
+        }
+
         public AddNode(NumericParameterNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {

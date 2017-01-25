@@ -132,4 +132,10 @@
   <data name="OperandMismatchInFunctionCall" xml:space="preserve">
     <value>The operands required for this function call are mismatched with the given operand expressions.</value>
   </data>
+  <data name="ParameterMustBeFloatButAlreadyRequiredToBeInteger" xml:space="preserve">
+    <value>The parameter {0} should be an float value lest the expression makes no sense, but it is already defined as obligatory integer.</value>
+  </data>
+  <data name="ParameterMustBeIntegerButAlreadyRequiredToBeFloat" xml:space="preserve">
+    <value>The parameter {0} should be an integer value lest the expression makes no sense, but it is already defined as obligatory float.</value>
+  </data>
 </root>
