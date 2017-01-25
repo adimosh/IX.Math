@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using IX.Math.BuiltIn;
 using IX.Math.BuiltIn.Operators;
+using IX.Math.Nodes.Constants;
 
 namespace IX.Math
 {
@@ -33,6 +34,11 @@ namespace IX.Math
         internal CancellationToken CancellationToken;
 
         // Working domain
+
+        internal Dictionary<string, ConstantNodeBase> ConstantsTable;
+        internal Dictionary<string, string> ReverseConstantsTable;
+
+
         internal Dictionary<string, RawExpressionContainer> SymbolTable;
         internal Dictionary<string, string> ReverseSymbolTable;
         internal string Expression;
@@ -50,6 +56,9 @@ namespace IX.Math
 
         internal WorkingExpressionSet(string expression, MathDefinition mathDefinition, CancellationToken cancellationToken)
         {
+            this.ConstantsTable = new Dictionary<string, ConstantNodeBase>();
+            this.ReverseConstantsTable = new Dictionary<string, string>();
+
             this.SymbolTable = new Dictionary<string, RawExpressionContainer>();
             this.ReverseSymbolTable = new Dictionary<string, string>();
             this.ExternalParameters = new Dictionary<string, ExpressionTreeNodeParameter>();

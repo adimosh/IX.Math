@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using IX.Math.BuiltIn;
 using IX.Math.BuiltIn.Constants;
+using IX.Math.Extraction;
 using IX.Math.Generators;
 using IX.Math.PlatformMitigation;
 
@@ -22,7 +23,7 @@ namespace IX.Math
             // Strings
             workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer(workingSet.Expression));
 
-            StringExpressionGenerator.ReplaceStrings(workingSet);
+            StringExtractor.ReplaceStrings(workingSet);
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 

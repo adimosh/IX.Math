@@ -1,10 +1,12 @@
-﻿// <copyright file="StringExpressionGenerator.cs" company="Adrian Mos">
+﻿// <copyright file="StringExtractor.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-namespace IX.Math.Generators
+using IX.Math.Generators;
+
+namespace IX.Math.Extraction
 {
-    internal static class StringExpressionGenerator
+    internal static class StringExtractor
     {
         internal static void ReplaceStrings(WorkingExpressionSet workingSet)
         {
@@ -34,10 +36,9 @@ namespace IX.Math.Generators
                     goto escapeRoute;
                 }
 
-                string itemName = SymbolExpressionGenerator.GenerateSymbolExpression(
+                string itemName = ConstantsGenerator.GenerateStringConstant(
                     workingSet,
-                    process.Substring(op + stringIndicator.Length, cp - op - stringIndicator.Length),
-                    isString: true);
+                    process.Substring(op, cp - op));
 
                 process = $"{process.Substring(0, op)}{itemName}{process.Substring(cp + stringIndicator.Length)}";
             }
