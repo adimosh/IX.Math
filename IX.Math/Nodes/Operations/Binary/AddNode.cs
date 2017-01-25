@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
@@ -210,18 +211,9 @@ namespace IX.Math.Nodes.Operations.Binary
             return this;
         }
 
-        public override Expression GenerateExpression()
+        protected override Expression GenerateExpressionInternal()
         {
-            NodeBase simplifiedExpression = this.Simplify();
-
-            if (simplifiedExpression != null)
-            {
-                return simplifiedExpression.GenerateExpression();
-            }
-            else
-            {
-                return Expression.Add(this.Left.GenerateExpression(), this.Right.GenerateExpression());
-            }
+            return Expression.Add(this.Left.GenerateExpression(), this.Right.GenerateExpression());
         }
     }
 }
