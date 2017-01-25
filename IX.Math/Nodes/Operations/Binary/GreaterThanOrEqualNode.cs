@@ -2,12 +2,14 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
+    [DebuggerDisplay("{Left} >= {Right}")]
     internal sealed class GreaterThanOrEqualNode : BinaryOperationNodeBase
     {
         public GreaterThanOrEqualNode(NumericNode left, NumericNode right)

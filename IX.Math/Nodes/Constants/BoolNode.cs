@@ -2,10 +2,12 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace IX.Math.Nodes.Constants
 {
+    [DebuggerDisplay("{Value}")]
     internal sealed class BoolNode : ConstantNodeBase
     {
         private readonly bool value;

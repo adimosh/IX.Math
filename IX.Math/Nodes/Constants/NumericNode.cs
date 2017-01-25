@@ -3,10 +3,12 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
 namespace IX.Math.Nodes.Constants
 {
+    [DebuggerDisplay("{Value}")]
     internal sealed class NumericNode : ConstantNodeBase
     {
         private long integerValue;

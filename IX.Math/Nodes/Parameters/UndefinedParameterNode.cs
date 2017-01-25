@@ -4,11 +4,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Generators;
 
 namespace IX.Math.Nodes.Parameters
 {
+    [DebuggerDisplay("{ParameterName} (undefined)")]
     internal sealed class UndefinedParameterNode : ParameterNodeBase
     {
         private IDictionary<string, ParameterNodeBase> parametersTable;

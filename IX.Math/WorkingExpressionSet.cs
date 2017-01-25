@@ -289,10 +289,10 @@ namespace IX.Math
             this.UnaryOperators = typeof(MathDefinition)
                 .GetTypeProperties()
                 .Where(p => p.Name.EndsWith("Symbol"))
-                .Select(p => p.Name.Substring(0, p.Name.Length - 6))
-                .Select(p => new { Name = p, Type = Type.GetType($"IX.Math.Nodes.Operations.Binary.{p}Node", false) })
+                .Select(p => new { Name = p.Name.Substring(0, p.Name.Length - 6), Value = (string)p.GetValue(this.Definition) })
+                .Select(p => new { Name = p.Name, Type = Type.GetType($"IX.Math.Nodes.Operations.Unary.{p.Name}Node", false), Value = p.Value })
                 .Where(p => p.Type != null)
-                .ToDictionary(p => p.Name, p => p.Type);
+                .ToDictionary(p => p.Value, p => p.Type);
         }
 
         private void InitializeBinaryOperators()
@@ -300,10 +300,10 @@ namespace IX.Math
             this.BinaryOperators = typeof(MathDefinition)
                 .GetTypeProperties()
                 .Where(p => p.Name.EndsWith("Symbol"))
-                .Select(p => p.Name.Substring(0, p.Name.Length - 6))
-                .Select(p => new { Name = p, Type = Type.GetType($"IX.Math.Nodes.Operations.Unary.{p}Node", false) })
+                .Select(p => new { Name = p.Name.Substring(0, p.Name.Length - 6), Value = (string)p.GetValue(this.Definition) })
+                .Select(p => new { Name = p.Name, Type = Type.GetType($"IX.Math.Nodes.Operations.Binary.{p.Name}Node", false), Value=p.Value })
                 .Where(p => p.Type != null)
-                .ToDictionary(p => p.Name, p => p.Type);
+                .ToDictionary(p => p.Value, p => p.Type);
         }
     }
 }

@@ -226,7 +226,7 @@ namespace IX.Math
             }
 
             // Check whether the expression is a binary operator
-            foreach (string op in workingSet.BinaryOperatorsInOrder)
+            foreach (string op in workingSet.BinaryOperatorsInOrder.Where(p => s.Contains(p)))
             {
                 var exp = ExpressionByBinaryOperator(s, op, workingSet);
                 if (exp != null)
@@ -236,7 +236,7 @@ namespace IX.Math
             }
 
             // Check whether the expression is a unary operator
-            foreach (string op in workingSet.UnaryOperatorsInOrder)
+            foreach (string op in workingSet.UnaryOperatorsInOrder.Where(p => s.Contains(p)))
             {
                 var exp = ExpressionByUnaryOperator(s, op, workingSet);
                 if (exp != null)
@@ -282,7 +282,7 @@ namespace IX.Math
             return null;
         }
 
-        private static BinaryOperationNodeBase ExpressionByBinaryOperator(
+        private static NodeBase ExpressionByBinaryOperator(
             string s,
             string op,
             WorkingExpressionSet workingSet)
@@ -338,7 +338,7 @@ namespace IX.Math
 
                         if (workingSet.BinaryOperators.TryGetValue(op, out Type t))
                         {
-                            return (BinaryOperationNodeBase)Activator.CreateInstance(t, left, right);
+                            return ((BinaryOperationNodeBase)Activator.CreateInstance(t, left, right))?.Simplify();
                         }
                         else
                         {
@@ -355,7 +355,7 @@ namespace IX.Math
             return null;
         }
 
-        private static UnaryOperatorNodeBase ExpressionByUnaryOperator(
+        private static NodeBase ExpressionByUnaryOperator(
             string s,
             string op,
             WorkingExpressionSet workingSet)
@@ -374,7 +374,7 @@ namespace IX.Math
 
                     if (workingSet.UnaryOperators.TryGetValue(op, out Type t))
                     {
-                        return (UnaryOperatorNodeBase)Activator.CreateInstance(t, expr);
+                        return ((UnaryOperatorNodeBase)Activator.CreateInstance(t, expr))?.Simplify();
                     }
                     else
                     {

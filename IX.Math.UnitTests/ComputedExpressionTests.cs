@@ -18,37 +18,37 @@ namespace IX.Math.UnitTests
                 {
                     "3+6",
                     new object[0],
-                    9,
+                    9L,
                 },
                 new object[]
                 {
                     "3+6-2*4",
                     new object[0],
-                    1,
+                    1L,
                 },
                 new object[]
                 {
                     "3+(6-2)*2",
                     new object[0],
-                    11,
+                    11L,
                 },
                 new object[]
                 {
                     "1<<2",
                     new object[0],
-                    4,
+                    4L,
                 },
                 new object[]
                 {
                     "((2+3)*2-1)*2",
                     new object[0],
-                    18,
+                    18L,
                 },
                 new object[]
                 {
                     "  3         +        6      ",
                     new object[0],
-                    9,
+                    9L,
                 },
                 new object[]
                 {
@@ -60,7 +60,7 @@ namespace IX.Math.UnitTests
                 {
                     "((2+3)*2-1)*2 - x",
                     new object[] { 12 },
-                    6,
+                    6L,
                 },
                 new object[]
                 {
@@ -78,13 +78,13 @@ namespace IX.Math.UnitTests
                 {
                     "x",
                     new object[] { 12 },
-                    12,
+                    12L,
                 },
                 new object[]
                 {
                     "2*x-7*y",
                     new object[] { 12, 2 },
-                    10,
+                    10L,
                 },
                 new object[]
                 {
@@ -108,7 +108,7 @@ namespace IX.Math.UnitTests
                 {
                     "1<<1",
                     new object[0],
-                    2,
+                    2L,
                 },
                 new object[]
                 {
@@ -120,19 +120,19 @@ namespace IX.Math.UnitTests
                 {
                     "1<<1 + 2 << 1",
                     new object[0],
-                    6,
+                    6L,
                 },
                 new object[]
                 {
                     "((1+1)-(1-1))+((1-1)-(1+1))",
                     new object[0],
-                    0,
+                    0L,
                 },
                 new object[]
                 {
                     "((6-3)*(3+3))-1",
                     new object[0],
-                    17,
+                    17L,
                 },
                 new object[]
                 {
@@ -150,25 +150,25 @@ namespace IX.Math.UnitTests
                 {
                     "!x",
                     new object[] { 32768 },
-                    -32769,
+                    -32769L,
                 },
                 new object[]
                 {
                     "strlen(x)",
                     new object[] { "alabala" },
-                    7,
+                    7L,
                 },
                 new object[]
                 {
                     "21*3-17",
                     new object[0],
-                    46,
+                    46L,
                 },
                 new object[]
                 {
                     "(1+1)*2-3",
                     new object[0],
-                    1,
+                    1L,
                 },
                 new object[]
                 {
@@ -180,13 +180,13 @@ namespace IX.Math.UnitTests
                 {
                     "!4+4",
                     new object[0],
-                    -1,
+                    -1L,
                 },
                 new object[]
                 {
                     "212",
                     new object[0],
-                    212,
+                    212L,
                 },
                 new object[]
                 {
@@ -204,7 +204,7 @@ namespace IX.Math.UnitTests
                 {
                     "0x10+26",
                     new object[0],
-                    42,
+                    42L,
                 },
                 new object[]
                 {
@@ -258,13 +258,13 @@ namespace IX.Math.UnitTests
                 {
                     "strlen(\"This that those\")",
                     new object[0],
-                    15,
+                    15L,
                 },
                 new object[]
                 {
                     "5+strlen(\"This that those\")-10",
                     new object[0],
-                    10,
+                    10L,
                 },
                 new object[]
                 {
@@ -288,19 +288,19 @@ namespace IX.Math.UnitTests
                 {
                     "1--2",
                     new object[0],
-                    3,
+                    3L,
                 },
                 new object[]
                 {
                     "x+y",
                     new object[2] { 1, -2 },
-                    -1,
+                    -1L,
                 },
                 new object[]
                 {
                     "1*-2",
                     new object[0],
-                    -2,
+                    -2L,
                 },
             };
         }
