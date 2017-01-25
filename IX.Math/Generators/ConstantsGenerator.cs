@@ -64,9 +64,32 @@ namespace IX.Math.Generators
             }
         }
 
+        public static void GenerateNamedNumericSymbol(
+            IDictionary<string, ConstantNodeBase> constantsTable,
+            IDictionary<string, string> reverseConstantsTable,
+            string name,
+            double value,
+            params string[] alternateNames)
+        {
+            if (reverseConstantsTable.TryGetValue(name, out string key))
+            {
+                return;
+            }
+            else
+            {
+                constantsTable.Add(name, new NumericNode(value));
+                reverseConstantsTable.Add(value.ToString(), name);
+
+                foreach (string alternateName in alternateNames)
+                {
+                    reverseConstantsTable.Add(alternateName, name);
+                }
+            }
+        }
+
         private static string GenerateName(IEnumerable<string> keys, string originalExpression)
         {
-            int index = int.Parse(keys.LastOrDefault()?.Substring(4) ?? "0");
+            int index = int.Parse(keys.Where(p => p.StartsWith("Const") && p.Length > 5).LastOrDefault()?.Substring(5) ?? "0");
 
             do
             {

@@ -136,6 +136,66 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public NotEqualsNode(NumericNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public NotEqualsNode(UndefinedParameterNode left, NumericNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public NotEqualsNode(NumericParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public NotEqualsNode(UndefinedParameterNode left, NumericParameterNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public NotEqualsNode(BoolNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineBool())
+        {
+        }
+
+        public NotEqualsNode(UndefinedParameterNode left, BoolNode right)
+            : base(left?.DetermineBool(), right)
+        {
+        }
+
+        public NotEqualsNode(BoolParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineBool())
+        {
+        }
+
+        public NotEqualsNode(UndefinedParameterNode left, BoolParameterNode right)
+            : base(left?.DetermineBool(), right)
+        {
+        }
+
+        public NotEqualsNode(StringNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineString())
+        {
+        }
+
+        public NotEqualsNode(UndefinedParameterNode left, StringNode right)
+            : base(left?.DetermineString(), right)
+        {
+        }
+
+        public NotEqualsNode(StringParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineString())
+        {
+        }
+
+        public NotEqualsNode(UndefinedParameterNode left, StringParameterNode right)
+            : base(left?.DetermineString(), right)
+        {
+        }
+
         public override NodeBase Simplify()
         {
             if (this.Left is NumericNode && this.Right is NumericNode)

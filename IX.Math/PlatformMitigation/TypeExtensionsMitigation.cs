@@ -86,5 +86,20 @@ namespace IX.Math.PlatformMitigation
                 return true;
             });
         }
+
+        internal static IEnumerable<PropertyInfo> GetTypeProperties(this Type type)
+        {
+            return type.
+#if !(NETSTANDARD10 || NETSTANDARD11)
+                GetProperties
+#else
+                GetRuntimeProperties
+#endif
+#pragma warning disable SA1110 // Opening parenthesis or bracket must be on declaration line
+#pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
+                ();
+#pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
+#pragma warning restore SA1110 // Opening parenthesis or bracket must be on declaration line
+        }
     }
 }

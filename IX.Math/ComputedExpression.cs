@@ -6,8 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using IX.Math.BuiltIn;
 using IX.Math.SimplificationAide;
+using IX.Math.Nodes.Parameters;
+using IX.Math.Nodes;
+using IX.Math.Formatters;
 
 namespace IX.Math
 {
@@ -17,13 +19,13 @@ namespace IX.Math
     public class ComputedExpression : IDisposable
     {
         private readonly string initialExpression;
-        private ExpressionTreeNodeBase body;
-        private ExpressionTreeNodeParameter[] parameters;
+        private NodeBase body;
+        private ParameterNodeBase[] parameters;
         private object locker;
         private Dictionary<int, Delegate> computedBodies;
         private bool disposedValue;
 
-        internal ComputedExpression(string initialExpression, ExpressionTreeNodeBase body, ExpressionTreeNodeParameter[] parameters, bool isRecognized)
+        internal ComputedExpression(string initialExpression, NodeBase body, ParameterNodeBase[] parameters, bool isRecognized)
         {
             this.initialExpression = initialExpression;
             this.body = body;
@@ -31,7 +33,7 @@ namespace IX.Math
             this.locker = new object();
             this.computedBodies = new Dictionary<int, Delegate>();
             this.parameters = parameters;
-            this.ParameterNames = parameters.Select(p => p.Name).ToArray();
+            this.ParameterNames = parameters?.Select(p => p.ParameterName).ToArray() ?? new string[0];
         }
 
         /// <summary>
@@ -80,14 +82,9 @@ namespace IX.Math
                 return this.initialExpression;
             }
 
-            Type numericType = WorkingConstants.DefaultNumericType;
-            NumericTypeAide.GetProperRequestedNumericalType(arguments, ref numericType);
+            var convertedArguments = NumericFormatter.FormatArgumentsAccordingToParameters(arguments, this.parameters);
 
-            int numericTypeValue = this.body.ComputeResultingNumericTypeValue(NumericTypeAide.NumericTypesConversionDictionary[numericType]);
-
-            var convertedArguments = NumericTypeAide.GetProperNumericTypeValues(arguments, NumericTypeAide.InverseNumericTypesConversionDictionary[numericTypeValue]);
-
-            Delegate del = this.GetDelegate(numericTypeValue);
+            Delegate del = this.GetDelegate();
 
             if (del == null)
             {
@@ -125,7 +122,7 @@ namespace IX.Math
 
             foreach (var p in this.parameters)
             {
-                if (!dataFinder.TryGetData(p.Name, out object data))
+                if (!dataFinder.TryGetData(p.ParameterName, out object data))
                 {
                     data = null;
                 }
@@ -165,45 +162,20 @@ namespace IX.Math
             }
         }
 
-        private Delegate GetDelegate(int numericTypeValue)
+        private Delegate GetDelegate()
         {
-            if (this.computedBodies.TryGetValue(numericTypeValue, out var result))
+            Expression bodyExpression;
+            try
             {
-                return result;
+                bodyExpression = this.body.GenerateExpression();
+            }
+            catch
+            {
+                return null;
             }
 
-            lock (this.locker)
-            {
-                if (this.computedBodies.TryGetValue(numericTypeValue, out result))
-                {
-                    return result;
-                }
-
-                Expression bodyExpression;
-                try
-                {
-                    bodyExpression = this.body.GenerateExpression(numericTypeValue);
-                }
-                catch
-                {
-                    return null;
-                }
-
-                result = Expression.Lambda(bodyExpression, this.parameters.Select(p => (ParameterExpression)p.GenerateExpression(numericTypeValue)))
-                    ?.Compile();
-
-                foreach (var parameterExpression in this.parameters)
-                {
-                    parameterExpression.Reset();
-                }
-
-                if (result == null)
-                {
-                    return null;
-                }
-
-                this.computedBodies.Add(numericTypeValue, result);
-            }
+            var result = Expression.Lambda(bodyExpression, this.parameters.Select(p => (ParameterExpression)p.GenerateExpression()))
+                ?.Compile();
 
             return result;
         }

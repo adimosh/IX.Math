@@ -6,8 +6,10 @@ namespace IX.Math.Nodes.Constants
 {
     internal abstract class ConstantNodeBase : NodeBase
     {
-        internal ConstantNodeBase()
+        protected ConstantNodeBase()
         {
         }
+
+        public abstract object DistilValue();
     }
 }

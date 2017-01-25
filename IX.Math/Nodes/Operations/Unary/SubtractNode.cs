@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
@@ -19,11 +18,15 @@ namespace IX.Math.Nodes.Operations.Unary
         public SubtractNode(NumericParameterNode operand)
             : base(operand)
         {
-            OperationsHelper.ParameterMustBeInteger(operand);
+        }
+
+        public SubtractNode(UndefinedParameterNode operand)
+            : base(operand?.DetermineNumeric())
+        {
         }
 
         public SubtractNode(OperationNodeBase operand)
-            : base(operand)
+            : base(operand?.Simplify())
         {
         }
 
@@ -32,7 +35,7 @@ namespace IX.Math.Nodes.Operations.Unary
             switch (this.Operand)
             {
                 case NumericNode numericNode:
-                    return new NumericNode(0 - numericNode.ExtractInteger());
+                    return NumericNode.Subtract(new NumericNode(0), numericNode);
                 default:
                     return this;
             }

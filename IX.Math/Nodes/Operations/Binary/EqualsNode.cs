@@ -136,6 +136,66 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public EqualsNode(NumericNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public EqualsNode(UndefinedParameterNode left, NumericNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public EqualsNode(NumericParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public EqualsNode(UndefinedParameterNode left, NumericParameterNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public EqualsNode(BoolNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineBool())
+        {
+        }
+
+        public EqualsNode(UndefinedParameterNode left, BoolNode right)
+            : base(left?.DetermineBool(), right)
+        {
+        }
+
+        public EqualsNode(BoolParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineBool())
+        {
+        }
+
+        public EqualsNode(UndefinedParameterNode left, BoolParameterNode right)
+            : base(left?.DetermineBool(), right)
+        {
+        }
+
+        public EqualsNode(StringNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineString())
+        {
+        }
+
+        public EqualsNode(UndefinedParameterNode left, StringNode right)
+            : base(left?.DetermineString(), right)
+        {
+        }
+
+        public EqualsNode(StringParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineString())
+        {
+        }
+
+        public EqualsNode(UndefinedParameterNode left, StringParameterNode right)
+            : base(left?.DetermineString(), right)
+        {
+        }
+
         public override NodeBase Simplify()
         {
             if (this.Left is NumericNode && this.Right is NumericNode)

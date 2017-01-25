@@ -211,6 +211,8 @@ namespace IX.Math.Nodes.Constants
             return Convert.ToInt32(this.integerValue);
         }
 
+        public override object DistilValue() => this.Value;
+
         private void Initialize(long value)
         {
             this.integerValue = value;

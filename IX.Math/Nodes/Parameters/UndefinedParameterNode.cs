@@ -3,16 +3,27 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using IX.Math.Generators;
 
 namespace IX.Math.Nodes.Parameters
 {
     internal sealed class UndefinedParameterNode : ParameterNodeBase
     {
-        public UndefinedParameterNode(string parameterName)
+        private IDictionary<string, ParameterNodeBase> parametersTable;
+
+        public UndefinedParameterNode(string parameterName, IDictionary<string, ParameterNodeBase> parametersTable)
             : base(parameterName)
         {
+            this.parametersTable = parametersTable;
         }
+
+        public NumericParameterNode DetermineNumeric() => ParametersGenerator.DetermineNumeric(this.parametersTable, this.ParameterName);
+
+        public BoolParameterNode DetermineBool() => ParametersGenerator.DetermineBool(this.parametersTable, this.ParameterName);
+
+        public StringParameterNode DetermineString() => ParametersGenerator.DetermineString(this.parametersTable, this.ParameterName);
 
         protected override Expression GenerateExpressionInternal()
         {

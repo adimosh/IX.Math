@@ -56,6 +56,26 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public RightShiftNode(NumericNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public RightShiftNode(UndefinedParameterNode left, NumericNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public RightShiftNode(NumericParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public RightShiftNode(UndefinedParameterNode left, NumericParameterNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
         public override NodeBase Simplify()
         {
             if (this.Right is NumericNode && this.Right is NumericNode)

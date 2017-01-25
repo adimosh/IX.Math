@@ -102,6 +102,46 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public XorNode(NumericNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public XorNode(UndefinedParameterNode left, NumericNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public XorNode(BoolNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineBool())
+        {
+        }
+
+        public XorNode(UndefinedParameterNode left, BoolNode right)
+            : base(left?.DetermineBool(), right)
+        {
+        }
+
+        public XorNode(NumericParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public XorNode(UndefinedParameterNode left, NumericParameterNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public XorNode(BoolParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineBool())
+        {
+        }
+
+        public XorNode(UndefinedParameterNode left, BoolParameterNode right)
+            : base(left?.DetermineBool(), right)
+        {
+        }
+
         public override NodeBase Simplify()
         {
             if (this.Left is NumericNode && this.Right is NumericNode)

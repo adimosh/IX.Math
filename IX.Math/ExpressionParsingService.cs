@@ -28,7 +28,7 @@ namespace IX.Math
                 AddSymbol = "+",
                 AndSymbol = "&",
                 DivideSymbol = "/",
-                DoesNotEqualSymbol = "!=",
+                NotEqualsSymbol = "!=",
                 EqualsSymbol = "=",
                 MultiplySymbol = "*",
                 NotSymbol = "!",
@@ -40,8 +40,8 @@ namespace IX.Math
                 GreaterThanSymbol = ">",
                 LessThanOrEqualSymbol = "<=",
                 LessThanSymbol = "<",
-                ShiftRightSymbol = ">>",
-                ShiftLeftSymbol = "<<",
+                RightShiftSymbol = ">>",
+                LeftShiftSymbol = "<<",
             })
         {
         }
@@ -79,7 +79,7 @@ namespace IX.Math
             }
             else
             {
-                return new ComputedExpression(expression, workingSet.Body, workingSet.ExternalParameters.Values.ToArray(), true);
+                return new ComputedExpression(expression, workingSet.Body, workingSet.ParametersTable.Values.ToArray(), true);
             }
         }
     }

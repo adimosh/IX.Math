@@ -4,6 +4,7 @@
 
 using System;
 using IX.Math.Nodes.Parameters;
+using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Nodes.Operations
 {

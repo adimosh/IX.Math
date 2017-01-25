@@ -33,7 +33,7 @@ namespace IX.Math
             this.AddSymbol = definition.AddSymbol;
             this.AndSymbol = definition.AndSymbol;
             this.DivideSymbol = definition.DivideSymbol;
-            this.DoesNotEqualSymbol = definition.DoesNotEqualSymbol;
+            this.NotEqualsSymbol = definition.NotEqualsSymbol;
             this.EqualsSymbol = definition.EqualsSymbol;
             this.GreaterThanOrEqualSymbol = definition.GreaterThanOrEqualSymbol;
             this.GreaterThanSymbol = definition.GreaterThanSymbol;
@@ -43,8 +43,8 @@ namespace IX.Math
             this.NotSymbol = definition.NotSymbol;
             this.OrSymbol = definition.OrSymbol;
             this.PowerSymbol = definition.PowerSymbol;
-            this.ShiftLeftSymbol = definition.ShiftLeftSymbol;
-            this.ShiftRightSymbol = definition.ShiftRightSymbol;
+            this.LeftShiftSymbol = definition.LeftShiftSymbol;
+            this.RightShiftSymbol = definition.RightShiftSymbol;
             this.SubtractSymbol = definition.SubtractSymbol;
             this.XorSymbol = definition.XorSymbol;
         }
@@ -143,7 +143,7 @@ namespace IX.Math
         /// Gets or sets a symbol for a comparison of inequality.
         /// </summary>
         [DataMember]
-        public string DoesNotEqualSymbol { get; set; }
+        public string NotEqualsSymbol { get; set; }
 
         /// <summary>
         /// Gets or sets a symbol for a comparison of greater than.
@@ -173,12 +173,12 @@ namespace IX.Math
         /// Gets or sets a symbol for a comparison of less than or equal.
         /// </summary>
         [DataMember]
-        public string ShiftRightSymbol { get; set; }
+        public string RightShiftSymbol { get; set; }
 
         /// <summary>
         /// Gets or sets a symbol for a comparison of less than or equal.
         /// </summary>
         [DataMember]
-        public string ShiftLeftSymbol { get; set; }
+        public string LeftShiftSymbol { get; set; }
     }
 }

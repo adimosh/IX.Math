@@ -102,6 +102,46 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public OrNode(NumericNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public OrNode(UndefinedParameterNode left, NumericNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public OrNode(BoolNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineBool())
+        {
+        }
+
+        public OrNode(UndefinedParameterNode left, BoolNode right)
+            : base(left?.DetermineBool(), right)
+        {
+        }
+
+        public OrNode(NumericParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public OrNode(UndefinedParameterNode left, NumericParameterNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public OrNode(BoolParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineBool())
+        {
+        }
+
+        public OrNode(UndefinedParameterNode left, BoolParameterNode right)
+            : base(left?.DetermineBool(), right)
+        {
+        }
+
         public override NodeBase Simplify()
         {
             if (this.Left is NumericNode && this.Right is NumericNode)

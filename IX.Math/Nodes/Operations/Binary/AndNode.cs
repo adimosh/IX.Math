@@ -96,6 +96,46 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public AndNode(NumericNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public AndNode(UndefinedParameterNode left, NumericNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public AndNode(BoolNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineBool())
+        {
+        }
+
+        public AndNode(UndefinedParameterNode left, BoolNode right)
+            : base(left?.DetermineBool(), right)
+        {
+        }
+
+        public AndNode(NumericParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public AndNode(UndefinedParameterNode left, NumericParameterNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public AndNode(BoolParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineBool())
+        {
+        }
+
+        public AndNode(UndefinedParameterNode left, BoolParameterNode right)
+            : base(left?.DetermineBool(), right)
+        {
+        }
+
         public override NodeBase Simplify()
         {
             if (this.Left is NumericNode && this.Right is NumericNode)
