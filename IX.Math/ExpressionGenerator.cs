@@ -6,7 +6,6 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using IX.Math.BuiltIn;
-using IX.Math.BuiltIn.Constants;
 using IX.Math.Extraction;
 using IX.Math.Generators;
 using IX.Math.PlatformMitigation;
