@@ -2,9 +2,9 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Collections.Generic;
 using IX.Math.Generators;
 using IX.Math.Nodes.Constants;
-using System.Collections.Generic;
 
 namespace IX.Math.Extraction
 {
