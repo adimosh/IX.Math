@@ -213,7 +213,10 @@ namespace IX.Math
             {
                 if (workingSet.SymbolTable.TryGetValue(e2, out var e3))
                 {
-                    return GenerateExpression(e3, workingSet);
+                    if (e3.Expression != s)
+                    {
+                        return GenerateExpression(e3, workingSet);
+                    }
                 }
             }
 

@@ -13,9 +13,10 @@ namespace IX.Math.Generators
         internal static void FormatParantheses(WorkingExpressionSet workingSet)
         {
             FormatParanthesis(string.Empty, workingSet);
-            for (int i = 1; i < workingSet.SymbolTable.Count; i++)
+            string[] names = workingSet.SymbolTable.Keys.Where(p => p.StartsWith("item")).ToArray();
+            foreach (var name in names)
             {
-                FormatParanthesis($"item{i}", workingSet);
+                FormatParanthesis(name, workingSet);
             }
         }
 
