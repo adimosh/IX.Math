@@ -5,12 +5,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
-using IX.Math.PlatformMitigation;
 
 namespace IX.Math
 {
@@ -82,7 +82,7 @@ namespace IX.Math
                 this.Definition.PowerSymbol,
                 this.Definition.LeftShiftSymbol,
                 this.Definition.RightShiftSymbol,
-                this.Definition.NotSymbol
+                this.Definition.NotSymbol,
             };
 
             this.FunctionRegex = new Regex($@"(?'functionName'.*?){Regex.Escape(this.Definition.Parantheses.Item1)}(?'expression'.*?){Regex.Escape(this.Definition.Parantheses.Item2)}");
@@ -219,7 +219,7 @@ namespace IX.Math
             this.UnaryOperatorsInOrder = new[]
             {
                 this.Definition.SubtractSymbol,
-                this.Definition.NotSymbol
+                this.Definition.NotSymbol,
             };
 
             this.AllSymbols = this.AllOperatorsInOrder
@@ -227,7 +227,7 @@ namespace IX.Math
                 {
                     this.Definition.ParameterSeparator,
                     this.Definition.Parantheses.Item1,
-                    this.Definition.Parantheses.Item2
+                    this.Definition.Parantheses.Item2,
                 })
                 .ToArray();
 
@@ -287,7 +287,7 @@ namespace IX.Math
         private void InitializeUnaryOperators()
         {
             this.UnaryOperators = typeof(MathDefinition)
-                .GetTypeProperties()
+                .GetRuntimeProperties()
                 .Where(p => p.Name.EndsWith("Symbol"))
                 .Select(p => new { Name = p.Name.Substring(0, p.Name.Length - 6), Value = (string)p.GetValue(this.Definition) })
                 .Select(p => new { Name = p.Name, Type = Type.GetType($"IX.Math.Nodes.Operations.Unary.{p.Name}Node", false), Value = p.Value })
@@ -298,7 +298,7 @@ namespace IX.Math
         private void InitializeBinaryOperators()
         {
             this.BinaryOperators = typeof(MathDefinition)
-                .GetTypeProperties()
+                .GetRuntimeProperties()
                 .Where(p => p.Name.EndsWith("Symbol"))
                 .Select(p => new { Name = p.Name.Substring(0, p.Name.Length - 6), Value = (string)p.GetValue(this.Definition) })
                 .Select(p => new { Name = p.Name, Type = Type.GetType($"IX.Math.Nodes.Operations.Binary.{p.Name}Node", false), Value=p.Value })

@@ -1,42 +1,34 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Description>A library for transforming text expressions containing mathematical operations into executable delegates.</Description>
-    <Copyright>Adrian Mos, 2016</Copyright>
-    <AssemblyName>IX.Math</AssemblyName>
-    <AssemblyTitle>IX.Math</AssemblyTitle>
-    <VersionPrefix>0.4.1-alpha2</VersionPrefix>
-    <Authors>Adrian Mos</Authors>
-    <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard1.3</TargetFrameworks>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageProjectUrl>https://github.com/adimosh/IX.Math/</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/adimosh/IX.Math/blob/master/LICENSE.md</PackageLicenseUrl>
-    <WarningLevel>4</WarningLevel>
-    <WarningsAsErrors>true</WarningsAsErrors>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+    <TargetFramework>netstandard1.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.4.1-alpha2</Version>
+    <FileVersion>0.4.1.0</FileVersion>
+    <AssemblyVersion>0.4.1.0</AssemblyVersion>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Adrian Mos</Authors>
+    <Company />
+    <Product>IX Framework</Product>
+    <Description>A library for transforming text expressions containing mathematical operations into executable delegates.</Description>
+    <Copyright>Adrian Mos, 2016</Copyright>
+    <PackageProjectUrl>https://github.com/adimosh/IX.Math/</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/adimosh/IX.Math/blob/master/LICENSE.md</PackageLicenseUrl>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineDebug>true</DefineDebug>
-    <DefineTrace>true</DefineTrace>
+    <DocumentationFile>bin\Debug\netstandard1.1\.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <DefineDebug>false</DefineDebug>
-    <DefineTrace>false</DefineTrace>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <TreatSpecificWarningsAsErrors />
+    <DefineConstants>RELEASE;NETSTANDARD1_1</DefineConstants>
+    <DocumentationFile>bin\Release\netstandard1.1\IX.Math.xml</DocumentationFile>
   </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove=".vscode\**" />
     <EmbeddedResource Remove=".vscode\**" />
@@ -59,20 +51,9 @@
     <PackageReference Include="System.Threading" Version="4.0.11" />
     <PackageReference Include="System.Threading.Tasks" Version="4.0.11" />
     <PackageReference Include="System.Diagnostics.Tools" Version="4.0.1" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-    <PackageReference Include="System.Reflection.Extensions" Version="4.0.1" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
     <PackageReference Include="System.Reflection.Extensions" Version="4.0.1" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.0.12" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="System.Collections.Concurrent" Version="4.0.12" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.1.0" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <PackageReference Include="StyleCop.Analyzers" Version="1.0.0" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta001" Type="build" Condition=" '$(Configuration)' == 'Debug' " PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources.Designer.cs">
@@ -102,13 +83,4 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD10</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD11</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD13</DefineConstants>
-  </PropertyGroup>
 </Project>
