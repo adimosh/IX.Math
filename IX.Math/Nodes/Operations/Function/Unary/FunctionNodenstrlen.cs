@@ -27,7 +27,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
         }
 
         public FunctionNodenstrlen(OperationNodeBase parameter)
-            : base(parameter)
+            : base(parameter?.Simplify())
         {
             if (parameter?.ReturnType != SupportedValueType.String)
             {
@@ -39,7 +39,13 @@ namespace IX.Math.Nodes.Operations.Function.Unary
 
         public override NodeBase Simplify()
         {
-            throw new NotImplementedException();
+            StringNode stringParam;
+            if ((stringParam = this.Parameter as StringNode) != null)
+            {
+                return new NumericNode(stringParam.Value.Length);
+            }
+
+            return this;
         }
 
         protected override Expression GenerateExpressionInternal()
