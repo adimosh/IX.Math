@@ -35,27 +35,49 @@ namespace IX.Math.Nodes.Operations.Binary
         public LessThanOrEqualNode(NumericNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public LessThanOrEqualNode(OperationNodeBase left, NumericNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public LessThanOrEqualNode(OperationNodeBase left, OperationNodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Numeric && left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public LessThanOrEqualNode(NumericParameterNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public LessThanOrEqualNode(OperationNodeBase left, NumericParameterNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
+
+        public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
         public override NodeBase Simplify()
         {

@@ -20,6 +20,7 @@ namespace IX.Math.Nodes.Operations.Binary
         public LeftShiftNode(NumericNode left, NumericParameterNode right)
             : base(left, right)
         {
+            OperationsHelper.ParameterMustBeInteger(right);
         }
 
         public LeftShiftNode(NumericParameterNode left, NumericNode right)
@@ -30,6 +31,7 @@ namespace IX.Math.Nodes.Operations.Binary
         public LeftShiftNode(NumericParameterNode left, NumericParameterNode right)
             : base(left, right)
         {
+            OperationsHelper.ParameterMustBeInteger(right);
         }
 
         public LeftShiftNode(NumericNode left, OperationNodeBase right)
@@ -62,6 +64,7 @@ namespace IX.Math.Nodes.Operations.Binary
         public LeftShiftNode(OperationNodeBase left, NumericParameterNode right)
             : base(left?.Simplify(), right)
         {
+            OperationsHelper.ParameterMustBeInteger(right);
             if (left?.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
@@ -75,6 +78,29 @@ namespace IX.Math.Nodes.Operations.Binary
             {
                 throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
             }
+        }
+
+        public LeftShiftNode(NumericNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+            OperationsHelper.ParameterMustBeInteger(this.Right as NumericParameterNode);
+        }
+
+        public LeftShiftNode(UndefinedParameterNode left, NumericNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public LeftShiftNode(NumericParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+            OperationsHelper.ParameterMustBeInteger(this.Right as NumericParameterNode);
+        }
+
+        public LeftShiftNode(UndefinedParameterNode left, NumericParameterNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+            OperationsHelper.ParameterMustBeInteger(right);
         }
 
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;

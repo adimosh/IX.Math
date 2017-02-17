@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
@@ -35,7 +34,13 @@ namespace IX.Math.Nodes.Operations.Unary
         public NotNode(OperationNodeBase operand)
             : base(operand)
         {
+            if (operand?.ReturnType != SupportedValueType.Numeric && operand?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
+
+        public override SupportedValueType ReturnType => this.Operand?.ReturnType ?? SupportedValueType.Unknown;
 
         public override NodeBase Simplify()
         {

@@ -26,6 +26,17 @@ namespace IX.Math.Nodes.Operations.Function.Unary
         {
         }
 
+        public FunctionNodenstrlen(OperationNodeBase parameter)
+            : base(parameter)
+        {
+            if (parameter?.ReturnType != SupportedValueType.String)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
+        }
+
+        public override SupportedValueType ReturnType => SupportedValueType.Numeric;
+
         public override NodeBase Simplify()
         {
             throw new NotImplementedException();

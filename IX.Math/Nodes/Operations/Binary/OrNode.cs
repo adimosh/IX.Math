@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
@@ -39,28 +40,53 @@ namespace IX.Math.Nodes.Operations.Binary
         public OrNode(NumericNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public OrNode(OperationNodeBase left, NumericNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public OrNode(NumericParameterNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
             OperationsHelper.ParameterMustBeInteger(left);
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public OrNode(OperationNodeBase left, NumericParameterNode right)
             : base(left?.Simplify(), right)
         {
             OperationsHelper.ParameterMustBeInteger(right);
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public OrNode(OperationNodeBase left, OperationNodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
+            if (right?.ReturnType != left?.ReturnType)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
+
+            if (right?.ReturnType != SupportedValueType.Numeric && right?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public OrNode(BoolNode left, BoolNode right)
@@ -86,21 +112,37 @@ namespace IX.Math.Nodes.Operations.Binary
         public OrNode(BoolNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public OrNode(OperationNodeBase left, BoolNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public OrNode(BoolParameterNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public OrNode(OperationNodeBase left, BoolParameterNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public OrNode(NumericNode left, UndefinedParameterNode right)
@@ -142,6 +184,8 @@ namespace IX.Math.Nodes.Operations.Binary
             : base(left?.DetermineBool(), right)
         {
         }
+
+        public override SupportedValueType ReturnType => this.Left?.ReturnType ?? this.Right?.ReturnType ?? SupportedValueType.Unknown;
 
         public override NodeBase Simplify()
         {

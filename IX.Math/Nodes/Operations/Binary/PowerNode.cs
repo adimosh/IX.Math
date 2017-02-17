@@ -35,26 +35,46 @@ namespace IX.Math.Nodes.Operations.Binary
         public PowerNode(NumericNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public PowerNode(OperationNodeBase left, NumericNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public PowerNode(NumericParameterNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public PowerNode(OperationNodeBase left, NumericParameterNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public PowerNode(OperationNodeBase left, OperationNodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Numeric && left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public PowerNode(NumericNode left, UndefinedParameterNode right)
@@ -76,6 +96,8 @@ namespace IX.Math.Nodes.Operations.Binary
             : base(left?.DetermineNumeric(), right)
         {
         }
+
+        public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
         public override NodeBase Simplify()
         {

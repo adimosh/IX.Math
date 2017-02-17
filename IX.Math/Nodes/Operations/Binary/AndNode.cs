@@ -35,26 +35,46 @@ namespace IX.Math.Nodes.Operations.Binary
         public AndNode(NumericNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AndNode(OperationNodeBase left, NumericNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AndNode(NumericParameterNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AndNode(OperationNodeBase left, NumericParameterNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AndNode(OperationNodeBase left, OperationNodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
+            if (left?.ReturnType != SupportedValueType.Numeric && right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AndNode(BoolNode left, BoolNode right)

@@ -28,7 +28,13 @@ namespace IX.Math.Nodes.Operations.Unary
         public SubtractNode(OperationNodeBase operand)
             : base(operand?.Simplify())
         {
+            if (operand?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
+
+        public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
         public override NodeBase Simplify()
         {

@@ -39,28 +39,53 @@ namespace IX.Math.Nodes.Operations.Binary
         public XorNode(NumericNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public XorNode(OperationNodeBase left, NumericNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public XorNode(NumericParameterNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
             OperationsHelper.ParameterMustBeInteger(left);
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public XorNode(OperationNodeBase left, NumericParameterNode right)
             : base(left?.Simplify(), right)
         {
             OperationsHelper.ParameterMustBeInteger(right);
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public XorNode(OperationNodeBase left, OperationNodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
+            if (right?.ReturnType != left?.ReturnType)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
+
+            if (right?.ReturnType != SupportedValueType.Numeric && right?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public XorNode(BoolNode left, BoolNode right)
@@ -86,21 +111,37 @@ namespace IX.Math.Nodes.Operations.Binary
         public XorNode(BoolNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public XorNode(OperationNodeBase left, BoolNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public XorNode(BoolParameterNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public XorNode(OperationNodeBase left, BoolParameterNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public XorNode(NumericNode left, UndefinedParameterNode right)
@@ -142,6 +183,8 @@ namespace IX.Math.Nodes.Operations.Binary
             : base(left?.DetermineBool(), right)
         {
         }
+
+        public override SupportedValueType ReturnType => this.Left?.ReturnType ?? this.Right?.ReturnType ?? SupportedValueType.Unknown;
 
         public override NodeBase Simplify()
         {
