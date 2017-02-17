@@ -21,6 +21,8 @@ namespace IX.Math.Nodes.Parameters
             this.parametersTable = parametersTable;
         }
 
+        public override SupportedValueType ReturnType => SupportedValueType.Unknown;
+
         public NumericParameterNode DetermineNumeric() => ParametersGenerator.DetermineNumeric(this.parametersTable, this.ParameterName);
 
         public BoolParameterNode DetermineBool() => ParametersGenerator.DetermineBool(this.parametersTable, this.ParameterName);

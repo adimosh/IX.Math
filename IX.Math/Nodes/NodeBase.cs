@@ -12,6 +12,8 @@ namespace IX.Math.Nodes
         {
         }
 
+        public abstract SupportedValueType ReturnType { get; }
+
         public abstract Expression GenerateExpression();
     }
 }

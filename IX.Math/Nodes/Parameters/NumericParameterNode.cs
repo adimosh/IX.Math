@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 
@@ -16,6 +17,8 @@ namespace IX.Math.Nodes.Parameters
         }
 
         public bool? RequireFloat { get; set; }
+
+        public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
         protected override Expression GenerateExpressionInternal()
         {

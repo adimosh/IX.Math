@@ -135,26 +135,46 @@ namespace IX.Math.Nodes.Operations.Binary
         public AddNode(NumericNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Numeric && right?.ReturnType != SupportedValueType.String)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AddNode(OperationNodeBase left, NumericNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Numeric && left?.ReturnType != SupportedValueType.String)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AddNode(OperationNodeBase left, OperationNodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
+            if (right?.ReturnType != left?.ReturnType && right?.ReturnType != SupportedValueType.String && left?.ReturnType != SupportedValueType.String)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AddNode(NumericParameterNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Numeric && right?.ReturnType != SupportedValueType.String)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AddNode(OperationNodeBase left, NumericParameterNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Numeric && left?.ReturnType != SupportedValueType.String)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AddNode(StringNode left, OperationNodeBase right)
@@ -215,6 +235,19 @@ namespace IX.Math.Nodes.Operations.Binary
         public AddNode(UndefinedParameterNode left, StringParameterNode right)
             : base(left?.DetermineString(), right)
         {
+        }
+
+        public override SupportedValueType ReturnType
+        {
+            get
+            {
+                if (this.Left.ReturnType == SupportedValueType.String || this.Right.ReturnType == SupportedValueType.String)
+                {
+                    return SupportedValueType.String;
+                }
+
+                return SupportedValueType.Numeric;
+            }
         }
 
         public override NodeBase Simplify()

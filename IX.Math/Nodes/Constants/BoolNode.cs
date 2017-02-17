@@ -19,6 +19,8 @@ namespace IX.Math.Nodes.Constants
 
         public bool Value => this.value;
 
+        public override SupportedValueType ReturnType => SupportedValueType.Boolean;
+
         public override object DistilValue() => this.value;
 
         public override Expression GenerateExpression() => Expression.Constant(this.value, typeof(bool));

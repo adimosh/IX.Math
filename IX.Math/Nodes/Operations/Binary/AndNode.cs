@@ -80,21 +80,37 @@ namespace IX.Math.Nodes.Operations.Binary
         public AndNode(BoolNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AndNode(OperationNodeBase left, BoolNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AndNode(BoolParameterNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
+            if (right?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AndNode(OperationNodeBase left, BoolParameterNode right)
             : base(left?.Simplify(), right)
         {
+            if (left?.ReturnType != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
         }
 
         public AndNode(NumericNode left, UndefinedParameterNode right)
@@ -135,6 +151,19 @@ namespace IX.Math.Nodes.Operations.Binary
         public AndNode(UndefinedParameterNode left, BoolParameterNode right)
             : base(left?.DetermineBool(), right)
         {
+        }
+
+        public override SupportedValueType ReturnType
+        {
+            get
+            {
+                if (this.Left.ReturnType == SupportedValueType.String || this.Right.ReturnType == SupportedValueType.String)
+                {
+                    return SupportedValueType.String;
+                }
+
+                return SupportedValueType.Numeric;
+            }
         }
 
         public override NodeBase Simplify()

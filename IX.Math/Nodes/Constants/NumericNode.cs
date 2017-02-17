@@ -40,6 +40,8 @@ namespace IX.Math.Nodes.Constants
             }
         }
 
+        public override SupportedValueType ReturnType => SupportedValueType.Numeric;
+
         public object Value => this.isFloat ? this.floatValue : this.integerValue;
 
         public static NumericNode Add(NumericNode left, NumericNode right)

@@ -5,7 +5,6 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using IX.Math.BuiltIn;
 using IX.Math.Extraction;
 using IX.Math.Formatters;
 using IX.Math.Generators;
@@ -14,7 +13,6 @@ using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Operations.Binary;
 using IX.Math.Nodes.Operations.Function;
 using IX.Math.Nodes.Operations.Unary;
-using IX.Math.PlatformMitigation;
 
 namespace IX.Math
 {
