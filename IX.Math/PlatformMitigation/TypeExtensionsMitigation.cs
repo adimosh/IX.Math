@@ -10,14 +10,14 @@ namespace IX.Math.PlatformMitigation
 {
     internal static class TypeExtensionsMitigation
     {
-        internal static MethodInfo GetTypeMethod(this Type type, string name)
-        {
-            return type.GetRuntimeMethods().Where(p => p.Name == name).OrderBy(p => p.GetParameters().Length).FirstOrDefault();
-        }
+        internal static MethodInfo GetTypeMethod(this Type type, string name) =>
+            type.GetRuntimeMethods()
+                .Where(p => p.Name == name)
+                .OrderBy(p => p.GetParameters().Length)
+                .FirstOrDefault();
 
-        internal static MethodInfo GetTypeMethod(this Type type, string name, Type[] parameters)
-        {
-            return type.GetRuntimeMethods().SingleOrDefault(p =>
+        internal static MethodInfo GetTypeMethod(this Type type, string name, Type[] parameters) =>
+            type.GetRuntimeMethods().SingleOrDefault(p =>
             {
                 if (p.Name != name)
                 {
@@ -41,11 +41,9 @@ namespace IX.Math.PlatformMitigation
 
                 return true;
             });
-        }
 
-        internal static MethodInfo GetTypeMethod(this Type type, string name, Type returnType, Type[] parameters)
-        {
-            return type.GetRuntimeMethods().SingleOrDefault(p =>
+        internal static MethodInfo GetTypeMethod(this Type type, string name, Type returnType, Type[] parameters) =>
+            type.GetRuntimeMethods().SingleOrDefault(p =>
             {
                 if (p.Name != name || p.ReturnType != returnType)
                 {
@@ -69,6 +67,5 @@ namespace IX.Math.PlatformMitigation
 
                 return true;
             });
-        }
     }
 }
