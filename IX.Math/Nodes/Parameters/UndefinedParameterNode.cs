@@ -29,6 +29,11 @@ namespace IX.Math.Nodes.Parameters
 
         public StringParameterNode DetermineString() => ParametersGenerator.DetermineString(this.parametersTable, this.ParameterName);
 
+        public override Expression GenerateStringExpression()
+        {
+            throw new InvalidOperationException();
+        }
+
         protected override Expression GenerateExpressionInternal()
         {
             throw new InvalidOperationException();

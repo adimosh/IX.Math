@@ -287,7 +287,16 @@ namespace IX.Math.Nodes.Operations.Binary
 
         protected override Expression GenerateExpressionInternal()
         {
-            return Expression.Add(this.Left.GenerateExpression(), this.Right.GenerateExpression());
+            var pars = this.GetExpressionsOfSameTypeFromOperands();
+
+            if (this.ReturnType == SupportedValueType.String)
+            {
+                return Expression.Call(typeof(string), nameof(string.Concat), null, pars.Item1, pars.Item2);
+            }
+            else
+            {
+                return Expression.Add(pars.Item1, pars.Item2);
+            }
         }
     }
 }

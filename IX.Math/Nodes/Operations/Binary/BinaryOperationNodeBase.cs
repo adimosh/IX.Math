@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Linq.Expressions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
@@ -17,5 +18,27 @@ namespace IX.Math.Nodes.Operations.Binary
         public NodeBase Left { get; private set; }
 
         public NodeBase Right { get; private set; }
+
+        protected Tuple<Expression, Expression> GetExpressionsOfSameTypeFromOperands()
+        {
+            if (this.Left.ReturnType == SupportedValueType.String || this.Right.ReturnType == SupportedValueType.String)
+            {
+                return new Tuple<Expression, Expression>(this.Left.GenerateStringExpression(), this.Right.GenerateStringExpression());
+            }
+
+            var le = this.Left.GenerateExpression();
+            var re = this.Right.GenerateExpression();
+
+            if (le.Type == typeof(double) && re.Type == typeof(long))
+            {
+                return new Tuple<Expression, Expression>(le, Expression.Convert(re, typeof(double)));
+            }
+            else if (le.Type == typeof(long) && re.Type == typeof(double))
+            {
+                return new Tuple<Expression, Expression>(Expression.Convert(le, typeof(double)), re);
+            }
+
+            return new Tuple<Expression, Expression>(le, re);
+        }
     }
 }

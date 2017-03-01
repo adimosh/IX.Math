@@ -22,6 +22,12 @@ namespace IX.Math.UnitTests
                 },
                 new object[]
                 {
+                    @"""3""+6",
+                    new object[0],
+                    "36",
+                },
+                new object[]
+                {
                     "3+6-2*4",
                     new object[0],
                     1L,
@@ -60,7 +66,7 @@ namespace IX.Math.UnitTests
                 {
                     "((2+3)*2-1)*2 - x",
                     new object[] { 12 },
-                    6L,
+                    6D,
                 },
                 new object[]
                 {
@@ -84,7 +90,7 @@ namespace IX.Math.UnitTests
                 {
                     "2*x-7*y",
                     new object[] { 12, 2 },
-                    10L,
+                    10D,
                 },
                 new object[]
                 {
@@ -143,8 +149,8 @@ namespace IX.Math.UnitTests
                 new object[]
                 {
                     "2.0*x-7*y",
-                    new object[] { 12.5F, 2 },
-                    11.0F,
+                    new object[] { 12.5D, 2 },
+                    11.0D,
                 },
                 new object[]
                 {

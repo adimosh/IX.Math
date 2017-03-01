@@ -2,9 +2,9 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.PlatformMitigation;
 
 namespace IX.Math.Nodes.Parameters
 {
@@ -17,6 +17,8 @@ namespace IX.Math.Nodes.Parameters
         }
 
         public override SupportedValueType ReturnType => SupportedValueType.Boolean;
+
+        public override Expression GenerateStringExpression() => Expression.Call(this.GenerateExpression(), typeof(object).GetTypeMethod(nameof(object.ToString)));
 
         protected override Expression GenerateExpressionInternal()
         {

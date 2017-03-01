@@ -227,6 +227,8 @@ namespace IX.Math.Nodes.Constants
 
         public override object DistilValue() => this.Value;
 
+        public override Expression GenerateStringExpression() => Expression.Constant(this.Value.ToString(), typeof(string));
+
         private void Initialize(long value)
         {
             this.integerValue = value;

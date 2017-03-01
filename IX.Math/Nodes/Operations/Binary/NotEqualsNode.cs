@@ -273,7 +273,8 @@ namespace IX.Math.Nodes.Operations.Binary
 
         protected override Expression GenerateExpressionInternal()
         {
-            return Expression.NotEqual(this.Left.GenerateExpression(), this.Right.GenerateExpression());
+            var pars = this.GetExpressionsOfSameTypeFromOperands();
+            return Expression.NotEqual(pars.Item1, pars.Item2);
         }
     }
 }

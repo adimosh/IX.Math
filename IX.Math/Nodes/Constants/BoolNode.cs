@@ -24,5 +24,7 @@ namespace IX.Math.Nodes.Constants
         public override object DistilValue() => this.value;
 
         public override Expression GenerateExpression() => Expression.Constant(this.value, typeof(bool));
+
+        public override Expression GenerateStringExpression() => Expression.Constant(this.value ? "true" : "false", typeof(string));
     }
 }

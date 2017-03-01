@@ -114,7 +114,8 @@ namespace IX.Math.Nodes.Operations.Binary
 
         protected override Expression GenerateExpressionInternal()
         {
-            return Expression.GreaterThan(this.Left.GenerateExpression(), this.Right.GenerateExpression());
+            var pars = this.GetExpressionsOfSameTypeFromOperands();
+            return Expression.GreaterThan(pars.Item1, pars.Item2);
         }
     }
 }

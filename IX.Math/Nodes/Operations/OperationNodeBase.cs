@@ -2,7 +2,9 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Linq.Expressions;
+using IX.Math.PlatformMitigation;
 
 namespace IX.Math.Nodes.Operations
 {
@@ -23,6 +25,8 @@ namespace IX.Math.Nodes.Operations
                 return this.GenerateExpressionInternal();
             }
         }
+
+        public sealed override Expression GenerateStringExpression() => Expression.Call(this.GenerateExpression(), typeof(object).GetTypeMethod(nameof(object.ToString)));
 
         protected abstract Expression GenerateExpressionInternal();
     }

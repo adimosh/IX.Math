@@ -18,6 +18,8 @@ namespace IX.Math.Nodes.Parameters
 
         public override SupportedValueType ReturnType => SupportedValueType.String;
 
+        public override Expression GenerateStringExpression() => this.GenerateExpression();
+
         protected override Expression GenerateExpressionInternal()
         {
             return Expression.Parameter(typeof(string), this.ParameterName);
