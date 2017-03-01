@@ -90,7 +90,14 @@ namespace IX.Math.Extraction
                 List<string> argPlaceholders = new List<string>();
                 foreach (var s in arguments.Split(new[] { workingSet.Definition.ParameterSeparator }, StringSplitOptions.None))
                 {
-                    string sa = SymbolExpressionGenerator.GenerateSymbolExpression(workingSet, s);
+                    // We check whether or not this is actually a constant
+                    string sa = ConstantsGenerator.CheckAndAdd(workingSet.ConstantsTable, workingSet.ReverseConstantsTable, workingSet.Expression, s);
+                    if (sa == null)
+                    {
+                        // Not a constant, let's generate a symbol
+                        sa = SymbolExpressionGenerator.GenerateSymbolExpression(workingSet, s);
+                    }
+
                     argPlaceholders.Add(sa);
                 }
 

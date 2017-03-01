@@ -138,7 +138,7 @@ namespace IX.Math.UnitTests
                 {
                     "2+sqrt(4)+2",
                     new object[0],
-                    6.0,
+                    6L,
                 },
                 new object[]
                 {
@@ -174,7 +174,13 @@ namespace IX.Math.UnitTests
                 {
                     "sqrt(4)",
                     new object[0],
-                    2.0,
+                    2L,
+                },
+                new object[]
+                {
+                    "sqrt(4.0)",
+                    new object[0],
+                    2L,
                 },
                 new object[]
                 {

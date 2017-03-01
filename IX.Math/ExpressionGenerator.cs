@@ -251,7 +251,7 @@ namespace IX.Math
             return null;
         }
 
-        private static FunctionNodeBase GenerateFunctionCallExpression(
+        private static NodeBase GenerateFunctionCallExpression(
             string expression,
             WorkingExpressionSet workingSet)
         {
@@ -273,7 +273,7 @@ namespace IX.Math
                     {
                         if (workingSet.UnaryFunctions.TryGetValue(functionName, out Type t))
                         {
-                            return (FunctionNodeBase)((UnaryFunctionNodeBase)Activator.CreateInstance(t, expr))?.Simplify();
+                            return ((UnaryFunctionNodeBase)Activator.CreateInstance(t, GenerateExpression(expr[0], workingSet)))?.Simplify();
                         }
                         else
                         {
