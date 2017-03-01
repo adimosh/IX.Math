@@ -2,13 +2,9 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-#if !NETSTANDARD10
-
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
-using IX.Math.BuiltIn;
 
 namespace IX.Math
 {
@@ -21,7 +17,6 @@ namespace IX.Math
     public class CachedExpressionParsingService : IExpressionParsingService, IDisposable
     {
         private ExpressionParsingService eps;
-        private ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>> cachedDelegates;
         private ConcurrentDictionary<string, ComputedExpression> cachedComputedExpressions;
         private bool disposedValue;
 
@@ -31,7 +26,6 @@ namespace IX.Math
         public CachedExpressionParsingService()
         {
             this.eps = new ExpressionParsingService();
-            this.cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>>();
             this.cachedComputedExpressions = new ConcurrentDictionary<string, ComputedExpression>();
         }
 
@@ -42,7 +36,6 @@ namespace IX.Math
         public CachedExpressionParsingService(MathDefinition definition)
         {
             this.eps = new ExpressionParsingService(definition);
-            this.cachedDelegates = new ConcurrentDictionary<string, Tuple<Delegate, Type, IEnumerable<ExpressionTreeNodeParameter>>>();
             this.cachedComputedExpressions = new ConcurrentDictionary<string, ComputedExpression>();
         }
 
@@ -84,11 +77,9 @@ namespace IX.Math
             {
                 if (disposing)
                 {
-                    this.cachedDelegates.Clear();
                     this.cachedComputedExpressions.Clear();
                 }
 
-                this.cachedDelegates = null;
                 this.cachedComputedExpressions = null;
                 this.eps = null;
 
@@ -97,4 +88,3 @@ namespace IX.Math
         }
     }
 }
-#endif

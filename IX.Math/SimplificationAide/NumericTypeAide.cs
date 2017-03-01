@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using IX.Math.BuiltIn;
 
 namespace IX.Math.SimplificationAide
 {
@@ -96,72 +95,6 @@ namespace IX.Math.SimplificationAide
                     numericType = InverseNumericTypesConversionDictionary[currentTypeInt];
                 }
             }
-        }
-
-        internal static object[] GetValuesFromFinder(IEnumerable<ExpressionTreeNodeParameter> externalParameters, IDataFinder dataFinder)
-        {
-            List<object> parameterValues = new List<object>();
-
-            foreach (var v in externalParameters)
-            {
-                if (dataFinder.TryGetData(v.Name, out object data))
-                {
-                    if (v.ReturnType == SupportedValueType.String)
-                    {
-                        parameterValues.Add(data.ToString());
-                        continue;
-                    }
-                    else if (v.ReturnType == SupportedValueType.Boolean)
-                    {
-                        if (data is bool)
-                        {
-                            parameterValues.Add((bool)data);
-                            continue;
-                        }
-                        else if (data is string)
-                        {
-                            if (bool.TryParse((string)data, out bool val))
-                            {
-                                parameterValues.Add(val);
-                                continue;
-                            }
-                        }
-
-                        parameterValues.Add(null);
-                        continue;
-                    }
-                    else
-                    {
-                        Type dataType = data.GetType();
-                        if (NumericTypesConversionDictionary.ContainsKey(dataType))
-                        {
-                            parameterValues.Add(Convert.ChangeType(data, WorkingConstants.DefaultNumericTypeWithFinder));
-                            continue;
-                        }
-                        else
-                        {
-                            if (data is string)
-                            {
-                                if (double.TryParse((string)data, out double val))
-                                {
-                                    parameterValues.Add(val);
-                                    continue;
-                                }
-                            }
-
-                            parameterValues.Add(null);
-                            continue;
-                        }
-                    }
-                }
-                else
-                {
-                    parameterValues.Add(null);
-                    continue;
-                }
-            }
-
-            return parameterValues.ToArray();
         }
     }
 }
