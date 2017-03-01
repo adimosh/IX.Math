@@ -184,6 +184,12 @@ namespace IX.Math.UnitTests
                 },
                 new object[]
                 {
+                    "sqrt(0.49)",
+                    new object[0],
+                    0.7,
+                },
+                new object[]
+                {
                     "!4+4",
                     new object[0],
                     -1L,
@@ -234,31 +240,31 @@ namespace IX.Math.UnitTests
                 {
                     "min(2,17)",
                     new object[0],
-                    2D,
+                    2L,
                 },
                 new object[]
                 {
                     "max(2,17)+1",
                     new object[0],
-                    18D,
+                    18L,
                 },
                 new object[]
                 {
                     "(max(2,17)+1)/2",
                     new object[0],
-                    9D,
+                    9L,
                 },
                 new object[]
                 {
                     "max(2,17)+max(3,1)",
                     new object[0],
-                    20D,
+                    20L,
                 },
                 new object[]
                 {
                     "(sqrt(16)+1)*4-max(20,13)+(27*5-27*4 - sqrt(49))",
                     new object[0],
-                    20D,
+                    20L,
                 },
                 new object[]
                 {
@@ -276,19 +282,19 @@ namespace IX.Math.UnitTests
                 {
                     "min(max(10,5),max(25,10))",
                     new object[0],
-                    10D,
+                    10L,
                 },
                 new object[]
                 {
                     "min(max(10,5)+40,3*max(25,10))",
                     new object[0],
-                    50D,
+                    50L,
                 },
                 new object[]
                 {
                     "min(max(5+strlen(\"This that those\")-10,5)+40,3*max(25,10))",
                     new object[0],
-                    50D,
+                    50L,
                 },
                 new object[]
                 {

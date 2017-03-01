@@ -12,6 +12,7 @@ using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Operations.Binary;
 using IX.Math.Nodes.Operations.Function;
+using IX.Math.Nodes.Operations.Function.Binary;
 using IX.Math.Nodes.Operations.Function.Unary;
 using IX.Math.Nodes.Operations.Unary;
 
@@ -227,6 +228,17 @@ namespace IX.Math
                         if (workingSet.UnaryFunctions.TryGetValue(functionName, out Type t))
                         {
                             return ((UnaryFunctionNodeBase)Activator.CreateInstance(t, GenerateExpression(expr[0], workingSet)))?.Simplify();
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                    else if (expr.Length == 2)
+                    {
+                        if (workingSet.BinaryFunctions.TryGetValue(functionName, out Type t))
+                        {
+                            return ((BinaryFunctionNodeBase)Activator.CreateInstance(t, GenerateExpression(expr[0], workingSet), GenerateExpression(expr[1], workingSet)))?.Simplify();
                         }
                         else
                         {

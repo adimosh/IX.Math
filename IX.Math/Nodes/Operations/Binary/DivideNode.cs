@@ -133,9 +133,7 @@ namespace IX.Math.Nodes.Operations.Binary
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal()
-        {
-            return Expression.Divide(this.Left.GenerateExpression(), this.Right.GenerateExpression());
-        }
+        protected override Expression GenerateExpressionInternal() =>
+            Expression.Divide(Expression.Convert(this.Left.GenerateExpression(), typeof(double)), Expression.Convert(this.Right.GenerateExpression(), typeof(double)));
     }
 }

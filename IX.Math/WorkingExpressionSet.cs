@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
+using IX.Math.Nodes.Operations.Function.Binary;
 using IX.Math.Nodes.Operations.Function.Unary;
 using IX.Math.Nodes.Parameters;
 
@@ -44,6 +45,7 @@ namespace IX.Math
         internal Dictionary<string, Type> UnaryOperators;
         internal Dictionary<string, Type> BinaryOperators;
         internal Dictionary<string, Type> UnaryFunctions;
+        internal Dictionary<string, Type> BinaryFunctions;
 
         // Results
         internal object ValueIfConstant;
@@ -285,6 +287,7 @@ namespace IX.Math
             this.InitializeUnaryOperators();
             this.InitializeBinaryOperators();
             this.InitializeUnaryFunctions();
+            this.InitializeBinaryFunctions();
         }
 
         private void InitializeUnaryOperators()
@@ -333,6 +336,18 @@ namespace IX.Math
                 ["tan"] = typeof(FunctionNodetan),
                 ["tanh"] = typeof(FunctionNodetanh),
                 ["trun"] = typeof(FunctionNodetrun),
+            };
+        }
+
+        private void InitializeBinaryFunctions()
+        {
+            // TODO: Replace this with an injection mechanism
+            this.BinaryFunctions = new Dictionary<string, Type>
+            {
+                ["log"] = typeof(FunctionNodelog),
+                ["min"] = typeof(FunctionNodemin),
+                ["max"] = typeof(FunctionNodemax),
+                ["pow"] = typeof(FunctionNodepow),
             };
         }
     }
