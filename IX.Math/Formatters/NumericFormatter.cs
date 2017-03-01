@@ -105,6 +105,8 @@ namespace IX.Math.Formatters
                     default:
                         throw new InvalidCastException();
                 }
+
+                i++;
             }
 
             return finalValues;
