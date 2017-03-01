@@ -21,7 +21,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
 
         public NodeBase SecondParameter { get; private set; }
 
-        protected Expression GenerateStaticUnaryFunctionCall<T>(string functionName)
+        protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName)
         {
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
             Type secondParameterType = ParameterTypeFromParameter(this.SecondParameter);
@@ -36,7 +36,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             return Expression.Call(mi, this.FirstParameter.GenerateExpression(), this.SecondParameter.GenerateExpression());
         }
 
-        protected Expression GenerateStaticUnaryFunctionCall(Type t, string functionName)
+        protected Expression GenerateStaticBinaryFunctionCall(Type t, string functionName)
         {
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
             Type secondParameterType = ParameterTypeFromParameter(this.SecondParameter);

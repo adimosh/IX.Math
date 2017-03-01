@@ -28,7 +28,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
         public FunctionNoderound(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
-            if (parameter?.ReturnType != SupportedValueType.Numeric)
+            if (this.Parameter?.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
             }
