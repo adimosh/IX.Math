@@ -103,6 +103,25 @@ namespace IX.Math.Nodes.Operations.Binary
             OperationsHelper.ParameterMustBeInteger(right);
         }
 
+        public RightShiftNode(UndefinedParameterNode left, OperationNodeBase right)
+            : base(left?.DetermineNumeric(), right?.Simplify())
+        {
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
+        }
+
+        public RightShiftNode(OperationNodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right?.DetermineNumeric())
+        {
+            OperationsHelper.ParameterMustBeInteger(this.Right as NumericParameterNode);
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
+        }
+
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
         public override NodeBase Simplify()

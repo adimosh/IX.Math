@@ -32,6 +32,31 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public MultiplyNode(NumericNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public MultiplyNode(UndefinedParameterNode left, NumericNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public MultiplyNode(NumericParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public MultiplyNode(UndefinedParameterNode left, NumericParameterNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public MultiplyNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineNumeric(), right?.DetermineNumeric())
+        {
+        }
+
         public MultiplyNode(NumericNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
@@ -61,6 +86,24 @@ namespace IX.Math.Nodes.Operations.Binary
 
         public MultiplyNode(OperationNodeBase left, NumericParameterNode right)
             : base(left?.Simplify(), right)
+        {
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
+        }
+
+        public MultiplyNode(UndefinedParameterNode left, OperationNodeBase right)
+            : base(left?.DetermineNumeric(), right?.Simplify())
+        {
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
+        }
+
+        public MultiplyNode(OperationNodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right?.DetermineNumeric())
         {
             if (left?.ReturnType != SupportedValueType.Numeric)
             {

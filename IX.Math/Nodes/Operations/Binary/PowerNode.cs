@@ -68,6 +68,24 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
+        public PowerNode(UndefinedParameterNode left, OperationNodeBase right)
+            : base(left?.DetermineNumeric(), right?.Simplify())
+        {
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
+        }
+
+        public PowerNode(OperationNodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right?.DetermineNumeric())
+        {
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
+        }
+
         public PowerNode(OperationNodeBase left, OperationNodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
@@ -109,9 +127,11 @@ namespace IX.Math.Nodes.Operations.Binary
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal()
-        {
-            return Expression.Power(this.Left.GenerateExpression(), this.Right.GenerateExpression());
-        }
+        protected override Expression GenerateExpressionInternal() => Expression.Call(
+                typeof(System.Math),
+                nameof(System.Math.Pow),
+                null,
+                Expression.Convert(this.Left.GenerateExpression(), typeof(double)),
+                Expression.Convert(this.Right.GenerateExpression(), typeof(double)));
     }
 }

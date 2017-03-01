@@ -68,6 +68,24 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
+        public SubtractNode(UndefinedParameterNode left, OperationNodeBase right)
+            : base(left?.DetermineNumeric(), right?.Simplify())
+        {
+            if (right?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
+        }
+
+        public SubtractNode(OperationNodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right?.DetermineNumeric())
+        {
+            if (left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+            }
+        }
+
         public SubtractNode(OperationNodeBase left, OperationNodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
@@ -94,6 +112,11 @@ namespace IX.Math.Nodes.Operations.Binary
 
         public SubtractNode(UndefinedParameterNode left, NumericParameterNode right)
             : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public SubtractNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineNumeric(), right?.DetermineNumeric())
         {
         }
 

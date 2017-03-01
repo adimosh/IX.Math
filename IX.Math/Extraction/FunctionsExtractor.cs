@@ -90,12 +90,21 @@ namespace IX.Math.Extraction
                 List<string> argPlaceholders = new List<string>();
                 foreach (var s in arguments.Split(new[] { workingSet.Definition.ParameterSeparator }, StringSplitOptions.None))
                 {
+                    TablePopulationGenerator.PopulateTables(s, workingSet);
+
                     // We check whether or not this is actually a constant
                     string sa = ConstantsGenerator.CheckAndAdd(workingSet.ConstantsTable, workingSet.ReverseConstantsTable, workingSet.Expression, s);
                     if (sa == null)
                     {
-                        // Not a constant, let's generate a symbol
-                        sa = SymbolExpressionGenerator.GenerateSymbolExpression(workingSet, s);
+                        if (workingSet.ParametersTable.ContainsKey(s))
+                        {
+                            // Not a constant, and also not an already-recognized external parameter, let's generate a symbol
+                            sa = SymbolExpressionGenerator.GenerateSymbolExpression(workingSet, s);
+                        }
+                        else
+                        {
+                            sa = s;
+                        }
                     }
 
                     argPlaceholders.Add(sa);

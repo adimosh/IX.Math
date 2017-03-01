@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
@@ -41,7 +42,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
             StringNode stringParam;
             if ((stringParam = this.Parameter as StringNode) != null)
             {
-                return new NumericNode(stringParam.Value.Length);
+                return new NumericNode(Convert.ToInt64(stringParam.Value.Length));
             }
 
             return this;
