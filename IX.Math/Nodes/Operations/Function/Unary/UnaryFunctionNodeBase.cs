@@ -5,8 +5,6 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
-using IX.Math.Nodes.Constants;
-using IX.Math.Nodes.Parameters;
 using IX.Math.PlatformMitigation;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
