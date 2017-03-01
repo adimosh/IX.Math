@@ -1,32 +1,31 @@
-﻿// <copyright file="FunctionNodenstrlen.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodestrlen.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
-    internal class FunctionNodenstrlen : UnaryFunctionNodeBase
+    internal class FunctionNodestrlen : UnaryFunctionNodeBase
     {
-        public FunctionNodenstrlen(StringNode parameter)
+        public FunctionNodestrlen(StringNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodenstrlen(StringParameterNode parameter)
+        public FunctionNodestrlen(StringParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodenstrlen(UndefinedParameterNode parameter)
+        public FunctionNodestrlen(UndefinedParameterNode parameter)
             : base(parameter?.DetermineString())
         {
         }
 
-        public FunctionNodenstrlen(OperationNodeBase parameter)
+        public FunctionNodestrlen(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (parameter?.ReturnType != SupportedValueType.String)
@@ -48,9 +47,6 @@ namespace IX.Math.Nodes.Operations.Function.Unary
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal()
-        {
-            throw new NotImplementedException();
-        }
+        protected override Expression GenerateExpressionInternal() => this.GenerateStaticUnaryPropertyCall<string>(nameof(string.Length));
     }
 }

@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
+using IX.Math.Nodes.Operations.Function.Unary;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math
@@ -40,8 +41,9 @@ namespace IX.Math
         internal NodeBase Body;
 
         // Scrap
-        internal Dictionary<string, Type> BinaryOperators;
         internal Dictionary<string, Type> UnaryOperators;
+        internal Dictionary<string, Type> BinaryOperators;
+        internal Dictionary<string, Type> UnaryFunctions;
 
         // Results
         internal object ValueIfConstant;
@@ -280,8 +282,9 @@ namespace IX.Math
                 0.3036630028987326,
                 $"{this.Definition.SpecialSymbolIndicators.Item1}lambda{this.Definition.SpecialSymbolIndicators.Item2}");
 
-            this.InitializeBinaryOperators();
             this.InitializeUnaryOperators();
+            this.InitializeBinaryOperators();
+            this.InitializeUnaryFunctions();
         }
 
         private void InitializeUnaryOperators()
@@ -304,6 +307,33 @@ namespace IX.Math
                 .Select(p => new { Name = p.Name, Type = Type.GetType($"IX.Math.Nodes.Operations.Binary.{p.Name}Node", false), Value=p.Value })
                 .Where(p => p.Type != null)
                 .ToDictionary(p => p.Value, p => p.Type);
+        }
+
+        private void InitializeUnaryFunctions()
+        {
+            // TODO: Replace this with an injection mechanism
+            this.UnaryFunctions = new Dictionary<string, Type>
+            {
+                ["strlen"] = typeof(FunctionNodestrlen),
+                ["abs"] = typeof(FunctionNodeabs),
+                ["acos"] = typeof(FunctionNodeacos),
+                ["asin"] = typeof(FunctionNodeasin),
+                ["atan"] = typeof(FunctionNodeatan),
+                ["ceiling"] = typeof(FunctionNodeceiling),
+                ["cos"] = typeof(FunctionNodecos),
+                ["cosh"] = typeof(FunctionNodecosh),
+                ["exp"] = typeof(FunctionNodeexp),
+                ["floor"] = typeof(FunctionNodefloor),
+                ["ln"] = typeof(FunctionNodeln),
+                ["lg"] = typeof(FunctionNodelg),
+                ["round"] = typeof(FunctionNoderound),
+                ["sin"] = typeof(FunctionNodesin),
+                ["sinh"] = typeof(FunctionNodesinh),
+                ["sqrt"] = typeof(FunctionNodesqrt),
+                ["tan"] = typeof(FunctionNodetan),
+                ["tanh"] = typeof(FunctionNodetanh),
+                ["trun"] = typeof(FunctionNodetrun),
+            };
         }
     }
 }

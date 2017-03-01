@@ -12,6 +12,7 @@ using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Operations.Binary;
 using IX.Math.Nodes.Operations.Function;
+using IX.Math.Nodes.Operations.Function.Unary;
 using IX.Math.Nodes.Operations.Unary;
 
 namespace IX.Math
@@ -44,7 +45,7 @@ namespace IX.Math
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Break expression based on function calls
-            FunctionExpressionGenerator.ReplaceFunctions(workingSet);
+            FunctionsExtractor.ReplaceFunctions(workingSet);
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
@@ -268,12 +269,21 @@ namespace IX.Math
 
                     var body = GenerateExpression(expr, workingSet);
 
-                    return null;
-                    //if (body != null
-                    //    && SupportedFunctionsLocator.BuiltInFunctions.TryGetValue(functionName, out var n))
-                    //{
-                    //    return n().SetOperands(body);
-                    //}
+                    if (expr.Length == 1)
+                    {
+                        if (workingSet.UnaryFunctions.TryGetValue(functionName, out Type t))
+                        {
+                            return (FunctionNodeBase)((UnaryFunctionNodeBase)Activator.CreateInstance(t, expr))?.Simplify();
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
             catch (Exception)

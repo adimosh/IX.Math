@@ -200,6 +200,16 @@ namespace IX.Math.Nodes.Constants
             return this.integerValue;
         }
 
+        public double ExtractFloat()
+        {
+            if (this.isFloat)
+            {
+                return this.floatValue;
+            }
+
+            return this.integerValue;
+        }
+
         public int ExtractInt()
         {
             if (this.isFloat)

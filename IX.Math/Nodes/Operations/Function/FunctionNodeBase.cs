@@ -3,21 +3,55 @@
 // </copyright>
 
 using System;
-using System.Linq.Expressions;
-using System.Reflection;
+using IX.Math.Nodes.Constants;
+using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function
 {
     internal abstract class FunctionNodeBase : OperationNodeBase
     {
-        //protected static Expression GetMethodFromClass<T>(string method, params Expression[] parameters)
-        //{
-        //    return GetMethodFromClass(typeof(T), method, parameters);
-        //}
+        protected static Type ParameterTypeFromParameter(NodeBase parameter)
+        {
+            Type parameterType;
 
-        //protected static Expression GetMethodFromClass(Type t, string method, params Expression[] parameters)
-        //{
-        //    t.GetRuntimeMethods().Where
-        //}
+            switch (parameter.ReturnType)
+            {
+                case SupportedValueType.Numeric:
+                    {
+                        switch (parameter)
+                        {
+                            case NumericParameterNode nn:
+                                if (nn.RequireFloat == true)
+                                {
+                                    parameterType = typeof(double);
+                                }
+                                else
+                                {
+                                    parameterType = typeof(long);
+                                }
+
+                                break;
+                            case NumericNode cn:
+                                parameterType = cn.Value.GetType();
+                                break;
+                            default:
+                                parameterType = typeof(long);
+                                break;
+                        }
+                    }
+
+                    break;
+                case SupportedValueType.Boolean:
+                    parameterType = typeof(bool);
+                    break;
+                case SupportedValueType.String:
+                    parameterType = typeof(string);
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+
+            return parameterType;
+        }
     }
 }

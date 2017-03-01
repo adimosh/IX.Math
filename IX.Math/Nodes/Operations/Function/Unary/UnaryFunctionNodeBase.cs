@@ -3,6 +3,11 @@
 // </copyright>
 
 using System;
+using System.Linq.Expressions;
+using System.Reflection;
+using IX.Math.Nodes.Constants;
+using IX.Math.Nodes.Parameters;
+using IX.Math.PlatformMitigation;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
@@ -14,5 +19,45 @@ namespace IX.Math.Nodes.Operations.Function.Unary
         }
 
         public NodeBase Parameter { get; private set; }
+
+        protected Expression GenerateStaticUnaryFunctionCall<T>(string functionName)
+        {
+            Type parameterType = ParameterTypeFromParameter(this.Parameter);
+
+            MethodInfo mi = typeof(T).GetTypeMethod(functionName, parameterType);
+
+            if (mi == null)
+            {
+                throw new ArgumentException(Resources.FunctionCouldNotBeFound);
+            }
+
+            return Expression.Call(mi, this.Parameter.GenerateExpression());
+        }
+
+        protected Expression GenerateStaticUnaryFunctionCall(Type t, string functionName)
+        {
+            Type parameterType = ParameterTypeFromParameter(this.Parameter);
+
+            MethodInfo mi = t.GetTypeMethod(functionName, parameterType);
+
+            if (mi == null)
+            {
+                throw new ArgumentException(Resources.FunctionCouldNotBeFound);
+            }
+
+            return Expression.Call(mi, this.Parameter.GenerateExpression());
+        }
+
+        protected Expression GenerateStaticUnaryPropertyCall<T>(string parameterName)
+        {
+            PropertyInfo pi = typeof(T).GetTypeProperty(parameterName);
+
+            if (pi == null)
+            {
+                throw new ArgumentException(Resources.FunctionCouldNotBeFound);
+            }
+
+            return Expression.Property(this.Parameter.GenerateExpression(), pi);
+        }
     }
 }

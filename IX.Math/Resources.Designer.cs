@@ -10,6 +10,7 @@
 
 namespace IX.Math {
     using System;
+    using System.Reflection;
     
     
     /// <summary>
@@ -39,7 +40,7 @@ namespace IX.Math {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager(typeof(Resources));
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("IX.Math.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -66,6 +67,15 @@ namespace IX.Math {
         internal static string FunctionCallNotValid {
             get {
                 return ResourceManager.GetString("FunctionCallNotValid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The function cannot be found..
+        /// </summary>
+        internal static string FunctionCouldNotBeFound {
+            get {
+                return ResourceManager.GetString("FunctionCouldNotBeFound", resourceCulture);
             }
         }
         

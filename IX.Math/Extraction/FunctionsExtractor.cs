@@ -1,14 +1,15 @@
-﻿// <copyright file="FunctionExpressionGenerator.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionsExtractor.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IX.Math.Generators;
 
-namespace IX.Math.Generators
+namespace IX.Math.Extraction
 {
-    internal static class FunctionExpressionGenerator
+    internal static class FunctionsExtractor
     {
         internal static void ReplaceFunctions(WorkingExpressionSet workingSet)
         {

@@ -10,13 +10,16 @@ namespace IX.Math.PlatformMitigation
 {
     internal static class TypeExtensionsMitigation
     {
+        internal static PropertyInfo GetTypeProperty(this Type type, string name) =>
+            type.GetRuntimeProperty(name);
+
         internal static MethodInfo GetTypeMethod(this Type type, string name) =>
             type.GetRuntimeMethods()
                 .Where(p => p.Name == name)
                 .OrderBy(p => p.GetParameters().Length)
                 .FirstOrDefault();
 
-        internal static MethodInfo GetTypeMethod(this Type type, string name, Type[] parameters) =>
+        internal static MethodInfo GetTypeMethod(this Type type, string name, params Type[] parameters) =>
             type.GetRuntimeMethods().SingleOrDefault(p =>
             {
                 if (p.Name != name)
