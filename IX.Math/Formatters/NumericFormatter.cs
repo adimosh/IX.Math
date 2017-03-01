@@ -34,13 +34,13 @@ namespace IX.Math.Formatters
                 switch (pe.Current)
                 {
                     case NumericParameterNode n:
-                        if (n.RequireFloat == true)
+                        if (n.RequireFloat == false)
                         {
-                            finalValues[i] = Convert.ToDouble(pve.Current);
+                            finalValues[i] = Convert.ToInt64(pve.Current);
                         }
                         else
                         {
-                            finalValues[i] = Convert.ToInt64(pve.Current);
+                            finalValues[i] = Convert.ToDouble(pve.Current);
                         }
 
                         break;
