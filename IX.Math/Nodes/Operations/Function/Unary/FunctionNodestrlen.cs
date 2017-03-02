@@ -3,13 +3,15 @@
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
-    internal class FunctionNodestrlen : UnaryFunctionNodeBase
+    [DebuggerDisplay("strlen({Parameter})")]
+    internal sealed class FunctionNodestrlen : UnaryFunctionNodeBase
     {
         public FunctionNodestrlen(StringNode parameter)
             : base(parameter)

@@ -2,13 +2,15 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
-    internal class FunctionNodemin : BinaryFunctionNodeBase
+    [DebuggerDisplay("min({FirstParameter}, {SecondParameter})")]
+    internal sealed class FunctionNodemin : BinaryFunctionNodeBase
     {
         public FunctionNodemin(NumericNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
@@ -17,11 +19,6 @@ namespace IX.Math.Nodes.Operations.Function.Binary
 
         public FunctionNodemin(NumericNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
-        {
-        }
-
-        public FunctionNodemin(NumericNode firstParameter, UndefinedParameterNode secondParameter)
-            : base(firstParameter, secondParameter?.DetermineNumeric())
         {
         }
 
@@ -44,37 +41,8 @@ namespace IX.Math.Nodes.Operations.Function.Binary
         {
         }
 
-        public FunctionNodemin(NumericParameterNode firstParameter, UndefinedParameterNode secondParameter)
-            : base(firstParameter, secondParameter?.DetermineNumeric())
-        {
-        }
-
         public FunctionNodemin(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
-        {
-            if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public FunctionNodemin(UndefinedParameterNode firstParameter, NumericNode secondParameter)
-            : base(firstParameter?.DetermineNumeric(), secondParameter)
-        {
-        }
-
-        public FunctionNodemin(UndefinedParameterNode firstParameter, NumericParameterNode secondParameter)
-            : base(firstParameter?.DetermineNumeric(), secondParameter)
-        {
-        }
-
-        public FunctionNodemin(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
-            : base(firstParameter?.DetermineNumeric(), secondParameter?.DetermineNumeric())
-        {
-        }
-
-        public FunctionNodemin(UndefinedParameterNode firstParameter, OperationNodeBase secondParameter)
-            : base(firstParameter?.DetermineNumeric(), secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
             {
@@ -100,15 +68,6 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemin(OperationNodeBase firstParameter, UndefinedParameterNode secondParameter)
-            : base(firstParameter?.Simplify(), secondParameter?.DetermineNumeric())
-        {
-            if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
         public FunctionNodemin(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter?.Simplify(), secondParameter?.Simplify())
         {
@@ -118,6 +77,37 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
 
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public FunctionNodemin(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
+            : base(firstParameter?.DetermineNumeric(), secondParameter?.DetermineNumeric())
+        {
+        }
+
+        public FunctionNodemin(UndefinedParameterNode firstParameter, NodeBase secondParameter)
+            : base(firstParameter, secondParameter?.Simplify())
+        {
+            if (this.SecondParameter.ReturnType == SupportedValueType.Numeric)
+            {
+                this.FirstParameter = firstParameter.DetermineNumeric();
+            }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public FunctionNodemin(NodeBase firstParameter, UndefinedParameterNode secondParameter)
+            : base(firstParameter?.Simplify(), secondParameter)
+        {
+            if (this.FirstParameter.ReturnType == SupportedValueType.Numeric)
+            {
+                this.SecondParameter = secondParameter.DetermineNumeric();
+            }
+            else
             {
                 throw new ExpressionNotValidLogicallyException();
             }

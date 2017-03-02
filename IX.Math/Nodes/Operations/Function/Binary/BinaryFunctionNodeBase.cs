@@ -17,9 +17,9 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             this.SecondParameter = secondParameter ?? throw new ArgumentNullException(nameof(secondParameter));
         }
 
-        public NodeBase FirstParameter { get; private set; }
+        public NodeBase FirstParameter { get; protected set; }
 
-        public NodeBase SecondParameter { get; private set; }
+        public NodeBase SecondParameter { get; protected set; }
 
         public override NodeBase RefreshParametersRecursive()
         {

@@ -2,13 +2,15 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
-    internal class FunctionNodetrun : UnaryFunctionNodeBase
+    [DebuggerDisplay("trun({Parameter})")]
+    internal sealed class FunctionNodetrun : UnaryFunctionNodeBase
     {
         public FunctionNodetrun(NumericNode parameter)
             : base(parameter)
