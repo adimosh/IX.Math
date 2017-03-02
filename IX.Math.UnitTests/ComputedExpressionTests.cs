@@ -406,33 +406,33 @@ namespace IX.Math.UnitTests
                 },
                 new object[]
                 {
-                    "(temp0=0) & (temp1=1)",
+                    "(x=0) & (y=1)",
                     new object[2] { 0, 1 },
                     true,
                 },
                 new object[]
                 {
-                    "(temp0=0) | (temp1=1)",
+                    "(x=0) | (y=1)",
                     new object[2] { 0, 0 },
                     true,
                 },
                 new object[]
                 {
-                    "(temp0=0) & (temp1=1)",
+                    "(x=0) & (y=1)",
                     new object[2] { 0, 2 },
                     false,
                 },
                 new object[]
                 {
-                    "(temp0>0) & (temp1<1)",
+                    "(x>0) & (y<1)",
                     new object[2] { 1, 0 },
                     true,
                 },
                 new object[]
                 {
-                    "temp0=0&temp1=1",
+                    "x=0&y=1",
                     new object[2] { 0, 1 },
-                    true,
+                    false,
                 },
             };
         }

@@ -28,6 +28,26 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public EqualsNode(UndefinedParameterNode left, NumericParameterNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public EqualsNode(NumericParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public EqualsNode(NumericNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public EqualsNode(UndefinedParameterNode left, NumericNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
         public EqualsNode(NumericParameterNode left, NumericParameterNode right)
             : base(left, right)
         {
@@ -45,6 +65,26 @@ namespace IX.Math.Nodes.Operations.Binary
 
         public EqualsNode(StringParameterNode left, StringNode right)
             : base(left, right)
+        {
+        }
+
+        public EqualsNode(UndefinedParameterNode left, StringParameterNode right)
+            : base(left?.DetermineString(), right)
+        {
+        }
+
+        public EqualsNode(StringParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineString())
+        {
+        }
+
+        public EqualsNode(StringNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineString())
+        {
+        }
+
+        public EqualsNode(UndefinedParameterNode left, StringNode right)
+            : base(left?.DetermineString(), right)
         {
         }
 
@@ -190,26 +230,6 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        public EqualsNode(NumericNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-        }
-
-        public EqualsNode(UndefinedParameterNode left, NumericNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
-        public EqualsNode(NumericParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-        }
-
-        public EqualsNode(UndefinedParameterNode left, NumericParameterNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
         public EqualsNode(BoolNode left, UndefinedParameterNode right)
             : base(left, right?.DetermineBool())
         {
@@ -227,26 +247,6 @@ namespace IX.Math.Nodes.Operations.Binary
 
         public EqualsNode(UndefinedParameterNode left, BoolParameterNode right)
             : base(left?.DetermineBool(), right)
-        {
-        }
-
-        public EqualsNode(StringNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineString())
-        {
-        }
-
-        public EqualsNode(UndefinedParameterNode left, StringNode right)
-            : base(left?.DetermineString(), right)
-        {
-        }
-
-        public EqualsNode(StringParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineString())
-        {
-        }
-
-        public EqualsNode(UndefinedParameterNode left, StringParameterNode right)
-            : base(left?.DetermineString(), right)
         {
         }
 

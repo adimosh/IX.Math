@@ -71,7 +71,12 @@ namespace IX.Math.Nodes.Operations.Binary
         public AndNode(OperationNodeBase left, OperationNodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
-            if (left?.ReturnType != SupportedValueType.Numeric && right?.ReturnType != SupportedValueType.Numeric)
+            if (left?.ReturnType != right?.ReturnType)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+
+            if (right?.ReturnType != SupportedValueType.Numeric && right?.ReturnType != SupportedValueType.Boolean)
             {
                 throw new ExpressionNotValidLogicallyException();
             }
@@ -173,18 +178,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
-        public override SupportedValueType ReturnType
-        {
-            get
-            {
-                if (this.Left.ReturnType == SupportedValueType.String || this.Right.ReturnType == SupportedValueType.String)
-                {
-                    return SupportedValueType.String;
-                }
-
-                return SupportedValueType.Numeric;
-            }
-        }
+        public override SupportedValueType ReturnType => this.Left?.ReturnType ?? this.Right?.ReturnType ?? SupportedValueType.Unknown;
 
         public override NodeBase Simplify()
         {

@@ -15,9 +15,9 @@ namespace IX.Math.Nodes.Operations.Binary
             this.Right = right ?? throw new ArgumentNullException(nameof(right));
         }
 
-        public NodeBase Left { get; private set; }
+        public NodeBase Left { get; protected set; }
 
-        public NodeBase Right { get; private set; }
+        public NodeBase Right { get; protected set; }
 
         public override NodeBase RefreshParametersRecursive()
         {

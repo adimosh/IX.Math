@@ -242,6 +242,40 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public AddNode(UndefinedParameterNode left, OperationNodeBase right)
+            : base(left, right)
+        {
+            if (right.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Left = left.DetermineNumeric();
+            }
+            else if (right.ReturnType == SupportedValueType.String)
+            {
+                this.Left = left.DetermineString();
+            }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public AddNode(OperationNodeBase left, UndefinedParameterNode right)
+            : base(left, right)
+        {
+            if (left.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Right = right.DetermineNumeric();
+            }
+            else if (left.ReturnType == SupportedValueType.String)
+            {
+                this.Right = right.DetermineString();
+            }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
         public override SupportedValueType ReturnType
         {
             get
