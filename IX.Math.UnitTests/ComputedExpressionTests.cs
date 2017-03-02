@@ -22,9 +22,57 @@ namespace IX.Math.UnitTests
                 },
                 new object[]
                 {
+                    "8-9",
+                    new object[0],
+                    -1L,
+                },
+                new object[]
+                {
+                    "6-2",
+                    new object[0],
+                    4L,
+                },
+                new object[]
+                {
+                    "3*6",
+                    new object[0],
+                    18L,
+                },
+                new object[]
+                {
+                    "3/6",
+                    new object[0],
+                    0.5,
+                },
+                new object[]
+                {
+                    "6/3",
+                    new object[0],
+                    2L,
+                },
+                new object[]
+                {
+                    "6^3",
+                    new object[0],
+                    216L,
+                },
+                new object[]
+                {
                     @"""3""+6",
                     new object[0],
                     "36",
+                },
+                new object[]
+                {
+                    @"""3""+""6""",
+                    new object[0],
+                    "36",
+                },
+                new object[]
+                {
+                    @"""3+6""",
+                    new object[0],
+                    "3+6",
                 },
                 new object[]
                 {

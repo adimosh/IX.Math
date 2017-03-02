@@ -30,7 +30,7 @@ namespace IX.Math.Extraction
                 int cp = process.IndexOf(stringIndicator, op + stringIndicator.Length);
 
                 escapeRoute:
-                if (cp == -1 || (cp + stringIndicator.Length) >= process.Length)
+                if (cp == -1 || (cp + stringIndicator.Length) > process.Length)
                 {
                     break;
                 }
