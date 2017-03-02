@@ -83,6 +83,8 @@ namespace IX.Math
 
             var convertedArguments = NumericFormatter.FormatArgumentsAccordingToParameters(arguments, this.parameters);
 
+            this.body = this.body.RefreshParametersRecursive();
+
             Delegate del = this.GetDelegate();
 
             if (del == null)

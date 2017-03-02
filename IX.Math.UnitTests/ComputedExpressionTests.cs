@@ -112,6 +112,18 @@ namespace IX.Math.UnitTests
                 },
                 new object[]
                 {
+                    "1<<1<<2",
+                    new object[0],
+                    8L,
+                },
+                new object[]
+                {
+                    "1<<2>>2",
+                    new object[0],
+                    1L,
+                },
+                new object[]
+                {
                     "((2+3)*2-1)*2",
                     new object[0],
                     18L,
@@ -150,7 +162,7 @@ namespace IX.Math.UnitTests
                 {
                     "x",
                     new object[] { 12 },
-                    12L,
+                    12D,
                 },
                 new object[]
                 {

@@ -11,5 +11,10 @@ namespace IX.Math.Nodes.Constants
         }
 
         public abstract object DistilValue();
+
+        public override NodeBase RefreshParametersRecursive()
+        {
+            return this;
+        }
     }
 }

@@ -19,6 +19,14 @@ namespace IX.Math.Nodes.Operations.Binary
 
         public NodeBase Right { get; private set; }
 
+        public override NodeBase RefreshParametersRecursive()
+        {
+            this.Left = this.Left.RefreshParametersRecursive();
+            this.Right = this.Right.RefreshParametersRecursive();
+
+            return this;
+        }
+
         protected Tuple<Expression, Expression> GetExpressionsOfSameTypeFromOperands()
         {
             if (this.Left.ReturnType == SupportedValueType.String || this.Right.ReturnType == SupportedValueType.String)

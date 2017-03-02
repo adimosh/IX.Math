@@ -21,6 +21,14 @@ namespace IX.Math.Nodes.Operations.Function.Binary
 
         public NodeBase SecondParameter { get; private set; }
 
+        public override NodeBase RefreshParametersRecursive()
+        {
+            this.FirstParameter = this.FirstParameter.RefreshParametersRecursive();
+            this.SecondParameter = this.SecondParameter.RefreshParametersRecursive();
+
+            return this;
+        }
+
         protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName)
         {
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);

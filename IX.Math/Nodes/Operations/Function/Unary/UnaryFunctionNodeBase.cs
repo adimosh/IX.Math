@@ -18,6 +18,13 @@ namespace IX.Math.Nodes.Operations.Function.Unary
 
         public NodeBase Parameter { get; private set; }
 
+        public override NodeBase RefreshParametersRecursive()
+        {
+            this.Parameter = this.Parameter.RefreshParametersRecursive();
+
+            return this;
+        }
+
         protected Expression GenerateStaticUnaryFunctionCall<T>(string functionName)
         {
             Type parameterType = ParameterTypeFromParameter(this.Parameter);

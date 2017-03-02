@@ -3,52 +3,43 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Formatters
 {
     internal static class NumericFormatter
     {
-        internal static object[] FormatArgumentsAccordingToParameters(IEnumerable<object> parameterValues, IEnumerable<ParameterNodeBase> parameters)
+        internal static object[] FormatArgumentsAccordingToParameters(object[] parameterValues, ParameterNodeBase[] parameters)
         {
-            object[] finalValues = new object[parameterValues.Count()];
+            if (parameterValues.Length != parameterValues.Length)
+            {
+                throw new InvalidOperationException();
+            }
+
+            object[] finalValues = new object[parameterValues.Length];
 
             int i = 0;
 
-            var pve = parameterValues.GetEnumerator();
-            var pe = parameters.GetEnumerator();
             while (i < finalValues.Length)
             {
-                if (!pe.MoveNext())
-                {
-                    break;
-                }
-
-                if (!pve.MoveNext())
-                {
-                    throw new InvalidOperationException();
-                }
-
-                switch (pe.Current)
+                switch (parameters[i])
                 {
                     case NumericParameterNode n:
                         if (n.RequireFloat == false)
                         {
-                            finalValues[i] = Convert.ToInt64(pve.Current);
+                            finalValues[i] = Convert.ToInt64(parameterValues[i]);
                         }
                         else
                         {
-                            finalValues[i] = Convert.ToDouble(pve.Current);
+                            finalValues[i] = Convert.ToDouble(parameterValues[i]);
                         }
 
                         break;
                     case StringParameterNode s:
-                        finalValues[i] = pve.Current.ToString();
+                        finalValues[i] = parameterValues[i].ToString();
                         break;
                     case BoolParameterNode b:
-                        switch (pve.Current)
+                        switch (parameterValues[i])
                         {
                             case bool be:
                                 finalValues[i] = be;
@@ -102,6 +93,51 @@ namespace IX.Math.Formatters
                         }
 
                         break;
+                    case UndefinedParameterNode u:
+                        switch (parameterValues[i])
+                        {
+                            case bool be:
+                                parameters[i] = u.DetermineBool();
+                                break;
+                            case byte bbe:
+                                parameters[i] = u.DetermineNumeric();
+                                break;
+                            case sbyte bbe:
+                                parameters[i] = u.DetermineNumeric();
+                                break;
+                            case short bbe:
+                                parameters[i] = u.DetermineNumeric();
+                                break;
+                            case char bbe:
+                                parameters[i] = u.DetermineNumeric();
+                                break;
+                            case ushort bbe:
+                                parameters[i] = u.DetermineNumeric();
+                                break;
+                            case int bbe:
+                                parameters[i] = u.DetermineNumeric();
+                                break;
+                            case uint bbe:
+                                parameters[i] = u.DetermineNumeric();
+                                break;
+                            case long bbe:
+                                parameters[i] = u.DetermineNumeric();
+                                break;
+                            case ulong bbe:
+                                parameters[i] = u.DetermineNumeric();
+                                break;
+                            case float bbe:
+                                parameters[i] = u.DetermineNumeric();
+                                break;
+                            case double bbe:
+                                parameters[i] = u.DetermineNumeric();
+                                break;
+                            default:
+                                parameters[i] = u.DetermineString();
+                                break;
+                        }
+
+                        continue;
                     default:
                         throw new InvalidCastException();
                 }

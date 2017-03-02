@@ -14,5 +14,12 @@ namespace IX.Math.Nodes.Operations.Unary
         }
 
         public NodeBase Operand { get; private set; }
+
+        public override NodeBase RefreshParametersRecursive()
+        {
+            this.Operand = this.Operand.RefreshParametersRecursive();
+
+            return this;
+        }
     }
 }

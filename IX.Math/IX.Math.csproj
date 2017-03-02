@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.1</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.4.0-alpha1</Version>
     <FileVersion>0.4.0.0</FileVersion>
     <AssemblyVersion>0.4.0.0</AssemblyVersion>
@@ -27,6 +26,7 @@
     <TreatSpecificWarningsAsErrors />
     <DefineConstants>RELEASE;NETSTANDARD1_1</DefineConstants>
     <DocumentationFile>bin\Release\netstandard1.1\IX.Math.xml</DocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

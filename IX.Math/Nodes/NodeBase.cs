@@ -17,5 +17,7 @@ namespace IX.Math.Nodes
         public abstract Expression GenerateExpression();
 
         public abstract Expression GenerateStringExpression();
+
+        public abstract NodeBase RefreshParametersRecursive();
     }
 }
