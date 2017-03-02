@@ -88,9 +88,27 @@ namespace IX.Math.UnitTests
                 },
                 new object[]
                 {
+                    "3+(6-2*2)",
+                    new object[0],
+                    5L,
+                },
+                new object[]
+                {
                     "1<<2",
                     new object[0],
                     4L,
+                },
+                new object[]
+                {
+                    "3-6+1<<2",
+                    new object[0],
+                    1L,
+                },
+                new object[]
+                {
+                    "2<<2+1<<2",
+                    new object[0],
+                    12L,
                 },
                 new object[]
                 {
