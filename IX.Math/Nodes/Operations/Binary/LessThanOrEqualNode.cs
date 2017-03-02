@@ -77,6 +77,26 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
+        public LessThanOrEqualNode(NumericNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public LessThanOrEqualNode(UndefinedParameterNode left, NumericNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public LessThanOrEqualNode(NumericParameterNode left, UndefinedParameterNode right)
+            : base(left, right?.DetermineNumeric())
+        {
+        }
+
+        public LessThanOrEqualNode(UndefinedParameterNode left, NumericParameterNode right)
+            : base(left?.DetermineNumeric(), right)
+        {
+        }
+
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
         public override NodeBase Simplify()
