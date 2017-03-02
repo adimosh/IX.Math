@@ -78,7 +78,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (right?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -87,7 +87,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (left?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -96,7 +96,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (right?.ReturnType != left?.ReturnType)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -105,7 +105,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (right?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -114,7 +114,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (left?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -123,7 +123,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (right?.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -132,7 +132,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (left?.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -141,7 +141,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (right?.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -150,7 +150,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (left?.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -159,7 +159,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (right?.ReturnType != SupportedValueType.Boolean)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -168,7 +168,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (left?.ReturnType != SupportedValueType.Boolean)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -177,7 +177,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (right?.ReturnType != SupportedValueType.Boolean)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -186,7 +186,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (left?.ReturnType != SupportedValueType.Boolean)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 

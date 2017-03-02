@@ -137,7 +137,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (right?.ReturnType != SupportedValueType.Numeric && right?.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -146,7 +146,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (left?.ReturnType != SupportedValueType.Numeric && left?.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -155,7 +155,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (right?.ReturnType != left?.ReturnType && right?.ReturnType != SupportedValueType.String && left?.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -164,7 +164,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (right?.ReturnType != SupportedValueType.Numeric && right?.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -173,7 +173,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (left?.ReturnType != SupportedValueType.Numeric && left?.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -224,6 +224,11 @@ namespace IX.Math.Nodes.Operations.Binary
 
         public AddNode(UndefinedParameterNode left, NumericParameterNode right)
             : base(left?.DetermineNumeric(), right)
+        {
+        }
+
+        public AddNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineNumeric(), right?.DetermineNumeric())
         {
         }
 

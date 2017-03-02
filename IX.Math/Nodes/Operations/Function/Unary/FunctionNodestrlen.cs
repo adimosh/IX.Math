@@ -31,7 +31,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
         {
             if (parameter?.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 

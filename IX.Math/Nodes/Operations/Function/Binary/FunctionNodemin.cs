@@ -30,7 +30,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -54,7 +54,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -78,7 +78,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -87,7 +87,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -96,7 +96,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -105,7 +105,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 
@@ -114,12 +114,12 @@ namespace IX.Math.Nodes.Operations.Function.Binary
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
 
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 

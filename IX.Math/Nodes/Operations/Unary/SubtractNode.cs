@@ -30,7 +30,7 @@ namespace IX.Math.Nodes.Operations.Unary
         {
             if (operand?.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 

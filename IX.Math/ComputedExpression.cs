@@ -9,7 +9,6 @@ using System.Linq.Expressions;
 using IX.Math.Formatters;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Parameters;
-using IX.Math.SimplificationAide;
 
 namespace IX.Math
 {

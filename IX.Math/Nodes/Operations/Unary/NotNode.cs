@@ -20,6 +20,12 @@ namespace IX.Math.Nodes.Operations.Unary
         {
         }
 
+        public NotNode(UndefinedParameterNode operand)
+            : base(operand?.DetermineNumeric())
+        {
+            OperationsHelper.ParameterMustBeInteger(this.Operand as NumericParameterNode);
+        }
+
         public NotNode(NumericParameterNode operand)
             : base(operand)
         {
@@ -36,7 +42,7 @@ namespace IX.Math.Nodes.Operations.Unary
         {
             if (operand?.ReturnType != SupportedValueType.Numeric && operand?.ReturnType != SupportedValueType.Boolean)
             {
-                throw new ExpressionNotValidLogicallyException(Resources.NotValidInternally);
+                throw new ExpressionNotValidLogicallyException();
             }
         }
 

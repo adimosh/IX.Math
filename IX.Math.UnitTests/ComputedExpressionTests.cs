@@ -94,6 +94,12 @@ namespace IX.Math.UnitTests
                 },
                 new object[]
                 {
+                    "x-y",
+                    new object[] { 12, 2 },
+                    10D,
+                },
+                new object[]
+                {
                     "textparam = 12",
                     new object[] { 13 },
                     false,
@@ -312,7 +318,7 @@ namespace IX.Math.UnitTests
                 {
                     "x+y",
                     new object[2] { 1, -2 },
-                    -1L,
+                    -1D,
                 },
                 new object[]
                 {
