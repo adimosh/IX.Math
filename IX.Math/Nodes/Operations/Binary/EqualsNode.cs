@@ -28,26 +28,6 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
-        public EqualsNode(UndefinedParameterNode left, NumericParameterNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
-        public EqualsNode(NumericParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-        }
-
-        public EqualsNode(NumericNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-        }
-
-        public EqualsNode(UndefinedParameterNode left, NumericNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
         public EqualsNode(NumericParameterNode left, NumericParameterNode right)
             : base(left, right)
         {
@@ -65,26 +45,6 @@ namespace IX.Math.Nodes.Operations.Binary
 
         public EqualsNode(StringParameterNode left, StringNode right)
             : base(left, right)
-        {
-        }
-
-        public EqualsNode(UndefinedParameterNode left, StringParameterNode right)
-            : base(left?.DetermineString(), right)
-        {
-        }
-
-        public EqualsNode(StringParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineString())
-        {
-        }
-
-        public EqualsNode(StringNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineString())
-        {
-        }
-
-        public EqualsNode(UndefinedParameterNode left, StringNode right)
-            : base(left?.DetermineString(), right)
         {
         }
 
@@ -230,24 +190,43 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        public EqualsNode(BoolNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineBool())
+        public EqualsNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineBool(), right?.DetermineBool())
         {
         }
 
-        public EqualsNode(UndefinedParameterNode left, BoolNode right)
-            : base(left?.DetermineBool(), right)
+        public EqualsNode(UndefinedParameterNode left, NodeBase right)
+            : base(left, right?.Simplify())
         {
+            if (this.Right.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Left = left.DetermineNumeric();
+            }
+            else if (this.Right.ReturnType == SupportedValueType.Boolean)
+            {
+                this.Left = left.DetermineBool();
+            }
+            else
+            {
+                this.Left = left.DetermineString();
+            }
         }
 
-        public EqualsNode(BoolParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineBool())
+        public EqualsNode(NodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right)
         {
-        }
-
-        public EqualsNode(UndefinedParameterNode left, BoolParameterNode right)
-            : base(left?.DetermineBool(), right)
-        {
+            if (this.Left.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Right = right.DetermineNumeric();
+            }
+            else if (this.Left.ReturnType == SupportedValueType.Boolean)
+            {
+                this.Right = right.DetermineBool();
+            }
+            else
+            {
+                this.Right = right.DetermineString();
+            }
         }
 
         public override SupportedValueType ReturnType => this.Left?.ReturnType ?? this.Right?.ReturnType ?? SupportedValueType.Unknown;

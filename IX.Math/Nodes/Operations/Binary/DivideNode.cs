@@ -33,21 +33,6 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
-        public DivideNode(NumericNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-        }
-
-        public DivideNode(UndefinedParameterNode left, NumericNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
-        public DivideNode(UndefinedParameterNode left, UndefinedParameterNode right)
-            : base(left?.DetermineNumeric(), right?.DetermineNumeric())
-        {
-        }
-
         public DivideNode(NumericNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
@@ -84,24 +69,6 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        public DivideNode(UndefinedParameterNode left, OperationNodeBase right)
-            : base(left?.DetermineNumeric(), right?.Simplify())
-        {
-            if (right?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public DivideNode(OperationNodeBase left, UndefinedParameterNode right)
-            : base(left?.Simplify(), right?.DetermineNumeric())
-        {
-            if (left?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
         public DivideNode(OperationNodeBase left, OperationNodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
@@ -111,14 +78,35 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        public DivideNode(NumericParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
+        public DivideNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineNumeric(), right?.DetermineNumeric())
         {
         }
 
-        public DivideNode(UndefinedParameterNode left, NumericParameterNode right)
-            : base(left?.DetermineNumeric(), right)
+        public DivideNode(UndefinedParameterNode left, NodeBase right)
+            : base(left, right?.Simplify())
         {
+            if (this.Right.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Left = left.DetermineNumeric();
+            }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public DivideNode(NodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right)
+        {
+            if (this.Left.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Right = right.DetermineNumeric();
+            }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
         }
 
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;

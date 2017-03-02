@@ -78,6 +78,37 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
+        public GreaterThanOrEqualNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineNumeric(), right?.DetermineNumeric())
+        {
+        }
+
+        public GreaterThanOrEqualNode(UndefinedParameterNode left, NodeBase right)
+            : base(left, right?.Simplify())
+        {
+            if (this.Right.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Left = left.DetermineNumeric();
+            }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public GreaterThanOrEqualNode(NodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right)
+        {
+            if (this.Left.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Right = right.DetermineNumeric();
+            }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
         public override NodeBase Simplify()

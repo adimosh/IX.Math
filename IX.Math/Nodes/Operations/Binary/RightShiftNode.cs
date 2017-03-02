@@ -18,9 +18,8 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public RightShiftNode(NumericNode left, NumericParameterNode right)
-            : base(left, right)
+            : base(left, right?.ParameterMustBeInteger())
         {
-            OperationsHelper.ParameterMustBeInteger(right);
         }
 
         public RightShiftNode(NumericParameterNode left, NumericNode right)
@@ -29,9 +28,8 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public RightShiftNode(NumericParameterNode left, NumericParameterNode right)
-            : base(left, right)
+            : base(left, right?.ParameterMustBeInteger())
         {
-            OperationsHelper.ParameterMustBeInteger(right);
         }
 
         public RightShiftNode(NumericNode left, OperationNodeBase right)
@@ -62,9 +60,8 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public RightShiftNode(OperationNodeBase left, NumericParameterNode right)
-            : base(left?.Simplify(), right)
+            : base(left?.Simplify(), right?.ParameterMustBeInteger())
         {
-            OperationsHelper.ParameterMustBeInteger(right);
             if (left?.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException();
@@ -80,43 +77,32 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        public RightShiftNode(NumericNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-            OperationsHelper.ParameterMustBeInteger(this.Right as NumericParameterNode);
-        }
-
-        public RightShiftNode(UndefinedParameterNode left, NumericNode right)
-            : base(left?.DetermineNumeric(), right)
+        public RightShiftNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineNumeric(), right?.DetermineNumeric()?.ParameterMustBeInteger())
         {
         }
 
-        public RightShiftNode(NumericParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
+        public RightShiftNode(UndefinedParameterNode left, NodeBase right)
+            : base(left, right?.Simplify())
         {
-            OperationsHelper.ParameterMustBeInteger(this.Right as NumericParameterNode);
-        }
-
-        public RightShiftNode(UndefinedParameterNode left, NumericParameterNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-            OperationsHelper.ParameterMustBeInteger(right);
-        }
-
-        public RightShiftNode(UndefinedParameterNode left, OperationNodeBase right)
-            : base(left?.DetermineNumeric(), right?.Simplify())
-        {
-            if (right?.ReturnType != SupportedValueType.Numeric)
+            if (this.Right.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Left = left.DetermineNumeric();
+            }
+            else
             {
                 throw new ExpressionNotValidLogicallyException();
             }
         }
 
-        public RightShiftNode(OperationNodeBase left, UndefinedParameterNode right)
-            : base(left?.Simplify(), right?.DetermineNumeric())
+        public RightShiftNode(NodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right)
         {
-            OperationsHelper.ParameterMustBeInteger(this.Right as NumericParameterNode);
-            if (left?.ReturnType != SupportedValueType.Numeric)
+            if (this.Left.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Right = right.DetermineNumeric().ParameterMustBeInteger();
+            }
+            else
             {
                 throw new ExpressionNotValidLogicallyException();
             }

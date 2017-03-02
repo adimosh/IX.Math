@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
@@ -19,22 +18,18 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public OrNode(NumericNode left, NumericParameterNode right)
-            : base(left, right)
+            : base(left, right?.ParameterMustBeInteger())
         {
-            OperationsHelper.ParameterMustBeInteger(right);
         }
 
         public OrNode(NumericParameterNode left, NumericNode right)
-            : base(left, right)
+            : base(left?.ParameterMustBeInteger(), right)
         {
-            OperationsHelper.ParameterMustBeInteger(left);
         }
 
         public OrNode(NumericParameterNode left, NumericParameterNode right)
-            : base(left, right)
+            : base(left?.ParameterMustBeInteger(), right?.ParameterMustBeInteger())
         {
-            OperationsHelper.ParameterMustBeInteger(left);
-            OperationsHelper.ParameterMustBeInteger(right);
         }
 
         public OrNode(NumericNode left, OperationNodeBase right)
@@ -56,9 +51,8 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public OrNode(NumericParameterNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
+            : base(left?.ParameterMustBeInteger(), right?.Simplify())
         {
-            OperationsHelper.ParameterMustBeInteger(left);
             if (right?.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException();
@@ -66,9 +60,8 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public OrNode(OperationNodeBase left, NumericParameterNode right)
-            : base(left?.Simplify(), right)
+            : base(left?.Simplify(), right?.ParameterMustBeInteger())
         {
-            OperationsHelper.ParameterMustBeInteger(right);
             if (left?.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException();
@@ -145,44 +138,35 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        public OrNode(NumericNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
+        public OrNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineBool(), right?.DetermineBool())
         {
         }
 
-        public OrNode(UndefinedParameterNode left, NumericNode right)
-            : base(left?.DetermineNumeric(), right)
+        public OrNode(UndefinedParameterNode left, NodeBase right)
+            : base(left, right?.Simplify())
         {
+            if (this.Right.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Left = left.DetermineNumeric().ParameterMustBeInteger();
+            }
+            else
+            {
+                this.Left = left.DetermineBool();
+            }
         }
 
-        public OrNode(BoolNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineBool())
+        public OrNode(NodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right)
         {
-        }
-
-        public OrNode(UndefinedParameterNode left, BoolNode right)
-            : base(left?.DetermineBool(), right)
-        {
-        }
-
-        public OrNode(NumericParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-        }
-
-        public OrNode(UndefinedParameterNode left, NumericParameterNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
-        public OrNode(BoolParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineBool())
-        {
-        }
-
-        public OrNode(UndefinedParameterNode left, BoolParameterNode right)
-            : base(left?.DetermineBool(), right)
-        {
+            if (this.Left.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Right = right.DetermineNumeric().ParameterMustBeInteger();
+            }
+            else
+            {
+                this.Right = right.DetermineBool();
+            }
         }
 
         public override SupportedValueType ReturnType => this.Left?.ReturnType ?? this.Right?.ReturnType ?? SupportedValueType.Unknown;

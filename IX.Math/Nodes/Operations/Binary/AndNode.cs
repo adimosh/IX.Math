@@ -138,44 +138,35 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        public AndNode(NumericNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
+        public AndNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineBool(), right?.DetermineBool())
         {
         }
 
-        public AndNode(UndefinedParameterNode left, NumericNode right)
-            : base(left?.DetermineNumeric(), right)
+        public AndNode(UndefinedParameterNode left, NodeBase right)
+            : base(left, right?.Simplify())
         {
+            if (this.Right.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Left = left.DetermineNumeric().ParameterMustBeInteger();
+            }
+            else
+            {
+                this.Left = left.DetermineBool();
+            }
         }
 
-        public AndNode(BoolNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineBool())
+        public AndNode(NodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right)
         {
-        }
-
-        public AndNode(UndefinedParameterNode left, BoolNode right)
-            : base(left?.DetermineBool(), right)
-        {
-        }
-
-        public AndNode(NumericParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-        }
-
-        public AndNode(UndefinedParameterNode left, NumericParameterNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
-        public AndNode(BoolParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineBool())
-        {
-        }
-
-        public AndNode(UndefinedParameterNode left, BoolParameterNode right)
-            : base(left?.DetermineBool(), right)
-        {
+            if (this.Left.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Right = right.DetermineNumeric().ParameterMustBeInteger();
+            }
+            else
+            {
+                this.Right = right.DetermineBool();
+            }
         }
 
         public override SupportedValueType ReturnType => this.Left?.ReturnType ?? this.Right?.ReturnType ?? SupportedValueType.Unknown;

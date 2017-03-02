@@ -78,24 +78,35 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        public GreaterThanNode(NumericNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
+        public GreaterThanNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineNumeric(), right?.DetermineNumeric())
         {
         }
 
-        public GreaterThanNode(UndefinedParameterNode left, NumericNode right)
-            : base(left?.DetermineNumeric(), right)
+        public GreaterThanNode(UndefinedParameterNode left, NodeBase right)
+            : base(left, right?.Simplify())
         {
+            if (this.Right.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Left = left.DetermineNumeric();
+            }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
         }
 
-        public GreaterThanNode(NumericParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
+        public GreaterThanNode(NodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right)
         {
-        }
-
-        public GreaterThanNode(UndefinedParameterNode left, NumericParameterNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
+            if (this.Left.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Right = right.DetermineNumeric();
+            }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
         }
 
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;

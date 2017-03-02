@@ -32,31 +32,6 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
-        public MultiplyNode(NumericNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-        }
-
-        public MultiplyNode(UndefinedParameterNode left, NumericNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
-        public MultiplyNode(NumericParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-        }
-
-        public MultiplyNode(UndefinedParameterNode left, NumericParameterNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
-        public MultiplyNode(UndefinedParameterNode left, UndefinedParameterNode right)
-            : base(left?.DetermineNumeric(), right?.DetermineNumeric())
-        {
-        }
-
         public MultiplyNode(NumericNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
@@ -93,28 +68,41 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        public MultiplyNode(UndefinedParameterNode left, OperationNodeBase right)
-            : base(left?.DetermineNumeric(), right?.Simplify())
-        {
-            if (right?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public MultiplyNode(OperationNodeBase left, UndefinedParameterNode right)
-            : base(left?.Simplify(), right?.DetermineNumeric())
-        {
-            if (left?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
         public MultiplyNode(OperationNodeBase left, OperationNodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
             if (right?.ReturnType != SupportedValueType.Numeric && left?.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public MultiplyNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineNumeric(), right?.DetermineNumeric())
+        {
+        }
+
+        public MultiplyNode(UndefinedParameterNode left, NodeBase right)
+            : base(left, right?.Simplify())
+        {
+            if (this.Right.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Left = left.DetermineNumeric();
+            }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public MultiplyNode(NodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right)
+        {
+            if (this.Left.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Right = right.DetermineNumeric();
+            }
+            else
             {
                 throw new ExpressionNotValidLogicallyException();
             }

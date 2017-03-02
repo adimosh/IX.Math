@@ -16,5 +16,10 @@ namespace IX.Math.Nodes.Constants
         {
             return this;
         }
+
+        public override NodeBase Simplify()
+        {
+            return this;
+        }
     }
 }

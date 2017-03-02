@@ -18,22 +18,18 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public XorNode(NumericNode left, NumericParameterNode right)
-            : base(left, right)
+            : base(left, right?.ParameterMustBeInteger())
         {
-            OperationsHelper.ParameterMustBeInteger(right);
         }
 
         public XorNode(NumericParameterNode left, NumericNode right)
-            : base(left, right)
+            : base(left?.ParameterMustBeInteger(), right)
         {
-            OperationsHelper.ParameterMustBeInteger(left);
         }
 
         public XorNode(NumericParameterNode left, NumericParameterNode right)
-            : base(left, right)
+            : base(left?.ParameterMustBeInteger(), right?.ParameterMustBeInteger())
         {
-            OperationsHelper.ParameterMustBeInteger(left);
-            OperationsHelper.ParameterMustBeInteger(right);
         }
 
         public XorNode(NumericNode left, OperationNodeBase right)
@@ -55,9 +51,8 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public XorNode(NumericParameterNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
+            : base(left?.ParameterMustBeInteger(), right?.Simplify())
         {
-            OperationsHelper.ParameterMustBeInteger(left);
             if (right?.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException();
@@ -65,9 +60,8 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public XorNode(OperationNodeBase left, NumericParameterNode right)
-            : base(left?.Simplify(), right)
+            : base(left?.Simplify(), right?.ParameterMustBeInteger())
         {
-            OperationsHelper.ParameterMustBeInteger(right);
             if (left?.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException();
@@ -144,44 +138,35 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        public XorNode(NumericNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
+        public XorNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineBool(), right?.DetermineBool())
         {
         }
 
-        public XorNode(UndefinedParameterNode left, NumericNode right)
-            : base(left?.DetermineNumeric(), right)
+        public XorNode(UndefinedParameterNode left, NodeBase right)
+            : base(left, right?.Simplify())
         {
+            if (this.Right.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Left = left.DetermineNumeric().ParameterMustBeInteger();
+            }
+            else
+            {
+                this.Left = left.DetermineBool();
+            }
         }
 
-        public XorNode(BoolNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineBool())
+        public XorNode(NodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right)
         {
-        }
-
-        public XorNode(UndefinedParameterNode left, BoolNode right)
-            : base(left?.DetermineBool(), right)
-        {
-        }
-
-        public XorNode(NumericParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-        }
-
-        public XorNode(UndefinedParameterNode left, NumericParameterNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
-        public XorNode(BoolParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineBool())
-        {
-        }
-
-        public XorNode(UndefinedParameterNode left, BoolParameterNode right)
-            : base(left?.DetermineBool(), right)
-        {
+            if (this.Left.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Right = right.DetermineNumeric().ParameterMustBeInteger();
+            }
+            else
+            {
+                this.Right = right.DetermineBool();
+            }
         }
 
         public override SupportedValueType ReturnType => this.Left?.ReturnType ?? this.Right?.ReturnType ?? SupportedValueType.Unknown;

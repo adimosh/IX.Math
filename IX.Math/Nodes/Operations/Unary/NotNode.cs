@@ -2,12 +2,14 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Unary
 {
+    [DebuggerDisplay("!{Operand}")]
     internal sealed class NotNode : UnaryOperatorNodeBase
     {
         public NotNode(NumericNode operand)
@@ -20,16 +22,9 @@ namespace IX.Math.Nodes.Operations.Unary
         {
         }
 
-        public NotNode(UndefinedParameterNode operand)
-            : base(operand?.DetermineNumeric())
-        {
-            OperationsHelper.ParameterMustBeInteger(this.Operand as NumericParameterNode);
-        }
-
         public NotNode(NumericParameterNode operand)
-            : base(operand)
+            : base(operand?.ParameterMustBeInteger())
         {
-            OperationsHelper.ParameterMustBeInteger(operand);
         }
 
         public NotNode(BoolParameterNode operand)
@@ -44,6 +39,11 @@ namespace IX.Math.Nodes.Operations.Unary
             {
                 throw new ExpressionNotValidLogicallyException();
             }
+        }
+
+        public NotNode(UndefinedParameterNode operand)
+            : base(operand?.DetermineNumeric().ParameterMustBeInteger())
+        {
         }
 
         public override SupportedValueType ReturnType => this.Operand?.ReturnType ?? SupportedValueType.Unknown;

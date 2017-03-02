@@ -428,12 +428,6 @@ namespace IX.Math.UnitTests
                     new object[2] { 1, 0 },
                     true,
                 },
-                new object[]
-                {
-                    "x=0&y=1",
-                    new object[2] { 0, 1 },
-                    false,
-                },
             };
         }
 

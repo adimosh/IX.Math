@@ -189,64 +189,43 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        public NotEqualsNode(NumericNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
+        public NotEqualsNode(UndefinedParameterNode left, UndefinedParameterNode right)
+            : base(left?.DetermineBool(), right?.DetermineBool())
         {
         }
 
-        public NotEqualsNode(UndefinedParameterNode left, NumericNode right)
-            : base(left?.DetermineNumeric(), right)
+        public NotEqualsNode(UndefinedParameterNode left, NodeBase right)
+            : base(left, right?.Simplify())
         {
+            if (this.Right.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Left = left.DetermineNumeric();
+            }
+            else if (this.Right.ReturnType == SupportedValueType.Boolean)
+            {
+                this.Left = left.DetermineBool();
+            }
+            else
+            {
+                this.Left = left.DetermineString();
+            }
         }
 
-        public NotEqualsNode(NumericParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
+        public NotEqualsNode(NodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right)
         {
-        }
-
-        public NotEqualsNode(UndefinedParameterNode left, NumericParameterNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
-        public NotEqualsNode(BoolNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineBool())
-        {
-        }
-
-        public NotEqualsNode(UndefinedParameterNode left, BoolNode right)
-            : base(left?.DetermineBool(), right)
-        {
-        }
-
-        public NotEqualsNode(BoolParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineBool())
-        {
-        }
-
-        public NotEqualsNode(UndefinedParameterNode left, BoolParameterNode right)
-            : base(left?.DetermineBool(), right)
-        {
-        }
-
-        public NotEqualsNode(StringNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineString())
-        {
-        }
-
-        public NotEqualsNode(UndefinedParameterNode left, StringNode right)
-            : base(left?.DetermineString(), right)
-        {
-        }
-
-        public NotEqualsNode(StringParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineString())
-        {
-        }
-
-        public NotEqualsNode(UndefinedParameterNode left, StringParameterNode right)
-            : base(left?.DetermineString(), right)
-        {
+            if (this.Left.ReturnType == SupportedValueType.Numeric)
+            {
+                this.Right = right.DetermineNumeric();
+            }
+            else if (this.Left.ReturnType == SupportedValueType.Boolean)
+            {
+                this.Right = right.DetermineBool();
+            }
+            else
+            {
+                this.Right = right.DetermineString();
+            }
         }
 
         public override SupportedValueType ReturnType => this.Left?.ReturnType ?? this.Right?.ReturnType ?? SupportedValueType.Unknown;

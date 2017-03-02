@@ -2,12 +2,14 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Unary
 {
+    [DebuggerDisplay("-{Operand}")]
     internal sealed class SubtractNode : UnaryOperatorNodeBase
     {
         public SubtractNode(NumericNode operand)
@@ -20,11 +22,6 @@ namespace IX.Math.Nodes.Operations.Unary
         {
         }
 
-        public SubtractNode(UndefinedParameterNode operand)
-            : base(operand?.DetermineNumeric())
-        {
-        }
-
         public SubtractNode(OperationNodeBase operand)
             : base(operand?.Simplify())
         {
@@ -32,6 +29,11 @@ namespace IX.Math.Nodes.Operations.Unary
             {
                 throw new ExpressionNotValidLogicallyException();
             }
+        }
+
+        public SubtractNode(UndefinedParameterNode operand)
+            : base(operand?.DetermineNumeric())
+        {
         }
 
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;

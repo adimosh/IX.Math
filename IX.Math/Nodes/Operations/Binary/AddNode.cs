@@ -197,82 +197,34 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
-        public AddNode(NumericNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-        }
-
-        public AddNode(UndefinedParameterNode left, NumericNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
-        public AddNode(StringNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineString())
-        {
-        }
-
-        public AddNode(UndefinedParameterNode left, StringNode right)
-            : base(left?.DetermineString(), right)
-        {
-        }
-
-        public AddNode(NumericParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineNumeric())
-        {
-        }
-
-        public AddNode(UndefinedParameterNode left, NumericParameterNode right)
-            : base(left?.DetermineNumeric(), right)
-        {
-        }
-
         public AddNode(UndefinedParameterNode left, UndefinedParameterNode right)
             : base(left?.DetermineNumeric(), right?.DetermineNumeric())
         {
         }
 
-        public AddNode(StringParameterNode left, UndefinedParameterNode right)
-            : base(left, right?.DetermineString())
+        public AddNode(UndefinedParameterNode left, NodeBase right)
+            : base(left, right?.Simplify())
         {
-        }
-
-        public AddNode(UndefinedParameterNode left, StringParameterNode right)
-            : base(left?.DetermineString(), right)
-        {
-        }
-
-        public AddNode(UndefinedParameterNode left, OperationNodeBase right)
-            : base(left, right)
-        {
-            if (right.ReturnType == SupportedValueType.Numeric)
+            if (this.Right.ReturnType == SupportedValueType.Numeric)
             {
                 this.Left = left.DetermineNumeric();
             }
-            else if (right.ReturnType == SupportedValueType.String)
+            else
             {
                 this.Left = left.DetermineString();
             }
-            else
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
         }
 
-        public AddNode(OperationNodeBase left, UndefinedParameterNode right)
-            : base(left, right)
+        public AddNode(NodeBase left, UndefinedParameterNode right)
+            : base(left?.Simplify(), right)
         {
-            if (left.ReturnType == SupportedValueType.Numeric)
+            if (this.Left.ReturnType == SupportedValueType.Numeric)
             {
                 this.Right = right.DetermineNumeric();
             }
-            else if (left.ReturnType == SupportedValueType.String)
-            {
-                this.Right = right.DetermineString();
-            }
             else
             {
-                throw new ExpressionNotValidLogicallyException();
+                this.Right = right.DetermineString();
             }
         }
 

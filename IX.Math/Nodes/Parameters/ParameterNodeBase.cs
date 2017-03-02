@@ -34,6 +34,11 @@ namespace IX.Math.Nodes.Parameters
             return this;
         }
 
+        public override NodeBase Simplify()
+        {
+            return this;
+        }
+
         protected abstract Expression GenerateExpressionInternal();
     }
 }
