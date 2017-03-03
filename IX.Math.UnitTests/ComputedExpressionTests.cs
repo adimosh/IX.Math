@@ -106,6 +106,78 @@ namespace IX.Math.UnitTests
                 },
                 new object[]
                 {
+                    "x&y",
+                    new object[2] { 5, 49 },
+                    1L,
+                },
+                new object[]
+                {
+                    "x|y",
+                    new object[2] { 5, 49 },
+                    53L,
+                },
+                new object[]
+                {
+                    "x#y",
+                    new object[2] { 5, 49 },
+                    52L,
+                },
+                new object[]
+                {
+                    "x&y",
+                    new object[2] { true, false },
+                    false,
+                },
+                new object[]
+                {
+                    "x&y",
+                    new object[2] { true, true },
+                    true,
+                },
+                new object[]
+                {
+                    "x|y",
+                    new object[2] { true, false },
+                    true,
+                },
+                new object[]
+                {
+                    "x|(1>2)",
+                    new object[1] { true },
+                    true,
+                },
+                new object[]
+                {
+                    "x|y",
+                    new object[2] { false, false },
+                    false,
+                },
+                new object[]
+                {
+                    "x#y",
+                    new object[2] { true, true },
+                    false,
+                },
+                new object[]
+                {
+                    "x#y",
+                    new object[2] { true, false },
+                    true,
+                },
+                new object[]
+                {
+                    "x<<y",
+                    new object[2] { 3, 2 },
+                    12L,
+                },
+                new object[]
+                {
+                    "x>>y",
+                    new object[2] { 3, 1 },
+                    1L,
+                },
+                new object[]
+                {
                     "2<<2+1<<2",
                     new object[0],
                     12L,

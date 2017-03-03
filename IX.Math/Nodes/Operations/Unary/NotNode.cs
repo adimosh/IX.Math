@@ -42,7 +42,7 @@ namespace IX.Math.Nodes.Operations.Unary
         }
 
         public NotNode(UndefinedParameterNode operand)
-            : base(operand?.DetermineNumeric().ParameterMustBeInteger())
+            : base(operand?.IfDeterminedNumericAlsoDetermineInteger())
         {
         }
 

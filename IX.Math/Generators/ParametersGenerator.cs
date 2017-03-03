@@ -20,7 +20,7 @@ namespace IX.Math.Generators
             }
         }
 
-        public static NumericParameterNode DetermineNumeric(IDictionary<string, ParameterNodeBase> parameters, string name)
+        public static NumericParameterNode DetermineNumeric(IDictionary<string, ParameterNodeBase> parameters, string name, bool? determineFloat)
         {
             string trueName = name.ToLower();
 
@@ -28,7 +28,10 @@ namespace IX.Math.Generators
             {
                 if (p is UndefinedParameterNode)
                 {
-                    var result = new NumericParameterNode(trueName);
+                    var result = new NumericParameterNode(trueName)
+                    {
+                        RequireFloat = determineFloat,
+                    };
                     parameters[trueName] = result;
                     return result;
                 }
@@ -38,7 +41,17 @@ namespace IX.Math.Generators
                 }
                 else
                 {
-                    return (NumericParameterNode)p;
+                    var n = (NumericParameterNode)p;
+                    if (determineFloat == false)
+                    {
+                        n.ParameterMustBeInteger();
+                    }
+                    else if (determineFloat == true)
+                    {
+                        n.ParameterMustBeFloat();
+                    }
+
+                    return n;
                 }
             }
             else

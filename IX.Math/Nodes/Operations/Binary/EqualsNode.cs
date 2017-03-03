@@ -191,7 +191,7 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public EqualsNode(UndefinedParameterNode left, UndefinedParameterNode right)
-            : base(left?.DetermineBool(), right?.DetermineBool())
+            : base(left, right)
         {
         }
 

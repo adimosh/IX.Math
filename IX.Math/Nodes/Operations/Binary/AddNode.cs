@@ -198,7 +198,7 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public AddNode(UndefinedParameterNode left, UndefinedParameterNode right)
-            : base(left?.DetermineNumeric(), right?.DetermineNumeric())
+            : base(left, right)
         {
         }
 

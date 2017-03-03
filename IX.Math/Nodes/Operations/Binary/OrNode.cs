@@ -139,7 +139,7 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public OrNode(UndefinedParameterNode left, UndefinedParameterNode right)
-            : base(left?.DetermineBool(), right?.DetermineBool())
+            : base(left?.IfDeterminedNumericAlsoDetermineInteger(), right?.IfDeterminedNumericAlsoDetermineInteger())
         {
         }
 

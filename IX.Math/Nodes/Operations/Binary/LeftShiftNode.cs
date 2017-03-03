@@ -23,12 +23,12 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public LeftShiftNode(NumericParameterNode left, NumericNode right)
-            : base(left, right)
+            : base(left?.ParameterMustBeInteger(), right)
         {
         }
 
         public LeftShiftNode(NumericParameterNode left, NumericParameterNode right)
-            : base(left, right?.ParameterMustBeInteger())
+            : base(left?.ParameterMustBeInteger(), right?.ParameterMustBeInteger())
         {
         }
 
@@ -51,7 +51,7 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public LeftShiftNode(NumericParameterNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
+            : base(left?.ParameterMustBeInteger(), right?.Simplify())
         {
             if (right?.ReturnType != SupportedValueType.Numeric)
             {
@@ -78,7 +78,7 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         public LeftShiftNode(UndefinedParameterNode left, UndefinedParameterNode right)
-            : base(left?.DetermineNumeric(), right?.DetermineNumeric()?.ParameterMustBeInteger())
+            : base(left?.DetermineNumeric().ParameterMustBeInteger(), right?.DetermineNumeric().ParameterMustBeInteger())
         {
         }
 
@@ -87,7 +87,11 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (this.Right.ReturnType == SupportedValueType.Numeric)
             {
-                this.Left = left.DetermineNumeric();
+                this.Left = left.DetermineNumeric().ParameterMustBeInteger();
+                if (this.Right is NumericParameterNode)
+                {
+                    ((NumericParameterNode)this.Right).ParameterMustBeInteger();
+                }
             }
             else
             {
@@ -101,6 +105,10 @@ namespace IX.Math.Nodes.Operations.Binary
             if (this.Left.ReturnType == SupportedValueType.Numeric)
             {
                 this.Right = right.DetermineNumeric().ParameterMustBeInteger();
+                if (this.Left is NumericParameterNode)
+                {
+                    ((NumericParameterNode)this.Left).ParameterMustBeInteger();
+                }
             }
             else
             {
@@ -120,9 +128,7 @@ namespace IX.Math.Nodes.Operations.Binary
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal()
-        {
-            return Expression.LeftShift(this.Left.GenerateExpression(), this.Right.GenerateExpression());
-        }
+        protected override Expression GenerateExpressionInternal() =>
+            Expression.LeftShift(this.Left.GenerateExpression(), Expression.Convert(this.Right.GenerateExpression(), typeof(int)));
     }
 }

@@ -15,6 +15,8 @@ namespace IX.Math.Nodes.Parameters
     {
         private IDictionary<string, ParameterNodeBase> parametersTable;
 
+        private bool? determineFloat;
+
         public UndefinedParameterNode(string parameterName, IDictionary<string, ParameterNodeBase> parametersTable)
             : base(parameterName)
         {
@@ -23,7 +25,19 @@ namespace IX.Math.Nodes.Parameters
 
         public override SupportedValueType ReturnType => SupportedValueType.Unknown;
 
-        public NumericParameterNode DetermineNumeric() => ParametersGenerator.DetermineNumeric(this.parametersTable, this.ParameterName);
+        public NumericParameterNode DetermineNumeric() => ParametersGenerator.DetermineNumeric(this.parametersTable, this.ParameterName, this.determineFloat);
+
+        public UndefinedParameterNode IfDeterminedNumericAlsoDetermineInteger()
+        {
+            this.determineFloat = false;
+            return this;
+        }
+
+        public UndefinedParameterNode IfDeterminedNumericAlsoDetermineFloat()
+        {
+            this.determineFloat = true;
+            return this;
+        }
 
         public BoolParameterNode DetermineBool() => ParametersGenerator.DetermineBool(this.parametersTable, this.ParameterName);
 
