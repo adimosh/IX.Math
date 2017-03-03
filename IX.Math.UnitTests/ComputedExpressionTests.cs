@@ -28,6 +28,60 @@ namespace IX.Math.UnitTests
                 },
                 new object[]
                 {
+                    "0=0",
+                    new object[0],
+                    true,
+                },
+                new object[]
+                {
+                    "\"some string\"=\"some string\"",
+                    new object[0],
+                    true,
+                },
+                new object[]
+                {
+                    "true=true",
+                    new object[0],
+                    true,
+                },
+                new object[]
+                {
+                    "0=1",
+                    new object[0],
+                    false,
+                },
+                new object[]
+                {
+                    "\"some string\"=\"spppng\"",
+                    new object[0],
+                    false,
+                },
+                new object[]
+                {
+                    "false=true",
+                    new object[0],
+                    false,
+                },
+                new object[]
+                {
+                    "0!=0",
+                    new object[0],
+                    false,
+                },
+                new object[]
+                {
+                    "\"some string\"!=\"skskskg\"",
+                    new object[0],
+                    true,
+                },
+                new object[]
+                {
+                    "false!=true",
+                    new object[0],
+                    true,
+                },
+                new object[]
+                {
                     "6-2",
                     new object[0],
                     4L,

@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
@@ -234,17 +235,23 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (this.Left is NumericNode && this.Right is NumericNode)
             {
-                return new BoolNode(((NumericNode)this.Left).Value != ((NumericNode)this.Right).Value);
+                var l = Convert.ToDouble(((NumericNode)this.Left).Value);
+                var r = Convert.ToDouble(((NumericNode)this.Right).Value);
+                return new BoolNode(l != r);
             }
 
             if (this.Left is StringNode && this.Right is StringNode)
             {
-                return new BoolNode(((StringNode)this.Left).Value != ((StringNode)this.Right).Value);
+                var l = Convert.ToString(((StringNode)this.Left).Value);
+                var r = ((StringNode)this.Right).Value;
+                return new BoolNode(l != r);
             }
 
             if (this.Left is BoolNode && this.Right is BoolNode)
             {
-                return new BoolNode(((BoolNode)this.Left).Value != ((BoolNode)this.Right).Value);
+                var l = Convert.ToBoolean(((BoolNode)this.Left).Value);
+                var r = Convert.ToBoolean(((BoolNode)this.Right).Value);
+                return new BoolNode(l != r);
             }
 
             return this;
