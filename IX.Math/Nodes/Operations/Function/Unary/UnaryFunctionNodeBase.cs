@@ -56,7 +56,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
                     }
                     else
                     {
-                        throw new ArgumentException(Resources.FunctionCouldNotBeFound);
+                        throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
                     }
                 }
             }
@@ -70,7 +70,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
 
             if (pi == null)
             {
-                throw new ArgumentException(Resources.FunctionCouldNotBeFound);
+                throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, parameterName), nameof(parameterName));
             }
 
             return Expression.Property(this.Parameter.GenerateExpression(), pi);

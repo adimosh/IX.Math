@@ -121,19 +121,13 @@
     <value>The requested function cannot be called with the specified operands, either because their number doesn't match the required number of operands, or because they have mismatched types.</value>
   </data>
   <data name="FunctionCouldNotBeFound" xml:space="preserve">
-    <value>The function cannot be found.</value>
+    <value>The function "{0}" cannot be found.</value>
   </data>
   <data name="NotValidInternally" xml:space="preserve">
     <value>The expression is either not logically sound, internally valid or its invocation was done with incorrect data.</value>
   </data>
   <data name="NumericTypeInvalid" xml:space="preserve">
     <value>The numerical type is either not a numerical type, or is not yet supported.</value>
-  </data>
-  <data name="NumericTypeMismatched" xml:space="preserve">
-    <value>The requested numerical type is mismatched considering the given arguments.</value>
-  </data>
-  <data name="OperandMismatchInFunctionCall" xml:space="preserve">
-    <value>The operands required for this function call are mismatched with the given operand expressions.</value>
   </data>
   <data name="ParameterMustBeFloatButAlreadyRequiredToBeInteger" xml:space="preserve">
     <value>The parameter {0} should be an float value lest the expression makes no sense, but it is already defined as obligatory integer.</value>

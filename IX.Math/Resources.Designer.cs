@@ -71,7 +71,7 @@ namespace IX.Math {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The function cannot be found..
+        ///   Looks up a localized string similar to The function &quot;{0}&quot; cannot be found..
         /// </summary>
         internal static string FunctionCouldNotBeFound {
             get {
@@ -94,24 +94,6 @@ namespace IX.Math {
         internal static string NumericTypeInvalid {
             get {
                 return ResourceManager.GetString("NumericTypeInvalid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The requested numerical type is mismatched considering the given arguments..
-        /// </summary>
-        internal static string NumericTypeMismatched {
-            get {
-                return ResourceManager.GetString("NumericTypeMismatched", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The operands required for this function call are mismatched with the given operand expressions..
-        /// </summary>
-        internal static string OperandMismatchInFunctionCall {
-            get {
-                return ResourceManager.GetString("OperandMismatchInFunctionCall", resourceCulture);
             }
         }
         

@@ -64,14 +64,14 @@ namespace IX.Math.Nodes.Operations.Function.Binary
 
                             if (mi == null)
                             {
-                                throw new ArgumentException(Resources.FunctionCouldNotBeFound);
+                                throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
                             }
                         }
                     }
                 }
                 else
                 {
-                    throw new ArgumentException(Resources.FunctionCouldNotBeFound);
+                    throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
                 }
             }
 

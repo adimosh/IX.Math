@@ -123,13 +123,16 @@
   <data name="NumericTypeInvalid" xml:space="preserve">
     <value>Die numerische Typ ist entweder keinem numerischen Typ oder wird noch nicht unterstützt.</value>
   </data>
-  <data name="NumericTypeMismatched" xml:space="preserve">
-    <value>Der angeforderte numerischen Typ ist falsch zugeordnet, unter Berücksichtigung der gegebenen Argumente.</value>
-  </data>
   <data name="FunctionCallNotValid" xml:space="preserve">
     <value>Die angeforderte Funktion kann nicht mit der angegebenen Operanden aufgerufen werden, weil ihre Zahl nicht die erforderliche Anzahl von Operanden übereinstimmt, oder weil sie Typen falsch zugeordnet haben.!</value>
   </data>
-  <data name="OperandMismatchInFunctionCall" xml:space="preserve">
-    <value>Die Operanden für dieser Funktionsaufruf erforderlichen Stimmen nicht überein mit den angegebenen Operanden ausdrücken.!</value>
+  <data name="FunctionCouldNotBeFound" xml:space="preserve">
+    <value>Die Funktion &amp;quot;{0}&amp;quot; kann nicht gefunden werden.</value>
+  </data>
+  <data name="ParameterMustBeFloatButAlreadyRequiredToBeInteger" xml:space="preserve">
+    <value>Der Parameter {0} sollte ein Float-Wert, damit der Ausdruck sein macht keinen Sinn, aber es ist bereits als obligatorisch ganze Zahl definiert.</value>
+  </data>
+  <data name="ParameterMustBeIntegerButAlreadyRequiredToBeFloat" xml:space="preserve">
+    <value>Der Parameter {0} sollte ein Integer-Wert, damit der Ausdruck sein macht keinen Sinn, aber es ist bereits als Pflicht float definiert.</value>
   </data>
 </root>

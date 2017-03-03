@@ -123,7 +123,16 @@
   <data name="NumericTypeInvalid" xml:space="preserve">
     <value>The numerical type is either not a numerical type, or is not yet supported.</value>
   </data>
-  <data name="NumericTypeMismatched" xml:space="preserve">
-    <value>The requested numerical type is mismatched considering the given arguments.</value>
+  <data name="FunctionCallNotValid" xml:space="preserve">
+    <value>The requested function cannot be called with the specified operands, either because their number doesn't match the required number of operands, or because they have mismatched types.</value>
+  </data>
+  <data name="FunctionCouldNotBeFound" xml:space="preserve">
+    <value>The function "{0}" cannot be found.</value>
+  </data>
+  <data name="ParameterMustBeFloatButAlreadyRequiredToBeInteger" xml:space="preserve">
+    <value>The parameter {0} should be an float value lest the expression makes no sense, but it is already defined as obligatory integer.</value>
+  </data>
+  <data name="ParameterMustBeIntegerButAlreadyRequiredToBeFloat" xml:space="preserve">
+    <value>The parameter {0} should be an integer value lest the expression makes no sense, but it is already defined as obligatory float.</value>
   </data>
 </root>
