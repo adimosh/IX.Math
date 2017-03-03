@@ -122,7 +122,7 @@ namespace IX.Math.Nodes.Operations.Binary
 
         protected override Expression GenerateExpressionInternal()
         {
-            var pars = this.GetExpressionsOfSameTypeFromOperands();
+            System.Tuple<Expression, Expression> pars = this.GetExpressionsOfSameTypeFromOperands();
             return Expression.Multiply(pars.Item1, pars.Item2);
         }
     }

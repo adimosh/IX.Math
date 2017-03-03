@@ -20,9 +20,6 @@ namespace IX.Math.Nodes.Parameters
 
         public override Expression GenerateStringExpression() => this.GenerateExpression();
 
-        protected override Expression GenerateExpressionInternal()
-        {
-            return Expression.Parameter(typeof(string), this.ParameterName);
-        }
+        protected override Expression GenerateExpressionInternal() => Expression.Parameter(typeof(string), this.ParameterName);
     }
 }

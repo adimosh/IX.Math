@@ -34,8 +34,8 @@ namespace IX.Math.Nodes.Operations.Binary
                 return new Tuple<Expression, Expression>(this.Left.GenerateStringExpression(), this.Right.GenerateStringExpression());
             }
 
-            var le = this.Left.GenerateExpression();
-            var re = this.Right.GenerateExpression();
+            Expression le = this.Left.GenerateExpression();
+            Expression re = this.Right.GenerateExpression();
 
             if (le.Type == typeof(double) && re.Type == typeof(long))
             {

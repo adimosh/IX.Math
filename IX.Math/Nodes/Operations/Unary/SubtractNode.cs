@@ -49,9 +49,6 @@ namespace IX.Math.Nodes.Operations.Unary
             }
         }
 
-        protected override Expression GenerateExpressionInternal()
-        {
-            return Expression.Subtract(Expression.Constant(0, typeof(long)), this.Operand.GenerateExpression());
-        }
+        protected override Expression GenerateExpressionInternal() => Expression.Subtract(Expression.Constant(0, typeof(long)), this.Operand.GenerateExpression());
     }
 }

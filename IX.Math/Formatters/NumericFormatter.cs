@@ -18,7 +18,7 @@ namespace IX.Math.Formatters
 
             object[] finalValues = new object[parameterValues.Length];
 
-            int i = 0;
+            var i = 0;
 
             while (i < finalValues.Length)
             {

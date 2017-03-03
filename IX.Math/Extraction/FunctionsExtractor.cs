@@ -14,7 +14,7 @@ namespace IX.Math.Extraction
         internal static void ReplaceFunctions(WorkingExpressionSet workingSet)
         {
             ReplaceOneFunction(string.Empty, workingSet);
-            for (int i = 1; i < workingSet.SymbolTable.Count; i++)
+            for (var i = 1; i < workingSet.SymbolTable.Count; i++)
             {
                 ReplaceOneFunction($"item{i}", workingSet);
             }
@@ -22,13 +22,13 @@ namespace IX.Math.Extraction
 
         private static void ReplaceOneFunction(string key, WorkingExpressionSet workingSet)
         {
-            var symbol = workingSet.SymbolTable[key];
+            RawExpressionContainer symbol = workingSet.SymbolTable[key];
             if (symbol.IsFunctionCall || symbol.IsString)
             {
                 return;
             }
 
-            string replaced = symbol.Expression;
+            var replaced = symbol.Expression;
             while (replaced != null)
             {
                 workingSet.SymbolTable[key] = new RawExpressionContainer(replaced);
@@ -38,7 +38,7 @@ namespace IX.Math.Extraction
 
         private static string ReplaceFunctions(string source, WorkingExpressionSet workingSet)
         {
-            int op = -1;
+            var op = -1;
 
             while (true)
             {
@@ -54,17 +54,17 @@ namespace IX.Math.Extraction
                     continue;
                 }
 
-                string functionHeaderCheck = source.Substring(0, op);
+                var functionHeaderCheck = source.Substring(0, op);
 
                 if (workingSet.AllSymbols.Any(p => functionHeaderCheck.EndsWith(p)))
                 {
                     continue;
                 }
 
-                string functionHeader = functionHeaderCheck.Split(workingSet.AllSymbols, StringSplitOptions.None).Last();
+                var functionHeader = functionHeaderCheck.Split(workingSet.AllSymbols, StringSplitOptions.None).Last();
 
-                int oop = source.IndexOf(workingSet.Definition.Parantheses.Item1, op + workingSet.Definition.Parantheses.Item1.Length);
-                int cp = source.IndexOf(workingSet.Definition.Parantheses.Item2, op + workingSet.Definition.Parantheses.Item2.Length);
+                var oop = source.IndexOf(workingSet.Definition.Parantheses.Item1, op + workingSet.Definition.Parantheses.Item1.Length);
+                var cp = source.IndexOf(workingSet.Definition.Parantheses.Item2, op + workingSet.Definition.Parantheses.Item2.Length);
 
                 while (oop < cp && oop != -1 && cp != -1)
                 {
@@ -77,23 +77,23 @@ namespace IX.Math.Extraction
                     continue;
                 }
 
-                string arguments = source.Substring(op + workingSet.Definition.Parantheses.Item1.Length, cp - op - workingSet.Definition.Parantheses.Item1.Length);
-                string originalArguments = arguments;
+                var arguments = source.Substring(op + workingSet.Definition.Parantheses.Item1.Length, cp - op - workingSet.Definition.Parantheses.Item1.Length);
+                var originalArguments = arguments;
 
-                string q = arguments;
+                var q = arguments;
                 while (q != null)
                 {
                     arguments = q;
                     q = ReplaceFunctions(q, workingSet);
                 }
 
-                List<string> argPlaceholders = new List<string>();
+                var argPlaceholders = new List<string>();
                 foreach (var s in arguments.Split(new[] { workingSet.Definition.ParameterSeparator }, StringSplitOptions.None))
                 {
                     TablePopulationGenerator.PopulateTables(s, workingSet);
 
                     // We check whether or not this is actually a constant
-                    string sa = ConstantsGenerator.CheckAndAdd(workingSet.ConstantsTable, workingSet.ReverseConstantsTable, workingSet.Expression, s);
+                    var sa = ConstantsGenerator.CheckAndAdd(workingSet.ConstantsTable, workingSet.ReverseConstantsTable, workingSet.Expression, s);
                     if (sa == null)
                     {
                         if (workingSet.ParametersTable.ContainsKey(s))
@@ -110,9 +110,9 @@ namespace IX.Math.Extraction
                     argPlaceholders.Add(sa);
                 }
 
-                string functionCallBody = $"{functionHeader}{workingSet.Definition.Parantheses.Item1}{string.Join(workingSet.Definition.ParameterSeparator, argPlaceholders)}{workingSet.Definition.Parantheses.Item2}";
-                string functionCallToReplace = $"{functionHeader}{workingSet.Definition.Parantheses.Item1}{originalArguments}{workingSet.Definition.Parantheses.Item2}";
-                string functionCallItem = SymbolExpressionGenerator.GenerateSymbolExpression(workingSet, functionCallBody, isFunction: true);
+                var functionCallBody = $"{functionHeader}{workingSet.Definition.Parantheses.Item1}{string.Join(workingSet.Definition.ParameterSeparator, argPlaceholders)}{workingSet.Definition.Parantheses.Item2}";
+                var functionCallToReplace = $"{functionHeader}{workingSet.Definition.Parantheses.Item1}{originalArguments}{workingSet.Definition.Parantheses.Item2}";
+                var functionCallItem = SymbolExpressionGenerator.GenerateSymbolExpression(workingSet, functionCallBody, isFunction: true);
 
                 return source.Replace(
                     functionCallToReplace,

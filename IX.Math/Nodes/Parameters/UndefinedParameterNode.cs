@@ -43,19 +43,10 @@ namespace IX.Math.Nodes.Parameters
 
         public StringParameterNode DetermineString() => ParametersGenerator.DetermineString(this.parametersTable, this.ParameterName);
 
-        public override Expression GenerateStringExpression()
-        {
-            throw new InvalidOperationException();
-        }
+        public override Expression GenerateStringExpression() => throw new InvalidOperationException();
 
-        public override NodeBase RefreshParametersRecursive()
-        {
-            return this.parametersTable[this.ParameterName];
-        }
+        public override NodeBase RefreshParametersRecursive() => this.parametersTable[this.ParameterName];
 
-        protected override Expression GenerateExpressionInternal()
-        {
-            throw new InvalidOperationException();
-        }
+        protected override Expression GenerateExpressionInternal() => throw new InvalidOperationException();
     }
 }

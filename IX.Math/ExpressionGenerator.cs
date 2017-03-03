@@ -108,9 +108,9 @@ namespace IX.Math
         {
             NodeBase[] nodes = new NodeBase[s.Length];
 
-            for (int i = 0; i < s.Length; i++)
+            for (var i = 0; i < s.Length; i++)
             {
-                var res = GenerateExpression(s[i], workingSet);
+                NodeBase res = GenerateExpression(s[i], workingSet);
                 if (res == null)
                 {
                     return null;
@@ -134,7 +134,7 @@ namespace IX.Math
                     workingSet);
             }
 
-            string s = expression.Expression;
+            var s = expression.Expression;
 
             // Expression might be an already-defined constant
             if (workingSet.ConstantsTable.TryGetValue(s, out var c1))
@@ -182,9 +182,9 @@ namespace IX.Math
             }
 
             // Check whether the expression is a binary operator
-            foreach (string op in workingSet.BinaryOperatorsInOrder.Where(p => s.Contains(p)))
+            foreach (var op in workingSet.BinaryOperatorsInOrder.Where(p => s.Contains(p)))
             {
-                var exp = ExpressionByBinaryOperator(s, op, workingSet);
+                NodeBase exp = ExpressionByBinaryOperator(s, op, workingSet);
                 if (exp != null)
                 {
                     return exp;
@@ -192,9 +192,9 @@ namespace IX.Math
             }
 
             // Check whether the expression is a unary operator
-            foreach (string op in workingSet.UnaryOperatorsInOrder.Where(p => s.Contains(p)))
+            foreach (var op in workingSet.UnaryOperatorsInOrder.Where(p => s.Contains(p)))
             {
-                var exp = ExpressionByUnaryOperator(s, op, workingSet);
+                NodeBase exp = ExpressionByUnaryOperator(s, op, workingSet);
                 if (exp != null)
                 {
                     return exp;
@@ -214,13 +214,13 @@ namespace IX.Math
             {
                 if (match.Success)
                 {
-                    string functionName = match.Groups["functionName"].Value;
-                    var expr = match.Groups["expression"].Value
+                    var functionName = match.Groups["functionName"].Value;
+                    RawExpressionContainer[] expr = match.Groups["expression"].Value
                         .Split(new[] { workingSet.Definition.ParameterSeparator }, StringSplitOptions.None)
                         .Select(p => new RawExpressionContainer(p))
                         .ToArray();
 
-                    var body = GenerateExpression(expr, workingSet);
+                    NodeBase[] body = GenerateExpression(expr, workingSet);
 
                     if (expr.Length == 1)
                     {
@@ -265,7 +265,7 @@ namespace IX.Math
         {
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
-            var split = s.Split(new[] { op }, StringSplitOptions.None);
+            string[] split = s.Split(new[] { op }, StringSplitOptions.None);
             if (split.Length > 1)
             {
                 if (string.IsNullOrWhiteSpace(split[0]))

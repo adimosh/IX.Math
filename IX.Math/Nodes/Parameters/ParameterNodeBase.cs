@@ -29,15 +29,9 @@ namespace IX.Math.Nodes.Parameters
             return this.cachedExpression;
         }
 
-        public override NodeBase RefreshParametersRecursive()
-        {
-            return this;
-        }
+        public override NodeBase RefreshParametersRecursive() => this;
 
-        public override NodeBase Simplify()
-        {
-            return this;
-        }
+        public override NodeBase Simplify() => this;
 
         protected abstract Expression GenerateExpressionInternal();
     }

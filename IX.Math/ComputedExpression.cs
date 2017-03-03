@@ -81,7 +81,7 @@ namespace IX.Math
                 return this.initialExpression;
             }
 
-            var convertedArguments = NumericFormatter.FormatArgumentsAccordingToParameters(arguments, this.parameters);
+            object[] convertedArguments = NumericFormatter.FormatArgumentsAccordingToParameters(arguments, this.parameters);
 
             this.body = this.body.RefreshParametersRecursive();
 
@@ -119,9 +119,9 @@ namespace IX.Math
                 return this.initialExpression;
             }
 
-            List<object> pars = new List<object>();
+            var pars = new List<object>();
 
-            foreach (var p in this.parameters)
+            foreach (ParameterNodeBase p in this.parameters)
             {
                 if (!dataFinder.TryGetData(p.ParameterName, out object data))
                 {
@@ -175,7 +175,7 @@ namespace IX.Math
                 return null;
             }
 
-            var result = Expression.Lambda(bodyExpression, this.parameters.Select(p => (ParameterExpression)p.GenerateExpression()))
+            Delegate result = Expression.Lambda(bodyExpression, this.parameters.Select(p => (ParameterExpression)p.GenerateExpression()))
                 ?.Compile();
 
             return result;

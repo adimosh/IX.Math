@@ -61,9 +61,6 @@ namespace IX.Math.Nodes.Operations.Unary
             }
         }
 
-        protected override Expression GenerateExpressionInternal()
-        {
-            return Expression.Not(this.Operand.GenerateExpression());
-        }
+        protected override Expression GenerateExpressionInternal() => Expression.Not(this.Operand.GenerateExpression());
     }
 }

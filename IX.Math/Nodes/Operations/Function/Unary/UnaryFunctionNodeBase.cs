@@ -60,7 +60,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
                 }
             }
 
-            var e = this.Parameter.GenerateExpression();
+            Expression e = this.Parameter.GenerateExpression();
 
             if (e.Type != parameterType)
             {

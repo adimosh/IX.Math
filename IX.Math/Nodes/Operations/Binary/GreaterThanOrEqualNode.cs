@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
@@ -115,7 +114,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (this.Left is NumericNode && this.Right is NumericNode)
             {
-                var value = NumericNode.ExtractFloats((NumericNode)this.Left, (NumericNode)this.Right);
+                System.Tuple<double, double> value = NumericNode.ExtractFloats((NumericNode)this.Left, (NumericNode)this.Right);
 
                 return new BoolNode(value.Item1 >= value.Item2);
             }
@@ -125,7 +124,7 @@ namespace IX.Math.Nodes.Operations.Binary
 
         protected override Expression GenerateExpressionInternal()
         {
-            var pars = this.GetExpressionsOfSameTypeFromOperands();
+            System.Tuple<Expression, Expression> pars = this.GetExpressionsOfSameTypeFromOperands();
             return Expression.GreaterThanOrEqual(pars.Item1, pars.Item2);
         }
     }

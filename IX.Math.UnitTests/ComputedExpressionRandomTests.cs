@@ -12,7 +12,7 @@ namespace IX.Math.UnitTests
         [Fact(DisplayName = "Tests the function \"random\".")]
         public void ComputedRandomFunctionCallExpression()
         {
-            ExpressionParsingService service = new ExpressionParsingService();
+            var service = new ExpressionParsingService();
 
             ComputedExpression del;
             try

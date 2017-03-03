@@ -27,14 +27,14 @@ namespace IX.Math.PlatformMitigation
                     return false;
                 }
 
-                var pars = p.GetParameters();
+                ParameterInfo[] pars = p.GetParameters();
 
                 if (pars.Length != parameters.Length)
                 {
                     return false;
                 }
 
-                for (int i = 0; i < parameters.Length; i++)
+                for (var i = 0; i < parameters.Length; i++)
                 {
                     if (pars[i].ParameterType != parameters[i])
                     {
@@ -53,14 +53,14 @@ namespace IX.Math.PlatformMitigation
                     return false;
                 }
 
-                var pars = p.GetParameters();
+                ParameterInfo[] pars = p.GetParameters();
 
                 if (pars.Length != parameters.Length)
                 {
                     return false;
                 }
 
-                for (int i = 0; i < parameters.Length; i++)
+                for (var i = 0; i < parameters.Length; i++)
                 {
                     if (pars[i].ParameterType != parameters[i])
                     {

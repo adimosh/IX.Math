@@ -24,7 +24,7 @@ namespace IX.Math.Generators
             }
             else
             {
-                string name = GenerateName(constantsTable.Keys, originalExpression);
+                var name = GenerateName(constantsTable.Keys, originalExpression);
                 constantsTable.Add(name, new StringNode(content.Substring(stringIndicator.Length, content.Length - stringIndicator.Length)));
                 reverseConstantsTable.Add(content, name);
                 return name;
@@ -45,14 +45,14 @@ namespace IX.Math.Generators
             {
                 if (NumericParsingFormatter.Parse(content, out object n))
                 {
-                    string name = GenerateName(constantsTable.Keys, originalExpression);
+                    var name = GenerateName(constantsTable.Keys, originalExpression);
                     constantsTable.Add(name, new NumericNode(n));
                     reverseConstantsTable.Add(content, name);
                     return name;
                 }
                 else if (bool.TryParse(content, out bool b))
                 {
-                    string name = GenerateName(constantsTable.Keys, originalExpression);
+                    var name = GenerateName(constantsTable.Keys, originalExpression);
                     constantsTable.Add(name, new BoolNode(b));
                     reverseConstantsTable.Add(content, name);
                     return name;
@@ -80,7 +80,7 @@ namespace IX.Math.Generators
                 constantsTable.Add(name, new NumericNode(value));
                 reverseConstantsTable.Add(value.ToString(), name);
 
-                foreach (string alternateName in alternateNames)
+                foreach (var alternateName in alternateNames)
                 {
                     reverseConstantsTable.Add(alternateName, name);
                 }
@@ -89,7 +89,7 @@ namespace IX.Math.Generators
 
         private static string GenerateName(IEnumerable<string> keys, string originalExpression)
         {
-            int index = int.Parse(keys.Where(p => p.StartsWith("Const") && p.Length > 5).LastOrDefault()?.Substring(5) ?? "0");
+            var index = int.Parse(keys.Where(p => p.StartsWith("Const") && p.Length > 5).LastOrDefault()?.Substring(5) ?? "0");
 
             do
             {

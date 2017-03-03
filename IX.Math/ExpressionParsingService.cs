@@ -69,7 +69,7 @@ namespace IX.Math
                 throw new ArgumentNullException(nameof(expression));
             }
 
-            WorkingExpressionSet workingSet = new WorkingExpressionSet(expression, this.workingDefinition, cancellationToken);
+            var workingSet = new WorkingExpressionSet(expression, this.workingDefinition, cancellationToken);
 
             ExpressionGenerator.CreateBody(workingSet);
 

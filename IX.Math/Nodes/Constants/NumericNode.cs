@@ -106,28 +106,28 @@ namespace IX.Math.Nodes.Constants
 
         public static NumericNode Divide(NumericNode left, NumericNode right)
         {
-            var floats = ExtractFloats(left, right);
+            Tuple<double, double> floats = ExtractFloats(left, right);
             return new NumericNode(floats.Item1 / floats.Item2);
         }
 
         public static NumericNode Power(NumericNode left, NumericNode right)
         {
-            var floats = ExtractFloats(left, right);
+            Tuple<double, double> floats = ExtractFloats(left, right);
             return new NumericNode(System.Math.Pow(floats.Item1, floats.Item2));
         }
 
         public static NumericNode LeftShift(NumericNode left, NumericNode right)
         {
-            int by = right.ExtractInt();
-            long data = left.ExtractInteger();
+            var by = right.ExtractInt();
+            var data = left.ExtractInteger();
 
             return new NumericNode(data << by);
         }
 
         public static NumericNode RightShift(NumericNode left, NumericNode right)
         {
-            int by = right.ExtractInt();
-            long data = left.ExtractInteger();
+            var by = right.ExtractInt();
+            var data = left.ExtractInteger();
 
             return new NumericNode(data >> by);
         }

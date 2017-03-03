@@ -75,8 +75,8 @@ namespace IX.Math.Nodes.Operations.Function.Binary
                 }
             }
 
-            var e1 = this.FirstParameter.GenerateExpression();
-            var e2 = this.SecondParameter.GenerateExpression();
+            Expression e1 = this.FirstParameter.GenerateExpression();
+            Expression e2 = this.SecondParameter.GenerateExpression();
 
             if (e1.Type != firstParameterType)
             {

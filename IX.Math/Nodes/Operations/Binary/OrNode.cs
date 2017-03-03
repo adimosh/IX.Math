@@ -189,9 +189,6 @@ namespace IX.Math.Nodes.Operations.Binary
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal()
-        {
-            return Expression.Or(this.Left.GenerateExpression(), this.Right.GenerateExpression());
-        }
+        protected override Expression GenerateExpressionInternal() => Expression.Or(this.Left.GenerateExpression(), this.Right.GenerateExpression());
     }
 }

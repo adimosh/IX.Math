@@ -259,7 +259,7 @@ namespace IX.Math.Nodes.Operations.Binary
 
         protected override Expression GenerateExpressionInternal()
         {
-            var pars = this.GetExpressionsOfSameTypeFromOperands();
+            Tuple<Expression, Expression> pars = this.GetExpressionsOfSameTypeFromOperands();
             return Expression.Equal(pars.Item1, pars.Item2);
         }
     }

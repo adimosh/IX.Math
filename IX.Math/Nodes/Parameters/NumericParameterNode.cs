@@ -57,11 +57,8 @@ namespace IX.Math.Nodes.Parameters
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal()
-        {
-            return (this.RequireFloat ?? true) ?
+        protected override Expression GenerateExpressionInternal() => (this.RequireFloat ?? true) ?
                 Expression.Parameter(typeof(double), this.ParameterName) :
                 Expression.Parameter(typeof(long), this.ParameterName);
-        }
     }
 }

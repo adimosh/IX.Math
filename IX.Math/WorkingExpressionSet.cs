@@ -94,11 +94,11 @@ namespace IX.Math
 
         internal void Initialize()
         {
-            var operators = this.AllOperatorsInOrder
+            IEnumerable<string> operators = this.AllOperatorsInOrder
                 .OrderByDescending(p => p.Length)
                 .Where(p => this.AllOperatorsInOrder.Any(q => q.Length < p.Length && p.Contains(q)));
 
-            int i = 1;
+            var i = 1;
             foreach (var op in operators.OrderByDescending(p => p.Length))
             {
                 var s = $"@op{i}@";
@@ -290,67 +290,53 @@ namespace IX.Math
             this.InitializeBinaryFunctions();
         }
 
-        private void InitializeUnaryOperators()
-        {
-            this.UnaryOperators = typeof(MathDefinition)
+        private void InitializeUnaryOperators() => this.UnaryOperators = typeof(MathDefinition)
                 .GetRuntimeProperties()
                 .Where(p => p.Name.EndsWith("Symbol"))
                 .Select(p => new { Name = p.Name.Substring(0, p.Name.Length - 6), Value = (string)p.GetValue(this.Definition) })
                 .Select(p => new { Name = p.Name, Type = Type.GetType($"IX.Math.Nodes.Operations.Unary.{p.Name}Node", false), Value = p.Value })
                 .Where(p => p.Type != null)
                 .ToDictionary(p => p.Value, p => p.Type);
-        }
 
-        private void InitializeBinaryOperators()
-        {
-            this.BinaryOperators = typeof(MathDefinition)
+        private void InitializeBinaryOperators() => this.BinaryOperators = typeof(MathDefinition)
                 .GetRuntimeProperties()
                 .Where(p => p.Name.EndsWith("Symbol"))
                 .Select(p => new { Name = p.Name.Substring(0, p.Name.Length - 6), Value = (string)p.GetValue(this.Definition) })
-                .Select(p => new { Name = p.Name, Type = Type.GetType($"IX.Math.Nodes.Operations.Binary.{p.Name}Node", false), Value=p.Value })
+                .Select(p => new { Name = p.Name, Type = Type.GetType($"IX.Math.Nodes.Operations.Binary.{p.Name}Node", false), Value = p.Value })
                 .Where(p => p.Type != null)
                 .ToDictionary(p => p.Value, p => p.Type);
-        }
 
-        private void InitializeUnaryFunctions()
+        private void InitializeUnaryFunctions() => this.UnaryFunctions = new Dictionary<string, Type>
         {
-            // TODO: Replace this with an injection mechanism
-            this.UnaryFunctions = new Dictionary<string, Type>
-            {
-                ["strlen"] = typeof(FunctionNodestrlen),
-                ["abs"] = typeof(FunctionNodeabs),
-                ["acos"] = typeof(FunctionNodeacos),
-                ["asin"] = typeof(FunctionNodeasin),
-                ["atan"] = typeof(FunctionNodeatan),
-                ["ceil"] = typeof(FunctionNodeceiling),
-                ["ceiling"] = typeof(FunctionNodeceiling),
-                ["cos"] = typeof(FunctionNodecos),
-                ["cosh"] = typeof(FunctionNodecosh),
-                ["exp"] = typeof(FunctionNodeexp),
-                ["floor"] = typeof(FunctionNodefloor),
-                ["ln"] = typeof(FunctionNodeln),
-                ["lg"] = typeof(FunctionNodelg),
-                ["random"] = typeof(FunctionNoderandom),
-                ["round"] = typeof(FunctionNoderound),
-                ["sin"] = typeof(FunctionNodesin),
-                ["sinh"] = typeof(FunctionNodesinh),
-                ["sqrt"] = typeof(FunctionNodesqrt),
-                ["tan"] = typeof(FunctionNodetan),
-                ["tanh"] = typeof(FunctionNodetanh),
-                ["trun"] = typeof(FunctionNodetrun),
-            };
-        }
+            ["strlen"] = typeof(FunctionNodestrlen),
+            ["abs"] = typeof(FunctionNodeabs),
+            ["acos"] = typeof(FunctionNodeacos),
+            ["asin"] = typeof(FunctionNodeasin),
+            ["atan"] = typeof(FunctionNodeatan),
+            ["ceil"] = typeof(FunctionNodeceiling),
+            ["ceiling"] = typeof(FunctionNodeceiling),
+            ["cos"] = typeof(FunctionNodecos),
+            ["cosh"] = typeof(FunctionNodecosh),
+            ["exp"] = typeof(FunctionNodeexp),
+            ["floor"] = typeof(FunctionNodefloor),
+            ["ln"] = typeof(FunctionNodeln),
+            ["lg"] = typeof(FunctionNodelg),
+            ["random"] = typeof(FunctionNoderandom),
+            ["round"] = typeof(FunctionNoderound),
+            ["sin"] = typeof(FunctionNodesin),
+            ["sinh"] = typeof(FunctionNodesinh),
+            ["sqrt"] = typeof(FunctionNodesqrt),
+            ["tan"] = typeof(FunctionNodetan),
+            ["tanh"] = typeof(FunctionNodetanh),
+            ["trun"] = typeof(FunctionNodetrun),
+        };
 
-        private void InitializeBinaryFunctions()
+        private void InitializeBinaryFunctions() => this.BinaryFunctions = new Dictionary<string, Type>
         {
-            // TODO: Replace this with an injection mechanism
-            this.BinaryFunctions = new Dictionary<string, Type>
-            {
-                ["log"] = typeof(FunctionNodelog),
-                ["min"] = typeof(FunctionNodemin),
-                ["max"] = typeof(FunctionNodemax),
-                ["pow"] = typeof(FunctionNodepow),
-            };
-        }
+            ["log"] = typeof(FunctionNodelog),
+            ["min"] = typeof(FunctionNodemin),
+            ["max"] = typeof(FunctionNodemax),
+            ["pow"] = typeof(FunctionNodepow),
+        };
     }
 }

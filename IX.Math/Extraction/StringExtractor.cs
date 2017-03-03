@@ -16,18 +16,18 @@ namespace IX.Math.Extraction
             string originalExpression,
             string stringIndicator)
         {
-            string process = originalExpression;
+            var process = originalExpression;
 
             while (true)
             {
-                int op = process.IndexOf(stringIndicator);
+                var op = process.IndexOf(stringIndicator);
 
                 if (op == -1)
                 {
                     break;
                 }
 
-                int cp = process.IndexOf(stringIndicator, op + stringIndicator.Length);
+                var cp = process.IndexOf(stringIndicator, op + stringIndicator.Length);
 
                 escapeRoute:
                 if (cp == -1 || (cp + stringIndicator.Length) > process.Length)
@@ -41,7 +41,7 @@ namespace IX.Math.Extraction
                     goto escapeRoute;
                 }
 
-                string itemName = ConstantsGenerator.GenerateStringConstant(
+                var itemName = ConstantsGenerator.GenerateStringConstant(
                     constantsTable,
                     reverseConstantsTable,
                     process,

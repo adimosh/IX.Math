@@ -54,10 +54,8 @@ namespace IX.Math
         /// <param name="expression">The expression to interpret.</param>
         /// <param name="cancellationToken">The cancellation token for this operation.</param>
         /// <returns>A <see cref="ComputedExpression"/> that represents the interpreted expression.</returns>
-        public ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return this.cachedComputedExpressions.GetOrAdd(expression, expr => this.eps.Interpret(expr, cancellationToken));
-        }
+        public ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default(CancellationToken)) =>
+            this.cachedComputedExpressions.GetOrAdd(expression, expr => this.eps.Interpret(expr, cancellationToken));
 
         /// <inheritdoc />
         public void Dispose()

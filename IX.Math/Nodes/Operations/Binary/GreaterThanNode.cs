@@ -115,7 +115,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (this.Left is NumericNode && this.Right is NumericNode)
             {
-                var value = NumericNode.ExtractFloats((NumericNode)this.Left, (NumericNode)this.Right);
+                Tuple<double, double> value = NumericNode.ExtractFloats((NumericNode)this.Left, (NumericNode)this.Right);
 
                 return new BoolNode(value.Item1 > value.Item2);
             }
@@ -125,7 +125,7 @@ namespace IX.Math.Nodes.Operations.Binary
 
         protected override Expression GenerateExpressionInternal()
         {
-            var pars = this.GetExpressionsOfSameTypeFromOperands();
+            Tuple<Expression, Expression> pars = this.GetExpressionsOfSameTypeFromOperands();
             return Expression.GreaterThan(pars.Item1, pars.Item2);
         }
     }

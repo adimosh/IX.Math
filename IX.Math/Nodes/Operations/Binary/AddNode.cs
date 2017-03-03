@@ -278,7 +278,7 @@ namespace IX.Math.Nodes.Operations.Binary
 
         protected override Expression GenerateExpressionInternal()
         {
-            var pars = this.GetExpressionsOfSameTypeFromOperands();
+            System.Tuple<Expression, Expression> pars = this.GetExpressionsOfSameTypeFromOperands();
 
             if (this.ReturnType == SupportedValueType.String)
             {

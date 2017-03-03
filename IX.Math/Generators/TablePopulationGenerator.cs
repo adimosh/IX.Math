@@ -12,7 +12,7 @@ namespace IX.Math.Generators
             string p,
             WorkingExpressionSet workingSet)
         {
-            var expressions = p.Split(workingSet.AllOperatorsInOrder, StringSplitOptions.RemoveEmptyEntries);
+            string[] expressions = p.Split(workingSet.AllOperatorsInOrder, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var exp in expressions)
             {

@@ -10,9 +10,7 @@ namespace IX.Math.UnitTests
 {
     public class ComputedExpressionTests
     {
-        public static object[][] ProvideDataForTheory()
-        {
-            return new object[][]
+        public static object[][] ProvideDataForTheory() => new object[][]
             {
                 new object[]
                 {
@@ -627,13 +625,12 @@ namespace IX.Math.UnitTests
                     5.5,
                 },
             };
-        }
 
         [Theory(DisplayName = "Para")]
         [MemberData(nameof(ProvideDataForTheory))]
         public void ComputedExpressionWithParameters(string expression, object[] parameters, object expectedResult)
         {
-            ExpressionParsingService service = new ExpressionParsingService();
+            var service = new ExpressionParsingService();
 
             ComputedExpression del;
             try
@@ -667,8 +664,8 @@ namespace IX.Math.UnitTests
         [MemberData(nameof(ProvideDataForTheory))]
         public void ComputedExpressionWithFinder(string expression, object[] parameters, object expectedResult)
         {
-            ExpressionParsingService service = new ExpressionParsingService();
-            Mock<IDataFinder> finder = new Mock<IDataFinder>(MockBehavior.Loose);
+            var service = new ExpressionParsingService();
+            var finder = new Mock<IDataFinder>(MockBehavior.Loose);
 
             ComputedExpression del;
             try
@@ -685,10 +682,10 @@ namespace IX.Math.UnitTests
                 throw new InvalidOperationException("No computed expression was generated!");
             }
 
-            for (int i = 0; i < System.Math.Min(del.ParameterNames.Length, parameters.Length); i++)
+            for (var i = 0; i < System.Math.Min(del.ParameterNames.Length, parameters.Length); i++)
             {
-                string valueName = del.ParameterNames[i];
-                object outValue = parameters[i];
+                var valueName = del.ParameterNames[i];
+                var outValue = parameters[i];
 
                 finder.Setup(p => p.TryGetData(valueName, out outValue)).Returns(true);
             }

@@ -12,7 +12,7 @@ namespace IX.Math.Generators
     {
         public static void GenerateParameter(IDictionary<string, ParameterNodeBase> parameters, string name)
         {
-            string trueName = name.ToLower();
+            var trueName = name.ToLower();
 
             if (!parameters.ContainsKey(trueName))
             {
@@ -22,7 +22,7 @@ namespace IX.Math.Generators
 
         public static NumericParameterNode DetermineNumeric(IDictionary<string, ParameterNodeBase> parameters, string name, bool? determineFloat)
         {
-            string trueName = name.ToLower();
+            var trueName = name.ToLower();
 
             if (parameters.TryGetValue(trueName, out var p))
             {
@@ -64,7 +64,7 @@ namespace IX.Math.Generators
 
         public static BoolParameterNode DetermineBool(IDictionary<string, ParameterNodeBase> parameters, string name)
         {
-            string trueName = name.ToLower();
+            var trueName = name.ToLower();
 
             if (parameters.TryGetValue(trueName, out var p))
             {
@@ -93,7 +93,7 @@ namespace IX.Math.Generators
 
         public static StringParameterNode DetermineString(IDictionary<string, ParameterNodeBase> parameters, string name)
         {
-            string trueName = name.ToLower();
+            var trueName = name.ToLower();
 
             if (parameters.TryGetValue(trueName, out var p))
             {
