@@ -45,23 +45,29 @@ namespace IX.Math.Nodes.Operations.Function.Unary
                     parameterType = typeof(long);
 
                     mi = t.GetTypeMethod(functionName, parameterType);
-                }
-                else
-                {
+
                     if (mi == null)
                     {
                         parameterType = typeof(int);
 
                         mi = t.GetTypeMethod(functionName, parameterType);
-                    }
-                    else
-                    {
-                        throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+
+                        if (mi == null)
+                        {
+                            throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                        }
                     }
                 }
             }
 
-            return Expression.Call(mi, this.Parameter.GenerateExpression());
+            var e = this.Parameter.GenerateExpression();
+
+            if (e.Type != parameterType)
+            {
+                e = Expression.Convert(e, parameterType);
+            }
+
+            return Expression.Call(mi, e);
         }
 
         protected Expression GenerateStaticUnaryPropertyCall<T>(string parameterName)
