@@ -500,6 +500,54 @@ namespace IX.Math.UnitTests
                     new object[2] { 1, 0 },
                     true,
                 },
+                new object[]
+                {
+                    "abs(x)",
+                    new object[] { -1 },
+                    1D,
+                },
+                new object[]
+                {
+                    "abs(0x1)",
+                    new object[0],
+                    1L,
+                },
+                new object[]
+                {
+                    "sqrt(x)",
+                    new object[] { 2 },
+                    1.4142135623730951,
+                },
+                new object[]
+                {
+                    "sqrt(x)",
+                    new object[] { 9 },
+                    3D,
+                },
+                new object[]
+                {
+                    "ceil(x)",
+                    new object[] { 2.2 },
+                    3D,
+                },
+                new object[]
+                {
+                    "floor(x)",
+                    new object[] { 4.9 },
+                    4D,
+                },
+                new object[]
+                {
+                    "round(x)",
+                    new object[] { 3.5 },
+                    4D,
+                },
+                new object[]
+                {
+                    "round(x)",
+                    new object[] { 2.49 },
+                    2D,
+                },
             };
         }
 

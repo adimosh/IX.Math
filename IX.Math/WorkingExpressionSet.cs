@@ -322,6 +322,7 @@ namespace IX.Math
                 ["acos"] = typeof(FunctionNodeacos),
                 ["asin"] = typeof(FunctionNodeasin),
                 ["atan"] = typeof(FunctionNodeatan),
+                ["ceil"] = typeof(FunctionNodeceiling),
                 ["ceiling"] = typeof(FunctionNodeceiling),
                 ["cos"] = typeof(FunctionNodecos),
                 ["cosh"] = typeof(FunctionNodecosh),

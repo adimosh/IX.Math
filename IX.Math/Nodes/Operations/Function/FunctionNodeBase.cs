@@ -21,13 +21,13 @@ namespace IX.Math.Nodes.Operations.Function
                         switch (parameter)
                         {
                             case NumericParameterNode nn:
-                                if (nn.RequireFloat == true)
+                                if (nn.RequireFloat == false)
                                 {
-                                    parameterType = typeof(double);
+                                    parameterType = typeof(long);
                                 }
                                 else
                                 {
-                                    parameterType = typeof(long);
+                                    parameterType = typeof(double);
                                 }
 
                                 break;
