@@ -330,6 +330,7 @@ namespace IX.Math
                 ["floor"] = typeof(FunctionNodefloor),
                 ["ln"] = typeof(FunctionNodeln),
                 ["lg"] = typeof(FunctionNodelg),
+                ["random"] = typeof(FunctionNoderandom),
                 ["round"] = typeof(FunctionNoderound),
                 ["sin"] = typeof(FunctionNodesin),
                 ["sinh"] = typeof(FunctionNodesinh),

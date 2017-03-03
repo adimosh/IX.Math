@@ -35,7 +35,7 @@ namespace IX.Math.Nodes.Operations.Function
                                 parameterType = cn.Value.GetType();
                                 break;
                             default:
-                                parameterType = typeof(long);
+                                parameterType = typeof(double);
                                 break;
                         }
                     }

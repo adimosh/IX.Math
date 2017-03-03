@@ -25,19 +25,8 @@ namespace IX.Math.Nodes.Operations.Function.Unary
             return this;
         }
 
-        protected Expression GenerateStaticUnaryFunctionCall<T>(string functionName)
-        {
-            Type parameterType = ParameterTypeFromParameter(this.Parameter);
-
-            MethodInfo mi = typeof(T).GetTypeMethod(functionName, parameterType);
-
-            if (mi == null)
-            {
-                throw new ArgumentException(Resources.FunctionCouldNotBeFound);
-            }
-
-            return Expression.Call(mi, this.Parameter.GenerateExpression());
-        }
+        protected Expression GenerateStaticUnaryFunctionCall<T>(string functionName) =>
+            this.GenerateStaticUnaryFunctionCall(typeof(T), functionName);
 
         protected Expression GenerateStaticUnaryFunctionCall(Type t, string functionName)
         {
@@ -47,7 +36,29 @@ namespace IX.Math.Nodes.Operations.Function.Unary
 
             if (mi == null)
             {
-                throw new ArgumentException(Resources.FunctionCouldNotBeFound);
+                parameterType = typeof(double);
+
+                mi = t.GetTypeMethod(functionName, parameterType);
+
+                if (mi == null)
+                {
+                    parameterType = typeof(long);
+
+                    mi = t.GetTypeMethod(functionName, parameterType);
+                }
+                else
+                {
+                    if (mi == null)
+                    {
+                        parameterType = typeof(int);
+
+                        mi = t.GetTypeMethod(functionName, parameterType);
+                    }
+                    else
+                    {
+                        throw new ArgumentException(Resources.FunctionCouldNotBeFound);
+                    }
+                }
             }
 
             return Expression.Call(mi, this.Parameter.GenerateExpression());

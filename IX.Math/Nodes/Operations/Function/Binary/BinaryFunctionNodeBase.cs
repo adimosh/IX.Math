@@ -29,20 +29,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             return this;
         }
 
-        protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName)
-        {
-            Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
-            Type secondParameterType = ParameterTypeFromParameter(this.SecondParameter);
-
-            MethodInfo mi = typeof(T).GetTypeMethod(functionName, firstParameterType, secondParameterType);
-
-            if (mi == null)
-            {
-                throw new ArgumentException(Resources.FunctionCouldNotBeFound);
-            }
-
-            return Expression.Call(mi, this.FirstParameter.GenerateExpression(), this.SecondParameter.GenerateExpression());
-        }
+        protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName) => this.GenerateStaticBinaryFunctionCall(typeof(T), functionName);
 
         protected Expression GenerateStaticBinaryFunctionCall(Type t, string functionName)
         {
@@ -53,10 +40,55 @@ namespace IX.Math.Nodes.Operations.Function.Binary
 
             if (mi == null)
             {
-                throw new ArgumentException(Resources.FunctionCouldNotBeFound);
+                if ((firstParameterType == typeof(long) && secondParameterType == typeof(double)) ||
+                    (firstParameterType == typeof(double) && secondParameterType == typeof(long)))
+                {
+                    firstParameterType = typeof(double);
+                    secondParameterType = typeof(double);
+
+                    mi = t.GetTypeMethod(functionName, firstParameterType, secondParameterType);
+
+                    if (mi == null)
+                    {
+                        firstParameterType = typeof(long);
+                        secondParameterType = typeof(long);
+
+                        mi = t.GetTypeMethod(functionName, firstParameterType, secondParameterType);
+
+                        if (mi == null)
+                        {
+                            firstParameterType = typeof(int);
+                            secondParameterType = typeof(int);
+
+                            mi = t.GetTypeMethod(functionName, firstParameterType, secondParameterType);
+
+                            if (mi == null)
+                            {
+                                throw new ArgumentException(Resources.FunctionCouldNotBeFound);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException(Resources.FunctionCouldNotBeFound);
+                }
             }
 
-            return Expression.Call(mi, this.FirstParameter.GenerateExpression(), this.SecondParameter.GenerateExpression());
+            var e1 = this.FirstParameter.GenerateExpression();
+            var e2 = this.SecondParameter.GenerateExpression();
+
+            if (e1.Type != firstParameterType)
+            {
+                e1 = Expression.Convert(e1, firstParameterType);
+            }
+
+            if (e2.Type != secondParameterType)
+            {
+                e2 = Expression.Convert(e2, secondParameterType);
+            }
+
+            return Expression.Call(mi, e1, e2);
         }
     }
 }

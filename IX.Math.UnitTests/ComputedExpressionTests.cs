@@ -548,6 +548,30 @@ namespace IX.Math.UnitTests
                     new object[] { 2.49 },
                     2D,
                 },
+                new object[]
+                {
+                    "(2*max(x,500)-y)/pow(x,2)",
+                    new object[] { 217, 323 },
+                    0.014377030729045,
+                },
+                new object[]
+                {
+                    "min(max(x,y),10)",
+                    new object[] { 5, 3 },
+                    5D,
+                },
+                new object[]
+                {
+                    "min(max(x,y),max(y,500)*2-min(995,pow(x,200)))",
+                    new object[] { 5, 3 },
+                    5D,
+                },
+                new object[]
+                {
+                    "max(max(x,y),max(y,500)*2-995)",
+                    new object[] { 5.5, 3 },
+                    5.5,
+                },
             };
         }
 
