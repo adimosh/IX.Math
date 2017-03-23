@@ -1,4 +1,4 @@
-﻿// <copyright file="ComputedExpressionTests.cs" company="Adrian Mos">
+// <copyright file="ComputedExpressionTests.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -227,6 +227,12 @@ namespace IX.Math.UnitTests
                     "x>>y",
                     new object[2] { 3, 1 },
                     1L,
+                },
+                new object[]
+                {
+                    "0x1123>>8",
+                    new object[0],
+                    17L,
                 },
                 new object[]
                 {

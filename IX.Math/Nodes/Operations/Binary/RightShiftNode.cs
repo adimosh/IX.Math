@@ -120,9 +120,9 @@ namespace IX.Math.Nodes.Operations.Binary
 
         public override NodeBase Simplify()
         {
-            if (this.Right is NumericNode && this.Right is NumericNode)
+            if (this.Left is NumericNode && this.Right is NumericNode)
             {
-                return NumericNode.RightShift((NumericNode)this.Right, (NumericNode)this.Right);
+                return NumericNode.RightShift((NumericNode)this.Left, (NumericNode)this.Right);
             }
 
             return this;
