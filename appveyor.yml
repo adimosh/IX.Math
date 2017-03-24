@@ -9,4 +9,4 @@ build_script:
 
     dotnet build IX.Math.sln
 test_script:
-- cmd: dotnet test IX.Math.sln
+- cmd: dotnet test IX.Math.UnitTests\IX.Math.UnitTests.csproj
