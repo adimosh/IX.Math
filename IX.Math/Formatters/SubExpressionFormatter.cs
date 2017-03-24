@@ -6,9 +6,6 @@ namespace IX.Math.Formatters
 {
     internal static class SubExpressionFormatter
     {
-        internal static string Cleanup(string expression)
-        {
-            return expression.Trim().Replace(" ", string.Empty);
-        }
+        internal static string Cleanup(string expression) => expression.Trim().Replace(" ", string.Empty);
     }
 }

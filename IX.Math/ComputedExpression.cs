@@ -85,7 +85,18 @@ namespace IX.Math
 
             this.body = this.body.RefreshParametersRecursive();
 
-            Delegate del = this.GetDelegate();
+            Delegate del;
+            try
+            {
+                del = Expression.Lambda(
+                        this.body.GenerateExpression(),
+                        this.parameters.Select(p => (ParameterExpression)p.GenerateExpression()))
+                    ?.Compile();
+            }
+            catch
+            {
+                del = null;
+            }
 
             if (del == null)
             {
@@ -161,24 +172,6 @@ namespace IX.Math
 
                 this.disposedValue = true;
             }
-        }
-
-        private Delegate GetDelegate()
-        {
-            Expression bodyExpression;
-            try
-            {
-                bodyExpression = this.body.GenerateExpression();
-            }
-            catch
-            {
-                return null;
-            }
-
-            Delegate result = Expression.Lambda(bodyExpression, this.parameters.Select(p => (ParameterExpression)p.GenerateExpression()))
-                ?.Compile();
-
-            return result;
         }
     }
 }

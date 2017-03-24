@@ -10,6 +10,10 @@ supports integer numbers (as [long](https://msdn.microsoft.com/en-us/library/sys
 boolean (as [bool](https://msdn.microsoft.com/en-us/library/system.boolean.aspx)) values, and can compute the most common mathemtic operations, as well as
 certain mathematics functions.
 
+## Code health
+- Build status: [![Build status](https://ci.appveyor.com/api/projects/status/dq2codv2mo32le37?svg=true)](https://ci.appveyor.com/project/adimosh/ix-math)
+- Master branch status: [![Build status](https://ci.appveyor.com/api/projects/status/dq2codv2mo32le37/branch/master?svg=true)](https://ci.appveyor.com/project/adimosh/ix-math/branch/master)
+
 ## Usage
 
 This library is based on two implementations of the interface IExpressionParsingService:

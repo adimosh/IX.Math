@@ -43,37 +43,37 @@ namespace IX.Math.Formatters
             {
                 return ParseSpecific(expression, out result);
             }
-        }
 
-        private static bool ParseSpecific(string expression, out object result)
-        {
-            IFormatProvider formatProvider = CultureInfo.CurrentCulture;
+            bool ParseHexSpecific(string hexExpression, out object hexResult)
+            {
+                if (long.TryParse(hexExpression, HexNumberStyle, CultureInfo.CurrentCulture, out long intVal))
+                {
+                    hexResult = intVal;
+                    return true;
+                }
 
-            if (long.TryParse(expression, IntegerNumberStyle, formatProvider, out long intVal))
-            {
-                result = intVal;
-                return true;
-            }
-            else if (double.TryParse(expression, FloatNumberStyle, formatProvider, out double doubleVal))
-            {
-                result = doubleVal;
-                return true;
+                hexResult = null;
+                return false;
             }
 
-            result = null;
-            return false;
-        }
-
-        private static bool ParseHexSpecific(string expression, out object result)
-        {
-            if (long.TryParse(expression, HexNumberStyle, CultureInfo.CurrentCulture, out long intVal))
+            bool ParseSpecific(string specificExpression, out object specificResult)
             {
-                result = intVal;
-                return true;
-            }
+                IFormatProvider formatProvider = CultureInfo.CurrentCulture;
 
-            result = null;
-            return false;
+                if (long.TryParse(specificExpression, IntegerNumberStyle, formatProvider, out long intVal))
+                {
+                    specificResult = intVal;
+                    return true;
+                }
+                else if (double.TryParse(specificExpression, FloatNumberStyle, formatProvider, out double doubleVal))
+                {
+                    specificResult = doubleVal;
+                    return true;
+                }
+
+                specificResult = null;
+                return false;
+            }
         }
     }
 }

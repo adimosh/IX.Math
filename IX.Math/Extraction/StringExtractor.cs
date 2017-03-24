@@ -8,8 +8,19 @@ using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Extraction
 {
+    /// <summary>
+    /// A class to extract strings.
+    /// </summary>
     internal static class StringExtractor
     {
+        /// <summary>
+        /// Extracts the string constants and replaces them with expression placeholders.
+        /// </summary>
+        /// <param name="constantsTable">The constants table.</param>
+        /// <param name="reverseConstantsTable">The reverse constants table.</param>
+        /// <param name="originalExpression">The original expression.</param>
+        /// <param name="stringIndicator">The string indicator.</param>
+        /// <returns>The new expression.</returns>
         internal static string ExtractStringConstants(
             IDictionary<string, ConstantNodeBase> constantsTable,
             IDictionary<string, string> reverseConstantsTable,
