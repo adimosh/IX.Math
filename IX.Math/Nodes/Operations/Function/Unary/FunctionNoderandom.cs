@@ -2,9 +2,9 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Generators;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
@@ -13,8 +13,6 @@ namespace IX.Math.Nodes.Operations.Function.Unary
     [DebuggerDisplay("random({Parameter})")]
     internal sealed class FunctionNoderandom : UnaryFunctionNodeBase
     {
-        private static readonly Random RandomGenerator = new Random();
-
         public FunctionNoderandom(NumericNode parameter)
             : base(parameter)
         {
@@ -26,7 +24,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
         }
 
         public FunctionNoderandom(UndefinedParameterNode parameter)
-            : base(parameter?.DetermineNumeric().ParameterMustBeInteger())
+            : base(parameter?.DetermineNumeric())
         {
         }
 
@@ -41,14 +39,14 @@ namespace IX.Math.Nodes.Operations.Function.Unary
 
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
-        public static long GenerateRandom(int max) => RandomGenerator.Next(max);
+        public static double GenerateRandom(double max) => RandomNumberGenerator.Generate(max);
 
         public override NodeBase Simplify()
         {
             NumericNode stringParam;
             if ((stringParam = this.Parameter as NumericNode) != null)
             {
-                return new NumericNode(GenerateRandom(stringParam.ExtractInt()));
+                return new NumericNode(GenerateRandom(stringParam.ExtractFloat()));
             }
 
             return this;

@@ -321,7 +321,7 @@ namespace IX.Math
             ["floor"] = typeof(FunctionNodefloor),
             ["ln"] = typeof(FunctionNodeln),
             ["lg"] = typeof(FunctionNodelg),
-            ["random"] = typeof(FunctionNoderandom),
+            ["random"] = typeof(Nodes.Operations.Function.Unary.FunctionNoderandom),
             ["round"] = typeof(FunctionNoderound),
             ["sin"] = typeof(FunctionNodesin),
             ["sinh"] = typeof(FunctionNodesinh),
@@ -337,6 +337,7 @@ namespace IX.Math
             ["min"] = typeof(FunctionNodemin),
             ["max"] = typeof(FunctionNodemax),
             ["pow"] = typeof(FunctionNodepow),
+            ["random"] = typeof(Nodes.Operations.Function.Binary.FunctionNoderandom),
         };
     }
 }
