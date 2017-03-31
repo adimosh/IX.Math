@@ -1,4 +1,4 @@
-﻿// <copyright file="FunctionNodePow.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeMinimum.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -10,21 +10,21 @@ using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
-    [DebuggerDisplay("pow({FirstParameter}, {SecondParameter})")]
-    [CallableMathematicsFunction("pow", "power")]
-    internal sealed class FunctionNodePow : BinaryFunctionNodeBase
+    [DebuggerDisplay("min({FirstParameter}, {SecondParameter})")]
+    [CallableMathematicsFunction("min", "minimum")]
+    internal sealed class FunctionNodeMinimum : BinaryFunctionNodeBase
     {
-        public FunctionNodePow(NumericNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeMinimum(NumericNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodePow(NumericNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeMinimum(NumericNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodePow(NumericNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeMinimum(NumericNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -33,17 +33,17 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodePow(NumericParameterNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeMinimum(NumericParameterNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodePow(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeMinimum(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodePow(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeMinimum(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -52,7 +52,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodePow(OperationNodeBase firstParameter, NumericNode secondParameter)
+        public FunctionNodeMinimum(OperationNodeBase firstParameter, NumericNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -61,7 +61,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodePow(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeMinimum(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -70,7 +70,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodePow(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeMinimum(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter?.Simplify(), secondParameter?.Simplify())
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -84,12 +84,12 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodePow(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeMinimum(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.DetermineNumeric(), secondParameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodePow(UndefinedParameterNode firstParameter, NodeBase secondParameter)
+        public FunctionNodeMinimum(UndefinedParameterNode firstParameter, NodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter.ReturnType == SupportedValueType.Numeric)
@@ -102,7 +102,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodePow(NodeBase firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeMinimum(NodeBase firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter.ReturnType == SupportedValueType.Numeric)
@@ -123,12 +123,12 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             if ((firstParam = this.FirstParameter as NumericNode) != null &&
                 (secondParam = this.SecondParameter as NumericNode) != null)
             {
-                return new NumericNode(System.Math.Pow(firstParam.ExtractFloat(), secondParam.ExtractFloat()));
+                return new NumericNode(System.Math.Min(firstParam.ExtractFloat(), secondParam.ExtractFloat()));
             }
 
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall(typeof(System.Math), nameof(System.Math.Pow));
+        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall(typeof(System.Math), nameof(System.Math.Min));
     }
 }

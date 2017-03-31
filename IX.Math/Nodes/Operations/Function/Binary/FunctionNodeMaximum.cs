@@ -1,4 +1,4 @@
-﻿// <copyright file="FunctionNodeMin.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeMaximum.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -10,21 +10,21 @@ using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
-    [DebuggerDisplay("min({FirstParameter}, {SecondParameter})")]
-    [CallableMathematicsFunction("min", "minimum")]
-    internal sealed class FunctionNodeMin : BinaryFunctionNodeBase
+    [DebuggerDisplay("max({FirstParameter}, {SecondParameter})")]
+    [CallableMathematicsFunction("max", "maximum")]
+    internal sealed class FunctionNodeMaximum : BinaryFunctionNodeBase
     {
-        public FunctionNodeMin(NumericNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeMaximum(NumericNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeMin(NumericNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeMaximum(NumericNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeMin(NumericNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeMaximum(NumericNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -33,17 +33,17 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeMin(NumericParameterNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeMaximum(NumericParameterNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeMin(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeMaximum(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeMin(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeMaximum(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -52,7 +52,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeMin(OperationNodeBase firstParameter, NumericNode secondParameter)
+        public FunctionNodeMaximum(OperationNodeBase firstParameter, NumericNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -61,7 +61,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeMin(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeMaximum(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -70,7 +70,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeMin(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeMaximum(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter?.Simplify(), secondParameter?.Simplify())
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -84,12 +84,12 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeMin(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeMaximum(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.DetermineNumeric(), secondParameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodeMin(UndefinedParameterNode firstParameter, NodeBase secondParameter)
+        public FunctionNodeMaximum(UndefinedParameterNode firstParameter, NodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter.ReturnType == SupportedValueType.Numeric)
@@ -102,7 +102,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeMin(NodeBase firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeMaximum(NodeBase firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter.ReturnType == SupportedValueType.Numeric)
@@ -123,12 +123,12 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             if ((firstParam = this.FirstParameter as NumericNode) != null &&
                 (secondParam = this.SecondParameter as NumericNode) != null)
             {
-                return new NumericNode(System.Math.Min(firstParam.ExtractFloat(), secondParam.ExtractFloat()));
+                return new NumericNode(System.Math.Max(firstParam.ExtractFloat(), secondParam.ExtractFloat()));
             }
 
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall(typeof(System.Math), nameof(System.Math.Min));
+        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall(typeof(System.Math), nameof(System.Math.Max));
     }
 }

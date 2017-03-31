@@ -1,29 +1,30 @@
-﻿// <copyright file="FunctionNoderandom.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeLogarithm.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
-using IX.Math.Generators;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
-    [DebuggerDisplay("random({FirstParameter}, {SecondParameter})")]
-    internal sealed class FunctionNoderandom : BinaryFunctionNodeBase
+    [DebuggerDisplay("log({FirstParameter}, {SecondParameter})")]
+    [CallableMathematicsFunction("log", "logarithm")]
+    internal sealed class FunctionNodeLogarithm : BinaryFunctionNodeBase
     {
-        public FunctionNoderandom(NumericNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeLogarithm(NumericNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNoderandom(NumericNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeLogarithm(NumericNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNoderandom(NumericNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeLogarithm(NumericNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -32,17 +33,17 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNoderandom(NumericParameterNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeLogarithm(NumericParameterNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNoderandom(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeLogarithm(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNoderandom(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeLogarithm(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -51,7 +52,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNoderandom(OperationNodeBase firstParameter, NumericNode secondParameter)
+        public FunctionNodeLogarithm(OperationNodeBase firstParameter, NumericNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -60,7 +61,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNoderandom(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeLogarithm(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -69,7 +70,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNoderandom(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeLogarithm(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter?.Simplify(), secondParameter?.Simplify())
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -83,12 +84,12 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNoderandom(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeLogarithm(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.DetermineNumeric(), secondParameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNoderandom(UndefinedParameterNode firstParameter, NodeBase secondParameter)
+        public FunctionNodeLogarithm(UndefinedParameterNode firstParameter, NodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter.ReturnType == SupportedValueType.Numeric)
@@ -101,7 +102,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNoderandom(NodeBase firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeLogarithm(NodeBase firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter.ReturnType == SupportedValueType.Numeric)
@@ -116,20 +117,18 @@ namespace IX.Math.Nodes.Operations.Function.Binary
 
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
-        public static double GenerateRandom(double min, double max) => RandomNumberGenerator.Generate(min, max);
-
         public override NodeBase Simplify()
         {
             NumericNode firstParam, secondParam;
             if ((firstParam = this.FirstParameter as NumericNode) != null &&
                 (secondParam = this.SecondParameter as NumericNode) != null)
             {
-                return new NumericNode(GenerateRandom(firstParam.ExtractFloat(), secondParam.ExtractFloat()));
+                return new NumericNode(System.Math.Log(firstParam.ExtractFloat(), secondParam.ExtractFloat()));
             }
 
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall<FunctionNoderandom>(nameof(GenerateRandom));
+        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall(typeof(System.Math), nameof(System.Math.Log));
     }
 }

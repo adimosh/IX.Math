@@ -1,30 +1,31 @@
-﻿// <copyright file="FunctionNodeMax.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeRand.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Extensibility;
+using IX.Math.Generators;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
-    [DebuggerDisplay("max({FirstParameter}, {SecondParameter})")]
-    [CallableMathematicsFunction("max", "maximum")]
-    internal sealed class FunctionNodeMax : BinaryFunctionNodeBase
+    [DebuggerDisplay("random({FirstParameter}, {SecondParameter})")]
+    [CallableMathematicsFunction("rand", "random")]
+    internal sealed class FunctionNodeRand : BinaryFunctionNodeBase
     {
-        public FunctionNodeMax(NumericNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeRand(NumericNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeMax(NumericNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeRand(NumericNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeMax(NumericNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeRand(NumericNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -33,17 +34,17 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeMax(NumericParameterNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeRand(NumericParameterNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeMax(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeRand(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeMax(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeRand(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -52,7 +53,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeMax(OperationNodeBase firstParameter, NumericNode secondParameter)
+        public FunctionNodeRand(OperationNodeBase firstParameter, NumericNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -61,7 +62,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeMax(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeRand(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -70,7 +71,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeMax(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeRand(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter?.Simplify(), secondParameter?.Simplify())
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -84,12 +85,12 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeMax(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeRand(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.DetermineNumeric(), secondParameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodeMax(UndefinedParameterNode firstParameter, NodeBase secondParameter)
+        public FunctionNodeRand(UndefinedParameterNode firstParameter, NodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter.ReturnType == SupportedValueType.Numeric)
@@ -102,7 +103,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeMax(NodeBase firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeRand(NodeBase firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter.ReturnType == SupportedValueType.Numeric)
@@ -117,18 +118,20 @@ namespace IX.Math.Nodes.Operations.Function.Binary
 
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
+        public static double GenerateRandom(double min, double max) => RandomNumberGenerator.Generate(min, max);
+
         public override NodeBase Simplify()
         {
             NumericNode firstParam, secondParam;
             if ((firstParam = this.FirstParameter as NumericNode) != null &&
                 (secondParam = this.SecondParameter as NumericNode) != null)
             {
-                return new NumericNode(System.Math.Max(firstParam.ExtractFloat(), secondParam.ExtractFloat()));
+                return new NumericNode(GenerateRandom(firstParam.ExtractFloat(), secondParam.ExtractFloat()));
             }
 
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall(typeof(System.Math), nameof(System.Math.Max));
+        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall<FunctionNodeRand>(nameof(GenerateRandom));
     }
 }

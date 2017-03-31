@@ -334,12 +334,12 @@ namespace IX.Math
 
         private void InitializeBinaryFunctions() => this.BinaryFunctions = new Dictionary<string, Type>
         {
-            ["log"] = typeof(FunctionNodeLog),
-            ["min"] = typeof(FunctionNodeMin),
-            ["max"] = typeof(FunctionNodeMax),
-            ["pow"] = typeof(FunctionNodePow),
-            ["rand"] = typeof(Nodes.Operations.Function.Binary.FunctionNoderandom),
-            ["random"] = typeof(Nodes.Operations.Function.Binary.FunctionNoderandom),
+            ["log"] = typeof(FunctionNodeLogarithm),
+            ["min"] = typeof(FunctionNodeMinimum),
+            ["max"] = typeof(FunctionNodeMaximum),
+            ["pow"] = typeof(FunctionNodePower),
+            ["rand"] = typeof(Nodes.Operations.Function.Binary.FunctionNodeRand),
+            ["random"] = typeof(Nodes.Operations.Function.Binary.FunctionNodeRand),
         };
     }
 }

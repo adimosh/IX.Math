@@ -1,4 +1,4 @@
-﻿// <copyright file="FunctionNodeLog.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodePower.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -10,21 +10,21 @@ using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
-    [DebuggerDisplay("log({FirstParameter}, {SecondParameter})")]
-    [CallableMathematicsFunction("log", "logarithm")]
-    internal sealed class FunctionNodeLog : BinaryFunctionNodeBase
+    [DebuggerDisplay("pow({FirstParameter}, {SecondParameter})")]
+    [CallableMathematicsFunction("pow", "power")]
+    internal sealed class FunctionNodePower : BinaryFunctionNodeBase
     {
-        public FunctionNodeLog(NumericNode firstParameter, NumericNode secondParameter)
+        public FunctionNodePower(NumericNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeLog(NumericNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodePower(NumericNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeLog(NumericNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodePower(NumericNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -33,17 +33,17 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeLog(NumericParameterNode firstParameter, NumericNode secondParameter)
+        public FunctionNodePower(NumericParameterNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeLog(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodePower(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeLog(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodePower(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -52,7 +52,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeLog(OperationNodeBase firstParameter, NumericNode secondParameter)
+        public FunctionNodePower(OperationNodeBase firstParameter, NumericNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -61,7 +61,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeLog(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodePower(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -70,7 +70,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeLog(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodePower(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter?.Simplify(), secondParameter?.Simplify())
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -84,12 +84,12 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeLog(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodePower(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.DetermineNumeric(), secondParameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodeLog(UndefinedParameterNode firstParameter, NodeBase secondParameter)
+        public FunctionNodePower(UndefinedParameterNode firstParameter, NodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter.ReturnType == SupportedValueType.Numeric)
@@ -102,7 +102,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeLog(NodeBase firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodePower(NodeBase firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter.ReturnType == SupportedValueType.Numeric)
@@ -123,12 +123,12 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             if ((firstParam = this.FirstParameter as NumericNode) != null &&
                 (secondParam = this.SecondParameter as NumericNode) != null)
             {
-                return new NumericNode(System.Math.Log(firstParam.ExtractFloat(), secondParam.ExtractFloat()));
+                return new NumericNode(System.Math.Pow(firstParam.ExtractFloat(), secondParam.ExtractFloat()));
             }
 
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall(typeof(System.Math), nameof(System.Math.Log));
+        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall(typeof(System.Math), nameof(System.Math.Pow));
     }
 }
