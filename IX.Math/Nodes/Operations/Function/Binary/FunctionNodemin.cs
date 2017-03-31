@@ -1,28 +1,30 @@
-﻿// <copyright file="FunctionNodemin.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeMin.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
     [DebuggerDisplay("min({FirstParameter}, {SecondParameter})")]
-    internal sealed class FunctionNodemin : BinaryFunctionNodeBase
+    [CallableMathematicsFunction("min", "minimum")]
+    internal sealed class FunctionNodeMin : BinaryFunctionNodeBase
     {
-        public FunctionNodemin(NumericNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeMin(NumericNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodemin(NumericNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeMin(NumericNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodemin(NumericNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeMin(NumericNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -31,17 +33,17 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemin(NumericParameterNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeMin(NumericParameterNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodemin(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeMin(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodemin(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeMin(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -50,7 +52,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemin(OperationNodeBase firstParameter, NumericNode secondParameter)
+        public FunctionNodeMin(OperationNodeBase firstParameter, NumericNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -59,7 +61,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemin(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeMin(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -68,7 +70,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemin(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeMin(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter?.Simplify(), secondParameter?.Simplify())
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -82,12 +84,12 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemin(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeMin(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.DetermineNumeric(), secondParameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodemin(UndefinedParameterNode firstParameter, NodeBase secondParameter)
+        public FunctionNodeMin(UndefinedParameterNode firstParameter, NodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter.ReturnType == SupportedValueType.Numeric)
@@ -100,7 +102,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemin(NodeBase firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeMin(NodeBase firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter.ReturnType == SupportedValueType.Numeric)

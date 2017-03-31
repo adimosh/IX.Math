@@ -39,9 +39,9 @@ namespace IX.Math.UnitTests
                 throw new InvalidOperationException($"The method should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
             }
 
-            Assert.IsType<long>(result);
+            Assert.IsType<double>(result);
 
-            Assert.True(((long)result) < 100);
+            Assert.True(((double)result) < 100);
         }
     }
 }

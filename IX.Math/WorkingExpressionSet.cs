@@ -321,6 +321,7 @@ namespace IX.Math
             ["floor"] = typeof(FunctionNodefloor),
             ["ln"] = typeof(FunctionNodeln),
             ["lg"] = typeof(FunctionNodelg),
+            ["rand"] = typeof(Nodes.Operations.Function.Unary.FunctionNoderandom),
             ["random"] = typeof(Nodes.Operations.Function.Unary.FunctionNoderandom),
             ["round"] = typeof(FunctionNoderound),
             ["sin"] = typeof(FunctionNodesin),
@@ -333,10 +334,11 @@ namespace IX.Math
 
         private void InitializeBinaryFunctions() => this.BinaryFunctions = new Dictionary<string, Type>
         {
-            ["log"] = typeof(FunctionNodelog),
-            ["min"] = typeof(FunctionNodemin),
-            ["max"] = typeof(FunctionNodemax),
-            ["pow"] = typeof(FunctionNodepow),
+            ["log"] = typeof(FunctionNodeLog),
+            ["min"] = typeof(FunctionNodeMin),
+            ["max"] = typeof(FunctionNodeMax),
+            ["pow"] = typeof(FunctionNodePow),
+            ["rand"] = typeof(Nodes.Operations.Function.Binary.FunctionNoderandom),
             ["random"] = typeof(Nodes.Operations.Function.Binary.FunctionNoderandom),
         };
     }

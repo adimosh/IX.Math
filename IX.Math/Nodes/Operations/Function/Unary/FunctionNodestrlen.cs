@@ -50,6 +50,6 @@ namespace IX.Math.Nodes.Operations.Function.Unary
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal() => Expression.Convert(this.GenerateStaticUnaryPropertyCall<string>(nameof(string.Length)), typeof(long));
+        protected override Expression GenerateExpressionInternal() => Expression.Convert(this.GenerateParameterPropertyCall<string>(nameof(string.Length)), typeof(long));
     }
 }

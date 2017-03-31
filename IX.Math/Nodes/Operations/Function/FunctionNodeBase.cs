@@ -8,8 +8,25 @@ using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function
 {
-    internal abstract class FunctionNodeBase : OperationNodeBase
+    /// <summary>
+    /// A base class for a function node.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.Operations.OperationNodeBase" />
+    public abstract class FunctionNodeBase : OperationNodeBase
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FunctionNodeBase"/> class.
+        /// </summary>
+        protected FunctionNodeBase()
+        {
+        }
+
+        /// <summary>
+        /// Gets the concrete type of a parameter.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <returns>The parameter type.</returns>
+        /// <exception cref="System.InvalidOperationException">The parameter could not be correctly recognized, or is undefined.</exception>
         protected static Type ParameterTypeFromParameter(NodeBase parameter)
         {
             Type parameterType;

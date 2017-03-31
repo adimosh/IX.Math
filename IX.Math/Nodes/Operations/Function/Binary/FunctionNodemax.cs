@@ -1,28 +1,30 @@
-﻿// <copyright file="FunctionNodemax.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeMax.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
     [DebuggerDisplay("max({FirstParameter}, {SecondParameter})")]
-    internal sealed class FunctionNodemax : BinaryFunctionNodeBase
+    [CallableMathematicsFunction("max", "maximum")]
+    internal sealed class FunctionNodeMax : BinaryFunctionNodeBase
     {
-        public FunctionNodemax(NumericNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeMax(NumericNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodemax(NumericNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeMax(NumericNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodemax(NumericNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeMax(NumericNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -31,17 +33,17 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemax(NumericParameterNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeMax(NumericParameterNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodemax(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeMax(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodemax(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeMax(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -50,7 +52,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemax(OperationNodeBase firstParameter, NumericNode secondParameter)
+        public FunctionNodeMax(OperationNodeBase firstParameter, NumericNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -59,7 +61,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemax(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeMax(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -68,7 +70,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemax(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeMax(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter?.Simplify(), secondParameter?.Simplify())
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -82,12 +84,12 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemax(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeMax(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.DetermineNumeric(), secondParameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodemax(UndefinedParameterNode firstParameter, NodeBase secondParameter)
+        public FunctionNodeMax(UndefinedParameterNode firstParameter, NodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter.ReturnType == SupportedValueType.Numeric)
@@ -100,7 +102,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodemax(NodeBase firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeMax(NodeBase firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter.ReturnType == SupportedValueType.Numeric)
