@@ -4,6 +4,7 @@
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Generators;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
@@ -11,24 +12,25 @@ using IX.Math.Nodes.Parameters;
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
     [DebuggerDisplay("random({Parameter})")]
-    internal sealed class FunctionNoderandom : UnaryFunctionNodeBase
+    [CallableMathematicsFunction("rand", "random")]
+    internal sealed class FunctionNodeRandom : UnaryFunctionNodeBase
     {
-        public FunctionNoderandom(NumericNode parameter)
+        public FunctionNodeRandom(NumericNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNoderandom(NumericParameterNode parameter)
+        public FunctionNodeRandom(NumericParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNoderandom(UndefinedParameterNode parameter)
+        public FunctionNodeRandom(UndefinedParameterNode parameter)
             : base(parameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNoderandom(OperationNodeBase parameter)
+        public FunctionNodeRandom(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (this.Parameter?.ReturnType != SupportedValueType.Numeric)
@@ -52,6 +54,6 @@ namespace IX.Math.Nodes.Operations.Function.Unary
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticUnaryFunctionCall<FunctionNoderandom>(nameof(GenerateRandom));
+        protected override Expression GenerateExpressionInternal() => this.GenerateStaticUnaryFunctionCall<FunctionNodeRandom>(nameof(GenerateRandom));
     }
 }

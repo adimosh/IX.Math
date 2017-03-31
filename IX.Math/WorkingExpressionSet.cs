@@ -308,7 +308,7 @@ namespace IX.Math
 
         private void InitializeUnaryFunctions() => this.UnaryFunctions = new Dictionary<string, Type>
         {
-            ["strlen"] = typeof(FunctionNodestrlen),
+            ["strlen"] = typeof(FunctionNodeStringLength),
             ["abs"] = typeof(FunctionNodeAbsolute),
             ["acos"] = typeof(FunctionNodeArcCosine),
             ["asin"] = typeof(FunctionNodeArcSine),
@@ -321,15 +321,15 @@ namespace IX.Math
             ["floor"] = typeof(FunctionNodeFloor),
             ["ln"] = typeof(FunctionNodeNaturalLogarithm),
             ["lg"] = typeof(FunctionNodeDecimalLogarithm),
-            ["rand"] = typeof(Nodes.Operations.Function.Unary.FunctionNoderandom),
-            ["random"] = typeof(Nodes.Operations.Function.Unary.FunctionNoderandom),
-            ["round"] = typeof(FunctionNoderound),
+            ["rand"] = typeof(Nodes.Operations.Function.Unary.FunctionNodeRandom),
+            ["random"] = typeof(Nodes.Operations.Function.Unary.FunctionNodeRandom),
+            ["round"] = typeof(FunctionNodeRound),
             ["sin"] = typeof(FunctionNodeSine),
             ["sinh"] = typeof(FunctionNodeHyperbolicSine),
             ["sqrt"] = typeof(FunctionNodeSquareRoot),
             ["tan"] = typeof(FunctionNodeTangent),
             ["tanh"] = typeof(FunctionNodeHyperbolicTangent),
-            ["trun"] = typeof(FunctionNodetrun),
+            ["trun"] = typeof(FunctionNodeTruncate),
         };
 
         private void InitializeBinaryFunctions() => this.BinaryFunctions = new Dictionary<string, Type>

@@ -4,30 +4,32 @@
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
     [DebuggerDisplay("round({Parameter})")]
-    internal sealed class FunctionNoderound : UnaryFunctionNodeBase
+    [CallableMathematicsFunction("round")]
+    internal sealed class FunctionNodeRound : UnaryFunctionNodeBase
     {
-        public FunctionNoderound(NumericNode parameter)
+        public FunctionNodeRound(NumericNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNoderound(NumericParameterNode parameter)
+        public FunctionNodeRound(NumericParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNoderound(UndefinedParameterNode parameter)
+        public FunctionNodeRound(UndefinedParameterNode parameter)
             : base(parameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNoderound(OperationNodeBase parameter)
+        public FunctionNodeRound(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (this.Parameter?.ReturnType != SupportedValueType.Numeric)

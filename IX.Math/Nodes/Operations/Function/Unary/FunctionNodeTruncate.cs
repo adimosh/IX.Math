@@ -1,33 +1,35 @@
-﻿// <copyright file="FunctionNodetrun.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeTruncate.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
     [DebuggerDisplay("trun({Parameter})")]
-    internal sealed class FunctionNodetrun : UnaryFunctionNodeBase
+    [CallableMathematicsFunction("trun", "truncate")]
+    internal sealed class FunctionNodeTruncate : UnaryFunctionNodeBase
     {
-        public FunctionNodetrun(NumericNode parameter)
+        public FunctionNodeTruncate(NumericNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodetrun(NumericParameterNode parameter)
+        public FunctionNodeTruncate(NumericParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodetrun(UndefinedParameterNode parameter)
+        public FunctionNodeTruncate(UndefinedParameterNode parameter)
             : base(parameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodetrun(OperationNodeBase parameter)
+        public FunctionNodeTruncate(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (this.Parameter?.ReturnType != SupportedValueType.Numeric)

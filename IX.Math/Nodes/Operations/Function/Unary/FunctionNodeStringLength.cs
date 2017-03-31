@@ -1,34 +1,36 @@
-﻿// <copyright file="FunctionNodestrlen.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeStringLength.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
     [DebuggerDisplay("strlen({Parameter})")]
-    internal sealed class FunctionNodestrlen : UnaryFunctionNodeBase
+    [CallableMathematicsFunction("strlen", "length")]
+    internal sealed class FunctionNodeStringLength : UnaryFunctionNodeBase
     {
-        public FunctionNodestrlen(StringNode parameter)
+        public FunctionNodeStringLength(StringNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodestrlen(StringParameterNode parameter)
+        public FunctionNodeStringLength(StringParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodestrlen(UndefinedParameterNode parameter)
+        public FunctionNodeStringLength(UndefinedParameterNode parameter)
             : base(parameter?.DetermineString())
         {
         }
 
-        public FunctionNodestrlen(OperationNodeBase parameter)
+        public FunctionNodeStringLength(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (parameter?.ReturnType != SupportedValueType.String)
