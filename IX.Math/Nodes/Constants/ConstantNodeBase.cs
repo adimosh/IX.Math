@@ -4,16 +4,35 @@
 
 namespace IX.Math.Nodes.Constants
 {
-    internal abstract class ConstantNodeBase : NodeBase
+    /// <summary>
+    /// A base class for constants.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.NodeBase" />
+    public abstract class ConstantNodeBase : NodeBase
     {
-        protected ConstantNodeBase()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConstantNodeBase"/> class.
+        /// </summary>
+        internal ConstantNodeBase()
         {
         }
 
-        public abstract object DistilValue();
+        /// <summary>
+        /// Distills the value into a usable constant.
+        /// </summary>
+        /// <returns>A usable constant.</returns>
+        public abstract object DistillValue();
 
-        public override NodeBase RefreshParametersRecursive() => this;
+        /// <summary>
+        /// Refreshes all the parameters recursively.
+        /// </summary>
+        /// <returns>A reflexive return.</returns>
+        public sealed override NodeBase RefreshParametersRecursive() => this;
 
-        public override NodeBase Simplify() => this;
+        /// <summary>
+        /// Simplifies this node, if possible, reflexively returns otherwise.
+        /// </summary>
+        /// <returns>A reflexive return.</returns>
+        public sealed override NodeBase Simplify() => this;
     }
 }

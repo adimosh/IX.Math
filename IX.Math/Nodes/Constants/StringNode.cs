@@ -7,24 +7,55 @@ using System.Linq.Expressions;
 
 namespace IX.Math.Nodes.Constants
 {
+    /// <summary>
+    /// A string node. This class cannot be inherited.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.Constants.ConstantNodeBase" />
     [DebuggerDisplay("{Value}")]
-    internal sealed class StringNode : ConstantNodeBase
+    public sealed class StringNode : ConstantNodeBase
     {
+        /// <summary>
+        /// The value.
+        /// </summary>
         private readonly string value;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StringNode"/> class.
+        /// </summary>
+        /// <param name="value">The value.</param>
         public StringNode(string value)
         {
             this.value = value;
         }
 
+        /// <summary>
+        /// Gets the value.
+        /// </summary>
+        /// <value>The value.</value>
         public string Value => this.value;
 
+        /// <summary>
+        /// Gets the return type of this node.
+        /// </summary>
+        /// <value>Always <see cref="SupportedValueType.String"/>.</value>
         public override SupportedValueType ReturnType => SupportedValueType.String;
 
+        /// <summary>
+        /// Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <returns>The expression.</returns>
         public override Expression GenerateExpression() => Expression.Constant(this.value, typeof(string));
 
+        /// <summary>
+        /// Generates the expression that will be compiled into code as a string expression.
+        /// </summary>
+        /// <returns>The string expression.</returns>
         public override Expression GenerateStringExpression() => this.GenerateExpression();
 
-        public override object DistilValue() => this.value;
+        /// <summary>
+        /// Distills the value into a usable constant.
+        /// </summary>
+        /// <returns>A usable constant.</returns>
+        public override object DistillValue() => this.value;
     }
 }

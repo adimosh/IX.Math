@@ -8,23 +8,51 @@ using System.Linq.Expressions;
 
 namespace IX.Math.Nodes.Constants
 {
+    /// <summary>
+    /// A numeric node. This class cannot be inherited.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.Constants.ConstantNodeBase" />
     [DebuggerDisplay("{Value}")]
-    internal sealed class NumericNode : ConstantNodeBase
+    public sealed class NumericNode : ConstantNodeBase
     {
+        /// <summary>
+        /// The integer value.
+        /// </summary>
         private long integerValue;
+
+        /// <summary>
+        /// The float value.
+        /// </summary>
         private double floatValue;
+
+        /// <summary>
+        /// Whether or not the number is floating-point.
+        /// </summary>
         private bool isFloat;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NumericNode"/> class.
+        /// </summary>
+        /// <param name="value">The integer value.</param>
         public NumericNode(long value)
         {
             this.Initialize(value);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NumericNode"/> class.
+        /// </summary>
+        /// <param name="value">The floating-point value.</param>
         public NumericNode(double value)
         {
             this.Initialize(value);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NumericNode"/> class.
+        /// </summary>
+        /// <param name="value">The undefined value.</param>
+        /// <exception cref="System.ArgumentException">The value is not in an expected format.</exception>
         public NumericNode(object value)
         {
             switch (value)
@@ -40,10 +68,24 @@ namespace IX.Math.Nodes.Constants
             }
         }
 
+        /// <summary>
+        /// Gets the return type of this node.
+        /// </summary>
+        /// <value>Always <see cref="SupportedValueType.Numeric"/>.</value>
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
+        /// <summary>
+        /// Gets the value.
+        /// </summary>
+        /// <value>The value.</value>
         public object Value => this.isFloat ? this.floatValue : this.integerValue;
 
+        /// <summary>
+        /// Does an addition between two numeric nodes.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting node.</returns>
         public static NumericNode Add(NumericNode left, NumericNode right)
         {
             if (left.isFloat && right.isFloat)
@@ -64,6 +106,12 @@ namespace IX.Math.Nodes.Constants
             }
         }
 
+        /// <summary>
+        /// Does a subtraction between two numeric nodes.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting node.</returns>
         public static NumericNode Subtract(NumericNode left, NumericNode right)
         {
             if (left.isFloat && right.isFloat)
@@ -84,6 +132,12 @@ namespace IX.Math.Nodes.Constants
             }
         }
 
+        /// <summary>
+        /// Does a multiplication between two numeric nodes.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting node.</returns>
         public static NumericNode Multiply(NumericNode left, NumericNode right)
         {
             if (left.isFloat && right.isFloat)
@@ -104,18 +158,36 @@ namespace IX.Math.Nodes.Constants
             }
         }
 
+        /// <summary>
+        /// Does a division between two numeric nodes.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting node.</returns>
         public static NumericNode Divide(NumericNode left, NumericNode right)
         {
             Tuple<double, double> floats = ExtractFloats(left, right);
             return new NumericNode(floats.Item1 / floats.Item2);
         }
 
+        /// <summary>
+        /// Raises the left node's value to the power specified by the right node's value.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting node.</returns>
         public static NumericNode Power(NumericNode left, NumericNode right)
         {
             Tuple<double, double> floats = ExtractFloats(left, right);
             return new NumericNode(System.Math.Pow(floats.Item1, floats.Item2));
         }
 
+        /// <summary>
+        /// Does a left shift between two numeric nodes.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting node.</returns>
         public static NumericNode LeftShift(NumericNode left, NumericNode right)
         {
             var by = right.ExtractInt();
@@ -124,6 +196,12 @@ namespace IX.Math.Nodes.Constants
             return new NumericNode(data << by);
         }
 
+        /// <summary>
+        /// Does a right shift between two numeric nodes.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting node.</returns>
         public static NumericNode RightShift(NumericNode left, NumericNode right)
         {
             var by = right.ExtractInt();
@@ -132,6 +210,12 @@ namespace IX.Math.Nodes.Constants
             return new NumericNode(data >> by);
         }
 
+        /// <summary>
+        /// Extracts the floating-point values from two nodes.
+        /// </summary>
+        /// <param name="left">The left node.</param>
+        /// <param name="right">The right node.</param>
+        /// <returns>A tuple of floating-point values.</returns>
         internal static Tuple<double, double> ExtractFloats(NumericNode left, NumericNode right)
         {
             if (left.isFloat && right.isFloat)
@@ -152,10 +236,18 @@ namespace IX.Math.Nodes.Constants
             }
         }
 
+        /// <summary>
+        /// Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <returns>The expression.</returns>
         public override Expression GenerateExpression() => this.isFloat ?
             Expression.Constant(this.floatValue, typeof(double)) :
             Expression.Constant(this.integerValue, typeof(long));
 
+        /// <summary>
+        /// Generates a floating-point expression.
+        /// </summary>
+        /// <returns>The expression.</returns>
         public Expression GenerateFloatExpression()
         {
             if (this.isFloat)
@@ -168,6 +260,11 @@ namespace IX.Math.Nodes.Constants
             }
         }
 
+        /// <summary>
+        /// Generates an integer expression.
+        /// </summary>
+        /// <returns>The expression.</returns>
+        /// <exception cref="System.InvalidCastException">The node is floating-point and cannot be transformed.</exception>
         public Expression GenerateLongExpression()
         {
             if (!this.isFloat)
@@ -185,6 +282,11 @@ namespace IX.Math.Nodes.Constants
             }
         }
 
+        /// <summary>
+        /// Extracts an integer.
+        /// </summary>
+        /// <returns>An integer value.</returns>
+        /// <exception cref="System.InvalidCastException">The current value is floating-point and cannot be transformed.</exception>
         public long ExtractInteger()
         {
             if (this.isFloat)
@@ -200,6 +302,10 @@ namespace IX.Math.Nodes.Constants
             return this.integerValue;
         }
 
+        /// <summary>
+        /// Extracts a floating-point value.
+        /// </summary>
+        /// <returns>A floating-point value.</returns>
         public double ExtractFloat()
         {
             if (this.isFloat)
@@ -210,6 +316,11 @@ namespace IX.Math.Nodes.Constants
             return this.integerValue;
         }
 
+        /// <summary>
+        /// Extracts a 32-bit integer value.
+        /// </summary>
+        /// <returns>A 32-bit integer value.</returns>
+        /// <exception cref="System.InvalidCastException">The value is either floating-point or larger than 32-bit.</exception>
         public int ExtractInt()
         {
             if (this.isFloat)
@@ -225,16 +336,32 @@ namespace IX.Math.Nodes.Constants
             return Convert.ToInt32(this.integerValue);
         }
 
-        public override object DistilValue() => this.Value;
+        /// <summary>
+        /// Distills the value into a usable constant.
+        /// </summary>
+        /// <returns>A usable constant.</returns>
+        public override object DistillValue() => this.Value;
 
+        /// <summary>
+        /// Generates the expression that will be compiled into code as a string expression.
+        /// </summary>
+        /// <returns>The string expression.</returns>
         public override Expression GenerateStringExpression() => Expression.Constant(this.Value.ToString(), typeof(string));
 
+        /// <summary>
+        /// Initializes the specified value.
+        /// </summary>
+        /// <param name="value">The value.</param>
         private void Initialize(long value)
         {
             this.integerValue = value;
             this.isFloat = false;
         }
 
+        /// <summary>
+        /// Initializes the specified value.
+        /// </summary>
+        /// <param name="value">The value.</param>
         private void Initialize(double value)
         {
             if (System.Math.Floor(value) == value)

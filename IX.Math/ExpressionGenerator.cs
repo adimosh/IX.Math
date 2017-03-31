@@ -11,8 +11,6 @@ using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Operations.Binary;
-using IX.Math.Nodes.Operations.Function.Binary;
-using IX.Math.Nodes.Operations.Function.Unary;
 using IX.Math.Nodes.Operations.Unary;
 
 namespace IX.Math
@@ -89,7 +87,7 @@ namespace IX.Math
                 }
                 else
                 {
-                    workingSet.ValueIfConstant = ((ConstantNodeBase)workingSet.Body).DistilValue();
+                    workingSet.ValueIfConstant = ((ConstantNodeBase)workingSet.Body).DistillValue();
                     workingSet.Constant = true;
                 }
             }
