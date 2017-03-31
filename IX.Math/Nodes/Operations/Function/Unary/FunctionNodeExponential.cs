@@ -1,33 +1,35 @@
-﻿// <copyright file="FunctionNodeexp.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeExponential.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
     [DebuggerDisplay("exp({Parameter})")]
-    internal sealed class FunctionNodeexp : UnaryFunctionNodeBase
+    [CallableMathematicsFunction("exp", "exponential")]
+    internal sealed class FunctionNodeExponential : UnaryFunctionNodeBase
     {
-        public FunctionNodeexp(NumericNode parameter)
+        public FunctionNodeExponential(NumericNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodeexp(NumericParameterNode parameter)
+        public FunctionNodeExponential(NumericParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodeexp(UndefinedParameterNode parameter)
+        public FunctionNodeExponential(UndefinedParameterNode parameter)
             : base(parameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodeexp(OperationNodeBase parameter)
+        public FunctionNodeExponential(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (this.Parameter?.ReturnType != SupportedValueType.Numeric)

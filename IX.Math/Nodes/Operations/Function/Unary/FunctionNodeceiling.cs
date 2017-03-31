@@ -4,12 +4,14 @@
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
     [DebuggerDisplay("ceil({Parameter})")]
+    [CallableMathematicsFunction("ceil", "ceiling")]
     internal sealed class FunctionNodeCeiling : UnaryFunctionNodeBase
     {
         public FunctionNodeCeiling(NumericNode parameter)

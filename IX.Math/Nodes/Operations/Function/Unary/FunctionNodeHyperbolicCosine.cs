@@ -1,33 +1,35 @@
-﻿// <copyright file="FunctionNodecosh.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeHyperbolicCosine.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
     [DebuggerDisplay("cosh({Parameter})")]
-    internal sealed class FunctionNodecosh : UnaryFunctionNodeBase
+    [CallableMathematicsFunction("cosh")]
+    internal sealed class FunctionNodeHyperbolicCosine : UnaryFunctionNodeBase
     {
-        public FunctionNodecosh(NumericNode parameter)
+        public FunctionNodeHyperbolicCosine(NumericNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodecosh(NumericParameterNode parameter)
+        public FunctionNodeHyperbolicCosine(NumericParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodecosh(UndefinedParameterNode parameter)
+        public FunctionNodeHyperbolicCosine(UndefinedParameterNode parameter)
             : base(parameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodecosh(OperationNodeBase parameter)
+        public FunctionNodeHyperbolicCosine(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (this.Parameter?.ReturnType != SupportedValueType.Numeric)

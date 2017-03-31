@@ -1,33 +1,35 @@
-﻿// <copyright file="FunctionNodefloor.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeFloor.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
     [DebuggerDisplay("floor({Parameter})")]
-    internal class FunctionNodefloor : UnaryFunctionNodeBase
+    [CallableMathematicsFunction("floor")]
+    internal class FunctionNodeFloor : UnaryFunctionNodeBase
     {
-        public FunctionNodefloor(NumericNode parameter)
+        public FunctionNodeFloor(NumericNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodefloor(NumericParameterNode parameter)
+        public FunctionNodeFloor(NumericParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodefloor(UndefinedParameterNode parameter)
+        public FunctionNodeFloor(UndefinedParameterNode parameter)
             : base(parameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodefloor(OperationNodeBase parameter)
+        public FunctionNodeFloor(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (this.Parameter?.ReturnType != SupportedValueType.Numeric)
