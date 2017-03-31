@@ -7,12 +7,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.PlatformMitigation;
 
-namespace IX.Math.Nodes.Operations.Function.Unary
+namespace IX.Math.Nodes
 {
     /// <summary>
     /// A base class for a unary function (a function with only one parameter).
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.FunctionNodeBase" />
+    /// <seealso cref="FunctionNodeBase" />
     public abstract class UnaryFunctionNodeBase : FunctionNodeBase
     {
         /// <summary>

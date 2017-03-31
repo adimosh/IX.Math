@@ -7,12 +7,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.PlatformMitigation;
 
-namespace IX.Math.Nodes.Operations.Function.Nonary
+namespace IX.Math.Nodes
 {
     /// <summary>
     /// A base class for functions that take no parameters.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.FunctionNodeBase" />
+    /// <seealso cref="FunctionNodeBase" />
     public abstract class NonaryFunctionNodeBase : FunctionNodeBase
     {
         /// <summary>

@@ -7,12 +7,12 @@ using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.PlatformMitigation;
 
-namespace IX.Math.Nodes.Operations.Function.Binary
+namespace IX.Math.Nodes
 {
     /// <summary>
     /// A base class for a function that takes two parameters.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.FunctionNodeBase" />
+    /// <seealso cref="FunctionNodeBase" />
     public abstract class BinaryFunctionNodeBase : FunctionNodeBase
     {
         /// <summary>

@@ -6,12 +6,12 @@ using System;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
-namespace IX.Math.Nodes.Operations.Function
+namespace IX.Math.Nodes
 {
     /// <summary>
     /// A base class for a function node.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.OperationNodeBase" />
+    /// <seealso cref="OperationNodeBase" />
     public abstract class FunctionNodeBase : OperationNodeBase
     {
         /// <summary>
