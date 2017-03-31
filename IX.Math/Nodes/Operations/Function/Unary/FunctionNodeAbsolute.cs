@@ -1,33 +1,35 @@
-﻿// <copyright file="FunctionNodeasin.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeAbsolute.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
-    [DebuggerDisplay("asin({Parameter})")]
-    internal sealed class FunctionNodeasin : UnaryFunctionNodeBase
+    [DebuggerDisplay("abs({Parameter})")]
+    [CallableMathematicsFunction("abs", "absolute")]
+    internal sealed class FunctionNodeAbsolute : UnaryFunctionNodeBase
     {
-        public FunctionNodeasin(NumericNode parameter)
+        public FunctionNodeAbsolute(NumericNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodeasin(NumericParameterNode parameter)
+        public FunctionNodeAbsolute(NumericParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodeasin(UndefinedParameterNode parameter)
+        public FunctionNodeAbsolute(UndefinedParameterNode parameter)
             : base(parameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodeasin(OperationNodeBase parameter)
+        public FunctionNodeAbsolute(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (this.Parameter?.ReturnType != SupportedValueType.Numeric)
@@ -43,12 +45,12 @@ namespace IX.Math.Nodes.Operations.Function.Unary
             NumericNode stringParam;
             if ((stringParam = this.Parameter as NumericNode) != null)
             {
-                return new NumericNode(System.Math.Asin(stringParam.ExtractFloat()));
+                return new NumericNode(System.Math.Abs(stringParam.ExtractFloat()));
             }
 
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticUnaryFunctionCall(typeof(System.Math), nameof(System.Math.Asin));
+        protected override Expression GenerateExpressionInternal() => this.GenerateStaticUnaryFunctionCall(typeof(System.Math), nameof(System.Math.Abs));
     }
 }

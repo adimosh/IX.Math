@@ -1,4 +1,4 @@
-﻿// <copyright file="FunctionNodeRand.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeRandom.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -13,19 +13,19 @@ namespace IX.Math.Nodes.Operations.Function.Binary
 {
     [DebuggerDisplay("random({FirstParameter}, {SecondParameter})")]
     [CallableMathematicsFunction("rand", "random")]
-    internal sealed class FunctionNodeRand : BinaryFunctionNodeBase
+    internal sealed class FunctionNodeRandom : BinaryFunctionNodeBase
     {
-        public FunctionNodeRand(NumericNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeRandom(NumericNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeRand(NumericNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeRandom(NumericNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeRand(NumericNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeRandom(NumericNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -34,17 +34,17 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeRand(NumericParameterNode firstParameter, NumericNode secondParameter)
+        public FunctionNodeRandom(NumericParameterNode firstParameter, NumericNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeRand(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeRandom(NumericParameterNode firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter, secondParameter)
         {
         }
 
-        public FunctionNodeRand(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeRandom(NumericParameterNode firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter?.ReturnType != SupportedValueType.Numeric)
@@ -53,7 +53,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeRand(OperationNodeBase firstParameter, NumericNode secondParameter)
+        public FunctionNodeRandom(OperationNodeBase firstParameter, NumericNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -62,7 +62,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeRand(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
+        public FunctionNodeRandom(OperationNodeBase firstParameter, NumericParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -71,7 +71,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeRand(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
+        public FunctionNodeRandom(OperationNodeBase firstParameter, OperationNodeBase secondParameter)
             : base(firstParameter?.Simplify(), secondParameter?.Simplify())
         {
             if (this.FirstParameter?.ReturnType != SupportedValueType.Numeric)
@@ -85,12 +85,12 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeRand(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeRandom(UndefinedParameterNode firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.DetermineNumeric(), secondParameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodeRand(UndefinedParameterNode firstParameter, NodeBase secondParameter)
+        public FunctionNodeRandom(UndefinedParameterNode firstParameter, NodeBase secondParameter)
             : base(firstParameter, secondParameter?.Simplify())
         {
             if (this.SecondParameter.ReturnType == SupportedValueType.Numeric)
@@ -103,7 +103,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
-        public FunctionNodeRand(NodeBase firstParameter, UndefinedParameterNode secondParameter)
+        public FunctionNodeRandom(NodeBase firstParameter, UndefinedParameterNode secondParameter)
             : base(firstParameter?.Simplify(), secondParameter)
         {
             if (this.FirstParameter.ReturnType == SupportedValueType.Numeric)
@@ -132,6 +132,6 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall<FunctionNodeRand>(nameof(GenerateRandom));
+        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall<FunctionNodeRandom>(nameof(GenerateRandom));
     }
 }

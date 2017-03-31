@@ -1,4 +1,4 @@
-﻿// <copyright file="FunctionNodeceiling.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeCeiling.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -9,25 +9,25 @@ using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
-    [DebuggerDisplay("ceiling({Parameter})")]
-    internal sealed class FunctionNodeceiling : UnaryFunctionNodeBase
+    [DebuggerDisplay("ceil({Parameter})")]
+    internal sealed class FunctionNodeCeiling : UnaryFunctionNodeBase
     {
-        public FunctionNodeceiling(NumericNode parameter)
+        public FunctionNodeCeiling(NumericNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodeceiling(NumericParameterNode parameter)
+        public FunctionNodeCeiling(NumericParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodeceiling(UndefinedParameterNode parameter)
+        public FunctionNodeCeiling(UndefinedParameterNode parameter)
             : base(parameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodeceiling(OperationNodeBase parameter)
+        public FunctionNodeCeiling(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (this.Parameter?.ReturnType != SupportedValueType.Numeric)

@@ -1,33 +1,35 @@
-﻿// <copyright file="FunctionNodeabs.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeArcTangent.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
-    [DebuggerDisplay("abs({Parameter})")]
-    internal sealed class FunctionNodeabs : UnaryFunctionNodeBase
+    [DebuggerDisplay("atan({Parameter})")]
+    [CallableMathematicsFunction("atan", "arctg", "arctangent")]
+    internal sealed class FunctionNodeArcTangent : UnaryFunctionNodeBase
     {
-        public FunctionNodeabs(NumericNode parameter)
+        public FunctionNodeArcTangent(NumericNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodeabs(NumericParameterNode parameter)
+        public FunctionNodeArcTangent(NumericParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodeabs(UndefinedParameterNode parameter)
+        public FunctionNodeArcTangent(UndefinedParameterNode parameter)
             : base(parameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodeabs(OperationNodeBase parameter)
+        public FunctionNodeArcTangent(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (this.Parameter?.ReturnType != SupportedValueType.Numeric)
@@ -43,12 +45,12 @@ namespace IX.Math.Nodes.Operations.Function.Unary
             NumericNode stringParam;
             if ((stringParam = this.Parameter as NumericNode) != null)
             {
-                return new NumericNode(System.Math.Abs(stringParam.ExtractFloat()));
+                return new NumericNode(System.Math.Atan(stringParam.ExtractFloat()));
             }
 
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticUnaryFunctionCall(typeof(System.Math), nameof(System.Math.Abs));
+        protected override Expression GenerateExpressionInternal() => this.GenerateStaticUnaryFunctionCall(typeof(System.Math), nameof(System.Math.Atan));
     }
 }

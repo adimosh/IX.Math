@@ -309,12 +309,12 @@ namespace IX.Math
         private void InitializeUnaryFunctions() => this.UnaryFunctions = new Dictionary<string, Type>
         {
             ["strlen"] = typeof(FunctionNodestrlen),
-            ["abs"] = typeof(FunctionNodeabs),
-            ["acos"] = typeof(FunctionNodeacos),
-            ["asin"] = typeof(FunctionNodeasin),
-            ["atan"] = typeof(FunctionNodeatan),
-            ["ceil"] = typeof(FunctionNodeceiling),
-            ["ceiling"] = typeof(FunctionNodeceiling),
+            ["abs"] = typeof(FunctionNodeAbsolute),
+            ["acos"] = typeof(FunctionNodeArcCosine),
+            ["asin"] = typeof(FunctionNodeArcSine),
+            ["atan"] = typeof(FunctionNodeArcTangent),
+            ["ceil"] = typeof(FunctionNodeCeiling),
+            ["ceiling"] = typeof(FunctionNodeCeiling),
             ["cos"] = typeof(FunctionNodecos),
             ["cosh"] = typeof(FunctionNodecosh),
             ["exp"] = typeof(FunctionNodeexp),
@@ -338,8 +338,8 @@ namespace IX.Math
             ["min"] = typeof(FunctionNodeMinimum),
             ["max"] = typeof(FunctionNodeMaximum),
             ["pow"] = typeof(FunctionNodePower),
-            ["rand"] = typeof(Nodes.Operations.Function.Binary.FunctionNodeRand),
-            ["random"] = typeof(Nodes.Operations.Function.Binary.FunctionNodeRand),
+            ["rand"] = typeof(Nodes.Operations.Function.Binary.FunctionNodeRandom),
+            ["random"] = typeof(Nodes.Operations.Function.Binary.FunctionNodeRandom),
         };
     }
 }
