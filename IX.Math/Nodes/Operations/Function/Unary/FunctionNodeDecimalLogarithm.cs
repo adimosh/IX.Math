@@ -1,33 +1,35 @@
-﻿// <copyright file="FunctionNodetanh.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeDecimalLogarithm.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
-    [DebuggerDisplay("tanh({Parameter})")]
-    internal sealed class FunctionNodetanh : UnaryFunctionNodeBase
+    [DebuggerDisplay("lg({Parameter})")]
+    [CallableMathematicsFunction("lg")]
+    internal sealed class FunctionNodeDecimalLogarithm : UnaryFunctionNodeBase
     {
-        public FunctionNodetanh(NumericNode parameter)
+        public FunctionNodeDecimalLogarithm(NumericNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodetanh(NumericParameterNode parameter)
+        public FunctionNodeDecimalLogarithm(NumericParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodetanh(UndefinedParameterNode parameter)
+        public FunctionNodeDecimalLogarithm(UndefinedParameterNode parameter)
             : base(parameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodetanh(OperationNodeBase parameter)
+        public FunctionNodeDecimalLogarithm(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (this.Parameter?.ReturnType != SupportedValueType.Numeric)
@@ -43,12 +45,12 @@ namespace IX.Math.Nodes.Operations.Function.Unary
             NumericNode stringParam;
             if ((stringParam = this.Parameter as NumericNode) != null)
             {
-                return new NumericNode(System.Math.Tanh(stringParam.ExtractFloat()));
+                return new NumericNode(System.Math.Log10(stringParam.ExtractFloat()));
             }
 
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticUnaryFunctionCall(typeof(System.Math), nameof(System.Math.Tanh));
+        protected override Expression GenerateExpressionInternal() => this.GenerateStaticUnaryFunctionCall(typeof(System.Math), nameof(System.Math.Log10));
     }
 }

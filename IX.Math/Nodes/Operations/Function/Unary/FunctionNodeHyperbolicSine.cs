@@ -1,33 +1,35 @@
-﻿// <copyright file="FunctionNodesinh.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeHyperbolicSine.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
     [DebuggerDisplay("sinh({Parameter})")]
-    internal sealed class FunctionNodesinh : UnaryFunctionNodeBase
+    [CallableMathematicsFunction("sinh")]
+    internal sealed class FunctionNodeHyperbolicSine : UnaryFunctionNodeBase
     {
-        public FunctionNodesinh(NumericNode parameter)
+        public FunctionNodeHyperbolicSine(NumericNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodesinh(NumericParameterNode parameter)
+        public FunctionNodeHyperbolicSine(NumericParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodesinh(UndefinedParameterNode parameter)
+        public FunctionNodeHyperbolicSine(UndefinedParameterNode parameter)
             : base(parameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodesinh(OperationNodeBase parameter)
+        public FunctionNodeHyperbolicSine(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (this.Parameter?.ReturnType != SupportedValueType.Numeric)

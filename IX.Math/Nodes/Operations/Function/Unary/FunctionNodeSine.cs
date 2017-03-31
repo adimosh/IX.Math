@@ -1,33 +1,35 @@
-﻿// <copyright file="FunctionNodesqrt.cs" company="Adrian Mos">
+﻿// <copyright file="FunctionNodeSine.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
-    [DebuggerDisplay("sqrt({Parameter})")]
-    internal sealed class FunctionNodesqrt : UnaryFunctionNodeBase
+    [DebuggerDisplay("sin({Parameter})")]
+    [CallableMathematicsFunction("sin", "sine")]
+    internal sealed class FunctionNodeSine : UnaryFunctionNodeBase
     {
-        public FunctionNodesqrt(NumericNode parameter)
+        public FunctionNodeSine(NumericNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodesqrt(NumericParameterNode parameter)
+        public FunctionNodeSine(NumericParameterNode parameter)
             : base(parameter)
         {
         }
 
-        public FunctionNodesqrt(UndefinedParameterNode parameter)
+        public FunctionNodeSine(UndefinedParameterNode parameter)
             : base(parameter?.DetermineNumeric())
         {
         }
 
-        public FunctionNodesqrt(OperationNodeBase parameter)
+        public FunctionNodeSine(OperationNodeBase parameter)
             : base(parameter?.Simplify())
         {
             if (this.Parameter?.ReturnType != SupportedValueType.Numeric)
@@ -43,12 +45,12 @@ namespace IX.Math.Nodes.Operations.Function.Unary
             NumericNode stringParam;
             if ((stringParam = this.Parameter as NumericNode) != null)
             {
-                return new NumericNode(System.Math.Sqrt(stringParam.ExtractFloat()));
+                return new NumericNode(System.Math.Sin(stringParam.ExtractFloat()));
             }
 
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticUnaryFunctionCall(typeof(System.Math), nameof(System.Math.Sqrt));
+        protected override Expression GenerateExpressionInternal() => this.GenerateStaticUnaryFunctionCall(typeof(System.Math), nameof(System.Math.Sin));
     }
 }
