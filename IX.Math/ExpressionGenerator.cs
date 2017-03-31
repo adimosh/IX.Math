@@ -93,7 +93,7 @@ namespace IX.Math
                     workingSet.Constant = true;
                 }
             }
-            else if (workingSet.Body is Nodes.Parameters.ParameterNodeBase)
+            else if (workingSet.Body is ParameterNodeBase)
             {
                 workingSet.PossibleString = true;
             }

@@ -11,7 +11,7 @@ namespace IX.Math.Nodes.Parameters
     /// <summary>
     /// A boolean parameter node. This class cannot be inherited.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Parameters.ParameterNodeBase" />
+    /// <seealso cref="ParameterNodeBase" />
     [DebuggerDisplay("{ParameterName} (bool)")]
     public sealed class BoolParameterNode : ParameterNodeBase
     {

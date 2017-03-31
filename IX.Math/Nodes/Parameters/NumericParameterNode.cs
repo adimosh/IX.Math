@@ -12,7 +12,7 @@ namespace IX.Math.Nodes.Parameters
     /// <summary>
     /// A numeric parameter node. This class cannot be inherited.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Parameters.ParameterNodeBase" />
+    /// <seealso cref="ParameterNodeBase" />
     [DebuggerDisplay("{ParameterName} (numeric)")]
     public sealed class NumericParameterNode : ParameterNodeBase
     {

@@ -13,7 +13,7 @@ namespace IX.Math.Nodes.Parameters
     /// <summary>
     /// An undefined parameter. This class cannot be inherited.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Parameters.ParameterNodeBase" />
+    /// <seealso cref="ParameterNodeBase" />
     [DebuggerDisplay("{ParameterName} (undefined)")]
     public sealed class UndefinedParameterNode : ParameterNodeBase
     {

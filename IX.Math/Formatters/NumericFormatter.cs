@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using IX.Math.Nodes;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Formatters

@@ -4,7 +4,7 @@
 
 using System.Linq.Expressions;
 
-namespace IX.Math.Nodes.Parameters
+namespace IX.Math.Nodes
 {
     /// <summary>
     /// A base class for a parameter node.

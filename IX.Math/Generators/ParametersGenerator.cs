@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using IX.Math.Nodes;
 using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Generators
