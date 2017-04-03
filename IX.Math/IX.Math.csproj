@@ -82,4 +82,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="IoC\" />
+  </ItemGroup>
 </Project>

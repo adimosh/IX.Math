@@ -8,11 +8,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
+using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
-using IX.Math.Nodes.Operations.Function.Binary;
-using IX.Math.Nodes.Operations.Function.Unary;
-using IX.Math.Nodes.Parameters;
 
 namespace IX.Math
 {
@@ -44,6 +42,7 @@ namespace IX.Math
         // Scrap
         internal Dictionary<string, Type> UnaryOperators;
         internal Dictionary<string, Type> BinaryOperators;
+        internal Dictionary<string, Type> NonaryFunctions;
         internal Dictionary<string, Type> UnaryFunctions;
         internal Dictionary<string, Type> BinaryFunctions;
 
@@ -284,13 +283,7 @@ namespace IX.Math
                 0.3036630028987326,
                 $"{this.Definition.SpecialSymbolIndicators.Item1}lambda{this.Definition.SpecialSymbolIndicators.Item2}");
 
-            this.InitializeUnaryOperators();
-            this.InitializeBinaryOperators();
-            this.InitializeUnaryFunctions();
-            this.InitializeBinaryFunctions();
-        }
-
-        private void InitializeUnaryOperators() => this.UnaryOperators = typeof(MathDefinition)
+            this.UnaryOperators = typeof(MathDefinition)
                 .GetRuntimeProperties()
                 .Where(p => p.Name.EndsWith("Symbol"))
                 .Select(p => new { Name = p.Name.Substring(0, p.Name.Length - 6), Value = (string)p.GetValue(this.Definition) })
@@ -298,7 +291,7 @@ namespace IX.Math
                 .Where(p => p.Type != null)
                 .ToDictionary(p => p.Value, p => p.Type);
 
-        private void InitializeBinaryOperators() => this.BinaryOperators = typeof(MathDefinition)
+            this.BinaryOperators = typeof(MathDefinition)
                 .GetRuntimeProperties()
                 .Where(p => p.Name.EndsWith("Symbol"))
                 .Select(p => new { Name = p.Name.Substring(0, p.Name.Length - 6), Value = (string)p.GetValue(this.Definition) })
@@ -306,40 +299,9 @@ namespace IX.Math
                 .Where(p => p.Type != null)
                 .ToDictionary(p => p.Value, p => p.Type);
 
-        private void InitializeUnaryFunctions() => this.UnaryFunctions = new Dictionary<string, Type>
-        {
-            ["strlen"] = typeof(FunctionNodeStringLength),
-            ["abs"] = typeof(FunctionNodeAbsolute),
-            ["acos"] = typeof(FunctionNodeArcCosine),
-            ["asin"] = typeof(FunctionNodeArcSine),
-            ["atan"] = typeof(FunctionNodeArcTangent),
-            ["ceil"] = typeof(FunctionNodeCeiling),
-            ["ceiling"] = typeof(FunctionNodeCeiling),
-            ["cos"] = typeof(FunctionNodeCosine),
-            ["cosh"] = typeof(FunctionNodeHyperbolicCosine),
-            ["exp"] = typeof(FunctionNodeExponential),
-            ["floor"] = typeof(FunctionNodeFloor),
-            ["ln"] = typeof(FunctionNodeNaturalLogarithm),
-            ["lg"] = typeof(FunctionNodeDecimalLogarithm),
-            ["rand"] = typeof(Nodes.Operations.Function.Unary.FunctionNodeRandom),
-            ["random"] = typeof(Nodes.Operations.Function.Unary.FunctionNodeRandom),
-            ["round"] = typeof(FunctionNodeRound),
-            ["sin"] = typeof(FunctionNodeSine),
-            ["sinh"] = typeof(FunctionNodeHyperbolicSine),
-            ["sqrt"] = typeof(FunctionNodeSquareRoot),
-            ["tan"] = typeof(FunctionNodeTangent),
-            ["tanh"] = typeof(FunctionNodeHyperbolicTangent),
-            ["trun"] = typeof(FunctionNodeTruncate),
-        };
-
-        private void InitializeBinaryFunctions() => this.BinaryFunctions = new Dictionary<string, Type>
-        {
-            ["log"] = typeof(FunctionNodeLogarithm),
-            ["min"] = typeof(FunctionNodeMinimum),
-            ["max"] = typeof(FunctionNodeMaximum),
-            ["pow"] = typeof(FunctionNodePower),
-            ["rand"] = typeof(Nodes.Operations.Function.Binary.FunctionNodeRandom),
-            ["random"] = typeof(Nodes.Operations.Function.Binary.FunctionNodeRandom),
-        };
+            this.NonaryFunctions = FunctionsDictionaryGenerator.GenerateInternalNonaryFunctionsDictionary();
+            this.UnaryFunctions = FunctionsDictionaryGenerator.GenerateInternalUnaryFunctionsDictionary();
+            this.BinaryFunctions = FunctionsDictionaryGenerator.GenerateInternalBinaryFunctionsDictionary();
+        }
     }
 }

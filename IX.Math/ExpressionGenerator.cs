@@ -182,7 +182,78 @@ namespace IX.Math
             // Check whether the expression is a binary operator
             foreach (var op in workingSet.BinaryOperatorsInOrder.Where(p => s.Contains(p)))
             {
-                NodeBase exp = ExpressionByBinaryOperator(s, op, workingSet);
+                NodeBase exp = ExpressionByBinaryOperator();
+
+                NodeBase ExpressionByBinaryOperator()
+                {
+                    workingSet.CancellationToken.ThrowIfCancellationRequested();
+
+                    string[] split = s.Split(new[] { op }, StringSplitOptions.None);
+                    if (split.Length > 1)
+                    {
+                        if (string.IsNullOrWhiteSpace(split[0]))
+                        {
+                            // We are having a unary operator - until this is treated differently, let's simply return null
+                            return null;
+                        }
+                        else
+                        {
+                            // We are having a binary operator
+                            try
+                            {
+                                NodeBase left;
+                                NodeBase right;
+
+                                if (split.Length >= 3 && string.IsNullOrWhiteSpace(split.Take(split.Length - 1).Last()) && !string.IsNullOrWhiteSpace(split.Last()))
+                                {
+                                    // We have a doubling of an operator, probably because a unary operator (like -) is used in conjunction with a binary operator of the same kind
+                                    left = GenerateExpression(new RawExpressionContainer(string.Join(op, split.Take(split.Length - 2).ToArray())), workingSet);
+                                    if (left == null)
+                                    {
+                                        return null;
+                                    }
+
+                                    right = GenerateExpression(new RawExpressionContainer($"{op}{split.Last()}"), workingSet);
+                                    if (right == null)
+                                    {
+                                        return null;
+                                    }
+                                }
+                                else
+                                {
+                                    // We have a normal, regular binary
+                                    left = GenerateExpression(new RawExpressionContainer(string.Join(op, split.Take(split.Length - 1).ToArray())), workingSet);
+                                    if (left == null)
+                                    {
+                                        return null;
+                                    }
+
+                                    right = GenerateExpression(new RawExpressionContainer(split.Last()), workingSet);
+                                    if (right == null)
+                                    {
+                                        return null;
+                                    }
+                                }
+
+                                if (workingSet.BinaryOperators.TryGetValue(op, out Type t))
+                                {
+                                    return ((BinaryOperationNodeBase)Activator.CreateInstance(t, left, right))?.Simplify();
+                                }
+                                else
+                                {
+                                    return null;
+                                }
+                            }
+                            catch
+                            {
+                                return null;
+                            }
+                        }
+                    }
+
+                    return null;
+                }
+
                 if (exp != null)
                 {
                     return exp;
@@ -192,7 +263,40 @@ namespace IX.Math
             // Check whether the expression is a unary operator
             foreach (var op in workingSet.UnaryOperatorsInOrder.Where(p => s.Contains(p)))
             {
-                NodeBase exp = ExpressionByUnaryOperator(s, op, workingSet);
+                NodeBase exp = ExpressionByUnaryOperator();
+
+                NodeBase ExpressionByUnaryOperator()
+                {
+                    workingSet.CancellationToken.ThrowIfCancellationRequested();
+
+                    if (s.StartsWith(op))
+                    {
+                        try
+                        {
+                            NodeBase expr = GenerateExpression(new RawExpressionContainer(s.Substring(op.Length)), workingSet);
+                            if (expr == null)
+                            {
+                                return null;
+                            }
+
+                            if (workingSet.UnaryOperators.TryGetValue(op, out Type t))
+                            {
+                                return ((UnaryOperatorNodeBase)Activator.CreateInstance(t, expr))?.Simplify();
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    }
+
+                    return null;
+                }
+
                 if (exp != null)
                 {
                     return exp;
@@ -220,145 +324,37 @@ namespace IX.Math
 
                     NodeBase[] body = GenerateExpression(expr, workingSet);
 
-                    if (expr.Length == 1)
+                    switch (expr.Length)
                     {
-                        if (workingSet.UnaryFunctions.TryGetValue(functionName, out Type t))
-                        {
-                            return ((UnaryFunctionNodeBase)Activator.CreateInstance(t, GenerateExpression(expr[0], workingSet)))?.Simplify();
-                        }
-                        else
-                        {
+                        case 0:
+                            if (workingSet.UnaryFunctions.TryGetValue(functionName, out Type t))
+                            {
+                                return ((UnaryFunctionNodeBase)Activator.CreateInstance(t))?.Simplify();
+                            }
+
                             return null;
-                        }
-                    }
-                    else if (expr.Length == 2)
-                    {
-                        if (workingSet.BinaryFunctions.TryGetValue(functionName, out Type t))
-                        {
-                            return ((BinaryFunctionNodeBase)Activator.CreateInstance(t, GenerateExpression(expr[0], workingSet), GenerateExpression(expr[1], workingSet)))?.Simplify();
-                        }
-                        else
-                        {
+                        case 1:
+                            if (workingSet.UnaryFunctions.TryGetValue(functionName, out Type t1))
+                            {
+                                return ((UnaryFunctionNodeBase)Activator.CreateInstance(t1, GenerateExpression(expr[0], workingSet)))?.Simplify();
+                            }
+
                             return null;
-                        }
-                    }
-                    else
-                    {
-                        return null;
+                        case 2:
+                            if (workingSet.BinaryFunctions.TryGetValue(functionName, out Type t2))
+                            {
+                                return ((BinaryFunctionNodeBase)Activator.CreateInstance(t2, GenerateExpression(expr[0], workingSet), GenerateExpression(expr[1], workingSet)))?.Simplify();
+                            }
+
+                            return null;
+                        default:
+                            return null;
                     }
                 }
             }
             catch (Exception)
             {
                 return null;
-            }
-
-            return null;
-        }
-
-        private static NodeBase ExpressionByBinaryOperator(
-            string s,
-            string op,
-            WorkingExpressionSet workingSet)
-        {
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
-
-            string[] split = s.Split(new[] { op }, StringSplitOptions.None);
-            if (split.Length > 1)
-            {
-                if (string.IsNullOrWhiteSpace(split[0]))
-                {
-                    // We are having a unary operator - until this is treated differently, let's simply return null
-                    return null;
-                }
-                else
-                {
-                    // We are having a binary operator
-                    try
-                    {
-                        NodeBase left;
-                        NodeBase right;
-
-                        if (split.Length >= 3 && string.IsNullOrWhiteSpace(split.Take(split.Length - 1).Last()) && !string.IsNullOrWhiteSpace(split.Last()))
-                        {
-                            // We have a doubling of an operator, probably because a unary operator (like -) is used in conjunction with a binary operator of the same kind
-                            left = GenerateExpression(new RawExpressionContainer(string.Join(op, split.Take(split.Length - 2).ToArray())), workingSet);
-                            if (left == null)
-                            {
-                                return null;
-                            }
-
-                            right = GenerateExpression(new RawExpressionContainer($"{op}{split.Last()}"), workingSet);
-                            if (right == null)
-                            {
-                                return null;
-                            }
-                        }
-                        else
-                        {
-                            // We have a normal, regular binary
-                            left = GenerateExpression(new RawExpressionContainer(string.Join(op, split.Take(split.Length - 1).ToArray())), workingSet);
-                            if (left == null)
-                            {
-                                return null;
-                            }
-
-                            right = GenerateExpression(new RawExpressionContainer(split.Last()), workingSet);
-                            if (right == null)
-                            {
-                                return null;
-                            }
-                        }
-
-                        if (workingSet.BinaryOperators.TryGetValue(op, out Type t))
-                        {
-                            return ((BinaryOperationNodeBase)Activator.CreateInstance(t, left, right))?.Simplify();
-                        }
-                        else
-                        {
-                            return null;
-                        }
-                    }
-                    catch
-                    {
-                        return null;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        private static NodeBase ExpressionByUnaryOperator(
-            string s,
-            string op,
-            WorkingExpressionSet workingSet)
-        {
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
-
-            if (s.StartsWith(op))
-            {
-                try
-                {
-                    NodeBase expr = GenerateExpression(new RawExpressionContainer(s.Substring(op.Length)), workingSet);
-                    if (expr == null)
-                    {
-                        return null;
-                    }
-
-                    if (workingSet.UnaryOperators.TryGetValue(op, out Type t))
-                    {
-                        return ((UnaryOperatorNodeBase)Activator.CreateInstance(t, expr))?.Simplify();
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                catch
-                {
-                    return null;
-                }
             }
 
             return null;
