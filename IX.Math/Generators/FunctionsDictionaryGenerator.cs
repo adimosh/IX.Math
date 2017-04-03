@@ -54,7 +54,15 @@ namespace IX.Math.Generators
                         return;
                     }
 
-                    attr.Names.ForEach(q => typeDictionary.Add(q, p.AsType()));
+                    attr.Names.ForEach(q =>
+                    {
+                        if (typeDictionary.ContainsKey(q))
+                        {
+                            return;
+                        }
+
+                        typeDictionary.Add(q, p.AsType());
+                    });
                 }
             }
 
