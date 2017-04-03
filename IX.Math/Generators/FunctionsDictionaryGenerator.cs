@@ -14,43 +14,48 @@ namespace IX.Math.Generators
 {
     internal static class FunctionsDictionaryGenerator
     {
-        internal static Dictionary<string, Type> GenerateInternalNonaryFunctionsDictionary()
-            => GenerateTypeAssignableFrom<NonaryFunctionNodeBase>();
+        internal static Dictionary<string, Type> GenerateInternalNonaryFunctionsDictionary(IEnumerable<Assembly> assemblies)
+            => GenerateTypeAssignableFrom<NonaryFunctionNodeBase>(assemblies);
 
-        internal static Dictionary<string, Type> GenerateInternalUnaryFunctionsDictionary()
-            => GenerateTypeAssignableFrom<UnaryFunctionNodeBase>();
+        internal static Dictionary<string, Type> GenerateInternalUnaryFunctionsDictionary(IEnumerable<Assembly> assemblies)
+            => GenerateTypeAssignableFrom<UnaryFunctionNodeBase>(assemblies);
 
-        internal static Dictionary<string, Type> GenerateInternalBinaryFunctionsDictionary()
-            => GenerateTypeAssignableFrom<BinaryFunctionNodeBase>();
+        internal static Dictionary<string, Type> GenerateInternalBinaryFunctionsDictionary(IEnumerable<Assembly> assemblies)
+            => GenerateTypeAssignableFrom<BinaryFunctionNodeBase>(assemblies);
 
-        internal static Dictionary<string, Type> GenerateTypeAssignableFrom<T>()
+        internal static Dictionary<string, Type> GenerateTypeAssignableFrom<T>(IEnumerable<Assembly> assemblies)
             where T : FunctionNodeBase
         {
             var typeDictionary = new Dictionary<string, Type>();
 
-            typeof(FunctionsDictionaryGenerator).GetTypeInfo().Assembly.DefinedTypes
-                .Where(p => typeof(T).GetTypeInfo().IsAssignableFrom(p))
-                .ForEach(AddToTypeDictionary);
+            assemblies.ForEach(InterpretAssembly);
 
-            void AddToTypeDictionary(TypeInfo p)
+            void InterpretAssembly(Assembly assembly)
             {
-                CallableMathematicsFunctionAttribute attr;
-                try
-                {
-                    attr = p.GetCustomAttribute<CallableMathematicsFunctionAttribute>();
-                }
-                catch
-                {
-                    // We need not do anything special here.
-                    return;
-                }
+                assembly.DefinedTypes
+                    .Where(p => typeof(T).GetTypeInfo().IsAssignableFrom(p))
+                    .ForEach(AddToTypeDictionary);
 
-                if (attr == null)
+                void AddToTypeDictionary(TypeInfo p)
                 {
-                    return;
-                }
+                    CallableMathematicsFunctionAttribute attr;
+                    try
+                    {
+                        attr = p.GetCustomAttribute<CallableMathematicsFunctionAttribute>();
+                    }
+                    catch
+                    {
+                        // We need not do anything special here.
+                        return;
+                    }
 
-                attr.Names.ForEach(q => typeDictionary.Add(q, p.AsType()));
+                    if (attr == null)
+                    {
+                        return;
+                    }
+
+                    attr.Names.ForEach(q => typeDictionary.Add(q, p.AsType()));
+                }
             }
 
             return typeDictionary;

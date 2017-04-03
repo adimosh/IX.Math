@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Reflection;
 using System.Threading;
 
 namespace IX.Math
@@ -19,5 +20,11 @@ namespace IX.Math
         /// <param name="cancellationToken">The cancellation token for this operation.</param>
         /// <returns>A <see cref="ComputedExpression"/> that represents the interpreted expression.</returns>
         ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Registers an assembly to extract compatible functions from.
+        /// </summary>
+        /// <param name="assembly">The assembly to register.</param>
+        void RegisterFunctionsAssembly(Assembly assembly);
     }
 }

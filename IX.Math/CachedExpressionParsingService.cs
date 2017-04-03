@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Threading;
 
 namespace IX.Math
@@ -64,6 +65,12 @@ namespace IX.Math
             this.Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        /// <summary>
+        /// Registers an assembly to extract compatible functions from.
+        /// </summary>
+        /// <param name="assembly">The assembly to register.</param>
+        public void RegisterFunctionsAssembly(Assembly assembly) => this.eps.RegisterFunctionsAssembly(assembly);
 
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.

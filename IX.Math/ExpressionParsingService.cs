@@ -3,7 +3,9 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 
 namespace IX.Math
@@ -14,6 +16,8 @@ namespace IX.Math
     public sealed class ExpressionParsingService : IExpressionParsingService
     {
         private readonly MathDefinition workingDefinition;
+
+        private readonly List<Assembly> assembliesToRegister;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionParsingService"/> class with a standard math definition object.
@@ -53,6 +57,11 @@ namespace IX.Math
         public ExpressionParsingService(MathDefinition definition)
         {
             this.workingDefinition = definition;
+
+            this.assembliesToRegister = new List<Assembly>
+            {
+                typeof(ExpressionParsingService).GetTypeInfo().Assembly,
+            };
         }
 
         /// <summary>
@@ -69,7 +78,7 @@ namespace IX.Math
                 throw new ArgumentNullException(nameof(expression));
             }
 
-            var workingSet = new WorkingExpressionSet(expression, this.workingDefinition, cancellationToken);
+            var workingSet = new WorkingExpressionSet(expression, this.workingDefinition, this.assembliesToRegister, cancellationToken);
 
             ExpressionGenerator.CreateBody(workingSet);
 
@@ -81,6 +90,25 @@ namespace IX.Math
             {
                 return new ComputedExpression(expression, workingSet.Body, workingSet.ParametersTable.Values.ToArray(), true);
             }
+        }
+
+        /// <summary>
+        /// Registers an assembly to extract compatible functions from.
+        /// </summary>
+        /// <param name="assembly">The assembly to register.</param>
+        public void RegisterFunctionsAssembly(Assembly assembly)
+        {
+            if (assembly == null)
+            {
+                throw new ArgumentNullException(nameof(assembly));
+            }
+
+            if (this.assembliesToRegister.Contains(assembly))
+            {
+                return;
+            }
+
+            this.assembliesToRegister.Add(assembly);
         }
     }
 }

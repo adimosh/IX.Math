@@ -54,7 +54,9 @@ namespace IX.Math
         internal bool PossibleString = false;
 #pragma warning restore SA1401 // Fields must be private
 
-        internal WorkingExpressionSet(string expression, MathDefinition mathDefinition, CancellationToken cancellationToken)
+        private IEnumerable<Assembly> assembliesForFunctions;
+
+        internal WorkingExpressionSet(string expression, MathDefinition mathDefinition, IEnumerable<Assembly> assembliesForFunctions, CancellationToken cancellationToken)
         {
             this.ConstantsTable = new Dictionary<string, ConstantNodeBase>();
             this.ReverseConstantsTable = new Dictionary<string, string>();
@@ -66,6 +68,8 @@ namespace IX.Math
             this.CancellationToken = cancellationToken;
             this.Expression = expression;
             this.Definition = new MathDefinition(mathDefinition);
+
+            this.assembliesForFunctions = assembliesForFunctions;
 
             this.AllOperatorsInOrder = new[]
             {
@@ -299,9 +303,9 @@ namespace IX.Math
                 .Where(p => p.Type != null)
                 .ToDictionary(p => p.Value, p => p.Type);
 
-            this.NonaryFunctions = FunctionsDictionaryGenerator.GenerateInternalNonaryFunctionsDictionary();
-            this.UnaryFunctions = FunctionsDictionaryGenerator.GenerateInternalUnaryFunctionsDictionary();
-            this.BinaryFunctions = FunctionsDictionaryGenerator.GenerateInternalBinaryFunctionsDictionary();
+            this.NonaryFunctions = FunctionsDictionaryGenerator.GenerateInternalNonaryFunctionsDictionary(this.assembliesForFunctions);
+            this.UnaryFunctions = FunctionsDictionaryGenerator.GenerateInternalUnaryFunctionsDictionary(this.assembliesForFunctions);
+            this.BinaryFunctions = FunctionsDictionaryGenerator.GenerateInternalBinaryFunctionsDictionary(this.assembliesForFunctions);
         }
     }
 }
