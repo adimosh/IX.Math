@@ -47,8 +47,8 @@ namespace IX.Math
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
-            // Break by parantheses
-            ParanthesesExpressionGenerator.FormatParantheses(workingSet);
+            // Break by parentheses
+            ParenthesesExpressionGenerator.FormatParentheses(workingSet);
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 

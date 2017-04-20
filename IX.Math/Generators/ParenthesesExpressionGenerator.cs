@@ -1,4 +1,4 @@
-﻿// <copyright file="ParanthesesExpressionGenerator.cs" company="Adrian Mos">
+﻿// <copyright file="ParenthesesExpressionGenerator.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -8,9 +8,9 @@ using System.Linq;
 
 namespace IX.Math.Generators
 {
-    internal static class ParanthesesExpressionGenerator
+    internal static class ParenthesesExpressionGenerator
     {
-        internal static void FormatParantheses(WorkingExpressionSet workingSet)
+        internal static void FormatParentheses(WorkingExpressionSet workingSet)
         {
             FormatParanthesis(string.Empty);
             string[] names = workingSet.SymbolTable.Keys.Where(p => p.StartsWith("item")).ToArray();
