@@ -86,12 +86,8 @@ namespace IX.Math.Nodes
                     {
                         parameterType = typeof(int);
 
-                        mi = t.GetTypeMethod(functionName, parameterType);
-
-                        if (mi == null)
-                        {
+                        mi = t.GetTypeMethod(functionName, parameterType) ??
                             throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
-                        }
                     }
                 }
             }
@@ -120,12 +116,8 @@ namespace IX.Math.Nodes
                 throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, propertyName), nameof(propertyName));
             }
 
-            PropertyInfo pi = typeof(T).GetTypeProperty(propertyName);
-
-            if (pi == null)
-            {
+            PropertyInfo pi = typeof(T).GetTypeProperty(propertyName) ??
                 throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, propertyName), nameof(propertyName));
-            }
 
             return Expression.Property(this.Parameter.GenerateExpression(), pi);
         }

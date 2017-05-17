@@ -13,6 +13,8 @@ namespace IX.Math.Generators
     {
         private static readonly Random RandomGenerator = new Random();
 
+        public static double Generate() => RandomGenerator.NextDouble();
+
         public static double Generate(double max)
         {
             var result = RandomGenerator.NextDouble();
