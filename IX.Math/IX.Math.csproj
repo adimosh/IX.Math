@@ -22,8 +22,6 @@
     <DocumentationFile>bin\Debug\netstandard1.1\IX.Math.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <TreatSpecificWarningsAsErrors />
     <DefineConstants>RELEASE;NETSTANDARD1_1</DefineConstants>
     <DocumentationFile>bin\Release\netstandard1.1\IX.Math.xml</DocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
