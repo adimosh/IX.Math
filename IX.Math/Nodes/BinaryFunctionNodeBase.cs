@@ -105,12 +105,8 @@ namespace IX.Math.Nodes
                             firstParameterType = typeof(int);
                             secondParameterType = typeof(int);
 
-                            mi = t.GetTypeMethod(functionName, firstParameterType, secondParameterType);
-
-                            if (mi == null)
-                            {
+                            mi = t.GetTypeMethod(functionName, firstParameterType, secondParameterType) ??
                                 throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
-                            }
                         }
                     }
                 }

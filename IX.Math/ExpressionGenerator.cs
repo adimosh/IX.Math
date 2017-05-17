@@ -345,14 +345,19 @@ namespace IX.Math
                         case 1:
                             if (workingSet.UnaryFunctions.TryGetValue(functionName, out Type t1))
                             {
-                                return ((UnaryFunctionNodeBase)Activator.CreateInstance(t1, GenerateExpression(parameterExpressions[0], workingSet)))?.Simplify();
+                                return ((UnaryFunctionNodeBase)Activator.CreateInstance(
+                                    t1,
+                                    GenerateExpression(parameterExpressions[0], workingSet)))?.Simplify();
                             }
 
                             return null;
                         case 2:
                             if (workingSet.BinaryFunctions.TryGetValue(functionName, out Type t2))
                             {
-                                return ((BinaryFunctionNodeBase)Activator.CreateInstance(t2, GenerateExpression(parameterExpressions[0], workingSet), GenerateExpression(parameterExpressions[1], workingSet)))?.Simplify();
+                                return ((BinaryFunctionNodeBase)Activator.CreateInstance(
+                                    t2,
+                                    GenerateExpression(parameterExpressions[0], workingSet),
+                                    GenerateExpression(parameterExpressions[1], workingSet)))?.Simplify();
                             }
 
                             return null;
