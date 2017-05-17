@@ -37,6 +37,11 @@ namespace IX.Math.Generators
             string originalExpression,
             string content)
         {
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return null;
+            }
+
             if (reverseConstantsTable.TryGetValue(content, out string key))
             {
                 return key;

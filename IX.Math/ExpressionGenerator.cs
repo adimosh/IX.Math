@@ -317,33 +317,42 @@ namespace IX.Math
                 if (match.Success)
                 {
                     var functionName = match.Groups["functionName"].Value;
-                    RawExpressionContainer[] expr = match.Groups["expression"].Value
-                        .Split(new[] { workingSet.Definition.ParameterSeparator }, StringSplitOptions.None)
-                        .Select(p => new RawExpressionContainer(p))
-                        .ToArray();
+                    var expressionValue = match.Groups["expression"].Value;
 
-                    NodeBase[] body = GenerateExpression(expr, workingSet);
+                    RawExpressionContainer[] parameterExpressions;
 
-                    switch (expr.Length)
+                    if (string.IsNullOrWhiteSpace(expressionValue))
+                    {
+                        parameterExpressions = new RawExpressionContainer[0];
+                    }
+                    else
+                    {
+                        parameterExpressions = match.Groups["expression"].Value
+                            .Split(new[] { workingSet.Definition.ParameterSeparator }, StringSplitOptions.None)
+                            .Select(p => new RawExpressionContainer(p))
+                            .ToArray();
+                    }
+
+                    switch (parameterExpressions.Length)
                     {
                         case 0:
-                            if (workingSet.UnaryFunctions.TryGetValue(functionName, out Type t))
+                            if (workingSet.NonaryFunctions.TryGetValue(functionName, out Type t))
                             {
-                                return ((UnaryFunctionNodeBase)Activator.CreateInstance(t))?.Simplify();
+                                return ((NonaryFunctionNodeBase)Activator.CreateInstance(t))?.Simplify();
                             }
 
                             return null;
                         case 1:
                             if (workingSet.UnaryFunctions.TryGetValue(functionName, out Type t1))
                             {
-                                return ((UnaryFunctionNodeBase)Activator.CreateInstance(t1, GenerateExpression(expr[0], workingSet)))?.Simplify();
+                                return ((UnaryFunctionNodeBase)Activator.CreateInstance(t1, GenerateExpression(parameterExpressions[0], workingSet)))?.Simplify();
                             }
 
                             return null;
                         case 2:
                             if (workingSet.BinaryFunctions.TryGetValue(functionName, out Type t2))
                             {
-                                return ((BinaryFunctionNodeBase)Activator.CreateInstance(t2, GenerateExpression(expr[0], workingSet), GenerateExpression(expr[1], workingSet)))?.Simplify();
+                                return ((BinaryFunctionNodeBase)Activator.CreateInstance(t2, GenerateExpression(parameterExpressions[0], workingSet), GenerateExpression(parameterExpressions[1], workingSet)))?.Simplify();
                             }
 
                             return null;
