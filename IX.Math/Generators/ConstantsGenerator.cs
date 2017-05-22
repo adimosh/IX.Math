@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using IX.Math.Formatters;
+using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Generators

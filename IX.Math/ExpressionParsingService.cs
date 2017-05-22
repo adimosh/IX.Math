@@ -7,6 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using IX.Math.Generators;
+using IX.Math.Nodes.Constants;
+using IX.Math.Nodes.Parameters;
+using IX.Math.PlatformMitigation;
 
 namespace IX.Math
 {
@@ -15,9 +19,15 @@ namespace IX.Math
     /// </summary>
     public sealed class ExpressionParsingService : IExpressionParsingService
     {
-        private readonly MathDefinition workingDefinition;
+        private MathDefinition workingDefinition;
 
-        private readonly List<Assembly> assembliesToRegister;
+        private List<Assembly> assembliesToRegister;
+
+        private Dictionary<string, Type> nonaryFunctions;
+        private Dictionary<string, Type> unaryFunctions;
+        private Dictionary<string, Type> binaryFunctions;
+
+        private bool disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionParsingService"/> class with a standard math definition object.
@@ -65,6 +75,14 @@ namespace IX.Math
         }
 
         /// <summary>
+        /// Finalizes an instance of the <see cref="ExpressionParsingService"/> class.
+        /// </summary>
+        ~ExpressionParsingService()
+        {
+            this.Dispose(false);
+        }
+
+        /// <summary>
         /// Interprets the mathematical expression and returns a container that can be invoked for solving using specific mathematical types.
         /// </summary>
         /// <param name="expression">The expression to interpret.</param>
@@ -78,7 +96,23 @@ namespace IX.Math
                 throw new ArgumentNullException(nameof(expression));
             }
 
-            var workingSet = new WorkingExpressionSet(expression, this.workingDefinition, this.assembliesToRegister, cancellationToken);
+            this.ThrowIfDisposed();
+
+            if (this.nonaryFunctions == null ||
+                this.unaryFunctions == null ||
+                this.binaryFunctions == null)
+            {
+                this.InitializeFunctionsDictionary();
+            }
+
+            var workingSet = new WorkingExpressionSet(
+                expression,
+                this.workingDefinition,
+                this.assembliesToRegister,
+                this.nonaryFunctions,
+                this.unaryFunctions,
+                this.binaryFunctions,
+                cancellationToken);
 
             ExpressionGenerator.CreateBody(workingSet);
 
@@ -93,6 +127,76 @@ namespace IX.Math
         }
 
         /// <summary>
+        /// Returns the prototypes of all registered functions.
+        /// </summary>
+        /// <returns>All function names, with all possible combinations of input and output data.</returns>
+        public string[] GetRegisteredFunctions()
+        {
+            this.ThrowIfDisposed();
+
+            if (this.nonaryFunctions == null ||
+                this.unaryFunctions == null ||
+                this.binaryFunctions == null)
+            {
+                this.InitializeFunctionsDictionary();
+            }
+
+            var bldr = new List<string>();
+
+            foreach (KeyValuePair<string, Type> function in this.nonaryFunctions)
+            {
+                bldr.Add($"{function.Key}()");
+            }
+
+            foreach (KeyValuePair<string, Type> function in this.unaryFunctions)
+            {
+                foreach (ConstructorInfo constructor in function.Value.GetTypeConstructors())
+                {
+                    ParameterInfo[] parameters = constructor.GetParameters();
+
+                    if (parameters.Length != 1)
+                    {
+                        continue;
+                    }
+
+                    var parameterName = this.GetParameterNode(parameters[0]);
+
+                    if (parameterName == null)
+                    {
+                        continue;
+                    }
+
+                    bldr.Add($"{function.Key}({parameterName})");
+                }
+            }
+
+            foreach (KeyValuePair<string, Type> function in this.binaryFunctions)
+            {
+                foreach (ConstructorInfo constructor in function.Value.GetTypeConstructors())
+                {
+                    ParameterInfo[] parameters = constructor.GetParameters();
+
+                    if (parameters.Length != 2)
+                    {
+                        continue;
+                    }
+
+                    var parameterNameLeft = this.GetParameterNode(parameters[0]);
+                    var parameterNameRight = this.GetParameterNode(parameters[1]);
+
+                    if (parameterNameLeft == null || parameterNameRight == null)
+                    {
+                        continue;
+                    }
+
+                    bldr.Add($"{function.Key}({parameterNameLeft}, {parameterNameRight})");
+                }
+            }
+
+            return bldr.ToArray();
+        }
+
+        /// <summary>
         /// Registers an assembly to extract compatible functions from.
         /// </summary>
         /// <param name="assembly">The assembly to register.</param>
@@ -103,12 +207,115 @@ namespace IX.Math
                 throw new ArgumentNullException(nameof(assembly));
             }
 
+            this.ThrowIfDisposed();
+
             if (this.assembliesToRegister.Contains(assembly))
             {
                 return;
             }
 
             this.assembliesToRegister.Add(assembly);
+
+            this.nonaryFunctions?.Clear();
+            this.unaryFunctions?.Clear();
+            this.binaryFunctions?.Clear();
+        }
+
+        /// <summary>
+        /// Disposes of this instance of the <see cref="ExpressionParsingService"/> class.
+        /// </summary>
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes of this instance of the <see cref="ExpressionParsingService"/> class.
+        /// </summary>
+        /// <param name="isManaged">Indicates whether or not this came from a <see cref="M:Dispose"/> call, or the destructor.</param>
+        private void Dispose(bool isManaged)
+        {
+            if (isManaged)
+            {
+                this.nonaryFunctions?.Clear();
+                this.unaryFunctions?.Clear();
+                this.binaryFunctions?.Clear();
+                this.assembliesToRegister?.Clear();
+            }
+
+            this.nonaryFunctions = null;
+            this.unaryFunctions = null;
+            this.binaryFunctions = null;
+            this.assembliesToRegister = null;
+
+            this.workingDefinition = null;
+
+            this.disposed = true;
+        }
+
+        /// <summary>
+        /// Checks whether this instance of the <see cref="ExpressionParsingService"/> is disposed, and throws an exception if so.
+        /// </summary>
+        private void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(typeof(ExpressionParsingService).FullName);
+            }
+        }
+
+        private void InitializeFunctionsDictionary()
+        {
+            if (this.nonaryFunctions != null)
+            {
+                this.nonaryFunctions.Clear();
+                this.nonaryFunctions = null;
+            }
+
+            if (this.unaryFunctions != null)
+            {
+                this.unaryFunctions.Clear();
+                this.unaryFunctions = null;
+            }
+
+            if (this.binaryFunctions != null)
+            {
+                this.binaryFunctions.Clear();
+                this.binaryFunctions = null;
+            }
+
+            this.nonaryFunctions = FunctionsDictionaryGenerator.GenerateInternalNonaryFunctionsDictionary(this.assembliesToRegister);
+            this.unaryFunctions = FunctionsDictionaryGenerator.GenerateInternalUnaryFunctionsDictionary(this.assembliesToRegister);
+            this.binaryFunctions = FunctionsDictionaryGenerator.GenerateInternalBinaryFunctionsDictionary(this.assembliesToRegister);
+        }
+
+        private string GetParameterNode(ParameterInfo parameter)
+        {
+            if (parameter.ParameterType == typeof(BoolParameterNode) ||
+                parameter.ParameterType == typeof(BoolNode))
+            {
+                return "boolean";
+            }
+            else if (parameter.ParameterType == typeof(NumericParameterNode) ||
+                parameter.ParameterType == typeof(NumericNode))
+            {
+                return "numeric";
+            }
+            else if (parameter.ParameterType == typeof(StringParameterNode) ||
+                parameter.ParameterType == typeof(StringNode))
+            {
+                return "string";
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

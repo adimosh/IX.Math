@@ -4,7 +4,7 @@
 
 using System.Collections.Generic;
 using IX.Math.Generators;
-using IX.Math.Nodes.Constants;
+using IX.Math.Nodes;
 
 namespace IX.Math.Extraction
 {

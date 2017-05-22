@@ -636,77 +636,80 @@ namespace IX.Math.UnitTests
         [MemberData(nameof(ProvideDataForTheory))]
         public void ComputedExpressionWithParameters(string expression, object[] parameters, object expectedResult)
         {
-            var service = new ExpressionParsingService();
+            using (var service = new ExpressionParsingService())
+            {
+                ComputedExpression del;
+                try
+                {
+                    del = service.Interpret(expression);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"The generation process should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
+                }
 
-            ComputedExpression del;
-            try
-            {
-                del = service.Interpret(expression);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"The generation process should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
-            }
+                if (del == null)
+                {
+                    throw new InvalidOperationException("No computed expression was generated!");
+                }
 
-            if (del == null)
-            {
-                throw new InvalidOperationException("No computed expression was generated!");
-            }
+                object result;
+                try
+                {
+                    result = del.Compute(parameters);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"The method should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
+                }
 
-            object result;
-            try
-            {
-                result = del.Compute(parameters);
+                Assert.Equal(expectedResult, result);
             }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"The method should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
-            }
-
-            Assert.Equal(expectedResult, result);
         }
 
         [Theory(DisplayName = "Findr")]
         [MemberData(nameof(ProvideDataForTheory))]
         public void ComputedExpressionWithFinder(string expression, object[] parameters, object expectedResult)
         {
-            var service = new ExpressionParsingService();
-            var finder = new Mock<IDataFinder>(MockBehavior.Loose);
-
-            ComputedExpression del;
-            try
+            using (var service = new ExpressionParsingService())
             {
-                del = service.Interpret(expression);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"The generation process should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
-            }
+                var finder = new Mock<IDataFinder>(MockBehavior.Loose);
 
-            if (del == null)
-            {
-                throw new InvalidOperationException("No computed expression was generated!");
-            }
+                ComputedExpression del;
+                try
+                {
+                    del = service.Interpret(expression);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"The generation process should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
+                }
 
-            for (var i = 0; i < System.Math.Min(del.ParameterNames.Length, parameters.Length); i++)
-            {
-                var valueName = del.ParameterNames[i];
-                var outValue = parameters[i];
+                if (del == null)
+                {
+                    throw new InvalidOperationException("No computed expression was generated!");
+                }
 
-                finder.Setup(p => p.TryGetData(valueName, out outValue)).Returns(true);
-            }
+                for (var i = 0; i < System.Math.Min(del.ParameterNames.Length, parameters.Length); i++)
+                {
+                    var valueName = del.ParameterNames[i];
+                    var outValue = parameters[i];
 
-            object result;
-            try
-            {
-                result = del.Compute(finder.Object);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"The method should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
-            }
+                    finder.Setup(p => p.TryGetData(valueName, out outValue)).Returns(true);
+                }
 
-            Assert.Equal(expectedResult, result);
+                object result;
+                try
+                {
+                    result = del.Compute(finder.Object);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"The method should not have thrown an exception, but it threw {ex.GetType()} with message \"{ex.Message}\".");
+                }
+
+                Assert.Equal(expectedResult, result);
+            }
         }
     }
 }

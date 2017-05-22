@@ -10,7 +10,7 @@ namespace IX.Math.Nodes.Constants
     /// <summary>
     /// A boolean node. This class cannot be inherited.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Constants.ConstantNodeBase" />
+    /// <seealso cref="ConstantNodeBase" />
     [DebuggerDisplay("{Value}")]
     public sealed class BoolNode : ConstantNodeBase
     {

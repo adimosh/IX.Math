@@ -70,5 +70,7 @@ namespace IX.Math.PlatformMitigation
 
                 return true;
             });
+
+        internal static ConstructorInfo[] GetTypeConstructors(this Type type) => type.GetTypeInfo().DeclaredConstructors.ToArray();
     }
 }

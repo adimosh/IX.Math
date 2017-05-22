@@ -10,7 +10,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using IX.Math.Generators;
 using IX.Math.Nodes;
-using IX.Math.Nodes.Constants;
 
 namespace IX.Math
 {
@@ -42,6 +41,7 @@ namespace IX.Math
         // Scrap
         internal Dictionary<string, Type> UnaryOperators;
         internal Dictionary<string, Type> BinaryOperators;
+
         internal Dictionary<string, Type> NonaryFunctions;
         internal Dictionary<string, Type> UnaryFunctions;
         internal Dictionary<string, Type> BinaryFunctions;
@@ -56,7 +56,14 @@ namespace IX.Math
 
         private IEnumerable<Assembly> assembliesForFunctions;
 
-        internal WorkingExpressionSet(string expression, MathDefinition mathDefinition, IEnumerable<Assembly> assembliesForFunctions, CancellationToken cancellationToken)
+        internal WorkingExpressionSet(
+            string expression,
+            MathDefinition mathDefinition,
+            IEnumerable<Assembly> assembliesForFunctions,
+            Dictionary<string, Type> nonaryFunctions,
+            Dictionary<string, Type> unaryFunctions,
+            Dictionary<string, Type> binaryFunctions,
+            CancellationToken cancellationToken)
         {
             this.ConstantsTable = new Dictionary<string, ConstantNodeBase>();
             this.ReverseConstantsTable = new Dictionary<string, string>();
@@ -91,6 +98,10 @@ namespace IX.Math
                 this.Definition.RightShiftSymbol,
                 this.Definition.NotSymbol,
             };
+
+            this.NonaryFunctions = nonaryFunctions;
+            this.UnaryFunctions = unaryFunctions;
+            this.BinaryFunctions = binaryFunctions;
 
             this.FunctionRegex = new Regex($@"(?'functionName'.*?){Regex.Escape(this.Definition.Parantheses.Item1)}(?'expression'.*?){Regex.Escape(this.Definition.Parantheses.Item2)}");
         }
@@ -241,14 +252,14 @@ namespace IX.Math
             // Special symbols
 
             // Euler-Napier constant (e)
-            Generators.ConstantsGenerator.GenerateNamedNumericSymbol(
+            ConstantsGenerator.GenerateNamedNumericSymbol(
                 this.ConstantsTable,
                 this.ReverseConstantsTable,
                 "e",
                 System.Math.E);
 
             // Archimedes-Ludolph constant (pi)
-            Generators.ConstantsGenerator.GenerateNamedNumericSymbol(
+            ConstantsGenerator.GenerateNamedNumericSymbol(
                 this.ConstantsTable,
                 this.ReverseConstantsTable,
                 "π",
@@ -256,7 +267,7 @@ namespace IX.Math
                 $"{this.Definition.SpecialSymbolIndicators.Item1}pi{this.Definition.SpecialSymbolIndicators.Item2}");
 
             // Golden ratio
-            Generators.ConstantsGenerator.GenerateNamedNumericSymbol(
+            ConstantsGenerator.GenerateNamedNumericSymbol(
                 this.ConstantsTable,
                 this.ReverseConstantsTable,
                 "φ",
@@ -264,7 +275,7 @@ namespace IX.Math
                 $"{this.Definition.SpecialSymbolIndicators.Item1}phi{this.Definition.SpecialSymbolIndicators.Item2}");
 
             // Bernstein constant
-            Generators.ConstantsGenerator.GenerateNamedNumericSymbol(
+            ConstantsGenerator.GenerateNamedNumericSymbol(
                 this.ConstantsTable,
                 this.ReverseConstantsTable,
                 "β",
@@ -272,7 +283,7 @@ namespace IX.Math
                 $"{this.Definition.SpecialSymbolIndicators.Item1}beta{this.Definition.SpecialSymbolIndicators.Item2}");
 
             // Euler-Mascheroni constant
-            Generators.ConstantsGenerator.GenerateNamedNumericSymbol(
+            ConstantsGenerator.GenerateNamedNumericSymbol(
                 this.ConstantsTable,
                 this.ReverseConstantsTable,
                 "γ",
@@ -280,7 +291,7 @@ namespace IX.Math
                 $"{this.Definition.SpecialSymbolIndicators.Item1}gamma{this.Definition.SpecialSymbolIndicators.Item2}");
 
             // Gauss-Kuzmin-Wirsing constant
-            Generators.ConstantsGenerator.GenerateNamedNumericSymbol(
+            ConstantsGenerator.GenerateNamedNumericSymbol(
                 this.ConstantsTable,
                 this.ReverseConstantsTable,
                 "λ",
@@ -302,10 +313,6 @@ namespace IX.Math
                 .Select(p => new { Name = p.Name, Type = Type.GetType($"IX.Math.Nodes.Operations.Binary.{p.Name}Node", false), Value = p.Value })
                 .Where(p => p.Type != null)
                 .ToDictionary(p => p.Value, p => p.Type);
-
-            this.NonaryFunctions = FunctionsDictionaryGenerator.GenerateInternalNonaryFunctionsDictionary(this.assembliesForFunctions);
-            this.UnaryFunctions = FunctionsDictionaryGenerator.GenerateInternalUnaryFunctionsDictionary(this.assembliesForFunctions);
-            this.BinaryFunctions = FunctionsDictionaryGenerator.GenerateInternalBinaryFunctionsDictionary(this.assembliesForFunctions);
         }
     }
 }

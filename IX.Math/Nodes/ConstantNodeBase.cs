@@ -2,12 +2,12 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-namespace IX.Math.Nodes.Constants
+namespace IX.Math.Nodes
 {
     /// <summary>
     /// A base class for constants.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.NodeBase" />
+    /// <seealso cref="NodeBase" />
     public abstract class ConstantNodeBase : NodeBase
     {
         /// <summary>

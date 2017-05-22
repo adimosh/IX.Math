@@ -73,6 +73,12 @@ namespace IX.Math
         public void RegisterFunctionsAssembly(Assembly assembly) => this.eps.RegisterFunctionsAssembly(assembly);
 
         /// <summary>
+        /// Returns the prototypes of all registered functions.
+        /// </summary>
+        /// <returns>All function names, with all possible combinations of input and output data.</returns>
+        public string[] GetRegisteredFunctions() => this.eps.GetRegisteredFunctions();
+
+        /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
@@ -83,6 +89,7 @@ namespace IX.Math
                 if (disposing)
                 {
                     this.cachedComputedExpressions.Clear();
+                    this.eps.Dispose();
                 }
 
                 this.cachedComputedExpressions = null;
