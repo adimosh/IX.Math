@@ -630,6 +630,18 @@ namespace IX.Math.UnitTests
                     new object[] { 5.5, 3 },
                     5.5,
                 },
+                new object[]
+                {
+                    "substr(x,y)",
+                    new object[] { "aaabbb", 3 },
+                    "bbb",
+                },
+                //new object[]
+                //{
+                //    "substr(x,y,z)",
+                //    new object[] { "aaabbb", 3, 2 },
+                //    "bb",
+                //},
             };
 
         [Theory(DisplayName = "Para")]
