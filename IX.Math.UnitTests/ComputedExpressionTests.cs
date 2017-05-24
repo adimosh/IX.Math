@@ -666,6 +666,66 @@ namespace IX.Math.UnitTests
                     new object[0],
                     "aaab",
                 },
+                new object[]
+                {
+                    "\"aaa\" > \"bbb\"",
+                    new object[0],
+                    false,
+                },
+                new object[]
+                {
+                    "\"aaa\" > x",
+                    new object[1] { "z" },
+                    false,
+                },
+                new object[]
+                {
+                    "\"aaa\" < \"bbb\"",
+                    new object[0],
+                    true,
+                },
+                new object[]
+                {
+                    "\"aaa\" < x",
+                    new object[1] { "aa" },
+                    false,
+                },
+                new object[]
+                {
+                    "\"aaa\" >= \"bbb\"",
+                    new object[0],
+                    false,
+                },
+                new object[]
+                {
+                    "\"aaa\" >= x",
+                    new object[1] { "z" },
+                    false,
+                },
+                new object[]
+                {
+                    "\"aaa\" <= \"bbb\"",
+                    new object[0],
+                    true,
+                },
+                new object[]
+                {
+                    "\"aaa\" <= x",
+                    new object[1] { "aa" },
+                    false,
+                },
+                new object[]
+                {
+                    "\"aaa\" <= \"aaa\"",
+                    new object[0],
+                    true,
+                },
+                new object[]
+                {
+                    "\"aaa\" >= \"aaa\"",
+                    new object[0],
+                    true,
+                },
             };
 
         [Theory(DisplayName = "Para")]
