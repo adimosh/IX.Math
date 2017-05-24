@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
+using IX.Math.PlatformMitigation;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
@@ -282,7 +283,8 @@ namespace IX.Math.Nodes.Operations.Binary
 
             if (this.ReturnType == SupportedValueType.String)
             {
-                return Expression.Call(typeof(string), nameof(string.Concat), null, pars.Item1, pars.Item2);
+                var mi = typeof(string).GetTypeMethod(nameof(string.Concat), typeof(string), typeof(string));
+                return Expression.Call(mi, pars.Item1, pars.Item2);
             }
             else
             {

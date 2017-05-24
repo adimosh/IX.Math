@@ -347,9 +347,9 @@ namespace IX.Math.Nodes.Operations.Function.Ternary
 
         public override NodeBase Simplify()
         {
-            if (this.FirstParameter is StringNode stringParam && this.SecondParameter is NumericNode numericParam)
+            if (this.FirstParameter is StringNode stringParam && this.SecondParameter is NumericNode numericParam && this.ThirdParameter is NumericNode secondNumericParam)
             {
-                return new StringNode(stringParam.Value.Substring(numericParam.ExtractInt()));
+                return new StringNode(stringParam.Value.Substring(numericParam.ExtractInt(), secondNumericParam.ExtractInt()));
             }
 
             return this;

@@ -642,6 +642,30 @@ namespace IX.Math.UnitTests
                     new object[] { "aaabbb", 3, 2 },
                     "bb",
                 },
+                new object[]
+                {
+                    "strlen(substr(x,y,z))",
+                    new object[] { "aaabbb", 3, 2 },
+                    2L,
+                },
+                new object[]
+                {
+                    "substr(x,y,z)+substr(q,y,z)",
+                    new object[] { "aaabbb", 3, 2, "ccccddd" },
+                    "bbcd",
+                },
+                new object[]
+                {
+                    "\"aaa\" + \"bbb\"",
+                    new object[0],
+                    "aaabbb",
+                },
+                new object[]
+                {
+                    "\"aaa\" + substr(\"bbbbbb\", 1, 1)",
+                    new object[0],
+                    "aaab",
+                },
             };
 
         [Theory(DisplayName = "Para")]
