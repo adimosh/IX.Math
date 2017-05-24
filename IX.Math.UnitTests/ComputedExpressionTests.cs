@@ -636,12 +636,12 @@ namespace IX.Math.UnitTests
                     new object[] { "aaabbb", 3 },
                     "bbb",
                 },
-                //new object[]
-                //{
-                //    "substr(x,y,z)",
-                //    new object[] { "aaabbb", 3, 2 },
-                //    "bb",
-                //},
+                new object[]
+                {
+                    "substr(x,y,z)",
+                    new object[] { "aaabbb", 3, 2 },
+                    "bb",
+                },
             };
 
         [Theory(DisplayName = "Para")]

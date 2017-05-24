@@ -26,6 +26,7 @@ namespace IX.Math
         private Dictionary<string, Type> nonaryFunctions;
         private Dictionary<string, Type> unaryFunctions;
         private Dictionary<string, Type> binaryFunctions;
+        private Dictionary<string, Type> ternaryFunctions;
 
         private bool disposed;
 
@@ -100,7 +101,8 @@ namespace IX.Math
 
             if (this.nonaryFunctions == null ||
                 this.unaryFunctions == null ||
-                this.binaryFunctions == null)
+                this.binaryFunctions == null ||
+                this.ternaryFunctions == null)
             {
                 this.InitializeFunctionsDictionary();
             }
@@ -112,6 +114,7 @@ namespace IX.Math
                 this.nonaryFunctions,
                 this.unaryFunctions,
                 this.binaryFunctions,
+                this.ternaryFunctions,
                 cancellationToken);
 
             ExpressionGenerator.CreateBody(workingSet);
@@ -136,7 +139,8 @@ namespace IX.Math
 
             if (this.nonaryFunctions == null ||
                 this.unaryFunctions == null ||
-                this.binaryFunctions == null)
+                this.binaryFunctions == null ||
+                this.ternaryFunctions == null)
             {
                 this.InitializeFunctionsDictionary();
             }
@@ -193,6 +197,30 @@ namespace IX.Math
                 }
             }
 
+            foreach (KeyValuePair<string, Type> function in this.ternaryFunctions)
+            {
+                foreach (ConstructorInfo constructor in function.Value.GetTypeConstructors())
+                {
+                    ParameterInfo[] parameters = constructor.GetParameters();
+
+                    if (parameters.Length != 3)
+                    {
+                        continue;
+                    }
+
+                    var parameterNameLeft = this.GetParameterNode(parameters[0]);
+                    var parameterNameMiddle = this.GetParameterNode(parameters[1]);
+                    var parameterNameRight = this.GetParameterNode(parameters[2]);
+
+                    if (parameterNameLeft == null || parameterNameMiddle == null || parameterNameRight == null)
+                    {
+                        continue;
+                    }
+
+                    bldr.Add($"{function.Key}({parameterNameLeft}, {parameterNameMiddle}, {parameterNameRight})");
+                }
+            }
+
             return bldr.ToArray();
         }
 
@@ -219,6 +247,7 @@ namespace IX.Math
             this.nonaryFunctions?.Clear();
             this.unaryFunctions?.Clear();
             this.binaryFunctions?.Clear();
+            this.ternaryFunctions?.Clear();
         }
 
         /// <summary>
@@ -246,12 +275,14 @@ namespace IX.Math
                 this.nonaryFunctions?.Clear();
                 this.unaryFunctions?.Clear();
                 this.binaryFunctions?.Clear();
+                this.ternaryFunctions?.Clear();
                 this.assembliesToRegister?.Clear();
             }
 
             this.nonaryFunctions = null;
             this.unaryFunctions = null;
             this.binaryFunctions = null;
+            this.ternaryFunctions = null;
             this.assembliesToRegister = null;
 
             this.workingDefinition = null;
@@ -290,9 +321,16 @@ namespace IX.Math
                 this.binaryFunctions = null;
             }
 
+            if (this.ternaryFunctions != null)
+            {
+                this.ternaryFunctions.Clear();
+                this.ternaryFunctions = null;
+            }
+
             this.nonaryFunctions = FunctionsDictionaryGenerator.GenerateInternalNonaryFunctionsDictionary(this.assembliesToRegister);
             this.unaryFunctions = FunctionsDictionaryGenerator.GenerateInternalUnaryFunctionsDictionary(this.assembliesToRegister);
             this.binaryFunctions = FunctionsDictionaryGenerator.GenerateInternalBinaryFunctionsDictionary(this.assembliesToRegister);
+            this.ternaryFunctions = FunctionsDictionaryGenerator.GenerateInternalTernaryFunctionsDictionary(this.assembliesToRegister);
         }
 
         private string GetParameterNode(ParameterInfo parameter)

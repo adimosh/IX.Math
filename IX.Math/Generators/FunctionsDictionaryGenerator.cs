@@ -23,6 +23,9 @@ namespace IX.Math.Generators
         internal static Dictionary<string, Type> GenerateInternalBinaryFunctionsDictionary(IEnumerable<Assembly> assemblies)
             => GenerateTypeAssignableFrom<BinaryFunctionNodeBase>(assemblies);
 
+        internal static Dictionary<string, Type> GenerateInternalTernaryFunctionsDictionary(IEnumerable<Assembly> assemblies)
+            => GenerateTypeAssignableFrom<TernaryFunctionNodeBase>(assemblies);
+
         internal static Dictionary<string, Type> GenerateTypeAssignableFrom<T>(IEnumerable<Assembly> assemblies)
             where T : FunctionNodeBase
         {

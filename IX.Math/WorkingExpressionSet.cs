@@ -45,6 +45,7 @@ namespace IX.Math
         internal Dictionary<string, Type> NonaryFunctions;
         internal Dictionary<string, Type> UnaryFunctions;
         internal Dictionary<string, Type> BinaryFunctions;
+        internal Dictionary<string, Type> TernaryFunctions;
 
         // Results
         internal object ValueIfConstant;
@@ -63,6 +64,7 @@ namespace IX.Math
             Dictionary<string, Type> nonaryFunctions,
             Dictionary<string, Type> unaryFunctions,
             Dictionary<string, Type> binaryFunctions,
+            Dictionary<string, Type> ternaryFunctions,
             CancellationToken cancellationToken)
         {
             this.ConstantsTable = new Dictionary<string, ConstantNodeBase>();
@@ -102,6 +104,7 @@ namespace IX.Math
             this.NonaryFunctions = nonaryFunctions;
             this.UnaryFunctions = unaryFunctions;
             this.BinaryFunctions = binaryFunctions;
+            this.TernaryFunctions = ternaryFunctions;
 
             this.FunctionRegex = new Regex($@"(?'functionName'.*?){Regex.Escape(this.Definition.Parantheses.Item1)}(?'expression'.*?){Regex.Escape(this.Definition.Parantheses.Item2)}");
         }

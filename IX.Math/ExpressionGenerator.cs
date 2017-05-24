@@ -9,7 +9,6 @@ using IX.Math.Extraction;
 using IX.Math.Formatters;
 using IX.Math.Generators;
 using IX.Math.Nodes;
-using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Operations.Binary;
 using IX.Math.Nodes.Operations.Unary;
 
@@ -358,6 +357,17 @@ namespace IX.Math
                                     t2,
                                     GenerateExpression(parameterExpressions[0], workingSet),
                                     GenerateExpression(parameterExpressions[1], workingSet)))?.Simplify();
+                            }
+
+                            return null;
+                        case 3:
+                            if (workingSet.TernaryFunctions.TryGetValue(functionName, out Type t3))
+                            {
+                                return ((TernaryFunctionNodeBase)Activator.CreateInstance(
+                                    t3,
+                                    GenerateExpression(parameterExpressions[0], workingSet),
+                                    GenerateExpression(parameterExpressions[1], workingSet),
+                                    GenerateExpression(parameterExpressions[2], workingSet)))?.Simplify();
                             }
 
                             return null;
