@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using IX.Math.Extensibility;
 using IX.Math.Nodes;
-using IX.Math.PlatformMitigation;
+using IX.StandardExtensions;
 
 namespace IX.Math.Generators
 {
