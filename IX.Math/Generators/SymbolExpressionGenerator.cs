@@ -12,10 +12,9 @@ namespace IX.Math.Generators
             Dictionary<string, RawExpressionContainer> symbolTable,
             Dictionary<string, string> reverseSymbolTable,
             string expression,
-            bool isFunction = false,
-            bool isString = false)
+            bool isFunction = false)
         {
-            var expressionContainer = new RawExpressionContainer(expression, isFunction, isString);
+            var expressionContainer = new RawExpressionContainer(expression, isFunction);
             if (!reverseSymbolTable.TryGetValue(expression, out string itemName))
             {
                 itemName = $"item{symbolTable.Count}";

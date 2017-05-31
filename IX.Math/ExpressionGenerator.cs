@@ -69,7 +69,7 @@ namespace IX.Math
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Populating symbol tables
-            foreach (var p in workingSet.SymbolTable.Where(p => !p.Value.IsFunctionCall && !p.Value.IsString).Select(p => p.Value.Expression))
+            foreach (var p in workingSet.SymbolTable.Where(p => !p.Value.IsFunctionCall).Select(p => p.Value.Expression))
             {
                 TablePopulationGenerator.PopulateTables(
                     p,

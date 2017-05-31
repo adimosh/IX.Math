@@ -11,24 +11,24 @@ namespace IX.Math.Generators
     internal static class ParenthesesExpressionGenerator
     {
         internal static void FormatParentheses(
-            string openParanthesis,
-            string closeParanthesis,
+            string openParenthesis,
+            string closeParenthesis,
             string parameterSeparator,
             string[] allOperatorsInOrder,
             Dictionary<string, RawExpressionContainer> symbolTable,
             Dictionary<string, string> reverseSymbolTable)
         {
-            FormatParanthesis(string.Empty);
+            FormatParenthesis(string.Empty);
             string[] names = symbolTable.Keys.Where(p => p.StartsWith("item")).ToArray();
             foreach (var name in names)
             {
-                FormatParanthesis(name);
+                FormatParenthesis(name);
             }
 
-            void FormatParanthesis(string key)
+            void FormatParenthesis(string key)
             {
                 RawExpressionContainer symbol = symbolTable[key];
-                if (symbol.IsFunctionCall || symbol.IsString)
+                if (symbol.IsFunctionCall)
                 {
                     return;
                 }
@@ -49,8 +49,8 @@ namespace IX.Math.Generators
                         return string.Empty;
                     }
 
-                    var openingParanthesisLocation = source.IndexOf(openParanthesis);
-                    var closingParanthesisLocation = source.IndexOf(closeParanthesis);
+                    var openingParanthesisLocation = source.IndexOf(openParenthesis);
+                    var closingParanthesisLocation = source.IndexOf(closeParenthesis);
 
                     beginning:
                     if (openingParanthesisLocation != -1)
@@ -59,7 +59,7 @@ namespace IX.Math.Generators
                         {
                             if (openingParanthesisLocation < closingParanthesisLocation)
                             {
-                                var resultingSubExpression = ReplaceParanthesis(source.Substring(openingParanthesisLocation + openParanthesis.Length));
+                                var resultingSubExpression = ReplaceParanthesis(source.Substring(openingParanthesisLocation + openParenthesis.Length));
 
                                 if (openingParanthesisLocation == 0)
                                 {
@@ -80,7 +80,7 @@ namespace IX.Math.Generators
                                         var expr2 = SymbolExpressionGenerator.GenerateSymbolExpression(
                                             symbolTable,
                                             reverseSymbolTable,
-                                            $"{expr6}{openParanthesis}item{symbolTable.Count - 1}{closeParanthesis}");
+                                            $"{expr6}{openParenthesis}item{symbolTable.Count - 1}{closeParenthesis}");
 
                                         if (expr6 == expr4)
                                         {
@@ -97,8 +97,8 @@ namespace IX.Math.Generators
                                     source = $"{expr4}{resultingSubExpression}";
                                 }
 
-                                openingParanthesisLocation = source.IndexOf(openParanthesis);
-                                closingParanthesisLocation = source.IndexOf(closeParanthesis);
+                                openingParanthesisLocation = source.IndexOf(openParenthesis);
+                                closingParanthesisLocation = source.IndexOf(closeParenthesis);
 
                                 goto beginning;
                             }
@@ -139,7 +139,7 @@ namespace IX.Math.Generators
                             parSymbols.Add(expr2);
                         }
 
-                        var k = cp + closeParanthesis.Length;
+                        var k = cp + closeParenthesis.Length;
                         return $"{string.Join(parameterSeparator, parSymbols)}{(source.Length == k ? string.Empty : source.Substring(k))}";
                     }
                 }

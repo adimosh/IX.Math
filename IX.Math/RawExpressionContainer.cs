@@ -10,7 +10,7 @@ namespace IX.Math
     [DebuggerDisplay("{Expression}")]
     internal sealed class RawExpressionContainer : IEquatable<RawExpressionContainer>
     {
-        internal RawExpressionContainer(string expression, bool isFunction = false, bool isString = false)
+        internal RawExpressionContainer(string expression, bool isFunction = false)
         {
             if (string.IsNullOrWhiteSpace(expression))
             {
@@ -22,14 +22,11 @@ namespace IX.Math
             }
 
             this.IsFunctionCall = isFunction;
-            this.IsString = isString;
         }
 
         public string Expression { get; private set; }
 
         public bool IsFunctionCall { get; private set; }
-
-        public bool IsString { get; private set; }
 
         public bool Equals(RawExpressionContainer other)
         {
@@ -39,8 +36,7 @@ namespace IX.Math
             }
 
             return this.Expression == other.Expression &&
-                this.IsFunctionCall == other.IsFunctionCall &&
-                this.IsString == other.IsString;
+                this.IsFunctionCall == other.IsFunctionCall;
         }
     }
 }

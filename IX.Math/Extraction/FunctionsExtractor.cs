@@ -18,8 +18,8 @@ namespace IX.Math.Extraction
         /// <summary>
         /// Replaces functions calls with expression placeholders.
         /// </summary>
-        /// <param name="openParanthesis">The symbol of an open paranthesis.</param>
-        /// <param name="closeParanthesis">The symbol of a closed paranthesis.</param>
+        /// <param name="openParenthesis">The symbol of an open parenthesis.</param>
+        /// <param name="closeParenthesis">The symbol of a closed parenthesis.</param>
         /// <param name="parameterSeparator">The symbol of a parameter separator.</param>
         /// <param name="constantsTable">The constants table.</param>
         /// <param name="reverseConstantsTable">The reverse-lookup constants table.</param>
@@ -30,8 +30,8 @@ namespace IX.Math.Extraction
         /// <param name="allOperatorsInOrder">All operators, in order.</param>
         /// <param name="allSymbols">All symbols.</param>
         internal static void ReplaceFunctions(
-            string openParanthesis,
-            string closeParanthesis,
+            string openParenthesis,
+            string closeParenthesis,
             string parameterSeparator,
             Dictionary<string, ConstantNodeBase> constantsTable,
             Dictionary<string, string> reverseConstantsTable,
@@ -51,7 +51,7 @@ namespace IX.Math.Extraction
             void ReplaceOneFunction(string key)
             {
                 RawExpressionContainer symbol = symbolTable[key];
-                if (symbol.IsFunctionCall || symbol.IsString)
+                if (symbol.IsFunctionCall)
                 {
                     return;
                 }
@@ -69,7 +69,7 @@ namespace IX.Math.Extraction
 
                     while (true)
                     {
-                        op = source.IndexOf(openParanthesis, op + openParanthesis.Length);
+                        op = source.IndexOf(openParenthesis, op + openParenthesis.Length);
 
                         if (op == -1)
                         {
@@ -90,13 +90,13 @@ namespace IX.Math.Extraction
 
                         var functionHeader = functionHeaderCheck.Split(allSymbols, StringSplitOptions.None).Last();
 
-                        var oop = source.IndexOf(openParanthesis, op + openParanthesis.Length);
-                        var cp = source.IndexOf(closeParanthesis, op + closeParanthesis.Length);
+                        var oop = source.IndexOf(openParenthesis, op + openParenthesis.Length);
+                        var cp = source.IndexOf(closeParenthesis, op + closeParenthesis.Length);
 
                         while (oop < cp && oop != -1 && cp != -1)
                         {
-                            oop = source.IndexOf(openParanthesis, oop + openParanthesis.Length);
-                            cp = source.IndexOf(closeParanthesis, cp + closeParanthesis.Length);
+                            oop = source.IndexOf(openParenthesis, oop + openParenthesis.Length);
+                            cp = source.IndexOf(closeParenthesis, cp + closeParenthesis.Length);
                         }
 
                         if (cp == -1)
@@ -104,7 +104,7 @@ namespace IX.Math.Extraction
                             continue;
                         }
 
-                        var arguments = source.Substring(op + openParanthesis.Length, cp - op - openParanthesis.Length);
+                        var arguments = source.Substring(op + openParenthesis.Length, cp - op - openParenthesis.Length);
                         var originalArguments = arguments;
 
                         var q = arguments;
@@ -125,7 +125,7 @@ namespace IX.Math.Extraction
                                 reverseSymbolTable,
                                 parametersTable,
                                 expression,
-                                openParanthesis,
+                                openParenthesis,
                                 allOperatorsInOrder);
 
                             // We check whether or not this is actually a constant
@@ -146,8 +146,8 @@ namespace IX.Math.Extraction
                             argPlaceholders.Add(sa);
                         }
 
-                        var functionCallBody = $"{functionHeader}{openParanthesis}{string.Join(parameterSeparator, argPlaceholders)}{closeParanthesis}";
-                        var functionCallToReplace = $"{functionHeader}{openParanthesis}{originalArguments}{closeParanthesis}";
+                        var functionCallBody = $"{functionHeader}{openParenthesis}{string.Join(parameterSeparator, argPlaceholders)}{closeParenthesis}";
+                        var functionCallToReplace = $"{functionHeader}{openParenthesis}{originalArguments}{closeParenthesis}";
                         var functionCallItem = SymbolExpressionGenerator.GenerateSymbolExpression(symbolTable, reverseSymbolTable, functionCallBody, isFunction: true);
 
                         return source.Replace(
