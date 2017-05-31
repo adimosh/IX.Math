@@ -66,10 +66,12 @@ namespace IX.Math.Extraction
                 string ReplaceFunctions(string source)
                 {
                     var op = -1;
+                    var opl = openParenthesis.Length;
+                    var cpl = closeParenthesis.Length;
 
                     while (true)
                     {
-                        op = source.IndexOf(openParenthesis, op + openParenthesis.Length);
+                        op = source.IndexOf(openParenthesis, op + opl);
 
                         if (op == -1)
                         {
@@ -90,13 +92,13 @@ namespace IX.Math.Extraction
 
                         var functionHeader = functionHeaderCheck.Split(allSymbols, StringSplitOptions.None).Last();
 
-                        var oop = source.IndexOf(openParenthesis, op + openParenthesis.Length);
-                        var cp = source.IndexOf(closeParenthesis, op + closeParenthesis.Length);
+                        var oop = source.IndexOf(openParenthesis, op + opl);
+                        var cp = source.IndexOf(closeParenthesis, op + cpl);
 
                         while (oop < cp && oop != -1 && cp != -1)
                         {
-                            oop = source.IndexOf(openParenthesis, oop + openParenthesis.Length);
-                            cp = source.IndexOf(closeParenthesis, cp + closeParenthesis.Length);
+                            oop = source.IndexOf(openParenthesis, oop + opl);
+                            cp = source.IndexOf(closeParenthesis, cp + cpl);
                         }
 
                         if (cp == -1)
@@ -104,7 +106,7 @@ namespace IX.Math.Extraction
                             continue;
                         }
 
-                        var arguments = source.Substring(op + openParenthesis.Length, cp - op - openParenthesis.Length);
+                        var arguments = source.Substring(op + opl, cp - op - opl);
                         var originalArguments = arguments;
 
                         var q = arguments;
@@ -115,7 +117,7 @@ namespace IX.Math.Extraction
                         }
 
                         var argPlaceholders = new List<string>();
-                        foreach (var s in arguments.Split(new[] { parameterSeparator }, StringSplitOptions.None))
+                        foreach (var s in arguments.Split(new[] { parameterSeparator }, StringSplitOptions.RemoveEmptyEntries))
                         {
                             TablePopulationGenerator.PopulateTables(
                                 s,
@@ -132,7 +134,8 @@ namespace IX.Math.Extraction
                             var sa = ConstantsGenerator.CheckAndAdd(constantsTable, reverseConstantsTable, expression, s);
                             if (sa == null)
                             {
-                                if (parametersTable.ContainsKey(s))
+                                // We check whether or not this is actually an already-recognized external parameter
+                                if (!parametersTable.ContainsKey(s))
                                 {
                                     // Not a constant, and also not an already-recognized external parameter, let's generate a symbol
                                     sa = SymbolExpressionGenerator.GenerateSymbolExpression(symbolTable, reverseSymbolTable, s);
