@@ -35,7 +35,7 @@ namespace IX.Math.Extraction
             string parameterSeparator,
             Dictionary<string, ConstantNodeBase> constantsTable,
             Dictionary<string, string> reverseConstantsTable,
-            Dictionary<string, RawExpressionContainer> symbolTable,
+            Dictionary<string, Tuple<RawExpressionContainer, SymbolOptimizationData>> symbolTable,
             Dictionary<string, string> reverseSymbolTable,
             Dictionary<string, ParameterNodeBase> parametersTable,
             string expression,
@@ -50,7 +50,7 @@ namespace IX.Math.Extraction
 
             void ReplaceOneFunction(string key)
             {
-                RawExpressionContainer symbol = symbolTable[key];
+                RawExpressionContainer symbol = symbolTable[key].Item1;
                 if (symbol.IsFunctionCall)
                 {
                     return;
@@ -59,7 +59,7 @@ namespace IX.Math.Extraction
                 var replaced = symbol.Expression;
                 while (replaced != null)
                 {
-                    symbolTable[key] = new RawExpressionContainer(replaced);
+                    symbolTable[key].Item1.Expression = replaced;
                     replaced = ReplaceFunctions(replaced);
                 }
 

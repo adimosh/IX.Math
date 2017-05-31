@@ -32,12 +32,14 @@ namespace IX.Math
 
             workingSet.Expression = SubExpressionFormatter.Cleanup(workingSet.Expression);
 
-            workingSet.SymbolTable.Add(string.Empty, new RawExpressionContainer(workingSet.Expression));
+            workingSet.SymbolTable.Add(
+                string.Empty,
+                new Tuple<RawExpressionContainer, SymbolOptimizationData>(new RawExpressionContainer(workingSet.Expression), new SymbolOptimizationData()));
 
             // Prepares expression and takes care of operators to ensure that they are all OK and usable
             workingSet.Initialize();
 
-            workingSet.SymbolTable[string.Empty] = new RawExpressionContainer(workingSet.Expression);
+            workingSet.SymbolTable[string.Empty].Item1.Expression = workingSet.Expression;
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
@@ -69,7 +71,7 @@ namespace IX.Math
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Populating symbol tables
-            foreach (var p in workingSet.SymbolTable.Where(p => !p.Value.IsFunctionCall).Select(p => p.Value.Expression))
+            foreach (var p in workingSet.SymbolTable.Where(p => !p.Value.Item1.IsFunctionCall).Select(p => p.Value.Item1.Expression))
             {
                 TablePopulationGenerator.PopulateTables(
                     p,
@@ -88,7 +90,7 @@ namespace IX.Math
             // Generate expressions
             try
             {
-                workingSet.Body = GenerateExpression(workingSet.SymbolTable[string.Empty], workingSet);
+                workingSet.Body = GenerateExpression(workingSet.SymbolTable[string.Empty].Item1, workingSet);
             }
             catch
             {
@@ -160,16 +162,16 @@ namespace IX.Math
             // Check whether the expression already exists in the symbols table
             if (workingSet.SymbolTable.TryGetValue(s, out var e1))
             {
-                return GenerateExpression(e1, workingSet);
+                return GenerateExpression(e1.Item1, workingSet);
             }
 
             if (workingSet.ReverseSymbolTable.TryGetValue(s, out var e2))
             {
                 if (workingSet.SymbolTable.TryGetValue(e2, out var e3))
                 {
-                    if (e3.Expression != s)
+                    if (e3.Item1.Expression != s)
                     {
-                        return GenerateExpression(e3, workingSet);
+                        return GenerateExpression(e3.Item1, workingSet);
                     }
                 }
             }

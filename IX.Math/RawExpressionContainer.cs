@@ -10,21 +10,29 @@ namespace IX.Math
     [DebuggerDisplay("{Expression}")]
     internal sealed class RawExpressionContainer : IEquatable<RawExpressionContainer>
     {
+        private string expression;
+
         internal RawExpressionContainer(string expression, bool isFunction = false)
         {
-            if (string.IsNullOrWhiteSpace(expression))
-            {
-                this.Expression = null;
-            }
-            else
-            {
-                this.Expression = expression;
-            }
-
+            this.Expression = expression;
             this.IsFunctionCall = isFunction;
         }
 
-        public string Expression { get; private set; }
+        public string Expression
+        {
+            get => this.expression;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    this.expression = null;
+                }
+                else
+                {
+                    this.expression = value;
+                }
+            }
+        }
 
         public bool IsFunctionCall { get; private set; }
 

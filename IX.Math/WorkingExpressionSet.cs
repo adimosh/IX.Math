@@ -32,7 +32,7 @@ namespace IX.Math
         // Working domain
         internal Dictionary<string, ConstantNodeBase> ConstantsTable;
         internal Dictionary<string, string> ReverseConstantsTable;
-        internal Dictionary<string, RawExpressionContainer> SymbolTable;
+        internal Dictionary<string, Tuple<RawExpressionContainer, SymbolOptimizationData>> SymbolTable;
         internal Dictionary<string, string> ReverseSymbolTable;
         internal Dictionary<string, ParameterNodeBase> ParametersTable;
         internal string Expression;
@@ -70,7 +70,7 @@ namespace IX.Math
             this.ConstantsTable = new Dictionary<string, ConstantNodeBase>();
             this.ReverseConstantsTable = new Dictionary<string, string>();
             this.ParametersTable = new Dictionary<string, ParameterNodeBase>();
-            this.SymbolTable = new Dictionary<string, RawExpressionContainer>();
+            this.SymbolTable = new Dictionary<string, Tuple<RawExpressionContainer, SymbolOptimizationData>>();
             this.ReverseSymbolTable = new Dictionary<string, string>();
 
             this.InitialExpression = expression;

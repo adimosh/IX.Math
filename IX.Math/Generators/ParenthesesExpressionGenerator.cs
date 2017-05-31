@@ -15,7 +15,7 @@ namespace IX.Math.Generators
             string closeParenthesis,
             string parameterSeparator,
             string[] allOperatorsInOrder,
-            Dictionary<string, RawExpressionContainer> symbolTable,
+            Dictionary<string, Tuple<RawExpressionContainer, SymbolOptimizationData>> symbolTable,
             Dictionary<string, string> reverseSymbolTable)
         {
             FormatParenthesis(string.Empty);
@@ -27,7 +27,7 @@ namespace IX.Math.Generators
 
             void FormatParenthesis(string key)
             {
-                RawExpressionContainer symbol = symbolTable[key];
+                RawExpressionContainer symbol = symbolTable[key].Item1;
                 if (symbol.IsFunctionCall)
                 {
                     return;
@@ -37,7 +37,7 @@ namespace IX.Math.Generators
                 var replaced = symbol.Expression;
                 while (replaced != replacedPreviously)
                 {
-                    symbolTable[key] = new RawExpressionContainer(replaced);
+                    symbolTable[key].Item1.Expression = replaced;
                     replacedPreviously = replaced;
                     replaced = ReplaceParanthesis(replaced);
                 }

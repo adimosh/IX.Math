@@ -29,7 +29,7 @@ namespace IX.Math.Generators
             string processedExpression,
             Dictionary<string, ConstantNodeBase> constantsTable,
             Dictionary<string, string> reverseConstantsTable,
-            Dictionary<string, RawExpressionContainer> symbolTable,
+            Dictionary<string, Tuple<RawExpressionContainer, SymbolOptimizationData>> symbolTable,
             Dictionary<string, string> reverseSymbolTable,
             Dictionary<string, ParameterNodeBase> parametersTable,
             string expression,
