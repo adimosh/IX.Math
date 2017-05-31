@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using IX.Math.Generators;
+using IX.Math.Nodes;
 
 namespace IX.Math.Extraction
 {
@@ -17,18 +18,39 @@ namespace IX.Math.Extraction
         /// <summary>
         /// Replaces functions calls with expression placeholders.
         /// </summary>
-        /// <param name="workingSet">The working set.</param>
-        internal static void ReplaceFunctions(WorkingExpressionSet workingSet)
+        /// <param name="openParanthesis">The symbol of an open paranthesis.</param>
+        /// <param name="closeParanthesis">The symbol of a closed paranthesis.</param>
+        /// <param name="parameterSeparator">The symbol of a parameter separator.</param>
+        /// <param name="constantsTable">The constants table.</param>
+        /// <param name="reverseConstantsTable">The reverse-lookup constants table.</param>
+        /// <param name="symbolTable">The symbols table.</param>
+        /// <param name="reverseSymbolTable">The reverse-lookup symbols table.</param>
+        /// <param name="parametersTable">The parameters table.</param>
+        /// <param name="expression">The expression before processing.</param>
+        /// <param name="allOperatorsInOrder">All operators, in order.</param>
+        /// <param name="allSymbols">All symbols.</param>
+        internal static void ReplaceFunctions(
+            string openParanthesis,
+            string closeParanthesis,
+            string parameterSeparator,
+            Dictionary<string, ConstantNodeBase> constantsTable,
+            Dictionary<string, string> reverseConstantsTable,
+            Dictionary<string, RawExpressionContainer> symbolTable,
+            Dictionary<string, string> reverseSymbolTable,
+            Dictionary<string, ParameterNodeBase> parametersTable,
+            string expression,
+            string[] allOperatorsInOrder,
+            string[] allSymbols)
         {
             ReplaceOneFunction(string.Empty);
-            for (var i = 1; i < workingSet.SymbolTable.Count; i++)
+            for (var i = 1; i < symbolTable.Count; i++)
             {
                 ReplaceOneFunction($"item{i}");
             }
 
             void ReplaceOneFunction(string key)
             {
-                RawExpressionContainer symbol = workingSet.SymbolTable[key];
+                RawExpressionContainer symbol = symbolTable[key];
                 if (symbol.IsFunctionCall || symbol.IsString)
                 {
                     return;
@@ -37,7 +59,7 @@ namespace IX.Math.Extraction
                 var replaced = symbol.Expression;
                 while (replaced != null)
                 {
-                    workingSet.SymbolTable[key] = new RawExpressionContainer(replaced);
+                    symbolTable[key] = new RawExpressionContainer(replaced);
                     replaced = ReplaceFunctions(replaced);
                 }
 
@@ -47,7 +69,7 @@ namespace IX.Math.Extraction
 
                     while (true)
                     {
-                        op = source.IndexOf(workingSet.Definition.Parantheses.Item1, op + workingSet.Definition.Parantheses.Item1.Length);
+                        op = source.IndexOf(openParanthesis, op + openParanthesis.Length);
 
                         if (op == -1)
                         {
@@ -61,20 +83,20 @@ namespace IX.Math.Extraction
 
                         var functionHeaderCheck = source.Substring(0, op);
 
-                        if (workingSet.AllSymbols.Any(p => functionHeaderCheck.EndsWith(p)))
+                        if (allSymbols.Any(p => functionHeaderCheck.EndsWith(p)))
                         {
                             continue;
                         }
 
-                        var functionHeader = functionHeaderCheck.Split(workingSet.AllSymbols, StringSplitOptions.None).Last();
+                        var functionHeader = functionHeaderCheck.Split(allSymbols, StringSplitOptions.None).Last();
 
-                        var oop = source.IndexOf(workingSet.Definition.Parantheses.Item1, op + workingSet.Definition.Parantheses.Item1.Length);
-                        var cp = source.IndexOf(workingSet.Definition.Parantheses.Item2, op + workingSet.Definition.Parantheses.Item2.Length);
+                        var oop = source.IndexOf(openParanthesis, op + openParanthesis.Length);
+                        var cp = source.IndexOf(closeParanthesis, op + closeParanthesis.Length);
 
                         while (oop < cp && oop != -1 && cp != -1)
                         {
-                            oop = source.IndexOf(workingSet.Definition.Parantheses.Item1, oop + workingSet.Definition.Parantheses.Item1.Length);
-                            cp = source.IndexOf(workingSet.Definition.Parantheses.Item2, cp + workingSet.Definition.Parantheses.Item2.Length);
+                            oop = source.IndexOf(openParanthesis, oop + openParanthesis.Length);
+                            cp = source.IndexOf(closeParanthesis, cp + closeParanthesis.Length);
                         }
 
                         if (cp == -1)
@@ -82,7 +104,7 @@ namespace IX.Math.Extraction
                             continue;
                         }
 
-                        var arguments = source.Substring(op + workingSet.Definition.Parantheses.Item1.Length, cp - op - workingSet.Definition.Parantheses.Item1.Length);
+                        var arguments = source.Substring(op + openParanthesis.Length, cp - op - openParanthesis.Length);
                         var originalArguments = arguments;
 
                         var q = arguments;
@@ -93,18 +115,27 @@ namespace IX.Math.Extraction
                         }
 
                         var argPlaceholders = new List<string>();
-                        foreach (var s in arguments.Split(new[] { workingSet.Definition.ParameterSeparator }, StringSplitOptions.None))
+                        foreach (var s in arguments.Split(new[] { parameterSeparator }, StringSplitOptions.None))
                         {
-                            TablePopulationGenerator.PopulateTables(s, workingSet);
+                            TablePopulationGenerator.PopulateTables(
+                                s,
+                                constantsTable,
+                                reverseConstantsTable,
+                                symbolTable,
+                                reverseSymbolTable,
+                                parametersTable,
+                                expression,
+                                openParanthesis,
+                                allOperatorsInOrder);
 
                             // We check whether or not this is actually a constant
-                            var sa = ConstantsGenerator.CheckAndAdd(workingSet.ConstantsTable, workingSet.ReverseConstantsTable, workingSet.Expression, s);
+                            var sa = ConstantsGenerator.CheckAndAdd(constantsTable, reverseConstantsTable, expression, s);
                             if (sa == null)
                             {
-                                if (workingSet.ParametersTable.ContainsKey(s))
+                                if (parametersTable.ContainsKey(s))
                                 {
                                     // Not a constant, and also not an already-recognized external parameter, let's generate a symbol
-                                    sa = SymbolExpressionGenerator.GenerateSymbolExpression(workingSet, s);
+                                    sa = SymbolExpressionGenerator.GenerateSymbolExpression(symbolTable, reverseSymbolTable, s);
                                 }
                                 else
                                 {
@@ -115,9 +146,9 @@ namespace IX.Math.Extraction
                             argPlaceholders.Add(sa);
                         }
 
-                        var functionCallBody = $"{functionHeader}{workingSet.Definition.Parantheses.Item1}{string.Join(workingSet.Definition.ParameterSeparator, argPlaceholders)}{workingSet.Definition.Parantheses.Item2}";
-                        var functionCallToReplace = $"{functionHeader}{workingSet.Definition.Parantheses.Item1}{originalArguments}{workingSet.Definition.Parantheses.Item2}";
-                        var functionCallItem = SymbolExpressionGenerator.GenerateSymbolExpression(workingSet, functionCallBody, isFunction: true);
+                        var functionCallBody = $"{functionHeader}{openParanthesis}{string.Join(parameterSeparator, argPlaceholders)}{closeParanthesis}";
+                        var functionCallToReplace = $"{functionHeader}{openParanthesis}{originalArguments}{closeParanthesis}";
+                        var functionCallItem = SymbolExpressionGenerator.GenerateSymbolExpression(symbolTable, reverseSymbolTable, functionCallBody, isFunction: true);
 
                         return source.Replace(
                             functionCallToReplace,

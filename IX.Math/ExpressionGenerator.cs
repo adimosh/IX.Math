@@ -42,19 +42,45 @@ namespace IX.Math
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Break expression based on function calls
-            FunctionsExtractor.ReplaceFunctions(workingSet);
+            FunctionsExtractor.ReplaceFunctions(
+                workingSet.Definition.Parantheses.Item1,
+                workingSet.Definition.Parantheses.Item2,
+                workingSet.Definition.ParameterSeparator,
+                workingSet.ConstantsTable,
+                workingSet.ReverseConstantsTable,
+                workingSet.SymbolTable,
+                workingSet.ReverseSymbolTable,
+                workingSet.ParametersTable,
+                workingSet.Expression,
+                workingSet.AllOperatorsInOrder,
+                workingSet.AllSymbols);
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Break by parentheses
-            ParenthesesExpressionGenerator.FormatParentheses(workingSet);
+            ParenthesesExpressionGenerator.FormatParentheses(
+                workingSet.Definition.Parantheses.Item1,
+                workingSet.Definition.Parantheses.Item2,
+                workingSet.Definition.ParameterSeparator,
+                workingSet.AllOperatorsInOrder,
+                workingSet.SymbolTable,
+                workingSet.ReverseSymbolTable);
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Populating symbol tables
             foreach (var p in workingSet.SymbolTable.Where(p => !p.Value.IsFunctionCall && !p.Value.IsString).Select(p => p.Value.Expression))
             {
-                TablePopulationGenerator.PopulateTables(p, workingSet);
+                TablePopulationGenerator.PopulateTables(
+                    p,
+                    workingSet.ConstantsTable,
+                    workingSet.ReverseConstantsTable,
+                    workingSet.SymbolTable,
+                    workingSet.ReverseSymbolTable,
+                    workingSet.ParametersTable,
+                    workingSet.Expression,
+                    workingSet.Definition.Parantheses.Item1,
+                    workingSet.AllOperatorsInOrder);
             }
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
@@ -99,26 +125,6 @@ namespace IX.Math
             workingSet.Success = true;
         }
 
-        private static NodeBase[] GenerateExpression(
-            RawExpressionContainer[] s,
-            WorkingExpressionSet workingSet)
-        {
-            NodeBase[] nodes = new NodeBase[s.Length];
-
-            for (var i = 0; i < s.Length; i++)
-            {
-                NodeBase res = GenerateExpression(s[i], workingSet);
-                if (res == null)
-                {
-                    return null;
-                }
-
-                nodes[i] = res;
-            }
-
-            return nodes;
-        }
-
         private static NodeBase GenerateExpression(
             RawExpressionContainer expression,
             WorkingExpressionSet workingSet)
@@ -126,9 +132,7 @@ namespace IX.Math
             // Expression might be a function call
             if (expression.IsFunctionCall)
             {
-                return GenerateFunctionCallExpression(
-                    expression.Expression,
-                    workingSet);
+                return GenerateFunctionCallExpression(expression.Expression);
             }
 
             var s = expression.Expression;
@@ -173,9 +177,7 @@ namespace IX.Math
             // Check whether the expression is a function call
             if (s.Contains(workingSet.Definition.Parantheses.Item1))
             {
-                return GenerateFunctionCallExpression(
-                    new RawExpressionContainer(s).Expression,
-                    workingSet);
+                return GenerateFunctionCallExpression(new RawExpressionContainer(s).Expression);
             }
 
             // Check whether the expression is a binary operator
@@ -303,85 +305,83 @@ namespace IX.Math
             }
 
             return null;
-        }
 
-        private static NodeBase GenerateFunctionCallExpression(
-            string expression,
-            WorkingExpressionSet workingSet)
-        {
-            Match match = workingSet.FunctionRegex.Match(expression);
-
-            try
+            NodeBase GenerateFunctionCallExpression(string possibleFunctionCallExpression)
             {
-                if (match.Success)
+                Match match = workingSet.FunctionRegex.Match(possibleFunctionCallExpression);
+
+                try
                 {
-                    var functionName = match.Groups["functionName"].Value;
-                    var expressionValue = match.Groups["expression"].Value;
-
-                    RawExpressionContainer[] parameterExpressions;
-
-                    if (string.IsNullOrWhiteSpace(expressionValue))
+                    if (match.Success)
                     {
-                        parameterExpressions = new RawExpressionContainer[0];
-                    }
-                    else
-                    {
-                        parameterExpressions = match.Groups["expression"].Value
-                            .Split(new[] { workingSet.Definition.ParameterSeparator }, StringSplitOptions.None)
-                            .Select(p => new RawExpressionContainer(p))
-                            .ToArray();
-                    }
+                        var functionName = match.Groups["functionName"].Value;
+                        var expressionValue = match.Groups["expression"].Value;
 
-                    switch (parameterExpressions.Length)
-                    {
-                        case 0:
-                            if (workingSet.NonaryFunctions.TryGetValue(functionName, out Type t))
-                            {
-                                return ((NonaryFunctionNodeBase)Activator.CreateInstance(t))?.Simplify();
-                            }
+                        RawExpressionContainer[] parameterExpressions;
 
-                            return null;
-                        case 1:
-                            if (workingSet.UnaryFunctions.TryGetValue(functionName, out Type t1))
-                            {
-                                return ((UnaryFunctionNodeBase)Activator.CreateInstance(
-                                    t1,
-                                    GenerateExpression(parameterExpressions[0], workingSet)))?.Simplify();
-                            }
+                        if (string.IsNullOrWhiteSpace(expressionValue))
+                        {
+                            parameterExpressions = new RawExpressionContainer[0];
+                        }
+                        else
+                        {
+                            parameterExpressions = match.Groups["expression"].Value
+                                .Split(new[] { workingSet.Definition.ParameterSeparator }, StringSplitOptions.None)
+                                .Select(p => new RawExpressionContainer(p))
+                                .ToArray();
+                        }
 
-                            return null;
-                        case 2:
-                            if (workingSet.BinaryFunctions.TryGetValue(functionName, out Type t2))
-                            {
-                                return ((BinaryFunctionNodeBase)Activator.CreateInstance(
-                                    t2,
-                                    GenerateExpression(parameterExpressions[0], workingSet),
-                                    GenerateExpression(parameterExpressions[1], workingSet)))?.Simplify();
-                            }
+                        switch (parameterExpressions.Length)
+                        {
+                            case 0:
+                                if (workingSet.NonaryFunctions.TryGetValue(functionName, out Type t))
+                                {
+                                    return ((NonaryFunctionNodeBase)Activator.CreateInstance(t))?.Simplify();
+                                }
 
-                            return null;
-                        case 3:
-                            if (workingSet.TernaryFunctions.TryGetValue(functionName, out Type t3))
-                            {
-                                return ((TernaryFunctionNodeBase)Activator.CreateInstance(
-                                    t3,
-                                    GenerateExpression(parameterExpressions[0], workingSet),
-                                    GenerateExpression(parameterExpressions[1], workingSet),
-                                    GenerateExpression(parameterExpressions[2], workingSet)))?.Simplify();
-                            }
+                                return null;
+                            case 1:
+                                if (workingSet.UnaryFunctions.TryGetValue(functionName, out Type t1))
+                                {
+                                    return ((UnaryFunctionNodeBase)Activator.CreateInstance(
+                                        t1,
+                                        GenerateExpression(parameterExpressions[0], workingSet)))?.Simplify();
+                                }
 
-                            return null;
-                        default:
-                            return null;
+                                return null;
+                            case 2:
+                                if (workingSet.BinaryFunctions.TryGetValue(functionName, out Type t2))
+                                {
+                                    return ((BinaryFunctionNodeBase)Activator.CreateInstance(
+                                        t2,
+                                        GenerateExpression(parameterExpressions[0], workingSet),
+                                        GenerateExpression(parameterExpressions[1], workingSet)))?.Simplify();
+                                }
+
+                                return null;
+                            case 3:
+                                if (workingSet.TernaryFunctions.TryGetValue(functionName, out Type t3))
+                                {
+                                    return ((TernaryFunctionNodeBase)Activator.CreateInstance(
+                                        t3,
+                                        GenerateExpression(parameterExpressions[0], workingSet),
+                                        GenerateExpression(parameterExpressions[1], workingSet),
+                                        GenerateExpression(parameterExpressions[2], workingSet)))?.Simplify();
+                                }
+
+                                return null;
+                            default:
+                                return null;
+                        }
                     }
                 }
-            }
-            catch (Exception)
-            {
+                catch (Exception)
+                {
+                    return null;
+                }
+
                 return null;
             }
-
-            return null;
         }
     }
 }

@@ -2,18 +2,25 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Collections.Generic;
+
 namespace IX.Math.Generators
 {
     internal static class SymbolExpressionGenerator
     {
-        internal static string GenerateSymbolExpression(WorkingExpressionSet workingSet, string expression, bool isFunction = false, bool isString = false)
+        internal static string GenerateSymbolExpression(
+            Dictionary<string, RawExpressionContainer> symbolTable,
+            Dictionary<string, string> reverseSymbolTable,
+            string expression,
+            bool isFunction = false,
+            bool isString = false)
         {
             var expressionContainer = new RawExpressionContainer(expression, isFunction, isString);
-            if (!workingSet.ReverseSymbolTable.TryGetValue(expression, out string itemName))
+            if (!reverseSymbolTable.TryGetValue(expression, out string itemName))
             {
-                itemName = $"item{workingSet.SymbolTable.Count}";
-                workingSet.SymbolTable.Add(itemName, expressionContainer);
-                workingSet.ReverseSymbolTable.Add(expressionContainer.Expression, itemName);
+                itemName = $"item{symbolTable.Count}";
+                symbolTable.Add(itemName, expressionContainer);
+                reverseSymbolTable.Add(expressionContainer.Expression, itemName);
             }
 
             return itemName;

@@ -3,55 +3,79 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
+using IX.Math.Nodes;
 
 namespace IX.Math.Generators
 {
+    /// <summary>
+    /// A class to handle table population.
+    /// </summary>
     internal static class TablePopulationGenerator
     {
+        /// <summary>
+        /// Populates tables according to the currently-processed expression.
+        /// </summary>
+        /// <param name="processedExpression">The expression that is being processed.</param>
+        /// <param name="constantsTable">The constants table.</param>
+        /// <param name="reverseConstantsTable">The reverse-lookup constants table.</param>
+        /// <param name="symbolTable">The symbols table.</param>
+        /// <param name="reverseSymbolTable">The reverse-lookup symbols table.</param>
+        /// <param name="parametersTable">The parameters table.</param>
+        /// <param name="expression">The expression before processing.</param>
+        /// <param name="openParanthesis">The symbol of an open paranthesis.</param>
+        /// <param name="allOperatorsInOrder">All operators, in order.</param>
         internal static void PopulateTables(
-            string p,
-            WorkingExpressionSet workingSet)
+            string processedExpression,
+            Dictionary<string, ConstantNodeBase> constantsTable,
+            Dictionary<string, string> reverseConstantsTable,
+            Dictionary<string, RawExpressionContainer> symbolTable,
+            Dictionary<string, string> reverseSymbolTable,
+            Dictionary<string, ParameterNodeBase> parametersTable,
+            string expression,
+            string openParanthesis,
+            string[] allOperatorsInOrder)
         {
-            string[] expressions = p.Split(workingSet.AllOperatorsInOrder, StringSplitOptions.RemoveEmptyEntries);
+            string[] expressions = processedExpression.Split(allOperatorsInOrder, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var exp in expressions)
             {
-                if (workingSet.ConstantsTable.ContainsKey(exp))
+                if (constantsTable.ContainsKey(exp))
                 {
                     continue;
                 }
 
-                if (workingSet.ReverseConstantsTable.ContainsKey(exp))
+                if (reverseConstantsTable.ContainsKey(exp))
                 {
                     continue;
                 }
 
-                if (workingSet.ParametersTable.ContainsKey(exp.ToLower()))
+                if (parametersTable.ContainsKey(exp.ToLower()))
                 {
                     continue;
                 }
 
-                if (workingSet.SymbolTable.ContainsKey(exp))
+                if (symbolTable.ContainsKey(exp))
                 {
                     continue;
                 }
 
-                if (workingSet.ReverseSymbolTable.ContainsKey(exp))
+                if (reverseSymbolTable.ContainsKey(exp))
                 {
                     continue;
                 }
 
-                if (exp.Contains(workingSet.Definition.Parantheses.Item1))
+                if (exp.Contains(openParanthesis))
                 {
                     continue;
                 }
 
-                if (ConstantsGenerator.CheckAndAdd(workingSet.ConstantsTable, workingSet.ReverseConstantsTable, workingSet.Expression, exp) != null)
+                if (ConstantsGenerator.CheckAndAdd(constantsTable, reverseConstantsTable, expression, exp) != null)
                 {
                     continue;
                 }
 
-                ParametersGenerator.GenerateParameter(workingSet.ParametersTable, exp);
+                ParametersGenerator.GenerateParameter(parametersTable, exp);
             }
         }
     }
