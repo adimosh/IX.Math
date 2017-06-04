@@ -32,7 +32,7 @@ namespace IX.Math
             this.locker = new object();
             this.computedBodies = new Dictionary<int, Delegate>();
             this.parameters = parameters;
-            this.ParameterNames = parameters?.Select(p => p.ParameterName).ToArray() ?? new string[0];
+            this.ParameterNames = parameters?.Select(p => p.Name).ToArray() ?? new string[0];
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace IX.Math
 
             foreach (ParameterNodeBase p in this.parameters)
             {
-                if (!dataFinder.TryGetData(p.ParameterName, out object data))
+                if (!dataFinder.TryGetData(p.Name, out object data))
                 {
                     data = null;
                 }

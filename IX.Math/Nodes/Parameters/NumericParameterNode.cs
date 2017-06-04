@@ -42,10 +42,18 @@ namespace IX.Math.Nodes.Parameters
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
         /// <summary>
-        /// Generates the expression that will be compiled into code as a string expression.
+        /// Generates an expression that will be cached before being compiled.
         /// </summary>
-        /// <returns>The string expression.</returns>
-        public override Expression GenerateStringExpression() => Expression.Call(this.GenerateExpression(), typeof(object).GetTypeMethod(nameof(object.ToString)));
+        /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" /> to be cached.</returns>
+        public override Expression GenerateCachedExpression() => (this.RequireFloat ?? true) ?
+                        Expression.Parameter(typeof(double), this.Name) :
+                        Expression.Parameter(typeof(long), this.Name);
+
+        /// <summary>
+        /// Generates a string expression that will be cached before being compiled.
+        /// </summary>
+        /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" /> to be cached.</returns>
+        public override Expression GenerateCachedStringExpression() => Expression.Call(this.GenerateExpression(), typeof(object).GetTypeMethod(nameof(object.ToString)));
 
         /// <summary>
         /// Sets this parameter as an obligatory floating-point parameter.
@@ -57,7 +65,7 @@ namespace IX.Math.Nodes.Parameters
             {
                 if (!this.RequireFloat.Value)
                 {
-                    throw new InvalidOperationException(string.Format(Resources.ParameterMustBeFloatButAlreadyRequiredToBeInteger, this.ParameterName));
+                    throw new InvalidOperationException(string.Format(Resources.ParameterMustBeFloatButAlreadyRequiredToBeInteger, this.Name));
                 }
             }
             else
@@ -78,7 +86,7 @@ namespace IX.Math.Nodes.Parameters
             {
                 if (this.RequireFloat.Value)
                 {
-                    throw new InvalidOperationException(string.Format(Resources.ParameterMustBeIntegerButAlreadyRequiredToBeFloat, this.ParameterName));
+                    throw new InvalidOperationException(string.Format(Resources.ParameterMustBeIntegerButAlreadyRequiredToBeFloat, this.Name));
                 }
             }
             else
@@ -88,13 +96,5 @@ namespace IX.Math.Nodes.Parameters
 
             return this;
         }
-
-        /// <summary>
-        /// Generates the expression that will be compiled into code.
-        /// </summary>
-        /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal() => (this.RequireFloat ?? true) ?
-                        Expression.Parameter(typeof(double), this.ParameterName) :
-                        Expression.Parameter(typeof(long), this.ParameterName);
     }
 }

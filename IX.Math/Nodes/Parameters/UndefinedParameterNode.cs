@@ -48,7 +48,7 @@ namespace IX.Math.Nodes.Parameters
         /// Transforms this undefined parameter into a numeric parameter.
         /// </summary>
         /// <returns>A numeric parameter node.</returns>
-        public NumericParameterNode DetermineNumeric() => ParametersGenerator.DetermineNumeric(this.parametersTable, this.ParameterName, this.determineFloat);
+        public NumericParameterNode DetermineNumeric() => ParametersGenerator.DetermineNumeric(this.parametersTable, this.Name, this.determineFloat);
 
         /// <summary>
         /// If the parameter is later determined to be numeric, also determine it to be floating-point.
@@ -74,32 +74,32 @@ namespace IX.Math.Nodes.Parameters
         /// Transforms this undefined parameter into a boolean parameter.
         /// </summary>
         /// <returns>A boolean parameter node.</returns>
-        public BoolParameterNode DetermineBool() => ParametersGenerator.DetermineBool(this.parametersTable, this.ParameterName);
+        public BoolParameterNode DetermineBool() => ParametersGenerator.DetermineBool(this.parametersTable, this.Name);
 
         /// <summary>
         /// Transforms this undefined parameter into a string parameter.
         /// </summary>
         /// <returns>A string parameter node.</returns>
-        public StringParameterNode DetermineString() => ParametersGenerator.DetermineString(this.parametersTable, this.ParameterName);
+        public StringParameterNode DetermineString() => ParametersGenerator.DetermineString(this.parametersTable, this.Name);
 
         /// <summary>
         /// Generates the expression that will be compiled into code as a string expression.
         /// </summary>
         /// <returns>Nothing, as this method always throws an exception.</returns>
         /// <exception cref="System.InvalidOperationException">This node cannot be compiled, as it's supposed to be determined beforehand.</exception>
-        public override Expression GenerateStringExpression() => throw new InvalidOperationException();
+        public override Expression GenerateCachedStringExpression() => throw new InvalidOperationException();
 
         /// <summary>
         /// Refreshes all the parameters recursively.
         /// </summary>
         /// <returns>A reference to the determined parameter.</returns>
-        public override NodeBase RefreshParametersRecursive() => this.parametersTable[this.ParameterName];
+        public override NodeBase RefreshParametersRecursive() => this.parametersTable[this.Name];
 
         /// <summary>
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>Nothing, as this method always throws an exception.</returns>
         /// <exception cref="System.InvalidOperationException">This node cannot be compiled, as it's supposed to be determined beforehand.</exception>
-        protected override Expression GenerateExpressionInternal() => throw new InvalidOperationException();
+        public override Expression GenerateCachedExpression() => throw new InvalidOperationException();
     }
 }

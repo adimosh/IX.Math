@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.PlatformMitigation;
@@ -31,15 +32,15 @@ namespace IX.Math.Nodes.Parameters
         public override SupportedValueType ReturnType => SupportedValueType.Boolean;
 
         /// <summary>
-        /// Generates the expression that will be compiled into code as a string expression.
+        /// Generates a string expression that will be cached before being compiled.
         /// </summary>
-        /// <returns>The string expression.</returns>
-        public override Expression GenerateStringExpression() => Expression.Call(this.GenerateExpression(), typeof(object).GetTypeMethod(nameof(object.ToString)));
+        /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" /> to be cached.</returns>
+        public override Expression GenerateCachedStringExpression() => Expression.Call(this.GenerateExpression(), typeof(object).GetTypeMethod(nameof(object.ToString)));
 
         /// <summary>
-        /// Generates the expression that will be compiled into code.
+        /// Generates an expression that will be cached before being compiled.
         /// </summary>
-        /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal() => Expression.Parameter(typeof(bool), this.ParameterName);
+        /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" /> to be cached.</returns>
+        public override Expression GenerateCachedExpression() => Expression.Parameter(typeof(bool), this.Name);
     }
 }

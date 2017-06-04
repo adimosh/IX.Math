@@ -27,13 +27,13 @@ namespace IX.Math.Nodes
         /// <summary>
         /// Generates the expression that will be compiled into code.
         /// </summary>
-        /// <returns>The expression.</returns>
+        /// <returns>The generated <see cref="Expression"/>.</returns>
         public abstract Expression GenerateExpression();
 
         /// <summary>
         /// Generates the expression that will be compiled into code as a string expression.
         /// </summary>
-        /// <returns>The string expression.</returns>
+        /// <returns>The generated <see cref="Expression"/> that gives the values as a string.</returns>
         public abstract Expression GenerateStringExpression();
 
         /// <summary>

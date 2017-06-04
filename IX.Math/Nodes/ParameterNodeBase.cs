@@ -2,19 +2,17 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Linq.Expressions;
+using System;
 
 namespace IX.Math.Nodes
 {
     /// <summary>
     /// A base class for a parameter node.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.NodeBase" />
-    public abstract class ParameterNodeBase : NodeBase
+    /// <seealso cref="IX.Math.Nodes.CachedExpressionNodeBase" />
+    public abstract class ParameterNodeBase : CachedExpressionNodeBase
     {
-        private readonly string parameterName;
-
-        private Expression cachedExpression;
+        private readonly string name;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterNodeBase"/> class.
@@ -22,28 +20,19 @@ namespace IX.Math.Nodes
         /// <param name="parameterName">Name of the parameter.</param>
         internal ParameterNodeBase(string parameterName)
         {
-            this.parameterName = parameterName;
+            if (string.IsNullOrWhiteSpace(parameterName))
+            {
+                throw new ArgumentNullException(nameof(parameterName));
+            }
+
+            this.name = parameterName;
         }
 
         /// <summary>
         /// Gets the name of the parameter.
         /// </summary>
         /// <value>The name of the parameter.</value>
-        public string ParameterName => this.parameterName;
-
-        /// <summary>
-        /// Generates the expression that will be compiled into code.
-        /// </summary>
-        /// <returns>The expression.</returns>
-        public sealed override Expression GenerateExpression()
-        {
-            if (this.cachedExpression == null)
-            {
-                this.cachedExpression = this.GenerateExpressionInternal();
-            }
-
-            return this.cachedExpression;
-        }
+        public string Name => this.name;
 
         /// <summary>
         /// Refreshes all the parameters recursively.
@@ -56,11 +45,5 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <returns>A reflexive reference.</returns>
         public override NodeBase Simplify() => this;
-
-        /// <summary>
-        /// Generates the expression that will be compiled into code.
-        /// </summary>
-        /// <returns>The expression.</returns>
-        protected abstract Expression GenerateExpressionInternal();
     }
 }
