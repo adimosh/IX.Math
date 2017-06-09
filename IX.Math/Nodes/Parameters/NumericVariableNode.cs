@@ -1,28 +1,32 @@
-﻿// <copyright file="VariableNodeBase.cs" company="Adrian Mos">
+﻿// <copyright file="NumericVariableNode.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 
-namespace IX.Math.Nodes
+namespace IX.Math.Nodes.Parameters
 {
     /// <summary>
-    /// An abstract base class for a variable node.
+    /// A numeric variable node.
     /// </summary>
-    /// <seealso cref="NodeBase" />
-    public abstract class VariableNodeBase : CachedExpressionNodeBase
+    /// <seealso cref="ParameterNodeBase" />
+    [DebuggerDisplay("{ParameterName} (numeric variable)")]
+    public class NumericVariableNode : NumericParameterNode, IVariableNode
     {
         private Expression cachedBodyExpression;
         private ParameterExpression cachedVariableExpression;
         private NodeBase referenceNode;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VariableNodeBase"/> class.
+        /// Initializes a new instance of the <see cref="NumericVariableNode"/> class.
         /// </summary>
+        /// <param name="variableName">The name of the variable.</param>
         /// <param name="referenceNode">The reference node.</param>
-        /// <exception cref="System.ArgumentNullException">referenceNode</exception>
-        internal VariableNodeBase(NodeBase referenceNode)
+        /// <exception cref="ArgumentNullException"><paramref name="referenceNode" /> is <c>null</c> (<c>Nothing</c> in Visual Basic).</exception>
+        internal NumericVariableNode(string variableName, NodeBase referenceNode)
+            : base(variableName)
         {
             this.referenceNode = referenceNode?.Simplify() ?? throw new ArgumentNullException(nameof(referenceNode));
         }
@@ -31,22 +35,17 @@ namespace IX.Math.Nodes
         /// Gets the reference node for this variable.
         /// </summary>
         /// <value>The reference node.</value>
-        protected NodeBase ReferenceNode => this.referenceNode;
+        public NodeBase ReferenceNode => this.referenceNode;
 
         /// <summary>
         /// Generates an expression that will be cached before being compiled.
         /// </summary>
-        /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" /> to be cached.</returns>
+        /// <returns>The generated <see cref="Expression" /> to be cached.</returns>
         public override Expression GenerateCachedExpression()
         {
-            if (this.cachedVariableExpression == null)
-            {
-                this.cachedVariableExpression = this.GenerateVariableExpression();
-            }
-
             if (this.cachedBodyExpression == null)
             {
-                this.cachedBodyExpression = Expression.Assign(this.cachedVariableExpression, this.referenceNode.GenerateExpression());
+                this.cachedBodyExpression = Expression.Assign(this.GenerateVariableExpression(), this.referenceNode.GenerateExpression());
             }
 
             return this.cachedBodyExpression;
@@ -55,8 +54,8 @@ namespace IX.Math.Nodes
         /// <summary>
         /// Generates a string expression that will be cached before being compiled.
         /// </summary>
-        /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" /> to be cached.</returns>
-        public override Expression GenerateCachedStringExpression() => this.referenceNode.GenerateStringExpression();
+        /// <returns>The generated <see cref="Expression" /> to be cached.</returns>
+        public override Expression GenerateCachedStringExpression() => this.referenceNode.GenerateExpression();
 
         /// <summary>
         /// Refreshes all the parameters recursively.
@@ -74,6 +73,24 @@ namespace IX.Math.Nodes
         /// Generates the expression that represents the variable itself.
         /// </summary>
         /// <returns>A <see cref="ParameterExpression"/> representing the variable.</returns>
-        protected abstract ParameterExpression GenerateVariableExpression();
+        public ParameterExpression GenerateVariableExpression()
+        {
+            if (this.RequireFloat == true)
+            {
+                this.cachedVariableExpression = Expression.Variable(typeof(double), this.Name);
+            }
+            else if (this.RequireFloat == false)
+            {
+                this.cachedVariableExpression = Expression.Variable(typeof(long), this.Name);
+            }
+            else
+            {
+                this.ParameterMustBeFloat();
+
+                return this.GenerateVariableExpression();
+            }
+
+            return this.cachedVariableExpression;
+        }
     }
 }

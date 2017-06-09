@@ -5,16 +5,15 @@
 using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using IX.Math.PlatformMitigation;
 
 namespace IX.Math.Nodes.Parameters
 {
     /// <summary>
-    /// A numeric parameter node. This class cannot be inherited.
+    /// A numeric parameter node.
     /// </summary>
     /// <seealso cref="ParameterNodeBase" />
     [DebuggerDisplay("{ParameterName} (numeric)")]
-    public sealed class NumericParameterNode : ParameterNodeBase
+    public class NumericParameterNode : ParameterNodeBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NumericParameterNode" /> class.
@@ -48,12 +47,6 @@ namespace IX.Math.Nodes.Parameters
         public override Expression GenerateCachedExpression() => (this.RequireFloat ?? true) ?
                         Expression.Parameter(typeof(double), this.Name) :
                         Expression.Parameter(typeof(long), this.Name);
-
-        /// <summary>
-        /// Generates a string expression that will be cached before being compiled.
-        /// </summary>
-        /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" /> to be cached.</returns>
-        public override Expression GenerateCachedStringExpression() => Expression.Call(this.GenerateExpression(), typeof(object).GetTypeMethod(nameof(object.ToString)));
 
         /// <summary>
         /// Sets this parameter as an obligatory floating-point parameter.

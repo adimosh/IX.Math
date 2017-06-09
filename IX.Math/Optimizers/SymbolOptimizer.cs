@@ -14,7 +14,7 @@ namespace IX.Math.Optimizers
     {
 #pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
 #pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
-        public (List<NodeBase> BodyExpressions, Dictionary<string, ParameterNodeBase> VariableExpressions) OptimizeSymbols(
+        public List<NodeBase> OptimizeSymbols(
             Dictionary<string, RawExpressionContainer> symbols,
             Dictionary<string, string> reverseSymbols,
             Dictionary<string, ConstantNodeBase> constantsTable,
@@ -54,12 +54,31 @@ namespace IX.Math.Optimizers
                     }
                     else
                     {
+                        ParameterNodeBase resultingBodyExpression;
+                        switch (expression.ReturnType)
+                        {
+                            case SupportedValueType.Boolean:
+                                resultingBodyExpression = new Nodes.Parameters.BoolVariableNode(p.Key, expression);
+                                break;
+                            case SupportedValueType.Numeric:
+                                resultingBodyExpression = new Nodes.Parameters.NumericVariableNode(p.Key, expression);
+                                break;
+                            case SupportedValueType.String:
+                                resultingBodyExpression = new Nodes.Parameters.StringVariableNode(p.Key, expression);
+                                break;
+                            default:
+                                throw new ExpressionNotValidLogicallyException();
+                        }
 
+                        symbols.Remove(p.Key);
+                        reverseSymbols.Remove(p.Value.Container.Expression);
+
+                        bodyExpressions.Add(resultingBodyExpression);
                     }
                 }
             }
 
-            return (bodyExpressions, null);
+            return bodyExpressions;
 
             Dictionary<string, (RawExpressionContainer Container, SymbolOptimizationData OptimizationData)>
                 CreateSymbolOptimizationCounters(Dictionary<string, RawExpressionContainer> symb)
@@ -67,9 +86,9 @@ namespace IX.Math.Optimizers
                 Dictionary<string, (RawExpressionContainer Container, SymbolOptimizationData OptimizationData)> futureOptimalSymbols =
                     symb.ToDictionary(p => p.Key, p => (p.Value, new SymbolOptimizationData()));
 
-                foreach (var p in futureOptimalSymbols)
+                foreach (KeyValuePair<string, (RawExpressionContainer Container, SymbolOptimizationData OptimizationData)> p in futureOptimalSymbols)
                 {
-                    foreach (var q in futureOptimalSymbols.Where(z => z.Key != p.Key))
+                    foreach (KeyValuePair<string, (RawExpressionContainer Container, SymbolOptimizationData OptimizationData)> q in futureOptimalSymbols.Where(z => z.Key != p.Key))
                     {
                         if (q.Value.Item1.Expression.Contains(p.Key))
                         {

@@ -3,6 +3,8 @@
 // </copyright>
 
 using System;
+using System.Linq.Expressions;
+using IX.Math.PlatformMitigation;
 
 namespace IX.Math.Nodes
 {
@@ -45,5 +47,11 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <returns>A reflexive reference.</returns>
         public override NodeBase Simplify() => this;
+
+        /// <summary>
+        /// Generates a string expression that will be cached before being compiled.
+        /// </summary>
+        /// <returns>The generated <see cref="Expression" /> to be cached.</returns>
+        public override Expression GenerateCachedStringExpression() => Expression.Call(this.GenerateExpression(), typeof(object).GetTypeMethod(nameof(object.ToString)));
     }
 }

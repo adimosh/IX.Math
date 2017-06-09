@@ -98,8 +98,4 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Nodes\Variables\" />
-  </ItemGroup>
 </Project>
