@@ -52,12 +52,12 @@ namespace IX.Math.Nodes.Constants
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>A <see cref="ConstantExpression"/> with a boolean value.</returns>
-        public override Expression GenerateExpression() => Expression.Constant(this.value, typeof(bool));
+        public override Expression GenerateCachedExpression() => Expression.Constant(this.value, typeof(bool));
 
         /// <summary>
         /// Generates the expression that will be compiled into code as a string expression.
         /// </summary>
         /// <returns>The string expression.</returns>
-        public override Expression GenerateStringExpression() => Expression.Constant(this.value ? "true" : "false", typeof(string));
+        public override Expression GenerateCachedStringExpression() => Expression.Constant(this.value ? "true" : "false", typeof(string));
     }
 }

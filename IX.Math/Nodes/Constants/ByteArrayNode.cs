@@ -13,10 +13,11 @@ namespace IX.Math.Nodes.Constants
     /// A boolean node. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="ConstantNodeBase" />
-    [DebuggerDisplay("{Value}")]
+    [DebuggerDisplay("{DisplayValue}")]
     public class ByteArrayNode : ConstantNodeBase
     {
         private readonly byte[] value;
+        private string cachedDistilledStringValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ByteArrayNode"/> class.
@@ -39,6 +40,11 @@ namespace IX.Math.Nodes.Constants
         public byte[] Value => this.value;
 
         /// <summary>
+        /// Gets the display value.
+        /// </summary>
+        public string DisplayValue => this.DistillStringValue();
+
+        /// <summary>
         /// Distills the value into a usable constant.
         /// </summary>
         /// <returns>A usable constant.</returns>
@@ -48,14 +54,21 @@ namespace IX.Math.Nodes.Constants
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>A <see cref="ConstantExpression"/> with a boolean value.</returns>
-        public override Expression GenerateExpression() => Expression.Constant(this.value, typeof(byte[]));
+        public override Expression GenerateCachedExpression() => Expression.Constant(this.value, typeof(byte[]));
 
         /// <summary>
         /// Generates the expression that will be compiled into code as a string expression.
         /// </summary>
         /// <returns>The string expression.</returns>
-        public override Expression GenerateStringExpression()
+        public override Expression GenerateCachedStringExpression() => Expression.Constant(this.DistillStringValue(), typeof(string));
+
+        private string DistillStringValue()
         {
+            if (this.cachedDistilledStringValue != null)
+            {
+                return this.cachedDistilledStringValue;
+            }
+
             var bldr = new StringBuilder();
 
             bldr.Append("0b");
@@ -72,7 +85,7 @@ namespace IX.Math.Nodes.Constants
                 }
             }
 
-            return Expression.Constant(bldr.ToString(), typeof(string));
+            return this.cachedDistilledStringValue = bldr.ToString();
         }
     }
 }

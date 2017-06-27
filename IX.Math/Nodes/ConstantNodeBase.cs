@@ -8,7 +8,7 @@ namespace IX.Math.Nodes
     /// A base class for constants.
     /// </summary>
     /// <seealso cref="NodeBase" />
-    public abstract class ConstantNodeBase : NodeBase
+    public abstract class ConstantNodeBase : CachedExpressionNodeBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstantNodeBase"/> class.

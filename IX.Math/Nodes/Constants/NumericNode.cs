@@ -240,7 +240,7 @@ namespace IX.Math.Nodes.Constants
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>The expression.</returns>
-        public override Expression GenerateExpression() => this.isFloat ?
+        public override Expression GenerateCachedExpression() => this.isFloat ?
             Expression.Constant(this.floatValue, typeof(double)) :
             Expression.Constant(this.integerValue, typeof(long));
 
@@ -346,7 +346,7 @@ namespace IX.Math.Nodes.Constants
         /// Generates the expression that will be compiled into code as a string expression.
         /// </summary>
         /// <returns>The string expression.</returns>
-        public override Expression GenerateStringExpression() => Expression.Constant(this.Value.ToString(), typeof(string));
+        public override Expression GenerateCachedStringExpression() => Expression.Constant(this.Value.ToString(), typeof(string));
 
         /// <summary>
         /// Initializes the specified value.

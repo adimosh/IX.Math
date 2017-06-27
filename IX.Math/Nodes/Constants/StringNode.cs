@@ -44,13 +44,13 @@ namespace IX.Math.Nodes.Constants
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>The expression.</returns>
-        public override Expression GenerateExpression() => Expression.Constant(this.value, typeof(string));
+        public override Expression GenerateCachedExpression() => Expression.Constant(this.value, typeof(string));
 
         /// <summary>
         /// Generates the expression that will be compiled into code as a string expression.
         /// </summary>
         /// <returns>The string expression.</returns>
-        public override Expression GenerateStringExpression() => this.GenerateExpression();
+        public override Expression GenerateCachedStringExpression() => this.GenerateExpression();
 
         /// <summary>
         /// Distills the value into a usable constant.
