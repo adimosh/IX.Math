@@ -49,7 +49,7 @@ namespace IX.Math.Generators
             }
             else
             {
-                if (NumericParsingFormatter.Parse(content, out object n))
+                if (ParsingFormatter.Parse(content, out object n))
                 {
                     var name = GenerateName(constantsTable.Keys, originalExpression);
                     constantsTable.Add(name, new NumericNode(n));

@@ -1,4 +1,4 @@
-﻿// <copyright file="NumericParsingFormatter.cs" company="Adrian Mos">
+﻿// <copyright file="ParsingFormatter.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace IX.Math.Formatters
 {
-    internal static class NumericParsingFormatter
+    internal static class ParsingFormatter
     {
         private const NumberStyles IntegerNumberStyle =
             NumberStyles.AllowLeadingSign | NumberStyles.AllowThousands | NumberStyles.AllowExponent | NumberStyles.AllowExponent;
@@ -32,6 +32,18 @@ namespace IX.Math.Formatters
                 if (expression.Length > 2)
                 {
                     return ParseHexSpecific(expression.Substring(2), out result);
+                }
+                else
+                {
+                    result = null;
+                    return false;
+                }
+            }
+            else if (expression.StartsWith("0b", StringComparison.CurrentCultureIgnoreCase))
+            {
+                if (expression.Length > 2)
+                {
+                    return ParseByteArray(expression.Substring(2), out result);
                 }
                 else
                 {
@@ -73,6 +85,30 @@ namespace IX.Math.Formatters
 
                 specificResult = null;
                 return false;
+            }
+
+            bool ParseByteArray(string byteArrayExpression, out object byteArrayResult)
+            {
+                var stringLength = byteArrayExpression.Length;
+
+                byte[] bytes = new byte[stringLength / 2];
+
+                try
+                {
+                    for (var i = 0; i < stringLength; i += 2)
+                    {
+                        bytes[i / 2] = Convert.ToByte(byteArrayExpression.Substring(i, 2), 16);
+                    }
+
+                    byteArrayResult = bytes;
+
+                    return true;
+                }
+                catch
+                {
+                    byteArrayResult = null;
+                    return false;
+                }
             }
         }
     }

@@ -27,6 +27,11 @@ namespace IX.Math
         /// <summary>
         /// String (pass as <see cref="string"/>).
         /// </summary>
-        String = 3
+        String = 3,
+
+        /// <summary>
+        /// Byte array (pass as <see cref="T:byte[]"/>).
+        /// </summary>
+        ByteArray = 4,
     }
 }
