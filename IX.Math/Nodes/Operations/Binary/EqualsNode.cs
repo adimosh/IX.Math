@@ -73,6 +73,26 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        public EqualsNode(ByteArrayNode left, ByteArrayNode right)
+            : base(left, right)
+        {
+        }
+
+        public EqualsNode(ByteArrayNode left, ByteArrayParameterNode right)
+            : base(left, right)
+        {
+        }
+
+        public EqualsNode(ByteArrayParameterNode left, ByteArrayNode right)
+            : base(left, right)
+        {
+        }
+
+        public EqualsNode(ByteArrayParameterNode left, ByteArrayParameterNode right)
+            : base(left, right)
+        {
+        }
+
         public EqualsNode(NumericNode left, OperationNodeBase right)
             : base(left, right?.Simplify())
         {
@@ -190,6 +210,42 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
+        public EqualsNode(ByteArrayNode left, OperationNodeBase right)
+            : base(left, right?.Simplify())
+        {
+            if (right?.ReturnType != SupportedValueType.ByteArray)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public EqualsNode(OperationNodeBase left, ByteArrayNode right)
+            : base(left?.Simplify(), right)
+        {
+            if (left?.ReturnType != SupportedValueType.ByteArray)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public EqualsNode(ByteArrayParameterNode left, OperationNodeBase right)
+            : base(left, right?.Simplify())
+        {
+            if (right?.ReturnType != SupportedValueType.ByteArray)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public EqualsNode(OperationNodeBase left, ByteArrayParameterNode right)
+            : base(left?.Simplify(), right)
+        {
+            if (left?.ReturnType != SupportedValueType.ByteArray)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
         public EqualsNode(UndefinedParameterNode left, UndefinedParameterNode right)
             : base(left, right)
         {
@@ -205,6 +261,10 @@ namespace IX.Math.Nodes.Operations.Binary
             else if (this.Right.ReturnType == SupportedValueType.Boolean)
             {
                 this.Left = left.DetermineBool();
+            }
+            else if (this.Right.ReturnType == SupportedValueType.ByteArray)
+            {
+                this.Left = left.DetermineByteArray();
             }
             else
             {
@@ -222,6 +282,10 @@ namespace IX.Math.Nodes.Operations.Binary
             else if (this.Left.ReturnType == SupportedValueType.Boolean)
             {
                 this.Right = right.DetermineBool();
+            }
+            else if (this.Left.ReturnType == SupportedValueType.ByteArray)
+            {
+                this.Right = right.DetermineByteArray();
             }
             else
             {

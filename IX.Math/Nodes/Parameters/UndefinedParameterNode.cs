@@ -77,6 +77,12 @@ namespace IX.Math.Nodes.Parameters
         public BoolParameterNode DetermineBool() => ParametersGenerator.DetermineBool(this.parametersTable, this.Name);
 
         /// <summary>
+        /// Transforms this undefined parameter into a byte array parameter.
+        /// </summary>
+        /// <returns>A byte array parameter node.</returns>
+        public ByteArrayParameterNode DetermineByteArray() => ParametersGenerator.DetermineByteArray(this.parametersTable, this.Name);
+
+        /// <summary>
         /// Transforms this undefined parameter into a string parameter.
         /// </summary>
         /// <returns>A string parameter node.</returns>

@@ -92,6 +92,35 @@ namespace IX.Math.Generators
             }
         }
 
+        public static ByteArrayParameterNode DetermineByteArray(IDictionary<string, ParameterNodeBase> parameters, string name)
+        {
+            var trueName = name.ToLower();
+
+            if (parameters.TryGetValue(trueName, out var p))
+            {
+                if (p is UndefinedParameterNode)
+                {
+                    var result = new ByteArrayParameterNode(trueName);
+                    parameters[trueName] = result;
+                    return result;
+                }
+                else if (!(p is ByteArrayParameterNode))
+                {
+                    throw new InvalidCastException();
+                }
+                else
+                {
+                    return (ByteArrayParameterNode)p;
+                }
+            }
+            else
+            {
+                var result = new ByteArrayParameterNode(trueName);
+                parameters.Add(trueName, result);
+                return result;
+            }
+        }
+
         public static StringParameterNode DetermineString(IDictionary<string, ParameterNodeBase> parameters, string name)
         {
             var trueName = name.ToLower();
