@@ -50,7 +50,7 @@ namespace IX.Math.Generators
                     continue;
                 }
 
-                if (parametersTable.ContainsKey(exp.ToLower()))
+                if (parametersTable.ContainsKey(exp))
                 {
                     continue;
                 }

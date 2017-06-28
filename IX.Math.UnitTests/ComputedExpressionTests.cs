@@ -726,6 +726,12 @@ namespace IX.Math.UnitTests
                     new object[0],
                     true,
                 },
+                new object[]
+                {
+                    "tempVariable1=2",
+                    new object[1] { 2 },
+                    true,
+                },
             };
 
         [Theory(DisplayName = "Para")]
