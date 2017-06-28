@@ -13,27 +13,23 @@ namespace IX.Math.Generators
     {
         public static void GenerateParameter(IDictionary<string, ParameterNodeBase> parameters, string name)
         {
-            var trueName = name.ToLower();
-
-            if (!parameters.ContainsKey(trueName))
+            if (!parameters.ContainsKey(name))
             {
-                parameters.Add(trueName, new UndefinedParameterNode(trueName, parameters));
+                parameters.Add(name, new UndefinedParameterNode(name, parameters));
             }
         }
 
         public static NumericParameterNode DetermineNumeric(IDictionary<string, ParameterNodeBase> parameters, string name, bool? determineFloat)
         {
-            var trueName = name.ToLower();
-
-            if (parameters.TryGetValue(trueName, out var p))
+            if (parameters.TryGetValue(name, out var p))
             {
                 if (p is UndefinedParameterNode)
                 {
-                    var result = new NumericParameterNode(trueName)
+                    var result = new NumericParameterNode(name)
                     {
                         RequireFloat = determineFloat,
                     };
-                    parameters[trueName] = result;
+                    parameters[name] = result;
                     return result;
                 }
                 else if (!(p is NumericParameterNode))
@@ -57,22 +53,20 @@ namespace IX.Math.Generators
             }
             else
             {
-                var result = new NumericParameterNode(trueName);
-                parameters.Add(trueName, result);
+                var result = new NumericParameterNode(name);
+                parameters.Add(name, result);
                 return result;
             }
         }
 
         public static BoolParameterNode DetermineBool(IDictionary<string, ParameterNodeBase> parameters, string name)
         {
-            var trueName = name.ToLower();
-
-            if (parameters.TryGetValue(trueName, out var p))
+            if (parameters.TryGetValue(name, out var p))
             {
                 if (p is UndefinedParameterNode)
                 {
-                    var result = new BoolParameterNode(trueName);
-                    parameters[trueName] = result;
+                    var result = new BoolParameterNode(name);
+                    parameters[name] = result;
                     return result;
                 }
                 else if (!(p is BoolParameterNode))
@@ -86,22 +80,20 @@ namespace IX.Math.Generators
             }
             else
             {
-                var result = new BoolParameterNode(trueName);
-                parameters.Add(trueName, result);
+                var result = new BoolParameterNode(name);
+                parameters.Add(name, result);
                 return result;
             }
         }
 
         public static StringParameterNode DetermineString(IDictionary<string, ParameterNodeBase> parameters, string name)
         {
-            var trueName = name.ToLower();
-
-            if (parameters.TryGetValue(trueName, out var p))
+            if (parameters.TryGetValue(name, out var p))
             {
                 if (p is UndefinedParameterNode)
                 {
-                    var result = new StringParameterNode(trueName);
-                    parameters[trueName] = result;
+                    var result = new StringParameterNode(name);
+                    parameters[name] = result;
                     return result;
                 }
                 else if (!(p is StringParameterNode))
@@ -115,8 +107,8 @@ namespace IX.Math.Generators
             }
             else
             {
-                var result = new StringParameterNode(trueName);
-                parameters.Add(trueName, result);
+                var result = new StringParameterNode(name);
+                parameters.Add(name, result);
                 return result;
             }
         }
