@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
+using IX.Math.PlatformMitigation;
+using IX.StandardExtensions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
@@ -313,9 +315,16 @@ namespace IX.Math.Nodes.Operations.Binary
 
             if (this.Left is BoolNode && this.Right is BoolNode)
             {
-                var l = Convert.ToBoolean(((BoolNode)this.Left).Value);
-                var r = Convert.ToBoolean(((BoolNode)this.Right).Value);
+                var l = ((BoolNode)this.Left).Value;
+                var r = ((BoolNode)this.Right).Value;
                 return new BoolNode(l == r);
+            }
+
+            if (this.Left is ByteArrayNode && this.Right is ByteArrayNode)
+            {
+                byte[] l = ((ByteArrayNode)this.Left).Value;
+                byte[] r = ((ByteArrayNode)this.Right).Value;
+                return new BoolNode(l.SequenceEquals(r));
             }
 
             return this;
@@ -324,7 +333,18 @@ namespace IX.Math.Nodes.Operations.Binary
         protected override Expression GenerateExpressionInternal()
         {
             Tuple<Expression, Expression> pars = this.GetExpressionsOfSameTypeFromOperands();
-            return Expression.Equal(pars.Item1, pars.Item2);
+
+            if (this.Left.ReturnType == SupportedValueType.ByteArray || this.Right.ReturnType == SupportedValueType.ByteArray)
+            {
+                return Expression.Call(
+                    typeof(ArraySequenceEqualsExtensions).GetTypeMethod(nameof(ArraySequenceEqualsExtensions.SequenceEquals), typeof(byte[]), typeof(byte[])),
+                    pars.Item1,
+                    pars.Item2);
+            }
+            else
+            {
+                return Expression.Equal(pars.Item1, pars.Item2);
+            }
         }
     }
 }
