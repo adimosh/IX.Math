@@ -12,7 +12,7 @@ namespace IX.Math.Nodes.Parameters
     /// A numeric parameter node.
     /// </summary>
     /// <seealso cref="ParameterNodeBase" />
-    [DebuggerDisplay("{ParameterName} (numeric)")]
+    [DebuggerDisplay("{Name} (numeric)")]
     public class NumericParameterNode : ParameterNodeBase
     {
         /// <summary>

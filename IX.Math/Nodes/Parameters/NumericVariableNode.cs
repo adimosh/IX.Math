@@ -12,7 +12,7 @@ namespace IX.Math.Nodes.Parameters
     /// A numeric variable node.
     /// </summary>
     /// <seealso cref="ParameterNodeBase" />
-    [DebuggerDisplay("{ParameterName} (numeric variable)")]
+    [DebuggerDisplay("{Name} (numeric variable)")]
     public class NumericVariableNode : NumericParameterNode, IVariableNode
     {
         private Expression cachedBodyExpression;

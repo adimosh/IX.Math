@@ -11,7 +11,7 @@ namespace IX.Math.Nodes.Parameters
     /// A boolean parameter node.
     /// </summary>
     /// <seealso cref="ParameterNodeBase" />
-    [DebuggerDisplay("{ParameterName} (bool)")]
+    [DebuggerDisplay("{Name} (bool)")]
     public class BoolParameterNode : ParameterNodeBase
     {
         /// <summary>

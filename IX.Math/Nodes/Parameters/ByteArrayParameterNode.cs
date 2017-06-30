@@ -11,7 +11,7 @@ namespace IX.Math.Nodes.Parameters
     /// A byte array parameter node.
     /// </summary>
     /// <seealso cref="ParameterNodeBase" />
-    [DebuggerDisplay("{ParameterName} (byte[])")]
+    [DebuggerDisplay("{Name} (byte[])")]
     public class ByteArrayParameterNode : ParameterNodeBase
     {
         /// <summary>

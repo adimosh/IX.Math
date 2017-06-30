@@ -12,7 +12,7 @@ namespace IX.Math.Nodes.Parameters
     /// A byte array variable node.
     /// </summary>
     /// <seealso cref="ParameterNodeBase" />
-    [DebuggerDisplay("{ParameterName} (byte[] variable)")]
+    [DebuggerDisplay("{Name} (byte[] variable)")]
     public class ByteArrayVariableNode : ByteArrayParameterNode
     {
         private Expression cachedBodyExpression;

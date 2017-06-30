@@ -12,7 +12,7 @@ namespace IX.Math.Nodes.Parameters
     /// A string parameter node. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="ParameterNodeBase" />
-    [DebuggerDisplay("{ParameterName} (string)")]
+    [DebuggerDisplay("{Name} (string)")]
     public sealed class StringParameterNode : ParameterNodeBase
     {
         /// <summary>

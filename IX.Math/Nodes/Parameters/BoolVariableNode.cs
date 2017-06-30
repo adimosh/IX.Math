@@ -12,7 +12,7 @@ namespace IX.Math.Nodes.Parameters
     /// A boolean variable node.
     /// </summary>
     /// <seealso cref="ParameterNodeBase" />
-    [DebuggerDisplay("{ParameterName} (bool variable)")]
+    [DebuggerDisplay("{Name} (bool variable)")]
     public class BoolVariableNode : BoolParameterNode, IVariableNode
     {
         private Expression cachedBodyExpression;

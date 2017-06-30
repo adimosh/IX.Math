@@ -12,7 +12,7 @@ namespace IX.Math.Nodes.Parameters
     /// A string variable node.
     /// </summary>
     /// <seealso cref="ParameterNodeBase" />
-    [DebuggerDisplay("{ParameterName} (string variable)")]
+    [DebuggerDisplay("{Name} (string variable)")]
     public class StringVariableNode : BoolParameterNode, IVariableNode
     {
         private Expression cachedBodyExpression;

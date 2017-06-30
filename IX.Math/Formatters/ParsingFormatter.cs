@@ -4,6 +4,7 @@
 
 using System;
 using System.Globalization;
+using System.Linq;
 
 namespace IX.Math.Formatters
 {
@@ -20,7 +21,7 @@ namespace IX.Math.Formatters
 
         private const NumberStyles HexNumberStyle = NumberStyles.AllowHexSpecifier;
 
-        internal static bool Parse(string expression, out object result)
+        internal static bool ParseNumeric(string expression, out object result)
         {
             if (string.IsNullOrWhiteSpace(expression))
             {
@@ -32,18 +33,6 @@ namespace IX.Math.Formatters
                 if (expression.Length > 2)
                 {
                     return ParseHexSpecific(expression.Substring(2), out result);
-                }
-                else
-                {
-                    result = null;
-                    return false;
-                }
-            }
-            else if (expression.StartsWith("0b", StringComparison.CurrentCultureIgnoreCase))
-            {
-                if (expression.Length > 2)
-                {
-                    return ParseByteArray(expression.Substring(2), out result);
                 }
                 else
                 {
@@ -86,21 +75,62 @@ namespace IX.Math.Formatters
                 specificResult = null;
                 return false;
             }
+        }
 
-            bool ParseByteArray(string byteArrayExpression, out object byteArrayResult)
+        internal static bool ParseByteArray(string expression, out byte[] result)
+        {
+            if (string.IsNullOrWhiteSpace(expression))
+            {
+                throw new ArgumentNullException(nameof(expression));
+            }
+
+            if (expression.StartsWith("0b", StringComparison.CurrentCultureIgnoreCase))
+            {
+                if (expression.Length > 2)
+                {
+                    return ParseByteArray(expression.Substring(2), out result);
+                }
+                else
+                {
+                    result = null;
+                    return false;
+                }
+            }
+
+            result = null;
+            return false;
+
+            bool ParseByteArray(string byteArrayExpression, out byte[] byteArrayResult)
             {
                 var stringLength = byteArrayExpression.Length;
+                var byteLength = stringLength / 8;
+                if (byteLength < (double)stringLength / 8)
+                {
+                    byteLength++;
+                }
 
-                byte[] bytes = new byte[stringLength / 2];
+                byte[] bytes = new byte[byteLength];
 
                 try
                 {
-                    for (var i = 0; i < stringLength; i += 2)
+                    for (var i = byteLength - 1; i >= 0; i -= 1)
                     {
-                        bytes[i / 2] = Convert.ToByte(byteArrayExpression.Substring(i, 2), 16);
+                        var startingIndex = stringLength - ((byteLength - i) * 8);
+                        int length;
+                        if (startingIndex < 0)
+                        {
+                            length = 8 + startingIndex;
+                            startingIndex = 0;
+                        }
+                        else
+                        {
+                            length = 8;
+                        }
+
+                        bytes[i] = Convert.ToByte(byteArrayExpression.Substring(startingIndex, length), 2);
                     }
 
-                    byteArrayResult = bytes;
+                    byteArrayResult = bytes.Reverse().ToArray();
 
                     return true;
                 }

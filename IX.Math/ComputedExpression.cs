@@ -81,7 +81,7 @@ namespace IX.Math
                 return this.initialExpression;
             }
 
-            object[] convertedArguments = NumericFormatter.FormatArgumentsAccordingToParameters(arguments, this.parameters);
+            object[] convertedArguments = ParameterFormatter.FormatArgumentsAccordingToParameters(arguments, this.parameters);
 
             this.body = this.body.RefreshParametersRecursive();
 

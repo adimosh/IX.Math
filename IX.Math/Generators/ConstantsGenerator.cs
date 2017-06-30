@@ -49,10 +49,17 @@ namespace IX.Math.Generators
             }
             else
             {
-                if (ParsingFormatter.Parse(content, out object n))
+                if (ParsingFormatter.ParseNumeric(content, out object n))
                 {
                     var name = GenerateName(constantsTable.Keys, originalExpression);
                     constantsTable.Add(name, new NumericNode(n));
+                    reverseConstantsTable.Add(content, name);
+                    return name;
+                }
+                else if (ParsingFormatter.ParseByteArray(content, out byte[] ba))
+                {
+                    var name = GenerateName(constantsTable.Keys, originalExpression);
+                    constantsTable.Add(name, new ByteArrayNode(ba));
                     reverseConstantsTable.Add(content, name);
                     return name;
                 }

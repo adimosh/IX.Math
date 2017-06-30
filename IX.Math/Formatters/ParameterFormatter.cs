@@ -1,4 +1,4 @@
-﻿// <copyright file="NumericFormatter.cs" company="Adrian Mos">
+﻿// <copyright file="ParameterFormatter.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -8,7 +8,7 @@ using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Formatters
 {
-    internal static class NumericFormatter
+    internal static class ParameterFormatter
     {
         internal static object[] FormatArgumentsAccordingToParameters(object[] parameterValues, ParameterNodeBase[] parameters)
         {
@@ -26,13 +26,37 @@ namespace IX.Math.Formatters
                 switch (parameters[i])
                 {
                     case NumericParameterNode n:
-                        if (n.RequireFloat == false)
+                        switch (parameterValues[i])
                         {
-                            finalValues[i] = Convert.ToInt64(parameterValues[i]);
-                        }
-                        else
-                        {
-                            finalValues[i] = Convert.ToDouble(parameterValues[i]);
+                            case string se:
+                                if (ParsingFormatter.ParseNumeric(se, out object val))
+                                {
+                                    if (n.RequireFloat == false)
+                                    {
+                                        finalValues[i] = Convert.ToInt64(val);
+                                    }
+                                    else
+                                    {
+                                        finalValues[i] = Convert.ToDouble(val);
+                                    }
+                                }
+                                else
+                                {
+                                    throw new InvalidCastException();
+                                }
+
+                                break;
+                            default:
+                                if (n.RequireFloat == false)
+                                {
+                                    finalValues[i] = Convert.ToInt64(parameterValues[i]);
+                                }
+                                else
+                                {
+                                    finalValues[i] = Convert.ToDouble(parameterValues[i]);
+                                }
+
+                                break;
                         }
 
                         break;
@@ -94,6 +118,64 @@ namespace IX.Math.Formatters
                         }
 
                         break;
+                    case ByteArrayParameterNode bapn:
+                        switch (parameterValues[i])
+                        {
+                            case bool be:
+                                finalValues[i] = BitConverter.GetBytes(be);
+                                break;
+                            case byte bbe:
+                                finalValues[i] = new byte[1] { bbe };
+                                break;
+                            case sbyte bbe:
+                                finalValues[i] = new byte[1] { (byte)bbe };
+                                break;
+                            case short bbe:
+                                finalValues[i] = BitConverter.GetBytes(bbe);
+                                break;
+                            case char bbe:
+                                finalValues[i] = BitConverter.GetBytes(bbe);
+                                break;
+                            case ushort bbe:
+                                finalValues[i] = BitConverter.GetBytes(bbe);
+                                break;
+                            case int bbe:
+                                finalValues[i] = BitConverter.GetBytes(bbe);
+                                break;
+                            case uint bbe:
+                                finalValues[i] = BitConverter.GetBytes(bbe);
+                                break;
+                            case long bbe:
+                                finalValues[i] = BitConverter.GetBytes(bbe);
+                                break;
+                            case ulong bbe:
+                                finalValues[i] = BitConverter.GetBytes(bbe);
+                                break;
+                            case float bbe:
+                                finalValues[i] = BitConverter.GetBytes(bbe);
+                                break;
+                            case double bbe:
+                                finalValues[i] = BitConverter.GetBytes(bbe);
+                                break;
+                            case byte[] ba:
+                                finalValues[i] = ba;
+                                break;
+                            case string se:
+                                if (ParsingFormatter.ParseByteArray(se, out byte[] val))
+                                {
+                                    finalValues[i] = val;
+                                }
+                                else
+                                {
+                                    throw new InvalidCastException();
+                                }
+
+                                break;
+                            default:
+                                throw new InvalidCastException();
+                        }
+
+                        break;
                     case UndefinedParameterNode u:
                         switch (parameterValues[i])
                         {
@@ -132,6 +214,9 @@ namespace IX.Math.Formatters
                                 break;
                             case double bbe:
                                 parameters[i] = u.DetermineNumeric();
+                                break;
+                            case byte[] ba:
+                                parameters[i] = u.DetermineByteArray();
                                 break;
                             default:
                                 parameters[i] = u.DetermineString();

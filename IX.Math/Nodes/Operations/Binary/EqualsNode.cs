@@ -295,7 +295,7 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        public override SupportedValueType ReturnType => this.Left?.ReturnType ?? this.Right?.ReturnType ?? SupportedValueType.Unknown;
+        public override SupportedValueType ReturnType => SupportedValueType.Boolean;
 
         public override NodeBase Simplify()
         {
@@ -324,7 +324,7 @@ namespace IX.Math.Nodes.Operations.Binary
             {
                 byte[] l = ((ByteArrayNode)this.Left).Value;
                 byte[] r = ((ByteArrayNode)this.Right).Value;
-                return new BoolNode(l.SequenceEquals(r));
+                return new BoolNode(l.SequenceEqualsWithMsb(r));
             }
 
             return this;
@@ -337,7 +337,7 @@ namespace IX.Math.Nodes.Operations.Binary
             if (this.Left.ReturnType == SupportedValueType.ByteArray || this.Right.ReturnType == SupportedValueType.ByteArray)
             {
                 return Expression.Call(
-                    typeof(ArraySequenceEqualsExtensions).GetTypeMethod(nameof(ArraySequenceEqualsExtensions.SequenceEquals), typeof(byte[]), typeof(byte[])),
+                    typeof(ArraySequenceEqualsWithMsbExtensions).GetTypeMethod(nameof(ArraySequenceEqualsWithMsbExtensions.SequenceEqualsWithMsb), typeof(byte[]), typeof(byte[])),
                     pars.Item1,
                     pars.Item2);
             }
