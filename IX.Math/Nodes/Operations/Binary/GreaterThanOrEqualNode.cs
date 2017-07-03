@@ -9,6 +9,7 @@ using System.Reflection;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 using IX.Math.PlatformMitigation;
+using IX.StandardExtensions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
@@ -150,6 +151,62 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
+        public GreaterThanOrEqualNode(ByteArrayNode left, ByteArrayNode right)
+            : base(left, right)
+        {
+        }
+
+        public GreaterThanOrEqualNode(ByteArrayNode left, ByteArrayParameterNode right)
+            : base(left, right)
+        {
+        }
+
+        public GreaterThanOrEqualNode(ByteArrayParameterNode left, ByteArrayNode right)
+            : base(left, right)
+        {
+        }
+
+        public GreaterThanOrEqualNode(ByteArrayParameterNode left, ByteArrayParameterNode right)
+            : base(left, right)
+        {
+        }
+
+        public GreaterThanOrEqualNode(ByteArrayNode left, OperationNodeBase right)
+            : base(left, right?.Simplify())
+        {
+            if (right?.ReturnType != SupportedValueType.ByteArray)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public GreaterThanOrEqualNode(OperationNodeBase left, ByteArrayNode right)
+            : base(left?.Simplify(), right)
+        {
+            if (left?.ReturnType != SupportedValueType.ByteArray)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public GreaterThanOrEqualNode(ByteArrayParameterNode left, OperationNodeBase right)
+            : base(left, right?.Simplify())
+        {
+            if (right?.ReturnType != SupportedValueType.ByteArray)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        public GreaterThanOrEqualNode(OperationNodeBase left, ByteArrayParameterNode right)
+            : base(left?.Simplify(), right)
+        {
+            if (left?.ReturnType != SupportedValueType.ByteArray)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
         public GreaterThanOrEqualNode(UndefinedParameterNode left, UndefinedParameterNode right)
             : base(left?.DetermineNumeric(), right?.DetermineNumeric())
         {
@@ -165,6 +222,10 @@ namespace IX.Math.Nodes.Operations.Binary
             else if (this.Right.ReturnType == SupportedValueType.String)
             {
                 this.Left = left.DetermineString();
+            }
+            else if (this.Right.ReturnType == SupportedValueType.ByteArray)
+            {
+                this.Left = left.DetermineByteArray();
             }
             else
             {
@@ -182,6 +243,10 @@ namespace IX.Math.Nodes.Operations.Binary
             else if (this.Left.ReturnType == SupportedValueType.String)
             {
                 this.Right = right.DetermineString();
+            }
+            else if (this.Left.ReturnType == SupportedValueType.ByteArray)
+            {
+                this.Right = right.DetermineByteArray();
             }
             else
             {
@@ -203,6 +268,12 @@ namespace IX.Math.Nodes.Operations.Binary
             {
                 return new BoolNode(left.Value.CompareTo(right.Value) >= 0);
             }
+            else if (this.Left is ByteArrayNode && this.Right is ByteArrayNode)
+            {
+                byte[] l = ((ByteArrayNode)this.Left).Value;
+                byte[] r = ((ByteArrayNode)this.Right).Value;
+                return new BoolNode(l.SequenceCompareWithMsb(r) >= 0);
+            }
             else
             {
                 return this;
@@ -217,6 +288,15 @@ namespace IX.Math.Nodes.Operations.Binary
                 MethodInfo mi = typeof(string).GetTypeMethod(nameof(string.Compare), typeof(string), typeof(string));
                 return Expression.GreaterThanOrEqual(
                     Expression.Call(mi, this.Left.GenerateStringExpression(), this.Right.GenerateStringExpression()),
+                    Expression.Constant(0, typeof(int)));
+            }
+            else if (this.Left.ReturnType == SupportedValueType.ByteArray || this.Right.ReturnType == SupportedValueType.ByteArray)
+            {
+                return Expression.GreaterThanOrEqual(
+                    Expression.Call(
+                        typeof(ArraySequenceCompareWithMsbExtensions).GetTypeMethod(nameof(ArraySequenceCompareWithMsbExtensions.SequenceCompareWithMsb), typeof(byte[]), typeof(byte[])),
+                        pars.Item1,
+                        pars.Item2),
                     Expression.Constant(0, typeof(int)));
             }
             else
