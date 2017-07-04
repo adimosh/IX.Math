@@ -5,125 +5,28 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
-using IX.Math.Nodes.Parameters;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
     [DebuggerDisplay("{Left} * {Right}")]
-    internal sealed class MultiplyNode : BinaryOperationNodeBase
+    internal sealed class MultiplyNode : SimpleMathematicalOperationNodeBase
     {
-        public MultiplyNode(NumericNode left, NumericNode right)
-            : base(left, right)
-        {
-        }
-
-        public MultiplyNode(NumericNode left, NumericParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public MultiplyNode(NumericParameterNode left, NumericNode right)
-            : base(left, right)
-        {
-        }
-
-        public MultiplyNode(NumericParameterNode left, NumericParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public MultiplyNode(NumericNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (right?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public MultiplyNode(OperationNodeBase left, NumericNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (left?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public MultiplyNode(NumericParameterNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (right?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public MultiplyNode(OperationNodeBase left, NumericParameterNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (left?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public MultiplyNode(OperationNodeBase left, OperationNodeBase right)
+        public MultiplyNode(NodeBase left, NodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
-            if (right?.ReturnType != SupportedValueType.Numeric && left?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
         }
-
-        public MultiplyNode(UndefinedParameterNode left, UndefinedParameterNode right)
-            : base(left?.DetermineNumeric(), right?.DetermineNumeric())
-        {
-        }
-
-        public MultiplyNode(UndefinedParameterNode left, NodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (this.Right.ReturnType == SupportedValueType.Numeric)
-            {
-                this.Left = left.DetermineNumeric();
-            }
-            else
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public MultiplyNode(NodeBase left, UndefinedParameterNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (this.Left.ReturnType == SupportedValueType.Numeric)
-            {
-                this.Right = right.DetermineNumeric();
-            }
-            else
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
         public override NodeBase Simplify()
         {
-            if (this.Left is NumericNode && this.Right is NumericNode)
+            if (this.Left is NumericNode nnLeft && this.Right is NumericNode nnRight)
             {
-                return NumericNode.Multiply((NumericNode)this.Left, (NumericNode)this.Right);
+                return NumericNode.Multiply(nnLeft, nnRight);
             }
 
             return this;
         }
 
-        protected override Expression GenerateExpressionInternal()
-        {
-            System.Tuple<Expression, Expression> pars = this.GetExpressionsOfSameTypeFromOperands();
-            return Expression.Multiply(pars.Item1, pars.Item2);
-        }
+        protected override Expression GenerateExpressionInternal() =>
+            Expression.Multiply(Expression.Convert(this.Left.GenerateExpression(), typeof(double)), Expression.Convert(this.Right.GenerateExpression(), typeof(double)));
     }
 }

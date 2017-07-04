@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace IX.Math.Nodes.Operations.Binary
@@ -11,8 +12,13 @@ namespace IX.Math.Nodes.Operations.Binary
     {
         protected BinaryOperationNodeBase(NodeBase left, NodeBase right)
         {
-            this.Left = left ?? throw new ArgumentNullException(nameof(left));
-            this.Right = right ?? throw new ArgumentNullException(nameof(right));
+            NodeBase leftTemp = left ?? throw new ArgumentNullException(nameof(left));
+            NodeBase rightTemp = right ?? throw new ArgumentNullException(nameof(right));
+
+            this.EnsureCompatibleOperands(ref leftTemp, ref rightTemp);
+
+            this.Left = leftTemp?.Simplify();
+            this.Right = rightTemp?.Simplify();
         }
 
         public NodeBase Left { get; protected set; }
@@ -26,6 +32,8 @@ namespace IX.Math.Nodes.Operations.Binary
 
             return this;
         }
+
+        protected abstract void EnsureCompatibleOperands(ref NodeBase left, ref NodeBase right);
 
         protected Tuple<Expression, Expression> GetExpressionsOfSameTypeFromOperands()
         {

@@ -37,6 +37,12 @@ namespace IX.Math.Nodes
         public string Name => this.name;
 
         /// <summary>
+        /// Gets a value indicating whether or not this node is actually a constant.
+        /// </summary>
+        /// <value><c>true</c> if the node is a constant, <c>false</c> otherwise.</value>
+        public override bool IsConstant => false;
+
+        /// <summary>
         /// Refreshes all the parameters recursively.
         /// </summary>
         /// <returns>A reflexive reference.</returns>

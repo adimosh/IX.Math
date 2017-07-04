@@ -25,6 +25,12 @@ namespace IX.Math.Nodes
         public abstract SupportedValueType ReturnType { get; }
 
         /// <summary>
+        /// Gets a value indicating whether or not this node is actually a constant.
+        /// </summary>
+        /// <value><c>true</c> if the node is a constant, <c>false</c> otherwise.</value>
+        public abstract bool IsConstant { get; }
+
+        /// <summary>
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>The generated <see cref="Expression"/>.</returns>

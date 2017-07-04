@@ -7,272 +7,36 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Nodes.Constants;
-using IX.Math.Nodes.Parameters;
 using IX.Math.PlatformMitigation;
 using IX.StandardExtensions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
     [DebuggerDisplay("{Left} >= {Right}")]
-    internal sealed class GreaterThanOrEqualNode : BinaryOperationNodeBase
+    internal sealed class GreaterThanOrEqualNode : ComparisonOperationNodeBase
     {
-        public GreaterThanOrEqualNode(NumericNode left, NumericNode right)
-            : base(left, right)
-        {
-        }
-
-        public GreaterThanOrEqualNode(NumericNode left, NumericParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public GreaterThanOrEqualNode(NumericParameterNode left, NumericNode right)
-            : base(left, right)
-        {
-        }
-
-        public GreaterThanOrEqualNode(NumericParameterNode left, NumericParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public GreaterThanOrEqualNode(NumericNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (this.Right.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(OperationNodeBase left, NumericNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (this.Left.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(OperationNodeBase left, OperationNodeBase right)
+        public GreaterThanOrEqualNode(NodeBase left, NodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
-            if (this.Left.ReturnType == SupportedValueType.Numeric)
-            {
-                if (this.Right.ReturnType != SupportedValueType.Numeric)
-                {
-                    throw new ExpressionNotValidLogicallyException();
-                }
-            }
-            else if (this.Left.ReturnType == SupportedValueType.String)
-            {
-                if (this.Right.ReturnType != SupportedValueType.String)
-                {
-                    throw new ExpressionNotValidLogicallyException();
-                }
-            }
-            else
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
         }
-
-        public GreaterThanOrEqualNode(NumericParameterNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (this.Right.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(OperationNodeBase left, NumericParameterNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (this.Left.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(StringNode left, StringNode right)
-            : base(left, right)
-        {
-        }
-
-        public GreaterThanOrEqualNode(StringParameterNode left, StringNode right)
-            : base(left, right)
-        {
-        }
-
-        public GreaterThanOrEqualNode(OperationNodeBase left, StringNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (this.Left.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(StringNode left, StringParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public GreaterThanOrEqualNode(StringParameterNode left, StringParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public GreaterThanOrEqualNode(OperationNodeBase left, StringParameterNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (this.Left.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(StringNode left, OperationNodeBase right)
-            : base(left, right)
-        {
-            if (this.Right.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(StringParameterNode left, OperationNodeBase right)
-            : base(left, right)
-        {
-            if (this.Right.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(ByteArrayNode left, ByteArrayNode right)
-            : base(left, right)
-        {
-        }
-
-        public GreaterThanOrEqualNode(ByteArrayNode left, ByteArrayParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public GreaterThanOrEqualNode(ByteArrayParameterNode left, ByteArrayNode right)
-            : base(left, right)
-        {
-        }
-
-        public GreaterThanOrEqualNode(ByteArrayParameterNode left, ByteArrayParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public GreaterThanOrEqualNode(ByteArrayNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (right?.ReturnType != SupportedValueType.ByteArray)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(OperationNodeBase left, ByteArrayNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (left?.ReturnType != SupportedValueType.ByteArray)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(ByteArrayParameterNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (right?.ReturnType != SupportedValueType.ByteArray)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(OperationNodeBase left, ByteArrayParameterNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (left?.ReturnType != SupportedValueType.ByteArray)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(UndefinedParameterNode left, UndefinedParameterNode right)
-            : base(left?.DetermineNumeric(), right?.DetermineNumeric())
-        {
-        }
-
-        public GreaterThanOrEqualNode(UndefinedParameterNode left, NodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (this.Right.ReturnType == SupportedValueType.Numeric)
-            {
-                this.Left = left.DetermineNumeric();
-            }
-            else if (this.Right.ReturnType == SupportedValueType.String)
-            {
-                this.Left = left.DetermineString();
-            }
-            else if (this.Right.ReturnType == SupportedValueType.ByteArray)
-            {
-                this.Left = left.DetermineByteArray();
-            }
-            else
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public GreaterThanOrEqualNode(NodeBase left, UndefinedParameterNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (this.Left.ReturnType == SupportedValueType.Numeric)
-            {
-                this.Right = right.DetermineNumeric();
-            }
-            else if (this.Left.ReturnType == SupportedValueType.String)
-            {
-                this.Right = right.DetermineString();
-            }
-            else if (this.Left.ReturnType == SupportedValueType.ByteArray)
-            {
-                this.Right = right.DetermineByteArray();
-            }
-            else
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public override SupportedValueType ReturnType => SupportedValueType.Boolean;
 
         public override NodeBase Simplify()
         {
-            if (this.Left is NumericNode && this.Right is NumericNode)
+            if (this.Left is NumericNode nnLeft && this.Right is NumericNode nnRight)
             {
-                Tuple<double, double> value = NumericNode.ExtractFloats((NumericNode)this.Left, (NumericNode)this.Right);
-
-                return new BoolNode(value.Item1 >= value.Item2);
+                return new BoolNode(Convert.ToDouble(nnLeft.Value) >= Convert.ToDouble(nnRight.Value));
             }
-            else if (this.Left is StringNode left && this.Right is StringNode right)
+            else if (this.Left is StringNode snLeft && this.Right is StringNode snRight)
             {
-                return new BoolNode(left.Value.CompareTo(right.Value) >= 0);
+                return new BoolNode(snLeft.Value.CompareTo(snRight.Value) >= 0);
             }
-            else if (this.Left is ByteArrayNode && this.Right is ByteArrayNode)
+            else if (this.Left is BoolNode bnLeft && this.Right is BoolNode bnRight)
             {
-                byte[] l = ((ByteArrayNode)this.Left).Value;
-                byte[] r = ((ByteArrayNode)this.Right).Value;
-                return new BoolNode(l.SequenceCompareWithMsb(r) >= 0);
+                return new BoolNode(bnLeft.Value ? true : !bnRight.Value);
+            }
+            else if (this.Left is ByteArrayNode baLeft && this.Right is ByteArrayNode baRight)
+            {
+                return new BoolNode(baLeft.Value.SequenceCompareWithMsb(baRight.Value) >= 0);
             }
             else
             {
@@ -289,6 +53,13 @@ namespace IX.Math.Nodes.Operations.Binary
                 return Expression.GreaterThanOrEqual(
                     Expression.Call(mi, this.Left.GenerateStringExpression(), this.Right.GenerateStringExpression()),
                     Expression.Constant(0, typeof(int)));
+            }
+            else if (this.Left.ReturnType == SupportedValueType.Boolean || this.Right.ReturnType == SupportedValueType.Boolean)
+            {
+                return Expression.Condition(
+                    Expression.Equal(pars.Item1, Expression.Constant(true, typeof(bool))),
+                    Expression.Constant(true, typeof(bool)),
+                    Expression.Negate(pars.Item2));
             }
             else if (this.Left.ReturnType == SupportedValueType.ByteArray || this.Right.ReturnType == SupportedValueType.ByteArray)
             {

@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
@@ -13,277 +14,166 @@ namespace IX.Math.Nodes.Operations.Binary
     [DebuggerDisplay("{Left} + {Right}")]
     internal sealed class AddNode : BinaryOperationNodeBase
     {
-        public AddNode(NumericNode left, NumericNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(NumericNode left, NumericParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(NumericParameterNode left, NumericNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(NumericParameterNode left, NumericParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(StringNode left, StringNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(StringNode left, StringParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(StringParameterNode left, StringNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(StringParameterNode left, StringParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(NumericNode left, StringNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(StringNode left, NumericNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(NumericNode left, StringParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(StringParameterNode left, NumericNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(NumericParameterNode left, StringNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(StringNode left, NumericParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(NumericParameterNode left, StringParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(StringParameterNode left, NumericParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(BoolNode left, StringNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(StringNode left, BoolNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(BoolNode left, StringParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(StringParameterNode left, BoolNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(BoolParameterNode left, StringNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(StringNode left, BoolParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(BoolParameterNode left, StringParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(StringParameterNode left, BoolParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(NumericNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (right?.ReturnType != SupportedValueType.Numeric && right?.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public AddNode(OperationNodeBase left, NumericNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (left?.ReturnType != SupportedValueType.Numeric && left?.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public AddNode(OperationNodeBase left, OperationNodeBase right)
+        public AddNode(NodeBase left, NodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
-            if (right?.ReturnType != left?.ReturnType && right?.ReturnType != SupportedValueType.String && left?.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
         }
 
-        public AddNode(NumericParameterNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (right?.ReturnType != SupportedValueType.Numeric && right?.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public AddNode(OperationNodeBase left, NumericParameterNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (left?.ReturnType != SupportedValueType.Numeric && left?.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public AddNode(StringNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
-        {
-        }
-
-        public AddNode(OperationNodeBase left, StringNode right)
-            : base(left?.Simplify(), right)
-        {
-        }
-
-        public AddNode(StringParameterNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
-        {
-        }
-
-        public AddNode(OperationNodeBase left, StringParameterNode right)
-            : base(left?.Simplify(), right)
-        {
-        }
-
-        public AddNode(UndefinedParameterNode left, UndefinedParameterNode right)
-            : base(left, right)
-        {
-        }
-
-        public AddNode(UndefinedParameterNode left, NodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (this.Right.ReturnType == SupportedValueType.Numeric)
-            {
-                this.Left = left.DetermineNumeric();
-            }
-            else
-            {
-                this.Left = left.DetermineString();
-            }
-        }
-
-        public AddNode(NodeBase left, UndefinedParameterNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (this.Left.ReturnType == SupportedValueType.Numeric)
-            {
-                this.Right = right.DetermineNumeric();
-            }
-            else
-            {
-                this.Right = right.DetermineString();
-            }
-        }
-
-        public override SupportedValueType ReturnType
-        {
-            get
-            {
-                if (this.Left.ReturnType == SupportedValueType.String || this.Right.ReturnType == SupportedValueType.String)
-                {
-                    return SupportedValueType.String;
-                }
-
-                return SupportedValueType.Numeric;
-            }
-        }
+        public override SupportedValueType ReturnType =>
+            (this.Left.ReturnType == SupportedValueType.Unknown && this.Right.ReturnType == SupportedValueType.Unknown) ?
+                SupportedValueType.Unknown :
+                ((this.Left.ReturnType == SupportedValueType.String || this.Right.ReturnType == SupportedValueType.String) ?
+                    SupportedValueType.String :
+                    SupportedValueType.Numeric);
 
         public override NodeBase Simplify()
         {
-            if (this.Left is NumericNode && this.Right is NumericNode)
+            if (this.Left.IsConstant != this.Right.IsConstant)
             {
-                return NumericNode.Add((NumericNode)this.Left, (NumericNode)this.Right);
+                return this;
             }
 
-            if (this.Left is StringNode && this.Right is StringNode)
+            if (!this.Left.IsConstant)
             {
-                return new StringNode(((StringNode)this.Left).Value + ((StringNode)this.Right).Value);
+                return this;
             }
 
-            if (this.Left is NumericNode && this.Right is StringNode)
+            if (this.Left is NumericNode nn1Left && this.Right is NumericNode nn1Right)
             {
-                return new StringNode($"{((NumericNode)this.Left).Value}{((StringNode)this.Right).Value}");
+                return NumericNode.Add(nn1Left, nn1Right);
             }
-
-            if (this.Left is StringNode && this.Right is NumericNode)
+            else if (this.Left is StringNode sn1Left && this.Right is StringNode sn1Right)
             {
-                return new StringNode($"{((StringNode)this.Left).Value}{((NumericNode)this.Right).Value}");
+                return new StringNode(sn1Left.Value + sn1Right.Value);
             }
-
-            if (this.Left is BoolNode && this.Right is StringNode)
+            else if (this.Left is NumericNode nn2Left && this.Right is StringNode sn2Right)
             {
-                return new StringNode($"{((BoolNode)this.Left).Value}{((StringNode)this.Right).Value}");
+                return new StringNode($"{nn2Left.Value}{sn2Right.Value}");
             }
-
-            if (this.Left is StringNode && this.Right is BoolNode)
+            else if (this.Left is StringNode sn3Left && this.Right is NumericNode nn3Right)
             {
-                return new StringNode($"{((StringNode)this.Left).Value}{((BoolNode)this.Right).Value}");
+                return new StringNode($"{sn3Left.Value}{nn3Right.Value}");
+            }
+            else if (this.Left is BoolNode bn4Left && this.Right is StringNode sn4Right)
+            {
+                return new StringNode($"{bn4Left.Value}{sn4Right.Value}");
+            }
+            else if (this.Left is StringNode sn5Left && this.Right is BoolNode bn5Right)
+            {
+                return new StringNode($"{sn5Left.Value}{bn5Right.Value}");
             }
 
             return this;
         }
 
+        protected override void EnsureCompatibleOperands(ref NodeBase left, ref NodeBase right)
+        {
+            if (left is UndefinedParameterNode uLeft)
+            {
+                switch (right.ReturnType)
+                {
+                    case SupportedValueType.Numeric:
+                        left = uLeft.DetermineNumeric();
+                        break;
+
+                    case SupportedValueType.Boolean:
+                    case SupportedValueType.ByteArray:
+                    case SupportedValueType.String:
+                        left = uLeft.DetermineString();
+                        break;
+
+                    case SupportedValueType.Unknown:
+                        break;
+
+                    default:
+                        throw new ExpressionNotValidLogicallyException();
+                }
+            }
+
+            if (right is UndefinedParameterNode uRight)
+            {
+                switch (left.ReturnType)
+                {
+                    case SupportedValueType.Numeric:
+                        right = uRight.DetermineNumeric();
+                        break;
+
+                    case SupportedValueType.Boolean:
+                    case SupportedValueType.ByteArray:
+                    case SupportedValueType.String:
+                        right = uRight.DetermineString();
+                        break;
+
+                    case SupportedValueType.Unknown:
+                        break;
+
+                    default:
+                        throw new ExpressionNotValidLogicallyException();
+                }
+            }
+
+            switch (left.ReturnType)
+            {
+                case SupportedValueType.Numeric:
+                    if (right.ReturnType != SupportedValueType.Numeric && right.ReturnType != SupportedValueType.String)
+                    {
+                        throw new ExpressionNotValidLogicallyException();
+                    }
+
+                    break;
+
+                case SupportedValueType.Boolean:
+                case SupportedValueType.ByteArray:
+                    if (right.ReturnType != SupportedValueType.String)
+                    {
+                        throw new ExpressionNotValidLogicallyException();
+                    }
+
+                    break;
+
+                case SupportedValueType.String:
+                case SupportedValueType.Unknown:
+                    break;
+
+                default:
+                    throw new ExpressionNotValidLogicallyException();
+            }
+
+            switch (right.ReturnType)
+            {
+                case SupportedValueType.Numeric:
+                    if (left.ReturnType != SupportedValueType.Numeric && left.ReturnType != SupportedValueType.String)
+                    {
+                        throw new ExpressionNotValidLogicallyException();
+                    }
+
+                    break;
+
+                case SupportedValueType.Boolean:
+                case SupportedValueType.ByteArray:
+                    if (left.ReturnType != SupportedValueType.String)
+                    {
+                        throw new ExpressionNotValidLogicallyException();
+                    }
+
+                    break;
+
+                case SupportedValueType.String:
+                case SupportedValueType.Unknown:
+                    break;
+
+                default:
+                    throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
         protected override Expression GenerateExpressionInternal()
         {
-            System.Tuple<Expression, Expression> pars = this.GetExpressionsOfSameTypeFromOperands();
+            Tuple<Expression, Expression> pars = this.GetExpressionsOfSameTypeFromOperands();
 
             if (this.ReturnType == SupportedValueType.String)
             {
-                var mi = typeof(string).GetTypeMethod(nameof(string.Concat), typeof(string), typeof(string));
+                System.Reflection.MethodInfo mi = typeof(string).GetTypeMethod(nameof(string.Concat), typeof(string), typeof(string));
                 return Expression.Call(mi, pars.Item1, pars.Item2);
             }
             else

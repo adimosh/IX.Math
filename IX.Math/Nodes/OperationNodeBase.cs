@@ -22,6 +22,12 @@ namespace IX.Math.Nodes
         }
 
         /// <summary>
+        /// Gets a value indicating whether or not this node is actually a constant.
+        /// </summary>
+        /// <value><c>true</c> if the node is a constant, <c>false</c> otherwise.</value>
+        public override bool IsConstant => false;
+
+        /// <summary>
         /// Generates an expression that will be cached before being compiled.
         /// </summary>
         /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" /> to be cached.</returns>
