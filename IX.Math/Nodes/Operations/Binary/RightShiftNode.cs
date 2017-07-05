@@ -5,130 +5,53 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
-using IX.Math.Nodes.Parameters;
+using IX.Math.PlatformMitigation;
+using IX.StandardExtensions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
     [DebuggerDisplay("{Left} >> {Right}")]
-    internal sealed class RightShiftNode : BinaryOperationNodeBase
+    internal sealed class RightShiftNode : ByteShiftOperationNodeBase
     {
-        public RightShiftNode(NumericNode left, NumericNode right)
-            : base(left, right)
-        {
-        }
-
-        public RightShiftNode(NumericNode left, NumericParameterNode right)
-            : base(left, right?.ParameterMustBeInteger())
-        {
-        }
-
-        public RightShiftNode(NumericParameterNode left, NumericNode right)
-            : base(left?.ParameterMustBeInteger(), right)
-        {
-        }
-
-        public RightShiftNode(NumericParameterNode left, NumericParameterNode right)
-            : base(left?.ParameterMustBeInteger(), right?.ParameterMustBeInteger())
-        {
-        }
-
-        public RightShiftNode(NumericNode left, OperationNodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (right?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public RightShiftNode(OperationNodeBase left, NumericNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (left?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public RightShiftNode(NumericParameterNode left, OperationNodeBase right)
-            : base(left?.ParameterMustBeInteger(), right?.Simplify())
-        {
-            if (right?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public RightShiftNode(OperationNodeBase left, NumericParameterNode right)
-            : base(left?.Simplify(), right?.ParameterMustBeInteger())
-        {
-            if (left?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public RightShiftNode(OperationNodeBase left, OperationNodeBase right)
+        public RightShiftNode(NodeBase left, NodeBase right)
             : base(left?.Simplify(), right?.Simplify())
         {
-            if (right?.ReturnType != SupportedValueType.Numeric && left?.ReturnType != SupportedValueType.Numeric)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
         }
-
-        public RightShiftNode(UndefinedParameterNode left, UndefinedParameterNode right)
-            : base(left?.DetermineNumeric().ParameterMustBeInteger(), right?.DetermineNumeric().ParameterMustBeInteger())
-        {
-        }
-
-        public RightShiftNode(UndefinedParameterNode left, NodeBase right)
-            : base(left, right?.Simplify())
-        {
-            if (this.Right.ReturnType == SupportedValueType.Numeric)
-            {
-                this.Left = left.DetermineNumeric().ParameterMustBeInteger();
-                if (this.Right is NumericParameterNode)
-                {
-                    ((NumericParameterNode)this.Right).ParameterMustBeInteger();
-                }
-            }
-            else
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public RightShiftNode(NodeBase left, UndefinedParameterNode right)
-            : base(left?.Simplify(), right)
-        {
-            if (this.Left.ReturnType == SupportedValueType.Numeric)
-            {
-                this.Right = right.DetermineNumeric().ParameterMustBeInteger();
-                if (this.Left is NumericParameterNode)
-                {
-                    ((NumericParameterNode)this.Left).ParameterMustBeInteger();
-                }
-            }
-            else
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
         public override NodeBase Simplify()
         {
-            if (this.Left is NumericNode && this.Right is NumericNode)
+            if (this.Left is NumericNode nLeft && this.Right is NumericNode nRight)
             {
-                return NumericNode.RightShift((NumericNode)this.Left, (NumericNode)this.Right);
+                return NumericNode.RightShift(nLeft, nRight);
             }
-
-            return this;
+            else if (this.Left is ByteArrayNode baLeft && this.Right is NumericNode baRight)
+            {
+                return new ByteArrayNode(baLeft.Value.RightShift(baRight.ExtractInt()));
+            }
+            else
+            {
+                return this;
+            }
         }
 
-        protected override Expression GenerateExpressionInternal() =>
-            Expression.RightShift(this.Left.GenerateExpression(), Expression.Convert(this.Right.GenerateExpression(), typeof(int)));
+        protected override Expression GenerateExpressionInternal()
+        {
+            Expression rightExpression = Expression.Convert(this.Right.GenerateExpression(), typeof(int));
+            if (this.Left is NumericNode)
+            {
+                return Expression.RightShift(this.Left.GenerateExpression(), rightExpression);
+            }
+            else if (this.Left is ByteArrayNode)
+            {
+                return Expression.Call(
+                    typeof(BitwiseExtensions).GetTypeMethod(nameof(BitwiseExtensions.RightShift), typeof(byte[]), typeof(int)),
+                    this.Left.GenerateExpression(),
+                    rightExpression);
+            }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
     }
 }
