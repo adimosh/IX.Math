@@ -65,9 +65,64 @@ namespace IX.Math.Nodes.Operations.Binary
                 }
             }
 
-            if (!((left.ReturnType == SupportedValueType.Numeric && right.ReturnType == SupportedValueType.Numeric) || (left.ReturnType == SupportedValueType.Boolean && right.ReturnType == SupportedValueType.Boolean)))
+            switch (left.ReturnType)
             {
-                throw new ExpressionNotValidLogicallyException();
+                case SupportedValueType.Unknown:
+                    if (right.ReturnType != SupportedValueType.Numeric && right.ReturnType != SupportedValueType.Boolean && right.ReturnType != SupportedValueType.Unknown)
+                    {
+                        throw new ExpressionNotValidLogicallyException();
+                    }
+
+                    break;
+
+                case SupportedValueType.Numeric:
+                    if (right.ReturnType != SupportedValueType.Numeric && right.ReturnType != SupportedValueType.Unknown)
+                    {
+                        throw new ExpressionNotValidLogicallyException();
+                    }
+
+                    break;
+
+                case SupportedValueType.Boolean:
+                    if (right.ReturnType != SupportedValueType.Boolean && right.ReturnType != SupportedValueType.Unknown)
+                    {
+                        throw new ExpressionNotValidLogicallyException();
+                    }
+
+                    break;
+
+                default:
+                    throw new ExpressionNotValidLogicallyException();
+            }
+
+            switch (right.ReturnType)
+            {
+                case SupportedValueType.Unknown:
+                    if (left.ReturnType != SupportedValueType.Numeric && left.ReturnType != SupportedValueType.Boolean && left.ReturnType != SupportedValueType.Unknown)
+                    {
+                        throw new ExpressionNotValidLogicallyException();
+                    }
+
+                    break;
+
+                case SupportedValueType.Numeric:
+                    if (left.ReturnType != SupportedValueType.Numeric && left.ReturnType != SupportedValueType.Unknown)
+                    {
+                        throw new ExpressionNotValidLogicallyException();
+                    }
+
+                    break;
+
+                case SupportedValueType.Boolean:
+                    if (left.ReturnType != SupportedValueType.Boolean && left.ReturnType != SupportedValueType.Unknown)
+                    {
+                        throw new ExpressionNotValidLogicallyException();
+                    }
+
+                    break;
+
+                default:
+                    throw new ExpressionNotValidLogicallyException();
             }
         }
     }
