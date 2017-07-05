@@ -81,7 +81,7 @@ namespace IX.Math.Nodes.Constants
             {
                 foreach (var b in this.value)
                 {
-                    bldr.AppendFormat("{0:x2}", b);
+                    bldr.Append(Convert.ToString(b, 2));
                 }
             }
 

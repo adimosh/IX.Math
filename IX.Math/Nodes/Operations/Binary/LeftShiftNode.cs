@@ -37,11 +37,11 @@ namespace IX.Math.Nodes.Operations.Binary
         protected override Expression GenerateExpressionInternal()
         {
             Expression rightExpression = Expression.Convert(this.Right.GenerateExpression(), typeof(int));
-            if (this.Left is NumericNode)
+            if (this.Left.ReturnType == SupportedValueType.Numeric)
             {
                 return Expression.LeftShift(this.Left.GenerateExpression(), rightExpression);
             }
-            else if (this.Left is ByteArrayNode)
+            else if (this.Left.ReturnType == SupportedValueType.ByteArray)
             {
                 return Expression.Call(
                     typeof(BitwiseExtensions).GetTypeMethod(nameof(BitwiseExtensions.LeftShift), typeof(byte[]), typeof(int)),

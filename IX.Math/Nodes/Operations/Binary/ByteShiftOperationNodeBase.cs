@@ -18,6 +18,11 @@ namespace IX.Math.Nodes.Operations.Binary
 
         protected override void EnsureCompatibleOperands(ref NodeBase left, ref NodeBase right)
         {
+            if (left is UndefinedParameterNode uLeft)
+            {
+                left = uLeft.IfDeterminedNumericAlsoDetermineInteger();
+            }
+
             switch (right)
             {
                 case UndefinedParameterNode uRight:
