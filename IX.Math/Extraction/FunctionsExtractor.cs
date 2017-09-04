@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IX.Math.ExpressionState;
 using IX.Math.Generators;
 using IX.Math.Nodes;
 
@@ -35,7 +36,7 @@ namespace IX.Math.Extraction
             string parameterSeparator,
             Dictionary<string, ConstantNodeBase> constantsTable,
             Dictionary<string, string> reverseConstantsTable,
-            Dictionary<string, Tuple<RawExpressionContainer, SymbolOptimizationData>> symbolTable,
+            Dictionary<string, ExpressionSymbol> symbolTable,
             Dictionary<string, string> reverseSymbolTable,
             Dictionary<string, ParameterNodeBase> parametersTable,
             string expression,
@@ -50,7 +51,7 @@ namespace IX.Math.Extraction
 
             void ReplaceOneFunction(string key)
             {
-                RawExpressionContainer symbol = symbolTable[key].Item1;
+                ExpressionSymbol symbol = symbolTable[key];
                 if (symbol.IsFunctionCall)
                 {
                     return;
@@ -59,7 +60,7 @@ namespace IX.Math.Extraction
                 var replaced = symbol.Expression;
                 while (replaced != null)
                 {
-                    symbolTable[key].Item1.Expression = replaced;
+                    symbolTable[key].Expression = replaced;
                     replaced = ReplaceFunctions(replaced);
                 }
 

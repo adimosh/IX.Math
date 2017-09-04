@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using IX.Math.ExpressionState;
 using IX.Math.Nodes;
 
 namespace IX.Math.Optimizers
@@ -15,11 +16,11 @@ namespace IX.Math.Optimizers
 #pragma warning disable SA1008 // Opening parenthesis must be spaced correctly
 #pragma warning disable SA1009 // Closing parenthesis must be spaced correctly
         public List<NodeBase> OptimizeSymbols(
-            Dictionary<string, RawExpressionContainer> symbols,
+            Dictionary<string, ExpressionSymbol> symbols,
             Dictionary<string, string> reverseSymbols,
             Dictionary<string, ConstantNodeBase> constantsTable,
             Dictionary<string, string> reverseConstants,
-            Func<RawExpressionContainer, NodeBase> expressionGenerator,
+            Func<ExpressionSymbol, NodeBase> expressionGenerator,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             var bodyExpressions = new List<NodeBase>();
@@ -27,7 +28,7 @@ namespace IX.Math.Optimizers
 
             while (symbols.Count > 1)
             {
-                KeyValuePair<string, (RawExpressionContainer Container, SymbolOptimizationData OptimizationData)>[] countedSymbols
+                KeyValuePair<string, (ExpressionSymbol Container, SymbolOptimizationData OptimizationData)>[] countedSymbols
                     = CreateSymbolOptimizationCounters(symbols).Where(q => q.Value.OptimizationData.Contains == 0).ToArray();
 
                 if (countedSymbols.Length == 0)
@@ -35,7 +36,7 @@ namespace IX.Math.Optimizers
                     break;
                 }
 
-                foreach (KeyValuePair<string, (RawExpressionContainer Container, SymbolOptimizationData OptimizationData)> p in countedSymbols)
+                foreach (KeyValuePair<string, (ExpressionSymbol Container, SymbolOptimizationData OptimizationData)> p in countedSymbols)
                 {
                     NodeBase expression = expressionGenerator(p.Value.Container)?.Simplify();
 
@@ -80,15 +81,15 @@ namespace IX.Math.Optimizers
 
             return bodyExpressions;
 
-            Dictionary<string, (RawExpressionContainer Container, SymbolOptimizationData OptimizationData)>
-                CreateSymbolOptimizationCounters(Dictionary<string, RawExpressionContainer> symb)
+            Dictionary<string, (ExpressionSymbol Container, SymbolOptimizationData OptimizationData)>
+                CreateSymbolOptimizationCounters(Dictionary<string, ExpressionSymbol> symb)
             {
-                Dictionary<string, (RawExpressionContainer Container, SymbolOptimizationData OptimizationData)> futureOptimalSymbols =
+                Dictionary<string, (ExpressionSymbol Container, SymbolOptimizationData OptimizationData)> futureOptimalSymbols =
                     symb.ToDictionary(p => p.Key, p => (p.Value, new SymbolOptimizationData()));
 
-                foreach (KeyValuePair<string, (RawExpressionContainer Container, SymbolOptimizationData OptimizationData)> p in futureOptimalSymbols)
+                foreach (KeyValuePair<string, (ExpressionSymbol Container, SymbolOptimizationData OptimizationData)> p in futureOptimalSymbols)
                 {
-                    foreach (KeyValuePair<string, (RawExpressionContainer Container, SymbolOptimizationData OptimizationData)> q in futureOptimalSymbols.Where(z => z.Key != p.Key))
+                    foreach (KeyValuePair<string, (ExpressionSymbol Container, SymbolOptimizationData OptimizationData)> q in futureOptimalSymbols.Where(z => z.Key != p.Key))
                     {
                         if (q.Value.Item1.Expression.Contains(p.Key))
                         {

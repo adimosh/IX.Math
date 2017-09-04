@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using IX.Math.ExpressionState;
 using IX.Math.Nodes;
 
 namespace IX.Math.Generators
@@ -29,7 +30,7 @@ namespace IX.Math.Generators
             string processedExpression,
             Dictionary<string, ConstantNodeBase> constantsTable,
             Dictionary<string, string> reverseConstantsTable,
-            Dictionary<string, Tuple<RawExpressionContainer, SymbolOptimizationData>> symbolTable,
+            Dictionary<string, ExpressionSymbol> symbolTable,
             Dictionary<string, string> reverseSymbolTable,
             Dictionary<string, ParameterNodeBase> parametersTable,
             string expression,

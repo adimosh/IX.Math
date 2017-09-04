@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
+using IX.Math.ExpressionState;
 using IX.Math.Generators;
 using IX.Math.Nodes;
 
@@ -32,7 +33,7 @@ namespace IX.Math
         // Working domain
         internal Dictionary<string, ConstantNodeBase> ConstantsTable;
         internal Dictionary<string, string> ReverseConstantsTable;
-        internal Dictionary<string, Tuple<RawExpressionContainer, SymbolOptimizationData>> SymbolTable;
+        internal Dictionary<string, ExpressionSymbol> SymbolTable;
         internal Dictionary<string, string> ReverseSymbolTable;
         internal Dictionary<string, ParameterNodeBase> ParametersTable;
         internal string Expression;
@@ -70,7 +71,7 @@ namespace IX.Math
             this.ConstantsTable = new Dictionary<string, ConstantNodeBase>();
             this.ReverseConstantsTable = new Dictionary<string, string>();
             this.ParametersTable = new Dictionary<string, ParameterNodeBase>();
-            this.SymbolTable = new Dictionary<string, Tuple<RawExpressionContainer, SymbolOptimizationData>>();
+            this.SymbolTable = new Dictionary<string, ExpressionSymbol>();
             this.ReverseSymbolTable = new Dictionary<string, string>();
 
             this.InitialExpression = expression;

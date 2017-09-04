@@ -5,6 +5,7 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using IX.Math.ExpressionState;
 using IX.Math.Extraction;
 using IX.Math.Formatters;
 using IX.Math.Generators;
@@ -34,12 +35,12 @@ namespace IX.Math
 
             workingSet.SymbolTable.Add(
                 string.Empty,
-                new Tuple<RawExpressionContainer, SymbolOptimizationData>(new RawExpressionContainer(workingSet.Expression), new SymbolOptimizationData()));
+                ExpressionSymbol.GenerateSymbol(string.Empty, workingSet.Expression));
 
             // Prepares expression and takes care of operators to ensure that they are all OK and usable
             workingSet.Initialize();
 
-            workingSet.SymbolTable[string.Empty].Item1.Expression = workingSet.Expression;
+            workingSet.SymbolTable[string.Empty].Expression = workingSet.Expression;
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
@@ -71,7 +72,7 @@ namespace IX.Math
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             // Populating symbol tables
-            foreach (var p in workingSet.SymbolTable.Where(p => !p.Value.Item1.IsFunctionCall).Select(p => p.Value.Item1.Expression))
+            foreach (var p in workingSet.SymbolTable.Where(p => !p.Value.IsFunctionCall).Select(p => p.Value.Expression))
             {
                 TablePopulationGenerator.PopulateTables(
                     p,
@@ -145,7 +146,7 @@ namespace IX.Math
             // Generate expressions
             try
             {
-                workingSet.Body = GenerateExpression(workingSet.SymbolTable[string.Empty].Item1, workingSet);
+                workingSet.Body = GenerateExpression(workingSet.SymbolTable[string.Empty].Expression, workingSet);
             }
             catch
             {
@@ -183,16 +184,10 @@ namespace IX.Math
         }
 
         private static NodeBase GenerateExpression(
-            RawExpressionContainer expression,
+            string expression,
             WorkingExpressionSet workingSet)
         {
-            // Expression might be a function call
-            if (expression.IsFunctionCall)
-            {
-                return GenerateFunctionCallExpression(expression.Expression);
-            }
-
-            var s = expression.Expression;
+            var s = expression;
 
             // Expression might be an already-defined constant
             if (workingSet.ConstantsTable.TryGetValue(s, out var c1))
@@ -217,16 +212,16 @@ namespace IX.Math
             // Check whether the expression already exists in the symbols table
             if (workingSet.SymbolTable.TryGetValue(s, out var e1))
             {
-                return GenerateExpression(e1.Item1, workingSet);
+                return GenerateExpression(e1.Expression, workingSet);
             }
 
             if (workingSet.ReverseSymbolTable.TryGetValue(s, out var e2))
             {
                 if (workingSet.SymbolTable.TryGetValue(e2, out var e3))
                 {
-                    if (e3.Item1.Expression != s)
+                    if (e3.Expression != s)
                     {
-                        return GenerateExpression(e3.Item1, workingSet);
+                        return GenerateExpression(e3.Expression, workingSet);
                     }
                 }
             }
@@ -234,7 +229,7 @@ namespace IX.Math
             // Check whether the expression is a function call
             if (s.Contains(workingSet.Definition.Parantheses.Item1) && s.Contains(workingSet.Definition.Parantheses.Item2))
             {
-                return GenerateFunctionCallExpression(new RawExpressionContainer(s).Expression);
+                return GenerateFunctionCallExpression(s);
             }
 
             // Check whether the expression is a binary operator
@@ -265,13 +260,21 @@ namespace IX.Math
                                 if (split.Length >= 3 && string.IsNullOrWhiteSpace(split.Take(split.Length - 1).Last()) && !string.IsNullOrWhiteSpace(split.Last()))
                                 {
                                     // We have a doubling of an operator, probably because a unary operator (like -) is used in conjunction with a binary operator of the same kind
-                                    left = GenerateExpression(new RawExpressionContainer(string.Join(op, split.Take(split.Length - 2).ToArray())), workingSet);
+                                    var eee = string.Join(op, split.Take(split.Length - 2).ToArray());
+                                    if (string.IsNullOrWhiteSpace(eee))
+                                    {
+                                        eee = null;
+                                    }
+
+                                    left = GenerateExpression(eee, workingSet);
+
                                     if (left == null)
                                     {
                                         return null;
                                     }
 
-                                    right = GenerateExpression(new RawExpressionContainer($"{op}{split.Last()}"), workingSet);
+                                    right = GenerateExpression($"{op}{split.Last()}", workingSet);
+
                                     if (right == null)
                                     {
                                         return null;
@@ -280,13 +283,25 @@ namespace IX.Math
                                 else
                                 {
                                     // We have a normal, regular binary
-                                    left = GenerateExpression(new RawExpressionContainer(string.Join(op, split.Take(split.Length - 1).ToArray())), workingSet);
+                                    var eee = string.Join(op, split.Take(split.Length - 1).ToArray());
+                                    if (string.IsNullOrWhiteSpace(eee))
+                                    {
+                                        eee = null;
+                                    }
+
+                                    left = GenerateExpression(eee, workingSet);
                                     if (left == null)
                                     {
                                         return null;
                                     }
 
-                                    right = GenerateExpression(new RawExpressionContainer(split.Last()), workingSet);
+                                    eee = split.Last();
+                                    if (string.IsNullOrWhiteSpace(eee))
+                                    {
+                                        eee = null;
+                                    }
+
+                                    right = GenerateExpression(eee, workingSet);
                                     if (right == null)
                                     {
                                         return null;
@@ -331,7 +346,8 @@ namespace IX.Math
                     {
                         try
                         {
-                            NodeBase expr = GenerateExpression(new RawExpressionContainer(s.Substring(op.Length)), workingSet);
+                            var eee = s.Substring(op.Length);
+                            NodeBase expr = GenerateExpression(string.IsNullOrWhiteSpace(eee) ? null : eee, workingSet);
                             if (expr == null)
                             {
                                 return null;
@@ -374,17 +390,17 @@ namespace IX.Math
                         var functionName = match.Groups["functionName"].Value;
                         var expressionValue = match.Groups["expression"].Value;
 
-                        RawExpressionContainer[] parameterExpressions;
+                        string[] parameterExpressions;
 
                         if (string.IsNullOrWhiteSpace(expressionValue))
                         {
-                            parameterExpressions = new RawExpressionContainer[0];
+                            parameterExpressions = new string[0];
                         }
                         else
                         {
                             parameterExpressions = match.Groups["expression"].Value
                                 .Split(new[] { workingSet.Definition.ParameterSeparator }, StringSplitOptions.None)
-                                .Select(p => new RawExpressionContainer(p))
+                                .Select(p => string.IsNullOrWhiteSpace(p) ? null : p)
                                 .ToArray();
                         }
 
