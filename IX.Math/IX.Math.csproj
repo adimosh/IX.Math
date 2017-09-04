@@ -46,7 +46,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="IX.StandardExtensions" Version="0.1.0.22" />
+    <PackageReference Include="IX.StandardExtensions" Version="0.1.0.26" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
