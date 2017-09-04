@@ -28,17 +28,17 @@ namespace IX.Math.Optimizers
 
             while (symbols.Count > 1)
             {
-                KeyValuePair<string, (ExpressionSymbol Container, SymbolOptimizationData OptimizationData)>[] countedSymbols
-                    = CreateSymbolOptimizationCounters(symbols).Where(q => q.Value.OptimizationData.Contains == 0).ToArray();
+                KeyValuePair<string, ExpressionSymbol>[] countedSymbols
+                    = CountSymbols(symbols).Where(q => q.Value.Contains == 0).ToArray();
 
                 if (countedSymbols.Length == 0)
                 {
                     break;
                 }
 
-                foreach (KeyValuePair<string, (ExpressionSymbol Container, SymbolOptimizationData OptimizationData)> p in countedSymbols)
+                foreach (KeyValuePair<string, ExpressionSymbol> p in countedSymbols)
                 {
-                    NodeBase expression = expressionGenerator(p.Value.Container)?.Simplify();
+                    NodeBase expression = expressionGenerator(p.Value)?.Simplify();
 
                     if (expression == null)
                     {
@@ -48,10 +48,10 @@ namespace IX.Math.Optimizers
                     if (expression is ConstantNodeBase constantExpression)
                     {
                         symbols.Remove(p.Key);
-                        reverseSymbols.Remove(p.Value.Container.Expression);
+                        reverseSymbols.Remove(p.Value.Expression);
 
                         constantsTable.Add(p.Key, constantExpression);
-                        reverseConstants.Add(p.Value.Container.Expression, p.Key);
+                        reverseConstants.Add(p.Value.Expression, p.Key);
                     }
                     else
                     {
@@ -72,7 +72,7 @@ namespace IX.Math.Optimizers
                         }
 
                         symbols.Remove(p.Key);
-                        reverseSymbols.Remove(p.Value.Container.Expression);
+                        reverseSymbols.Remove(p.Value.Expression);
 
                         bodyExpressions.Add(resultingBodyExpression);
                     }
@@ -81,25 +81,21 @@ namespace IX.Math.Optimizers
 
             return bodyExpressions;
 
-            Dictionary<string, (ExpressionSymbol Container, SymbolOptimizationData OptimizationData)>
-                CreateSymbolOptimizationCounters(Dictionary<string, ExpressionSymbol> symb)
+            Dictionary<string, ExpressionSymbol> CountSymbols(Dictionary<string, ExpressionSymbol> symb)
             {
-                Dictionary<string, (ExpressionSymbol Container, SymbolOptimizationData OptimizationData)> futureOptimalSymbols =
-                    symb.ToDictionary(p => p.Key, p => (p.Value, new SymbolOptimizationData()));
-
-                foreach (KeyValuePair<string, (ExpressionSymbol Container, SymbolOptimizationData OptimizationData)> p in futureOptimalSymbols)
+                foreach (KeyValuePair<string, ExpressionSymbol> p in symb)
                 {
-                    foreach (KeyValuePair<string, (ExpressionSymbol Container, SymbolOptimizationData OptimizationData)> q in futureOptimalSymbols.Where(z => z.Key != p.Key))
+                    foreach (KeyValuePair<string, ExpressionSymbol> q in symb.Where(z => z.Key != p.Key))
                     {
-                        if (q.Value.Item1.Expression.Contains(p.Key))
+                        if (q.Value.Expression.Contains(p.Key))
                         {
-                            p.Value.Item2.ContainedIn++;
-                            q.Value.Item2.Contains++;
+                            p.Value.ContainedIn++;
+                            q.Value.Contains++;
                         }
                     }
                 }
 
-                return futureOptimalSymbols;
+                return symb;
             }
         }
 #pragma warning restore SA1008 // Opening parenthesis must be spaced correctly
