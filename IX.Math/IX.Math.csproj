@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard1.1;netstandard2.0</TargetFrameworks>
     <Version>0.1.0.1</Version>
     <FileVersion>0.1.0.1</FileVersion>
     <AssemblyVersion>0.1.0.0</AssemblyVersion>
@@ -12,27 +12,44 @@
     <Authors>Adrian Mos</Authors>
     <Company />
     <Product>IX Framework</Product>
+    <Title>IX Mathematics</Title>
     <Description>A library for transforming text expressions containing mathematical operations into executable delegates.</Description>
     <Copyright>Adrian Mos, 2016</Copyright>
     <PackageProjectUrl>https://github.com/adimosh/IX.Math/</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/adimosh/IX.Math/blob/master/LICENSE.md</PackageLicenseUrl>
+    <NeutralLanguage>en</NeutralLanguage>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net45'">
+    <DefineConstants>NET45</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.1'">
+    <DefineConstants>NETSTANDARD1_1</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <DefineConstants>NETSTANDARD2_0</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|netstandard1.1'">
-    <DefineConstants>NETSTANDARD1_1</DefineConstants>
     <DocumentationFile>bin\Debug\netstandard1.1\IX.Math.xml</DocumentationFile>
   </PropertyGroup>
+  
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|netstandard1.1'">
-    <DefineConstants>RELEASE;NETSTANDARD1_1</DefineConstants>
     <DocumentationFile>bin\Release\netstandard1.1\IX.Math.xml</DocumentationFile>
   </PropertyGroup>
+  
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|netstandard2.0'">
-    <DefineConstants>NETSTANDARD2_0</DefineConstants>
     <DocumentationFile>bin\Debug\netstandard2.0\IX.Math.xml</DocumentationFile>
   </PropertyGroup>
+  
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|netstandard2.0'">
-    <DefineConstants>RELEASE;NETSTANDARD2_0</DefineConstants>
     <DocumentationFile>bin\Release\netstandard2.0\IX.Math.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DefineConstants>RELEASE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,9 +61,17 @@
   <ItemGroup>
     <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <PackageReference Include="IX.StandardExtensions" Version="0.1.0.26" />
+    <PackageReference Include="IX.StandardExtensions" Version="0.1.1.29" />
+    <PackageReference Include="System.ValueTuple" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net45'">
+    <Reference Include="System.Runtime.Serialization" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'!='net45'">
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
     <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
@@ -65,11 +90,10 @@
 
   <ItemGroup>
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta004" PrivateAssets="all" />
-    <PackageReference Include="System.ValueTuple" Version="4.3.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="dotnet-csprojVersioning" Version="1.0.0" />
+    <DotNetCliToolReference Include="dotnet-csprojVersioning" Version="1.0.0.1" />
   </ItemGroup>
 
   <ItemGroup>
