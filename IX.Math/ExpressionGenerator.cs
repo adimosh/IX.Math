@@ -88,61 +88,6 @@ namespace IX.Math
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
 
-            //// Optimization counters
-            //foreach (KeyValuePair<string, Tuple<RawExpressionContainer, SymbolOptimizationData>> p in workingSet.SymbolTable)
-            //{
-            //    foreach (KeyValuePair<string, Tuple<RawExpressionContainer, SymbolOptimizationData>> q in workingSet.SymbolTable.Where(z => z.Key != p.Key))
-            //    {
-            //        if (q.Value.Item1.Expression.Contains(p.Key))
-            //        {
-            //            p.Value.Item2.ContainedIn++;
-            //            q.Value.Item2.Contains++;
-            //        }
-            //    }
-            //}
-
-            //workingSet.CancellationToken.ThrowIfCancellationRequested();
-
-            //// Optimization algorithm
-            //while (workingSet.SymbolTable.Count > 1)
-            //{
-            //    KeyValuePair<string, Tuple<RawExpressionContainer, SymbolOptimizationData>>[] upmostSymbols
-            //        = workingSet.SymbolTable.Where(q => q.Value.Item2.Contains == 0).ToArray();
-
-            //    if (upmostSymbols.Length == 0)
-            //    {
-            //        break;
-            //    }
-
-            //    try
-            //    {
-            //        foreach (KeyValuePair<string, Tuple<RawExpressionContainer, SymbolOptimizationData>> p in upmostSymbols)
-            //        {
-            //            NodeBase expression = GenerateExpression(p.Value.Item1, workingSet)?.Simplify();
-
-            //            if (expression == null)
-            //            {
-            //                workingSet.Body = null;
-            //                return;
-            //            }
-
-            //            if (expression is ConstantNodeBase constantExpression)
-            //            {
-            //                workingSet.SymbolTable.Remove(p.Key);
-
-            //                workingSet.ConstantsTable.Add(p.Key, constantExpression);
-            //            }
-            //        }
-            //    }
-            //    catch (Exception ex) when (!(ex is OperationCanceledException))
-            //    {
-            //        workingSet.Body = null;
-            //        return;
-            //    }
-            //}
-
-            //workingSet.CancellationToken.ThrowIfCancellationRequested();
-
             // Generate expressions
             try
             {
