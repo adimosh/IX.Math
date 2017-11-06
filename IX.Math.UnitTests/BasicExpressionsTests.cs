@@ -32,6 +32,20 @@ namespace IX.Math.UnitTests
                         new object[2] { leftOperand, rightOperand },
                         leftOperand + rightOperand
                     });
+                tests.Add(
+                    new object[]
+                    {
+                        $"leftOperand+{rightOperand}",
+                        new object[1] { leftOperand },
+                        leftOperand + rightOperand
+                    });
+                tests.Add(
+                    new object[]
+                    {
+                        $"{leftOperand}+rightOperand",
+                        new object[1] { rightOperand },
+                        leftOperand + rightOperand
+                    });
             }
 
             // -
@@ -50,6 +64,20 @@ namespace IX.Math.UnitTests
                     {
                         "leftOperand-rightOperand",
                         new object[2] { leftOperand, rightOperand },
+                        leftOperand - rightOperand
+                    });
+                tests.Add(
+                    new object[]
+                    {
+                        $"{leftOperand}-rightOperand",
+                        new object[1] { rightOperand },
+                        leftOperand - rightOperand
+                    });
+                tests.Add(
+                    new object[]
+                    {
+                        $"leftOperand-{rightOperand}",
+                        new object[1] { leftOperand },
                         leftOperand - rightOperand
                     });
             }
@@ -73,6 +101,20 @@ namespace IX.Math.UnitTests
                         new object[2] { leftOperand, rightOperand },
                         leftOperand * rightOperand
                     });
+                tests.Add(
+                    new object[]
+                    {
+                        $"{leftOperand}*rightOperand",
+                        new object[1] { rightOperand },
+                        leftOperand * rightOperand
+                    });
+                tests.Add(
+                    new object[]
+                    {
+                        $"leftOperand*{rightOperand}",
+                        new object[1] { leftOperand },
+                        leftOperand * rightOperand
+                    });
             }
 
             // /
@@ -92,6 +134,20 @@ namespace IX.Math.UnitTests
                     {
                         "leftOperand/rightOperand",
                         new object[2] { leftOperand, rightOperand },
+                        result
+                    });
+                tests.Add(
+                    new object[]
+                    {
+                        $"leftOperand/{rightOperand}",
+                        new object[1] { leftOperand },
+                        result
+                    });
+                tests.Add(
+                    new object[]
+                    {
+                        $"{leftOperand}/rightOperand",
+                        new object[1] { rightOperand },
                         result
                     });
             }
