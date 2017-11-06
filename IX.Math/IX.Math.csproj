@@ -57,9 +57,9 @@
     <EmbeddedResource Remove=".vscode\**" />
     <None Remove=".vscode\**" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <AdditionalFiles Include="stylecop.json" />
+    <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>

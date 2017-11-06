@@ -1,7 +1,6 @@
 ﻿using IX.StandardExtensions.TestUtils;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace IX.Math.UnitTests
@@ -12,10 +11,13 @@ namespace IX.Math.UnitTests
         {
             var tests = new List<object[]>();
 
+            // Positive integers
+
             // +
             {
-                double leftOperand = DataGenerator.RandomNonNegativeInteger(int.MaxValue / 2);
-                double rightOperand = DataGenerator.RandomNonNegativeInteger(int.MaxValue / 2);
+                var limit = int.MaxValue / 2;
+                double leftOperand = DataGenerator.RandomNonNegativeInteger(limit);
+                double rightOperand = DataGenerator.RandomNonNegativeInteger(limit);
                 tests.Add(
                     new object[]
                     {
@@ -54,8 +56,9 @@ namespace IX.Math.UnitTests
 
             // *
             {
-                double leftOperand = DataGenerator.RandomNonNegativeInteger((int)System.Math.Sqrt(int.MaxValue));
-                double rightOperand = DataGenerator.RandomNonNegativeInteger((int)System.Math.Sqrt(int.MaxValue));
+                var limit = (int)System.Math.Sqrt(int.MaxValue);
+                double leftOperand = DataGenerator.RandomNonNegativeInteger(limit);
+                double rightOperand = DataGenerator.RandomNonNegativeInteger(limit);
                 tests.Add(
                     new object[]
                     {
