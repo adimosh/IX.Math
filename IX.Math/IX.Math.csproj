@@ -63,7 +63,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.StandardExtensions" Version="0.1.1.30" />
+    <PackageReference Include="IX.StandardExtensions" Version="0.1.1.35" />
     <PackageReference Include="System.ValueTuple" Version="4.3.0" />
   </ItemGroup>
 

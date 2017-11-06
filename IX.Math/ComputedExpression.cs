@@ -116,7 +116,7 @@ namespace IX.Math
         /// <summary>
         /// Computes the expression and returns a result.
         /// </summary>
-        /// <param name="dataFinder">The data finder for the arguments whith which to invoke execution of the expression.</param>
+        /// <param name="dataFinder">The data finder for the arguments with which to invoke execution of the expression.</param>
         /// <returns>The computed result, or, if the expression is not recognized correctly, the expression as a <see cref="string"/>.</returns>
         public object Compute(IDataFinder dataFinder)
         {
