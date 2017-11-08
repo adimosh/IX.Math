@@ -21,7 +21,7 @@ namespace IX.Math.Optimizers
             Dictionary<string, ConstantNodeBase> constantsTable,
             Dictionary<string, string> reverseConstants,
             Func<ExpressionSymbol, NodeBase> expressionGenerator,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var bodyExpressions = new List<NodeBase>();
             var variableExpressions = new List<ParameterNodeBase>();

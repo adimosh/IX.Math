@@ -90,7 +90,7 @@ namespace IX.Math
         /// <param name="cancellationToken">The cancellation token for this operation.</param>
         /// <returns>A <see cref="ComputedExpression"/> that represent</returns>
         /// <exception cref="ArgumentNullException"><paramref name="expression"/> is either null, empty or whitespace-only.</exception>
-        public ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default(CancellationToken))
+        public ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(expression))
             {

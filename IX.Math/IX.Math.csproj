@@ -6,6 +6,7 @@
     <FileVersion>0.1.0.1</FileVersion>
     <AssemblyVersion>0.1.0.0</AssemblyVersion>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -35,15 +36,15 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|netstandard1.1'">
     <DocumentationFile>bin\Debug\netstandard1.1\IX.Math.xml</DocumentationFile>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|netstandard1.1'">
     <DocumentationFile>bin\Release\netstandard1.1\IX.Math.xml</DocumentationFile>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Debug|netstandard2.0'">
     <DocumentationFile>bin\Debug\netstandard2.0\IX.Math.xml</DocumentationFile>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)'=='Release|netstandard2.0'">
     <DocumentationFile>bin\Release\netstandard2.0\IX.Math.xml</DocumentationFile>
   </PropertyGroup>

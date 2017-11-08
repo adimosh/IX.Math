@@ -20,7 +20,7 @@ namespace IX.Math
         /// <param name="expression">The expression to interpret.</param>
         /// <param name="cancellationToken">The cancellation token for this operation.</param>
         /// <returns>A <see cref="ComputedExpression"/> that represents the interpreted expression.</returns>
-        ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default(CancellationToken));
+        ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Registers an assembly to extract compatible functions from.

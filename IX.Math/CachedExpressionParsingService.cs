@@ -55,10 +55,12 @@ namespace IX.Math
         /// <param name="expression">The expression to interpret.</param>
         /// <param name="cancellationToken">The cancellation token for this operation.</param>
         /// <returns>A <see cref="ComputedExpression"/> that represents the interpreted expression.</returns>
-        public ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default(CancellationToken)) =>
+        public ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default) =>
             this.cachedComputedExpressions.GetOrAdd(expression, expr => this.eps.Interpret(expr, cancellationToken));
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
