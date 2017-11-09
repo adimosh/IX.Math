@@ -17,7 +17,7 @@ namespace IX.Math.Generators
         {
             if (!reverseSymbolTable.TryGetValue(expression, out string itemName))
             {
-                itemName = $"item{symbolTable.Count}";
+                itemName = $"item{symbolTable.Count.ToString().PadLeft(4, '0')}";
                 ExpressionSymbol symb;
                 if (isFunction)
                 {

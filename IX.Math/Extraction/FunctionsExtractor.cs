@@ -46,7 +46,7 @@ namespace IX.Math.Extraction
             ReplaceOneFunction(string.Empty);
             for (var i = 1; i < symbolTable.Count; i++)
             {
-                ReplaceOneFunction($"item{i}");
+                ReplaceOneFunction($"item{i.ToString().PadLeft(4, '0')}");
             }
 
             void ReplaceOneFunction(string key)
