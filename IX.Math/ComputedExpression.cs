@@ -8,7 +8,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using IX.Math.Formatters;
 using IX.Math.Nodes;
-using IX.Math.Nodes.Parameters;
 
 namespace IX.Math
 {
@@ -88,10 +87,18 @@ namespace IX.Math
             Delegate del;
             try
             {
-                del = Expression.Lambda(
-                        this.body.GenerateExpression(),
-                        this.parameters.Select(p => (ParameterExpression)p.GenerateExpression()))
-                    ?.Compile();
+                LambdaExpression lambda = Expression.Lambda(
+                    this.body.GenerateExpression(),
+                    this.parameters.Select(p => (ParameterExpression)p.GenerateExpression()));
+
+                if (lambda == null)
+                {
+                    del = null;
+                }
+                else
+                {
+                    del = lambda?.Compile();
+                }
             }
             catch
             {

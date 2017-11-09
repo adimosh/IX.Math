@@ -57,9 +57,9 @@ namespace IX.Math.ExpressionState
 
         internal static ExpressionSymbol GenerateFunctionCall(string name, string expression)
         {
-            ExpressionSymbol expr = GenerateSymbol(name, expression);
-            expr.IsFunctionCall = true;
-            return expr;
+            ExpressionSymbol generatedExpression = GenerateSymbol(name, expression);
+            generatedExpression.IsFunctionCall = true;
+            return generatedExpression;
         }
     }
 }

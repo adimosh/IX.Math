@@ -10,7 +10,7 @@ using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Nodes.Operations.Function.Nonary
 {
-    [DebuggerDisplay("random({FirstParameter}, {SecondParameter})")]
+    [DebuggerDisplay("random()")]
     [CallableMathematicsFunction("rand", "random")]
     internal sealed class FunctionNodeRandom : NonaryFunctionNodeBase
     {

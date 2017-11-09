@@ -186,12 +186,15 @@ namespace IX.Math
                 {
                     workingSet.CancellationToken.ThrowIfCancellationRequested();
 
-                    string[] split = s.Split(new[] { op }, StringSplitOptions.None);
-                    if (split.Length > 1)
+                    var index = s.Length;
+                    while (true)
                     {
-                        if (string.IsNullOrWhiteSpace(split[0]))
+                        index = s.LastIndexOf(op, index - 1);
+
+                        if (index < 1)
                         {
                             // We are having a unary operator - until this is treated differently, let's simply return null
+                            // Or, at this point, no expression makes sense with this split
                             return null;
                         }
                         else
@@ -202,55 +205,29 @@ namespace IX.Math
                                 NodeBase left;
                                 NodeBase right;
 
-                                if (split.Length >= 3 && string.IsNullOrWhiteSpace(split.Take(split.Length - 1).Last()) && !string.IsNullOrWhiteSpace(split.Last()))
+                                // We have a normal, regular binary
+                                var eee = s.Substring(0, index);
+                                if (string.IsNullOrWhiteSpace(eee))
                                 {
-                                    // We have a doubling of an operator, probably because a unary operator (like -) is used in conjunction with a binary operator of the same kind
-                                    var eee = string.Join(op, split.Take(split.Length - 2).ToArray());
-                                    if (string.IsNullOrWhiteSpace(eee))
-                                    {
-                                        eee = null;
-                                    }
-
-                                    left = GenerateExpression(eee, workingSet);
-
-                                    if (left == null)
-                                    {
-                                        return null;
-                                    }
-
-                                    right = GenerateExpression($"{op}{split.Last()}", workingSet);
-
-                                    if (right == null)
-                                    {
-                                        return null;
-                                    }
+                                    eee = null;
                                 }
-                                else
+
+                                left = GenerateExpression(eee, workingSet);
+                                if (left == null)
                                 {
-                                    // We have a normal, regular binary
-                                    var eee = string.Join(op, split.Take(split.Length - 1).ToArray());
-                                    if (string.IsNullOrWhiteSpace(eee))
-                                    {
-                                        eee = null;
-                                    }
+                                    continue;
+                                }
 
-                                    left = GenerateExpression(eee, workingSet);
-                                    if (left == null)
-                                    {
-                                        return null;
-                                    }
+                                eee = s.Substring(index + op.Length);
+                                if (string.IsNullOrWhiteSpace(eee))
+                                {
+                                    eee = null;
+                                }
 
-                                    eee = split.Last();
-                                    if (string.IsNullOrWhiteSpace(eee))
-                                    {
-                                        eee = null;
-                                    }
-
-                                    right = GenerateExpression(eee, workingSet);
-                                    if (right == null)
-                                    {
-                                        return null;
-                                    }
+                                right = GenerateExpression(eee, workingSet);
+                                if (right == null)
+                                {
+                                    continue;
                                 }
 
                                 if (workingSet.BinaryOperators.TryGetValue(op, out Type t))
@@ -259,17 +236,15 @@ namespace IX.Math
                                 }
                                 else
                                 {
-                                    return null;
+                                    continue;
                                 }
                             }
                             catch
                             {
-                                return null;
+                                continue;
                             }
                         }
                     }
-
-                    return null;
                 }
 
                 if (exp != null)
