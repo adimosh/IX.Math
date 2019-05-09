@@ -636,11 +636,13 @@ namespace IX.Math
                     }
 
 #pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - This is unavoidable now
+#pragma warning disable HAA0303 // Considering moving this out of the generic method - Not really possible
                     object CreateValue<T>(ParameterContext parameterContext, T value) => parameterContext.FuncParameter ? new Func<T>(() => value) : (object)value;
 
                     object CreateValueFromFunc<T>(
                         ParameterContext parameterContext,
                         Func<T> value) => parameterContext.FuncParameter ? (object)value : value();
+#pragma warning restore HAA0303 // Considering moving this out of the generic method
 #pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
 
                     if (paramValue == null)
