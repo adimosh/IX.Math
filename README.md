@@ -18,6 +18,21 @@ Install-Package IX.Math
 
 Releases: [![IX.Math NuGet](https://img.shields.io/nuget/v/IX.Math.svg)](https://www.nuget.org/packages/IX.Math/)
 
+## Contributing
+
+### Guidelines
+
+Contributing can be done by anyone, at any time and in any form, as long as the contributor
+has read the [contributing guidelines](https://adimosh.github.io/contributingguidelines)
+beforehand and tries their best to abide by them.
+
+### Code health checks
+
+| Build | Status |
+|:-----:|:------:|
+| Master branch | [![Build Status](https://ixiancorp.visualstudio.com/IX.Framework/_apis/build/status/IX.Math%20master%20CI?branchName=master)](https://ixiancorp.visualstudio.com/IX.Framework/_build/latest?definitionId=6&branchName=master) |
+| Continuous integration | [![Build Status](https://ixiancorp.visualstudio.com/IX.Framework/_apis/build/status/IX.Math%20continuous%20integration?branchName=dev)](https://ixiancorp.visualstudio.com/IX.Framework/_build/latest?definitionId=5&branchName=dev) |
+
 ## Usage
 
 ### Standard operation
@@ -135,3 +150,7 @@ There are two types of extractors available: constant extractors and pass-throug
 The pass-through extractors will be called when the expression is first evaluated. If the method called on it returns true, then the expression is kept as a literal string, otherwise it is interpreted.
 
 Constant extractors work on any unidentified symbols in the expression and have the ability to define symbols otherwise not recognized by the mathematics engine.
+
+## Licenses and structure
+
+Please be aware that this project is a sub-project of [IX.Framework](https://github.com/adimosh/IX.Framework). All credits and license information should be taken from there.
