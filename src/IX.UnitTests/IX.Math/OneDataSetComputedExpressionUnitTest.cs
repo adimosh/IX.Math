@@ -127,6 +127,7 @@ namespace IX.UnitTests.IX.Math
         }
 
 #pragma warning disable IDISP001 // Dispose created. - We specifically do not want these to be disposed
+
         /// <summary>
         ///     Tests the cached computed expression with parameters.
         /// </summary>
@@ -251,6 +252,7 @@ namespace IX.UnitTests.IX.Math
         }
 
 #pragma warning disable IDISP001 // Dispose created. - We specifically do not want these to be disposed
+
         /// <summary>
         ///     Tests a cached computed expression with finder.
         /// </summary>
