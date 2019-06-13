@@ -1,4 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<!--EXTERNAL_PROPERTIES: TargetFrameworkIsFramework-->
+<!--EXTERNAL_PROPERTIES: TargetFrameworkIsStandard-->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -22,8 +25,8 @@
   <Import Project="..\StyleCop.targets" />
 
   <ItemGroup>
-    <PackageReference Include="IX.Abstractions.Collections" Version="0.5.0.74" />
-    <PackageReference Include="IX.StandardExtensions" Version="0.5.0.74" />
+    <PackageReference Include="IX.Abstractions.Collections" Version="0.5.0.86" />
+    <PackageReference Include="IX.StandardExtensions" Version="0.5.0.86" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">
@@ -45,7 +48,7 @@
     <PackageReference Include="System.Runtime" Version="4.3.1" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.1" />
     <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.0" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     <PackageReference Include="System.Threading" Version="4.3.0" />
   </ItemGroup>
 

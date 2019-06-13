@@ -11,7 +11,7 @@ namespace IX.Math.Formatters
         internal static string Cleanup(string expression)
         {
             Contract.RequiresNotNullPrivate(
-                expression,
+                in expression,
                 nameof(expression));
 
             return expression.Trim().Replace(

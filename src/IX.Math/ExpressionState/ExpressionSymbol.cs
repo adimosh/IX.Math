@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Diagnostics;
+using JetBrains.Annotations;
 
 namespace IX.Math.ExpressionState
 {
@@ -10,6 +11,7 @@ namespace IX.Math.ExpressionState
     ///     An expression symbol.
     /// </summary>
     [DebuggerDisplay("Expression: {Name} -> {Expression}")]
+    [PublicAPI]
     public class ExpressionSymbol
     {
         private string expression;
@@ -17,18 +19,6 @@ namespace IX.Math.ExpressionState
         private ExpressionSymbol()
         {
         }
-
-        /// <summary>
-        ///     Gets or sets the number of symbols this symbol is contained in.
-        /// </summary>
-        /// <value>The number of containers.</value>
-        public int ContainedIn { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the number of symbols that this symbol contains.
-        /// </summary>
-        /// <value>The number of contained symbols.</value>
-        public int Contains { get; set; }
 
         /// <summary>
         ///     Gets or sets the expression.

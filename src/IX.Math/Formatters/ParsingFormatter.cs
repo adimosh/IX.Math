@@ -28,7 +28,7 @@ namespace IX.Math.Formatters
             out object result)
         {
             Contract.RequiresNotNullPrivate(
-                expression,
+                in expression,
                 nameof(expression));
 
             if (!expression.StartsWith(
@@ -75,7 +75,7 @@ namespace IX.Math.Formatters
                 out object specificResult)
             {
                 Contract.RequiresNotNullPrivate(
-                    specificExpression,
+                    in specificExpression,
                     nameof(specificExpression));
 
                 IFormatProvider formatProvider = CultureInfo.CurrentCulture;
@@ -110,7 +110,7 @@ namespace IX.Math.Formatters
             out byte[] result)
         {
             Contract.RequiresNotNullPrivate(
-                expression,
+                in expression,
                 nameof(expression));
 
             if (expression.CurrentCultureStartsWithInsensitive("0b"))
@@ -134,7 +134,7 @@ namespace IX.Math.Formatters
                 out byte[] byteArrayResult)
             {
                 Contract.RequiresNotNullPrivate(
-                    byteArrayExpression,
+                    in byteArrayExpression,
                     nameof(byteArrayExpression));
 
                 byteArrayExpression = byteArrayExpression.Replace(

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using IX.Math.Generators;
 using IX.Math.Nodes;
+using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Extraction
 {
@@ -14,7 +15,7 @@ namespace IX.Math.Extraction
     ///     An extractor for scientific notation of numbers. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="IX.Math.Extraction.IConstantsExtractor" />
-    public sealed class ScientificFormatNumberExtractor : IConstantsExtractor
+    internal sealed class ScientificFormatNumberExtractor : IConstantsExtractor
     {
         private readonly Regex exponentialNotationRegex = new Regex(@"[0-9.,]+(?:e\+|E\+|e\-|E\-|e|E)[0-9]+");
 
@@ -42,25 +43,18 @@ namespace IX.Math.Extraction
             IDictionary<string, string> reverseConstantsTable,
             MathDefinition mathDefinition)
         {
-            if (string.IsNullOrWhiteSpace(originalExpression))
-            {
-                throw new ArgumentNullException(nameof(originalExpression));
-            }
-
-            if (constantsTable == null)
-            {
-                throw new ArgumentNullException(nameof(constantsTable));
-            }
-
-            if (reverseConstantsTable == null)
-            {
-                throw new ArgumentNullException(nameof(reverseConstantsTable));
-            }
-
-            if (mathDefinition == null)
-            {
-                throw new ArgumentNullException(nameof(mathDefinition));
-            }
+            Contract.RequiresNotNullOrWhitespacePrivate(
+                originalExpression,
+                nameof(originalExpression));
+            Contract.RequiresNotNullPrivate(
+                in constantsTable,
+                nameof(constantsTable));
+            Contract.RequiresNotNullPrivate(
+                in reverseConstantsTable,
+                nameof(reverseConstantsTable));
+            Contract.RequiresNotNullPrivate(
+                in mathDefinition,
+                nameof(mathDefinition));
 
             var process = originalExpression;
             var location = 0;

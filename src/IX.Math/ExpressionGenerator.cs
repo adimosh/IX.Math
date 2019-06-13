@@ -24,7 +24,7 @@ namespace IX.Math
         internal static Tuple<NodeBase, IParameterRegistry> CreateBody(WorkingExpressionSet workingSet)
         {
             Contract.RequiresNotNullPrivate(
-                workingSet,
+                in workingSet,
                 nameof(workingSet));
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
@@ -174,7 +174,7 @@ namespace IX.Math
                 expression,
                 nameof(expression));
             Contract.RequiresNotNullPrivate(
-                workingSet,
+                in workingSet,
                 nameof(workingSet));
 
             // Expression might be an already-defined constant
