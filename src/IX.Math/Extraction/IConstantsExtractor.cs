@@ -4,12 +4,14 @@
 
 using System.Collections.Generic;
 using IX.Math.Nodes;
+using JetBrains.Annotations;
 
 namespace IX.Math.Extraction
 {
     /// <summary>
     ///     A service contract for extractors of constant values from the expression.
     /// </summary>
+    [PublicAPI]
     public interface IConstantsExtractor
     {
         /// <summary>

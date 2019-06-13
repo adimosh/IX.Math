@@ -10,6 +10,8 @@ using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Registration;
 using IX.StandardExtensions;
+using IX.StandardExtensions.Contracts;
+using JetBrains.Annotations;
 
 namespace IX.Math.Extraction
 {
@@ -32,17 +34,48 @@ namespace IX.Math.Extraction
         /// <param name="expression">The expression before processing.</param>
         /// <param name="allSymbols">All symbols.</param>
         internal static void ReplaceFunctions(
-            string openParenthesis,
-            string closeParenthesis,
-            string parameterSeparator,
-            Dictionary<string, ConstantNodeBase> constantsTable,
-            Dictionary<string, string> reverseConstantsTable,
-            Dictionary<string, ExpressionSymbol> symbolTable,
-            Dictionary<string, string> reverseSymbolTable,
-            IParameterRegistry parametersTable,
-            string expression,
-            string[] allSymbols)
+            [NotNull] string openParenthesis,
+            [NotNull] string closeParenthesis,
+            [NotNull] string parameterSeparator,
+            [NotNull] Dictionary<string, ConstantNodeBase> constantsTable,
+            [NotNull] Dictionary<string, string> reverseConstantsTable,
+            [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
+            [NotNull] Dictionary<string, string> reverseSymbolTable,
+            [NotNull] IParameterRegistry parametersTable,
+            [NotNull] string expression,
+            [NotNull] string[] allSymbols)
         {
+            Contract.RequiresNotNullOrWhitespacePrivate(
+                openParenthesis,
+                nameof(openParenthesis));
+            Contract.RequiresNotNullOrWhitespacePrivate(
+                closeParenthesis,
+                nameof(closeParenthesis));
+            Contract.RequiresNotNullOrWhitespacePrivate(
+                parameterSeparator,
+                nameof(parameterSeparator));
+            Contract.RequiresNotNullPrivate(
+                in constantsTable,
+                nameof(constantsTable));
+            Contract.RequiresNotNullPrivate(
+                in reverseConstantsTable,
+                nameof(reverseConstantsTable));
+            Contract.RequiresNotNullPrivate(
+                in symbolTable,
+                nameof(symbolTable));
+            Contract.RequiresNotNullPrivate(
+                in reverseSymbolTable,
+                nameof(reverseSymbolTable));
+            Contract.RequiresNotNullPrivate(
+                in parametersTable,
+                nameof(parametersTable));
+            Contract.RequiresNotNullOrWhitespacePrivate(
+                expression,
+                nameof(expression));
+            Contract.RequiresNotNullPrivate(
+                in allSymbols,
+                nameof(allSymbols));
+
             ReplaceOneFunction(
                 string.Empty,
                 openParenthesis,

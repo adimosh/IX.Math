@@ -6,20 +6,21 @@ using System;
 using System.Collections.Generic;
 using IX.StandardExtensions.Contracts;
 using IX.System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace IX.Math.Generators
 {
-    internal class OperatorSequenceGenerator
+    internal static class OperatorSequenceGenerator
     {
         internal static List<Tuple<int, int, string>> GetOperatorsInOrderInExpression(
-            string expression,
-            LevelDictionary<string, Type> operators)
+            [NotNull] string expression,
+            [NotNull] LevelDictionary<string, Type> operators)
         {
             Contract.RequiresNotNullPrivate(
-                expression,
+                in expression,
                 nameof(expression));
             Contract.RequiresNotNullPrivate(
-                operators,
+                in operators,
                 nameof(operators));
 
             var indexes = new List<Tuple<int, int, string>>();

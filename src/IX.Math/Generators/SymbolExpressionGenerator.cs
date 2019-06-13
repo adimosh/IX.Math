@@ -4,17 +4,29 @@
 
 using System.Collections.Generic;
 using IX.Math.ExpressionState;
+using IX.StandardExtensions.Contracts;
+using JetBrains.Annotations;
 
 namespace IX.Math.Generators
 {
     internal static class SymbolExpressionGenerator
     {
         internal static string GenerateSymbolExpression(
-            Dictionary<string, ExpressionSymbol> symbolTable,
-            Dictionary<string, string> reverseSymbolTable,
-            string expression,
+            [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
+            [NotNull] Dictionary<string, string> reverseSymbolTable,
+            [NotNull] string expression,
             bool isFunction)
         {
+            Contract.RequiresNotNullPrivate(
+                in symbolTable,
+                nameof(symbolTable));
+            Contract.RequiresNotNullPrivate(
+                in reverseSymbolTable,
+                nameof(reverseSymbolTable));
+            Contract.RequiresNotNullPrivate(
+                in expression,
+                nameof(expression));
+
             if (reverseSymbolTable.TryGetValue(
                 expression,
                 out var itemName))

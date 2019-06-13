@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using IX.Math.ExpressionState;
 using IX.Math.Nodes;
 using IX.Math.Registration;
+using IX.StandardExtensions.Contracts;
+using JetBrains.Annotations;
 
 namespace IX.Math.Generators
 {
@@ -28,16 +30,44 @@ namespace IX.Math.Generators
         /// <param name="openParenthesis">The symbol of an open parenthesis.</param>
         /// <param name="allSymbols">All symbols on which to split, in order.</param>
         internal static void PopulateTables(
-            string processedExpression,
-            Dictionary<string, ConstantNodeBase> constantsTable,
-            Dictionary<string, string> reverseConstantsTable,
-            Dictionary<string, ExpressionSymbol> symbolTable,
-            Dictionary<string, string> reverseSymbolTable,
-            IParameterRegistry parameterRegistry,
-            string expression,
-            string openParenthesis,
-            string[] allSymbols)
+            [NotNull] string processedExpression,
+            [NotNull] Dictionary<string, ConstantNodeBase> constantsTable,
+            [NotNull] Dictionary<string, string> reverseConstantsTable,
+            [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
+            [NotNull] Dictionary<string, string> reverseSymbolTable,
+            [NotNull] IParameterRegistry parameterRegistry,
+            [NotNull] string expression,
+            [NotNull] string openParenthesis,
+            [NotNull] string[] allSymbols)
         {
+            Contract.RequiresNotNullOrWhitespacePrivate(
+                processedExpression,
+                nameof(processedExpression));
+            Contract.RequiresNotNullPrivate(
+                in constantsTable,
+                nameof(constantsTable));
+            Contract.RequiresNotNullPrivate(
+                in reverseConstantsTable,
+                nameof(reverseConstantsTable));
+            Contract.RequiresNotNullPrivate(
+                in symbolTable,
+                nameof(symbolTable));
+            Contract.RequiresNotNullPrivate(
+                in reverseSymbolTable,
+                nameof(reverseSymbolTable));
+            Contract.RequiresNotNullPrivate(
+                in parameterRegistry,
+                nameof(parameterRegistry));
+            Contract.RequiresNotNullOrWhitespacePrivate(
+                expression,
+                nameof(expression));
+            Contract.RequiresNotNullOrWhitespacePrivate(
+                openParenthesis,
+                nameof(openParenthesis));
+            Contract.RequiresNotNullPrivate(
+                in allSymbols,
+                nameof(allSymbols));
+
             string[] expressions = processedExpression.Split(
                 allSymbols,
                 StringSplitOptions.RemoveEmptyEntries);

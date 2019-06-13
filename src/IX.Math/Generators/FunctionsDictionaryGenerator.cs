@@ -31,7 +31,7 @@ namespace IX.Math.Generators
         {
             // ReSharper disable once PossibleMultipleEnumeration - False positive
             Contract.RequiresNotNullPrivate(
-                assemblies,
+                in assemblies,
                 nameof(assemblies));
 
             var typeDictionary = new Dictionary<string, Type>();

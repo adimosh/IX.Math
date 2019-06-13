@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using JetBrains.Annotations;
 
 namespace IX.Math.Extensibility
 {
@@ -10,6 +11,7 @@ namespace IX.Math.Extensibility
     ///     An attribute that will signal a specific class as containing a constants extraction.
     /// </summary>
     /// <seealso cref="Attribute" />
+    [PublicAPI]
     public class ConstantsExtractorAttribute : Attribute
     {
         /// <summary>
