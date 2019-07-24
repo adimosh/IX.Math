@@ -12,6 +12,7 @@ namespace IX.Math.Extensibility
     /// </summary>
     /// <seealso cref="Attribute" />
     [PublicAPI]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class CallableMathematicsFunctionAttribute : Attribute
     {
         /// <summary>
