@@ -85,7 +85,7 @@ Currently-planned features (checked means in progress):
 
 ## Available operators
 
-Under construction
+_Under construction_
 
 ## Available mathematical functions
 

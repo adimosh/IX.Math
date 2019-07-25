@@ -52,6 +52,42 @@ The documentation for extending functions can be found at
 Constant extractors work on any unidentified symbols in the expression and have the
 ability to define symbols otherwise not recognized by the mathematics engine.
 
+In order to create a constant extractor, one needs to create a class in a scannable
+assembly, that implements the [IConstantsExtractor](src/IX.Math/Extraction/IConstantsExtractor.cs)
+interface, and is decorated with the [ConstantsExtractorAttribute](src/IX.Math/Extensibility/ConstantsExtractorAttribute.cs).
+
+The overridable method ```ExtractAllConstants``` will do all the work on extracting
+the constants. It takes the original expression, a dictionary of constants, a
+dictionary of reverse lookup constants, and the math definition as parameters.
+
+The extraction is done in multiple steps.
+
+1. First, the extractor needs to identify the constants it can extract
+2. The constant should then be looked up in the reverse lookup dictionary (to check
+whether or not it has already been identified before - if yes, jump to step 6)
+3. If the constant has not been identified before, a constant node should be created
+4. That constant node should be given a name that is guaranteed to not be found in the
+original or processed expression
+5. Both the name and the node should be added to the constants dictionary, and the
+constant value and its name should be added to the reverse lookup table
+6. The expression should have the extracted value replaced by its name
+7. The method should return the new expression
+
+A few things to note:
+
+- It is the extractor's responsibility to ensure that the constant is an actual constant,
+and not part of a literal
+- Returning ```null``` (```Nothing``` in Visual Basic) or an empty string will cause
+complete graph invalidation, so please refrain from such practices (throw exceptions
+if really necessary instead)
+- The extractor can extract as many constants as it wishes at the same time, provided
+that it follows the above steps for each one
+- The extractor method call is never guaranteed to be thread-safe, even across
+differing expressions, and should never be assumed to be such; it is the responsibility
+of the extractor to ensure that its internal state is consistent and thread-safe
+- The extractors are guaranteed to be called in sequence, so there is no risk of
+overlap with a different extractor on the same expression
+
 ## Pass-through extractors
 
 The pass-through extractors will be called when the expression is first evaluated.
@@ -84,3 +120,41 @@ Parsing formatters are not yet available to the general public, pending upgradin
 ## Type formatters
 
 _Under construction_
+
+Type formatters are, in a sense, the opposite of parsing formatters, as they aid when
+a non-string is transformed into a string.
+
+In order to create a type formatter, one needs to create a class in a scannable
+assembly, that implements the [ITypeFormatter](src/IX.Math/Formatters/ITypeFormatter.cs)
+interface, and is decorated with the [TypeFormatterAttribute](src/IX.Math/Extensibility/TypeFormatterAttribute.cs).
+
+A type formatter will be invoked whenever a value of a specific type needs to be
+converted to a string, wherever that would be the case in the expression. As an
+example, were one to interpret the expression:
+
+```
+"Mary has " + numericParameter1
+```
+
+...a type formatter can be defined as:
+
+```csharp
+[TypeFormatter(FromType = SupportedValueType.Numeric)]
+public class LittleLambFormatter : ITypeFormatter
+{
+    public string Format<TInput>(TInput input)
+    {
+        switch (input)
+        {
+            case long il:
+                return il < 0 ?
+                    $"some lambs she borrowed from her uncle Schrödinger" :
+                    (il == 0 ? "no lambs" : $"{il} little lambs.");
+            case double dl:
+                return $"a binary lamb that holds the value {dl}";
+        }
+    }
+}
+```
+
+Note: only the first type formatter will be accepted for any given type.
