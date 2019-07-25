@@ -6,7 +6,8 @@ Extensibility in IX.Math is achievable through multiple channels:
 
 - The mathematics definition
 - Functions
-- Extractors
+- Constant extractors
+- Pass-through extractors
 - Parsing formatters
 - Type formatters
 
@@ -43,68 +44,43 @@ larger operators with symbols that are verified to not be found in the expressio
 In order to extend the set of functions that the IX.Math library supports, a new class
 should be created for each function that can be invoked.
 
-### Basic definition
+The documentation for extending functions can be found at
+[the functions extensibility page](Functions.md).
 
-The newly-created class should inherit from one of the base classes that define functions
-usable by the engine: [NonaryFunctionNodeBase](src/IX.Math/Nodes/NonaryFunctionNodeBase.cs),
-[UnaryFunctionNodeBase](src/IX.Math/Nodes/UnaryFunctionNodeBase.cs),
-[BinaryFunctionNodeBase](src/IX.Math/Nodes/BinaryFunctionNodeBase.cs)
-or [TernaryFunctionNodeBase](src/IX.Math/Nodes/TernaryFunctionNodeBase.cs).
+## Constant Extractors
 
-For now, only unary, binary, ternary and nonary (no parameters) functions can be created,
-but a generalized implementation is planned.
+Constant extractors work on any unidentified symbols in the expression and have the
+ability to define symbols otherwise not recognized by the mathematics engine.
 
-Each class must be decorated with the [CallableMathematicsFunctionAttribute](src/IX.Math/Extensibility/CallableMathematicsFunctionAttribute.cs),
-and their containing assembly must be registered with the IExpressionParsingService's
-RegisterFunctionsAssembly method. The attribute is valid only on classes (struct support
-is considered, but not currently planned as it will most likely involve a completely
-separate extensibility system) and is not inheritable (meaning it has to be explicitly
-added to all classes that represent callable functions). The attribute's constructor
-takes at least one name, which represents the function name.
-
-The reason for this design is to allow multiple points of extensibility even when talking
-about functions, by allowing developers to have as many derived classes of the
-aforementioned base classes, for either grouping, functionality or volatility reasons,
-without encumbering the engine with anything the developer does not want to make
-available.
-
-Assuming that we have a function named as _&quot;scrt&quot;_ that is supposed to be
-a binary function, we can therefore define a class as:
-
-```csharp
-[CallableMathematicsFunction("scrt")]
-public class ScrtFunctionNode : BinaryFunctionNodeBase
-{
-    // ... class contents
-}
-```
-
-Such a construct will enable the following expression to be recognized:
-
-```1+scrt(7,12)```
-
-The actual result (including its type) depends on what the class actually does.
-
-### Basic operation
-
-Under construction
-
-## Extractors
-
-There are two types of extractors available: constant extractors and pass-through
-extractors.
+## Pass-through extractors
 
 The pass-through extractors will be called when the expression is first evaluated.
 If the method called on it returns true, then the expression is kept as a literal
 string, otherwise it is interpreted.
 
-Constant extractors work on any unidentified symbols in the expression and have the
-ability to define symbols otherwise not recognized by the mathematics engine.
+This facility might not seem important if a standard expression parsing service is
+used, however it can bring significant advantages if a cached expression parsing service
+is used. In such a case, the expression is not only evaluated to be a pass-through
+expression, but it is also cached as a pass-through expression, thus ensuring that
+whenever a method call for its interpretation happens, the shortest route is always
+taken (that of the cache).
+
+In order to create a pass-through extractor, one needs to create a class in a scannable
+assembly, that implements the [IConstantPassThroughExtractor](src/IX.Math/Extraction/IConstantPassThroughExtractor.cs)
+interface, and is decorated with the [ConstantsPassThroughExtractorAttribute](src/IX.Math/Extensibility/ConstantsPassThroughExtractorAttribute.cs).
+
+The only method that needs implemented in the extractor is the ```Evaluate``` method.
+The method receives the original expression as a parameter, and has a ```bool```
+return type. If the return value is ```true```, the expression is treated as a
+pass-through expression, and will always be returned as a string literal.
 
 ## Parsing formatters
 
-Under construction
+_Under construction_
+
+Parsing formatters are not yet available to the general public, pending upgrading of the
+```[string]``` data type to be convertible to other types via special functions.
 
 ## Type formatters
 
-Under construction
+_Under construction_
