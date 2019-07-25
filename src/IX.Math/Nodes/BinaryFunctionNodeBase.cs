@@ -6,6 +6,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.StandardExtensions;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes
 {
@@ -13,6 +14,7 @@ namespace IX.Math.Nodes
     /// A base class for a function that takes two parameters.
     /// </summary>
     /// <seealso cref="FunctionNodeBase" />
+    [PublicAPI]
     public abstract class BinaryFunctionNodeBase : FunctionNodeBase
     {
         /// <summary>
