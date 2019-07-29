@@ -157,4 +157,13 @@ public class LittleLambFormatter : ITypeFormatter
 }
 ```
 
-Note: only the first type formatter will be accepted for any given type.
+This will have the following results:
+
+```csharp
+numericParameter1 = 17; // Mary has 17 little lambs
+numericParameter1 = 0; // Mary has no lambs
+numericParameter1 = -17; // Mary has some lambs she borrowed from her uncle Schrödinger
+numericParameter1 = 72D; // Mary has a binary lamb that holds the value 72.0
+```
+
+Note: only the first type formatter will be accepted for any given internal type.
