@@ -23,8 +23,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IX.UnitTests", "IX.UnitTest
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Documentation", "GitHub Documentation", "{C0A2B3FA-1AE0-4321-A4A9-6F2861C9F11C}"
 	ProjectSection(SolutionItems) = preProject
-		Extensibility.md = Extensibility.md
+		..\Extensibility.md = ..\Extensibility.md
+		..\Functions.md = ..\Functions.md
 		..\README.md = ..\README.md
+		..\Usage.md = ..\Usage.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weavers", "Weavers\Weavers.csproj", "{F78E1A2A-D448-4840-B7DF-29AF28CA0004}"

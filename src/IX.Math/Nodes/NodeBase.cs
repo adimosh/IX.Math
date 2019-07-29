@@ -4,6 +4,7 @@
 
 using System.Linq.Expressions;
 using IX.StandardExtensions;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes
 {
@@ -11,15 +12,9 @@ namespace IX.Math.Nodes
     /// A base class for mathematics nodes.
     /// </summary>
     /// <seealso cref="IX.StandardExtensions.IDeepCloneable{T}" />
+    [PublicAPI]
     public abstract class NodeBase : IContextAwareDeepCloneable<NodeCloningContext, NodeBase>
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NodeBase"/> class.
-        /// </summary>
-        protected NodeBase()
-        {
-        }
-
         /// <summary>
         /// Gets the return type of this node.
         /// </summary>
@@ -37,24 +32,28 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public abstract NodeBase DeepClone(NodeCloningContext context);
+        [NotNull]
+        public abstract NodeBase DeepClone([NotNull] NodeCloningContext context);
 
         /// <summary>
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>The generated <see cref="Expression"/>.</returns>
+        [NotNull]
         public abstract Expression GenerateExpression();
 
         /// <summary>
         /// Generates the expression that will be compiled into code as a string expression.
         /// </summary>
         /// <returns>The generated <see cref="Expression"/> that gives the values as a string.</returns>
+        [NotNull]
         public abstract Expression GenerateStringExpression();
 
         /// <summary>
         /// Simplifies this node, if possible, reflexively returns otherwise.
         /// </summary>
         /// <returns>A simplified node, or this instance.</returns>
+        [NotNull]
         public abstract NodeBase Simplify();
     }
 }

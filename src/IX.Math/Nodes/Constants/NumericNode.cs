@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
 {
@@ -12,7 +13,8 @@ namespace IX.Math.Nodes.Constants
     /// A numeric node. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="ConstantNodeBase" />
-    [DebuggerDisplay("{Value}")]
+    [DebuggerDisplay("{" + nameof(Value) + "}")]
+    [PublicAPI]
     public sealed class NumericNode : ConstantNodeBase
     {
         /// <summary>
@@ -52,8 +54,8 @@ namespace IX.Math.Nodes.Constants
         /// Initializes a new instance of the <see cref="NumericNode"/> class.
         /// </summary>
         /// <param name="value">The undefined value.</param>
-        /// <exception cref="global::System.ArgumentException">The value is not in an expected format.</exception>
-        public NumericNode(object value)
+        /// <exception cref="ArgumentException">The value is not in an expected format.</exception>
+        public NumericNode([NotNull] object value)
         {
             switch (value)
             {
@@ -92,24 +94,25 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        public static NumericNode Add(NumericNode left, NumericNode right)
+        [NotNull]
+        public static NumericNode Add([NotNull] NumericNode left, [NotNull] NumericNode right)
         {
             if (left.isFloat && right.isFloat)
             {
                 return new NumericNode(left.floatValue + right.floatValue);
             }
-            else if (left.isFloat && !right.isFloat)
+
+            if (left.isFloat && !right.isFloat)
             {
                 return new NumericNode(left.floatValue + Convert.ToDouble(right.integerValue));
             }
-            else if (!left.isFloat && right.isFloat)
+
+            if (!left.isFloat && right.isFloat)
             {
                 return new NumericNode(Convert.ToDouble(left.integerValue) + right.floatValue);
             }
-            else
-            {
-                return new NumericNode(left.integerValue + right.integerValue);
-            }
+
+            return new NumericNode(left.integerValue + right.integerValue);
         }
 
         /// <summary>
@@ -118,24 +121,25 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        public static NumericNode Subtract(NumericNode left, NumericNode right)
+        [NotNull]
+        public static NumericNode Subtract([NotNull] NumericNode left, [NotNull] NumericNode right)
         {
             if (left.isFloat && right.isFloat)
             {
                 return new NumericNode(left.floatValue - right.floatValue);
             }
-            else if (left.isFloat && !right.isFloat)
+
+            if (left.isFloat && !right.isFloat)
             {
                 return new NumericNode(left.floatValue - Convert.ToDouble(right.integerValue));
             }
-            else if (!left.isFloat && right.isFloat)
+
+            if (!left.isFloat && right.isFloat)
             {
                 return new NumericNode(Convert.ToDouble(left.integerValue) - right.floatValue);
             }
-            else
-            {
-                return new NumericNode(left.integerValue - right.integerValue);
-            }
+
+            return new NumericNode(left.integerValue - right.integerValue);
         }
 
         /// <summary>
@@ -144,24 +148,25 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        public static NumericNode Multiply(NumericNode left, NumericNode right)
+        [NotNull]
+        public static NumericNode Multiply([NotNull] NumericNode left, [NotNull] NumericNode right)
         {
             if (left.isFloat && right.isFloat)
             {
                 return new NumericNode(left.floatValue * right.floatValue);
             }
-            else if (left.isFloat && !right.isFloat)
+
+            if (left.isFloat && !right.isFloat)
             {
                 return new NumericNode(left.floatValue * Convert.ToDouble(right.integerValue));
             }
-            else if (!left.isFloat && right.isFloat)
+
+            if (!left.isFloat && right.isFloat)
             {
                 return new NumericNode(Convert.ToDouble(left.integerValue) * right.floatValue);
             }
-            else
-            {
-                return new NumericNode(left.integerValue * right.integerValue);
-            }
+
+            return new NumericNode(left.integerValue * right.integerValue);
         }
 
         /// <summary>
@@ -170,10 +175,11 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        public static NumericNode Divide(NumericNode left, NumericNode right)
+        [NotNull]
+        public static NumericNode Divide([NotNull] NumericNode left, [NotNull] NumericNode right)
         {
-            Tuple<double, double> floats = ExtractFloats(left, right);
-            return new NumericNode(floats.Item1 / floats.Item2);
+            var (divided, divisor) = ExtractFloats(left, right);
+            return new NumericNode(divided / divisor);
         }
 
         /// <summary>
@@ -182,10 +188,11 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        public static NumericNode Power(NumericNode left, NumericNode right)
+        [NotNull]
+        public static NumericNode Power([NotNull] NumericNode left, [NotNull] NumericNode right)
         {
-            Tuple<double, double> floats = ExtractFloats(left, right);
-            return new NumericNode(global::System.Math.Pow(floats.Item1, floats.Item2));
+            var (@base, pow) = ExtractFloats(left, right);
+            return new NumericNode(global::System.Math.Pow(@base, pow));
         }
 
         /// <summary>
@@ -194,7 +201,8 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        public static NumericNode LeftShift(NumericNode left, NumericNode right)
+        [NotNull]
+        public static NumericNode LeftShift([NotNull] NumericNode left, [NotNull] NumericNode right)
         {
             var by = right.ExtractInt();
             var data = left.ExtractInteger();
@@ -208,7 +216,8 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        public static NumericNode RightShift(NumericNode left, NumericNode right)
+        [NotNull]
+        public static NumericNode RightShift([NotNull] NumericNode left, [NotNull] NumericNode right)
         {
             var by = right.ExtractInt();
             var data = left.ExtractInteger();
@@ -222,96 +231,83 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left node.</param>
         /// <param name="right">The right node.</param>
         /// <returns>A tuple of floating-point values.</returns>
-        internal static Tuple<double, double> ExtractFloats(NumericNode left, NumericNode right)
+        [NotNull]
+        internal static Tuple<double, double> ExtractFloats([NotNull] NumericNode left, [NotNull] NumericNode right)
         {
             if (left.isFloat && right.isFloat)
             {
                 return new Tuple<double, double>(left.floatValue, right.floatValue);
             }
-            else if (left.isFloat && !right.isFloat)
+
+            if (left.isFloat && !right.isFloat)
             {
                 return new Tuple<double, double>(left.floatValue, Convert.ToDouble(right.integerValue));
             }
-            else if (!left.isFloat && right.isFloat)
+
+            if (!left.isFloat && right.isFloat)
             {
                 return new Tuple<double, double>(Convert.ToDouble(left.integerValue), right.floatValue);
             }
-            else
-            {
-                return new Tuple<double, double>(Convert.ToDouble(left.integerValue), Convert.ToDouble(right.integerValue));
-            }
+
+            return new Tuple<double, double>(Convert.ToDouble(left.integerValue), Convert.ToDouble(right.integerValue));
         }
 
+#pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - This is required here, as we are generating an expression tree.
         /// <summary>
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>The expression.</returns>
         public override Expression GenerateCachedExpression() => this.isFloat ?
-#pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - This is required here, as we are generating an expression tree.
             Expression.Constant(this.floatValue, typeof(double)) :
             Expression.Constant(this.integerValue, typeof(long));
-#pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
 
         /// <summary>
         /// Generates a floating-point expression.
         /// </summary>
         /// <returns>The expression.</returns>
-        public Expression GenerateFloatExpression()
-        {
-            if (this.isFloat)
-            {
-                return this.GenerateExpression();
-            }
-            else
-            {
-#pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - This is required here, as we are generating an expression tree.
-                return Expression.Constant(Convert.ToDouble(this.floatValue), typeof(double));
-#pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
-            }
-        }
+        [NotNull]
+        public Expression GenerateFloatExpression() => this.isFloat ? this.GenerateExpression() : Expression.Constant(Convert.ToDouble(this.floatValue), typeof(double));
 
         /// <summary>
         /// Generates an integer expression.
         /// </summary>
         /// <returns>The expression.</returns>
-        /// <exception cref="global::System.InvalidCastException">The node is floating-point and cannot be transformed.</exception>
+        /// <exception cref="InvalidCastException">The node is floating-point and cannot be transformed.</exception>
+        [NotNull]
         public Expression GenerateLongExpression()
         {
             if (!this.isFloat)
             {
                 return this.GenerateExpression();
             }
-            else
-            {
-                if (global::System.Math.Floor(this.floatValue) != this.floatValue)
-                {
-                    throw new InvalidCastException();
-                }
 
-#pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - This is required here, as we are generating an expression tree.
-                return Expression.Constant(Convert.ToInt64(this.floatValue), typeof(long));
-#pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
+            if (global::System.Math.Floor(this.floatValue) != this.floatValue)
+            {
+                throw new InvalidCastException();
             }
+
+            return Expression.Constant(Convert.ToInt64(this.floatValue), typeof(long));
         }
+#pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
 
         /// <summary>
         /// Extracts an integer.
         /// </summary>
         /// <returns>An integer value.</returns>
-        /// <exception cref="global::System.InvalidCastException">The current value is floating-point and cannot be transformed.</exception>
+        /// <exception cref="InvalidCastException">The current value is floating-point and cannot be transformed.</exception>
         public long ExtractInteger()
         {
-            if (this.isFloat)
+            if (!this.isFloat)
             {
-                if (global::System.Math.Floor(this.floatValue) != this.floatValue)
-                {
-                    throw new InvalidCastException();
-                }
-
-                return Convert.ToInt64(this.floatValue);
+                return this.integerValue;
             }
 
-            return this.integerValue;
+            if (global::System.Math.Floor(this.floatValue) != this.floatValue)
+            {
+                throw new InvalidCastException();
+            }
+
+            return Convert.ToInt64(this.floatValue);
         }
 
         /// <summary>
@@ -332,20 +328,20 @@ namespace IX.Math.Nodes.Constants
         /// Extracts a 32-bit integer value.
         /// </summary>
         /// <returns>A 32-bit integer value.</returns>
-        /// <exception cref="global::System.InvalidCastException">The value is either floating-point or larger than 32-bit.</exception>
+        /// <exception cref="InvalidCastException">The value is either floating-point or larger than 32-bit.</exception>
         public int ExtractInt()
         {
-            if (this.isFloat)
+            if (!this.isFloat)
             {
-                if (global::System.Math.Floor(this.floatValue) != this.floatValue)
-                {
-                    throw new InvalidCastException();
-                }
-
-                return Convert.ToInt32(this.floatValue);
+                return Convert.ToInt32(this.integerValue);
             }
 
-            return Convert.ToInt32(this.integerValue);
+            if (global::System.Math.Floor(this.floatValue) != this.floatValue)
+            {
+                throw new InvalidCastException();
+            }
+
+            return Convert.ToInt32(this.floatValue);
         }
 
         /// <summary>

@@ -4,6 +4,7 @@
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
 {
@@ -11,7 +12,8 @@ namespace IX.Math.Nodes.Constants
     /// A boolean node. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="ConstantNodeBase" />
-    [DebuggerDisplay("{Value}")]
+    [DebuggerDisplay("{" + nameof(Value) + "}")]
+    [PublicAPI]
     public sealed class BoolNode : ConstantNodeBase
     {
         /// <summary>

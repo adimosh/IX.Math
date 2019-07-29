@@ -6,6 +6,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.StandardExtensions;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes
 {
@@ -13,6 +14,7 @@ namespace IX.Math.Nodes
     /// A base class for a unary function (a function with only one parameter).
     /// </summary>
     /// <seealso cref="FunctionNodeBase" />
+    [PublicAPI]
     public abstract class UnaryFunctionNodeBase : FunctionNodeBase
     {
         /// <summary>
@@ -20,10 +22,11 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <exception cref="ArgumentNullException">parameter.</exception>
-        protected UnaryFunctionNodeBase(NodeBase parameter)
+        protected UnaryFunctionNodeBase([NotNull] NodeBase parameter)
         {
             NodeBase parameterTemp = parameter ?? throw new ArgumentNullException(nameof(parameter));
 
+            // ReSharper disable once VirtualMemberCallInConstructor - We want this to happen
             this.EnsureCompatibleParameter(ref parameterTemp);
 
             this.Parameter = parameterTemp.Simplify();
@@ -33,13 +36,14 @@ namespace IX.Math.Nodes
         /// Gets the parameter.
         /// </summary>
         /// <value>The parameter.</value>
+        [NotNull]
         public NodeBase Parameter { get; private set; }
 
         /// <summary>
         /// Ensures that the parameter that is received is compatible with the function, optionally allowing the parameter reference to change.
         /// </summary>
         /// <param name="parameter">The parameter.</param>
-        protected abstract void EnsureCompatibleParameter(ref NodeBase parameter);
+        protected abstract void EnsureCompatibleParameter([NotNull] ref NodeBase parameter);
 
         /// <summary>
         /// Generates a static unary function call.
@@ -48,7 +52,8 @@ namespace IX.Math.Nodes
         /// <param name="functionName">Name of the function.</param>
         /// <returns>An expression representing the static function call.</returns>
         /// <exception cref="ArgumentException"><paramref name="functionName"/> represents a function that cannot be found.</exception>
-        protected Expression GenerateStaticUnaryFunctionCall<T>(string functionName) =>
+        [NotNull]
+        protected Expression GenerateStaticUnaryFunctionCall<T>([NotNull] string functionName) =>
             this.GenerateStaticUnaryFunctionCall(typeof(T), functionName);
 
         /// <summary>
@@ -58,7 +63,8 @@ namespace IX.Math.Nodes
         /// <param name="functionName">Name of the function.</param>
         /// <returns>An expression representing the static function call.</returns>
         /// <exception cref="ArgumentException"><paramref name="functionName"/> represents a function that cannot be found.</exception>
-        protected Expression GenerateStaticUnaryFunctionCall(Type t, string functionName)
+        [NotNull]
+        protected Expression GenerateStaticUnaryFunctionCall([NotNull] Type t, [NotNull] string functionName)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
@@ -108,7 +114,8 @@ namespace IX.Math.Nodes
         /// <param name="propertyName">Name of the parameter.</param>
         /// <returns>An expression representing a property call.</returns>
         /// <exception cref="ArgumentException"><paramref name="propertyName"/> represents a property that cannot be found.</exception>
-        protected Expression GenerateParameterPropertyCall<T>(string propertyName)
+        [NotNull]
+        protected Expression GenerateParameterPropertyCall<T>([NotNull] string propertyName)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
             {
@@ -128,7 +135,8 @@ namespace IX.Math.Nodes
         /// <param name="methodName">Name of the parameter.</param>
         /// <returns>An expression representing a property call.</returns>
         /// <exception cref="ArgumentException"><paramref name="methodName"/> represents a property that cannot be found.</exception>
-        protected Expression GenerateParameterMethodCall<T>(string methodName)
+        [NotNull]
+        protected Expression GenerateParameterMethodCall<T>([NotNull] string methodName)
         {
             if (string.IsNullOrWhiteSpace(methodName))
             {

@@ -5,6 +5,7 @@
 using System;
 using System.Linq.Expressions;
 using IX.StandardExtensions;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes
 {
@@ -12,16 +13,9 @@ namespace IX.Math.Nodes
     /// A base class for a node representing an operation.
     /// </summary>
     /// <seealso cref="IX.Math.Nodes.NodeBase" />
+    [PublicAPI]
     public abstract class OperationNodeBase : CachedExpressionNodeBase
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OperationNodeBase"/> class.
-        /// </summary>
-        protected OperationNodeBase()
-            : base()
-        {
-        }
-
         /// <summary>
         /// Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
@@ -41,14 +35,7 @@ namespace IX.Math.Nodes
         {
             NodeBase simplifiedExpression = this.Simplify();
 
-            if (simplifiedExpression != this)
-            {
-                return simplifiedExpression.GenerateExpression();
-            }
-            else
-            {
-                return this.GenerateExpressionInternal();
-            }
+            return simplifiedExpression != this ? simplifiedExpression.GenerateExpression() : this.GenerateExpressionInternal();
         }
 
         /// <summary>
@@ -57,7 +44,7 @@ namespace IX.Math.Nodes
         /// <returns>System.Linq.Expressions.Expression.</returns>
         /// <remarks>Since it is not possible for this node to be a constant node, the function <see cref="object.ToString"/> is called in whatever the node outputs.</remarks>
         public override Expression GenerateCachedStringExpression() => Expression.Call(this.GenerateExpression(), typeof(object).GetMethodWithExactParameters(
-            nameof(object.ToString),
+            nameof(this.ToString),
 #if !STANDARD && !NET45
             Array.Empty<Type>()));
 #else
@@ -68,6 +55,7 @@ namespace IX.Math.Nodes
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>The expression.</returns>
+        [NotNull]
         protected abstract Expression GenerateExpressionInternal();
     }
 }

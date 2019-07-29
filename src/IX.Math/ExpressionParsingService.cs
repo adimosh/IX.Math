@@ -17,12 +17,14 @@ using IX.StandardExtensions;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Contracts;
 using IX.System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace IX.Math
 {
     /// <summary>
     ///     A service that is able to parse strings containing mathematical expressions and solve them.
     /// </summary>
+    [PublicAPI]
     public sealed class ExpressionParsingService : DisposableBase, IExpressionParsingService
     {
         private List<Assembly> assembliesToRegister;
