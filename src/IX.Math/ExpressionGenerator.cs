@@ -21,7 +21,8 @@ namespace IX.Math
 {
     internal static class ExpressionGenerator
     {
-        internal static Tuple<NodeBase, IParameterRegistry> CreateBody(WorkingExpressionSet workingSet)
+        [NotNull]
+        internal static Tuple<NodeBase, IParameterRegistry> CreateBody([NotNull] WorkingExpressionSet workingSet)
         {
             Contract.RequiresNotNullPrivate(
                 in workingSet,
@@ -137,7 +138,7 @@ namespace IX.Math
 
             if (body == null)
             {
-                return null;
+                return new Tuple<NodeBase, IParameterRegistry>(null, null);
             }
 
             workingSet.CancellationToken.ThrowIfCancellationRequested();
@@ -147,7 +148,7 @@ namespace IX.Math
                 // Set success values and possibly constant values
                 case ConstantNodeBase _ when workingSet.ParameterRegistry.Populated:
                     // Cannot have external parameters if the expression is itself constant; something somewhere doesn't make sense
-                    return null;
+                    return new Tuple<NodeBase, IParameterRegistry>(null, null);
                 case ConstantNodeBase constantNodeBase:
                     workingSet.ValueIfConstant = constantNodeBase.DistillValue();
                     workingSet.Constant = true;
