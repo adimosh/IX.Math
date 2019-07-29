@@ -5,16 +5,16 @@
 using System;
 using System.Collections.Generic;
 using IX.StandardExtensions.Contracts;
-using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace IX.Math.Generators
 {
     internal static class OperatorSequenceGenerator
     {
+        [NotNull]
         internal static List<Tuple<int, int, string>> GetOperatorsInOrderInExpression(
             [NotNull] string expression,
-            [NotNull] LevelDictionary<string, Type> operators)
+            [NotNull] KeyValuePair<int, string[]>[] operators)
         {
             Contract.RequiresNotNullPrivate(
                 in expression,
@@ -25,7 +25,7 @@ namespace IX.Math.Generators
 
             var indexes = new List<Tuple<int, int, string>>();
 
-            foreach (KeyValuePair<int, string[]> level in operators.KeysByLevel)
+            foreach (KeyValuePair<int, string[]> level in operators)
             {
                 foreach (var op in level.Value)
                 {

@@ -5,34 +5,25 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Unary
 {
-    [DebuggerDisplay("-{Operand}")]
+    [DebuggerDisplay("-{" + nameof(Operand) + "}")]
     internal sealed class SubtractNode : UnaryOperatorNodeBase
     {
-        public SubtractNode(NumericNode operand)
-            : base(operand)
+        public SubtractNode([NotNull] NodeBase operand)
+            : base(operand.Simplify())
         {
-        }
+            if (operand is ParameterNode po)
+            {
+                po.DetermineNumeric();
+            }
 
-        public SubtractNode(ParameterNode operand)
-            : base(operand?.DetermineNumeric())
-        {
-        }
-
-        public SubtractNode(OperationNodeBase operand)
-            : base(operand?.Simplify())
-        {
-            if (operand?.ReturnType != SupportedValueType.Numeric)
+            if (operand.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException();
             }
-        }
-
-        private SubtractNode(NodeBase operand)
-            : base(operand)
-        {
         }
 
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;

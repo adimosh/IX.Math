@@ -44,8 +44,8 @@ namespace IX.Math
 #pragma warning disable IDISP002 // Dispose member.
 #pragma warning disable IDISP006 // Implement IDisposable.
 #pragma warning disable IDISP008 // Don't assign member with injected and created disposables.
-        internal LevelDictionary<string, Type> UnaryOperators;
-        internal LevelDictionary<string, Type> BinaryOperators;
+        internal LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase>> UnaryOperators;
+        internal LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, NodeBase>> BinaryOperators;
         internal LevelDictionary<Type, IConstantsExtractor> Extractors;
         internal LevelDictionary<Type, IConstantPassThroughExtractor> PassThroughExtractors;
 #pragma warning restore IDISP008 // Don't assign member with injected and created disposables.
@@ -241,43 +241,43 @@ namespace IX.Math
 #pragma warning disable IDISP003 // Dispose previous before re-assigning. - Not an issue, as Initialize is repeat-checked
 
             // Binary operators
-            this.BinaryOperators = new LevelDictionary<string, Type>
+            this.BinaryOperators = new LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, NodeBase>>
             {
                 // First tier - Comparison and equation operators
-                { this.Definition.GreaterThanOrEqualSymbol, typeof(Nodes.Operations.Binary.GreaterThanOrEqualNode), 10 },
-                { this.Definition.LessThanOrEqualSymbol, typeof(Nodes.Operations.Binary.LessThanOrEqualNode), 10 },
-                { this.Definition.GreaterThanSymbol, typeof(Nodes.Operations.Binary.GreaterThanNode), 10 },
-                { this.Definition.LessThanSymbol, typeof(Nodes.Operations.Binary.LessThanNode), 10 },
-                { this.Definition.NotEqualsSymbol, typeof(Nodes.Operations.Binary.NotEqualsNode), 10 },
-                { this.Definition.EqualsSymbol, typeof(Nodes.Operations.Binary.EqualsNode), 10 },
+                { this.Definition.GreaterThanOrEqualSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.GreaterThanOrEqualNode(leftOperand, rightOperand), 10 },
+                { this.Definition.LessThanOrEqualSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.LessThanOrEqualNode(leftOperand, rightOperand), 10 },
+                { this.Definition.GreaterThanSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.GreaterThanNode(leftOperand, rightOperand), 10 },
+                { this.Definition.LessThanSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.LessThanNode(leftOperand, rightOperand), 10 },
+                { this.Definition.NotEqualsSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.NotEqualsNode(leftOperand, rightOperand), 10 },
+                { this.Definition.EqualsSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.EqualsNode(leftOperand, rightOperand), 10 },
 
                 // Second tier - Logical operators
-                { this.Definition.OrSymbol, typeof(Nodes.Operations.Binary.OrNode), 20 },
-                { this.Definition.XorSymbol, typeof(Nodes.Operations.Binary.XorNode), this.Definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 21 : 20 },
-                { this.Definition.AndSymbol, typeof(Nodes.Operations.Binary.AndNode), this.Definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 22 : 20 },
+                { this.Definition.OrSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.OrNode(leftOperand, rightOperand), 20 },
+                { this.Definition.XorSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.XorNode(leftOperand, rightOperand), this.Definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 21 : 20 },
+                { this.Definition.AndSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.AndNode(leftOperand, rightOperand), this.Definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 22 : 20 },
 
                 // Third tier - Arithmetic second-rank operators
-                { this.Definition.AddSymbol, typeof(Nodes.Operations.Binary.AddNode), 30 },
-                { this.Definition.SubtractSymbol, typeof(Nodes.Operations.Binary.SubtractNode), 30 },
+                { this.Definition.AddSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.AddNode(leftOperand, rightOperand), 30 },
+                { this.Definition.SubtractSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.SubtractNode(leftOperand, rightOperand), 30 },
 
                 // Fourth tier - Arithmetic first-rank operators
-                { this.Definition.DivideSymbol, typeof(Nodes.Operations.Binary.DivideNode), 40 },
-                { this.Definition.MultiplySymbol, typeof(Nodes.Operations.Binary.MultiplyNode), 40 },
+                { this.Definition.DivideSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.DivideNode(leftOperand, rightOperand), 40 },
+                { this.Definition.MultiplySymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.MultiplyNode(leftOperand, rightOperand), 40 },
 
                 // Fifth tier - Power operator
-                { this.Definition.PowerSymbol, typeof(Nodes.Operations.Binary.PowerNode), 50 },
+                { this.Definition.PowerSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.PowerNode(leftOperand, rightOperand), 50 },
 
                 // Sixth tier - Bitwise shift operators
-                { this.Definition.LeftShiftSymbol, typeof(Nodes.Operations.Binary.LeftShiftNode), 60 },
-                { this.Definition.RightShiftSymbol, typeof(Nodes.Operations.Binary.RightShiftNode), 60 },
+                { this.Definition.LeftShiftSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.LeftShiftNode(leftOperand, rightOperand), 60 },
+                { this.Definition.RightShiftSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.RightShiftNode(leftOperand, rightOperand), 60 },
             };
 
             // Unary operators
-            this.UnaryOperators = new LevelDictionary<string, Type>
+            this.UnaryOperators = new LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase>>
             {
                 // First tier - Negation and inversion
-                { this.Definition.SubtractSymbol, typeof(Nodes.Operations.Unary.SubtractNode), 1 },
-                { this.Definition.NotSymbol, typeof(Nodes.Operations.Unary.NotNode), 1 },
+                { this.Definition.SubtractSymbol, (definition, operand) => new Nodes.Operations.Unary.SubtractNode(operand), 1 },
+                { this.Definition.NotSymbol, (definition, operand) => new Nodes.Operations.Unary.NotNode(operand), 1 },
             };
 #pragma warning restore IDISP003 // Dispose previous before re-assigning.
 
