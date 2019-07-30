@@ -5,6 +5,8 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using IX.Math.Computation;
+using IX.Math.Computation.InitialExpressionParsers;
 using IX.Math.ExpressionState;
 using IX.Math.Extraction;
 using IX.Math.Formatters;
@@ -18,16 +20,18 @@ namespace IX.Math
 {
     internal static class ExpressionGenerator
     {
-        [NotNull]
-        internal static Tuple<NodeBase, IParameterRegistry> CreateBody([NotNull] WorkingExpressionSet workingSet)
+        internal static ComputationBody CreateBody([NotNull] WorkingExpressionSet workingSet)
         {
             Contract.RequiresNotNullPrivate(
                 in workingSet,
                 nameof(workingSet));
 
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
+            if (workingSet.CancellationToken.IsCancellationRequested)
+            {
+                return ComputationBody.Empty;
+            }
 
-            // Extract constants
+            #region Extract constants
             foreach (Type extractorType in workingSet.Extractors.KeysByLevel.OrderBy(p => p.Key)
                 .SelectMany(p => p.Value).ToArray())
             {
@@ -37,13 +41,16 @@ namespace IX.Math
                     workingSet.ReverseConstantsTable,
                     workingSet.Definition);
 
-                if (extractorType == typeof(StringExtractor))
+                if (workingSet.CancellationToken.IsCancellationRequested)
                 {
-                    workingSet.Expression = SubExpressionFormatter.Cleanup(workingSet.Expression);
+                    return ComputationBody.Empty;
                 }
-
-                workingSet.CancellationToken.ThrowIfCancellationRequested();
             }
+
+            workingSet.Expression = SubExpressionFormatter.Cleanup(workingSet.Expression);
+            #endregion
+
+            #region Prepare inner set, as well ass expression
 
             // Start preparing expression
             workingSet.SymbolTable.Add(
@@ -56,8 +63,14 @@ namespace IX.Math
             workingSet.Initialize();
 
             workingSet.SymbolTable[string.Empty].Expression = workingSet.Expression;
+            #endregion
 
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
+            if (workingSet.CancellationToken.IsCancellationRequested)
+            {
+                return ComputationBody.Empty;
+            }
+
+            #region Replace functions
 
             // Break expression based on function calls
             FunctionsExtractor.ReplaceFunctions(
@@ -69,10 +82,14 @@ namespace IX.Math
                 workingSet.SymbolTable,
                 workingSet.ReverseSymbolTable,
                 workingSet.ParameterRegistry,
-                workingSet.Expression,
+                workingSet.SymbolTable[string.Empty].Expression,
                 workingSet.AllSymbols);
+            #endregion
 
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
+            if (workingSet.CancellationToken.IsCancellationRequested)
+            {
+                return ComputationBody.Empty;
+            }
 
             // We save a split expression for determining parameter order
             string[] splitExpression = workingSet.Expression.Split(
@@ -80,7 +97,7 @@ namespace IX.Math
                 StringSplitOptions.RemoveEmptyEntries);
 
             // Break by parentheses
-            ParenthesesExpressionGenerator.FormatParentheses(
+            ParenthesesParser.FormatParentheses(
                 workingSet.Definition.Parentheses.Item1,
                 workingSet.Definition.Parentheses.Item2,
                 workingSet.Definition.ParameterSeparator,
@@ -88,7 +105,10 @@ namespace IX.Math
                 workingSet.SymbolTable,
                 workingSet.ReverseSymbolTable);
 
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
+            if (workingSet.CancellationToken.IsCancellationRequested)
+            {
+                return ComputationBody.Empty;
+            }
 
             // Populating symbol tables
 #pragma warning disable HAA0401 // Possible allocation of reference type enumerator - This is OK
@@ -116,7 +136,10 @@ namespace IX.Math
                     paramForOrdering.Name);
             }
 
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
+            if (workingSet.CancellationToken.IsCancellationRequested)
+            {
+                return ComputationBody.Empty;
+            }
 
             // Generate expressions
             NodeBase body;
@@ -133,19 +156,17 @@ namespace IX.Math
             }
 #pragma warning restore ERP022 // Catching everything considered harmful.
 
-            if (body == null)
+            if (body == null || workingSet.CancellationToken.IsCancellationRequested)
             {
-                return new Tuple<NodeBase, IParameterRegistry>(null, null);
+                return ComputationBody.Empty;
             }
-
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             switch (body)
             {
                 // Set success values and possibly constant values
                 case ConstantNodeBase _ when workingSet.ParameterRegistry.Populated:
                     // Cannot have external parameters if the expression is itself constant; something somewhere doesn't make sense
-                    return new Tuple<NodeBase, IParameterRegistry>(null, null);
+                    return ComputationBody.Empty;
                 case ConstantNodeBase constantNodeBase:
                     workingSet.ValueIfConstant = constantNodeBase.DistillValue();
                     workingSet.Constant = true;
@@ -158,7 +179,7 @@ namespace IX.Math
             workingSet.InternallyValid = true;
             workingSet.Success = true;
 
-            return new Tuple<NodeBase, IParameterRegistry>(
+            return new ComputationBody(
                 body,
                 workingSet.ParameterRegistry);
         }

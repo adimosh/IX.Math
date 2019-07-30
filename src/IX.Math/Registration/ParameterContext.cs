@@ -57,6 +57,14 @@ namespace IX.Math.Registration
         public SupportedValueType ReturnType { get; private set; }
 
         /// <summary>
+        /// Gets the type of the supported return.
+        /// </summary>
+        /// <value>
+        /// The type of the supported return.
+        /// </value>
+        public SupportableValueType SupportedReturnType { get; private set; }
+
+        /// <summary>
         /// Gets a value indicating whether the parameter is a function.
         /// </summary>
         /// <value><see langword="true"/> if the parameter is a function; otherwise, <see langword="false"/>.</value>
@@ -124,7 +132,8 @@ namespace IX.Math.Registration
                 {
                     return;
                 }
-                else if (this.ReturnType == SupportedValueType.Unknown)
+
+                if (this.ReturnType == SupportedValueType.Unknown)
                 {
                     if (this.alreadyCompiled)
                     {

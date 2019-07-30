@@ -26,7 +26,7 @@ namespace IX.Math.Generators
         /// <param name="symbolTable">The symbols table.</param>
         /// <param name="reverseSymbolTable">The reverse-lookup symbols table.</param>
         /// <param name="parameterRegistry">The parameters registry.</param>
-        /// <param name="expression">The expression before processing.</param>
+        /// <param name="originalExpression">The expression before processing.</param>
         /// <param name="openParenthesis">The symbol of an open parenthesis.</param>
         /// <param name="allSymbols">All symbols on which to split, in order.</param>
         internal static void PopulateTables(
@@ -36,7 +36,7 @@ namespace IX.Math.Generators
             [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
             [NotNull] Dictionary<string, string> reverseSymbolTable,
             [NotNull] IParameterRegistry parameterRegistry,
-            [NotNull] string expression,
+            [NotNull] string originalExpression,
             [NotNull] string openParenthesis,
             [NotNull] string[] allSymbols)
         {
@@ -59,8 +59,8 @@ namespace IX.Math.Generators
                 in parameterRegistry,
                 nameof(parameterRegistry));
             Contract.RequiresNotNullOrWhitespacePrivate(
-                expression,
-                nameof(expression));
+                originalExpression,
+                nameof(originalExpression));
             Contract.RequiresNotNullOrWhitespacePrivate(
                 openParenthesis,
                 nameof(openParenthesis));
@@ -107,7 +107,7 @@ namespace IX.Math.Generators
                 if (ConstantsGenerator.CheckAndAdd(
                         constantsTable,
                         reverseConstantsTable,
-                        expression,
+                        originalExpression,
                         exp) != null)
                 {
                     continue;

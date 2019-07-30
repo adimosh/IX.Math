@@ -164,11 +164,13 @@ namespace IX.Math.Generators
                 return key;
             }
 
+            string name;
+
             if (ParsingFormatter.ParseNumeric(
                 content,
                 out object n))
             {
-                var name = GenerateName(
+                name = GenerateName(
                     constantsTable.Keys,
                     originalExpression);
                 constantsTable.Add(
@@ -184,7 +186,7 @@ namespace IX.Math.Generators
                 content,
                 out byte[] ba))
             {
-                var name = GenerateName(
+                name = GenerateName(
                     constantsTable.Keys,
                     originalExpression);
                 constantsTable.Add(
@@ -196,23 +198,23 @@ namespace IX.Math.Generators
                 return name;
             }
 
-            if (bool.TryParse(
+            if (!bool.TryParse(
                 content,
                 out var b))
             {
-                var name = GenerateName(
-                    constantsTable.Keys,
-                    originalExpression);
-                constantsTable.Add(
-                    name,
-                    new BoolNode(b));
-                reverseConstantsTable.Add(
-                    content,
-                    name);
-                return name;
+                return null;
             }
 
-            return null;
+            name = GenerateName(
+                constantsTable.Keys,
+                originalExpression);
+            constantsTable.Add(
+                name,
+                new BoolNode(b));
+            reverseConstantsTable.Add(
+                content,
+                name);
+            return name;
         }
 
         /// <summary>

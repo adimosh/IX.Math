@@ -1438,6 +1438,24 @@ namespace IX.UnitTests.IX.Math
                 },
                 "aqde",
             },
+            new object[]
+            {
+                "round(x, 2)=2.12",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 2.1247154D,
+                },
+                true
+            },
+            new object[]
+            {
+                "round(x, 3)=2.121",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 2.1247154D,
+                },
+                false
+            },
         };
 
         private static object GenerateFuncOutOfParameterValue(object tempParameter)
@@ -1495,11 +1513,6 @@ namespace IX.UnitTests.IX.Math
             {
                 using (ComputedExpression del = service.Interpret(expression))
                 {
-                    if (del == null)
-                    {
-                        throw new InvalidOperationException("No computed expression was generated!");
-                    }
-
                     object result = del.Compute(parameters?.Values.ToArray() ?? new object[0]);
 
                     Assert.Equal(
@@ -1531,11 +1544,6 @@ namespace IX.UnitTests.IX.Math
 
                 using (ComputedExpression del = service.Interpret(expression))
                 {
-                    if (del == null)
-                    {
-                        throw new InvalidOperationException("No computed expression was generated!");
-                    }
-
                     if (parameters != null)
                     {
                         foreach (KeyValuePair<string, object> parameter in parameters)
@@ -1656,11 +1664,6 @@ namespace IX.UnitTests.IX.Math
 
                 using (ComputedExpression del = service.Interpret(expression))
                 {
-                    if (del == null)
-                    {
-                        throw new InvalidOperationException("No computed expression was generated!");
-                    }
-
                     if (parameters != null)
                     {
                         foreach (KeyValuePair<string, object> parameter in parameters)
@@ -1753,11 +1756,6 @@ namespace IX.UnitTests.IX.Math
                 var finder = new Mock<IDataFinder>(MockBehavior.Loose);
 
                 ComputedExpression del = this.fixture.Service.Interpret(expression);
-
-                if (del == null)
-                {
-                    throw new InvalidOperationException("No computed expression was generated!");
-                }
 
                 if (parameters != null)
                 {

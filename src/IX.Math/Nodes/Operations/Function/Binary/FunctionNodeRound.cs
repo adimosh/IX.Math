@@ -11,7 +11,7 @@ using JetBrains.Annotations;
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
     [DebuggerDisplay("round({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
-    [CallableMathematicsFunction("substr", "substring")]
+    [CallableMathematicsFunction("round")]
     [UsedImplicitly]
     internal sealed class FunctionNodeRound : BinaryFunctionNodeBase
     {
@@ -75,7 +75,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
         /// </summary>
         /// <returns>The expression.</returns>
         protected override Expression GenerateExpressionInternal() =>
-            this.GenerateStaticBinaryFunctionCall(typeof(global::System.Math), nameof(global::System.Math.Round));
+            this.GenerateStaticBinaryFunctionCall<double, int>(typeof(global::System.Math), nameof(global::System.Math.Round));
 
         /// <summary>
         /// Ensures that the parameters that are received are compatible with the function, optionally allowing the parameter references to change.
