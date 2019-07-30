@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.ComponentModel;
 using System.Linq.Expressions;
 using IX.StandardExtensions;
 
@@ -31,6 +32,7 @@ namespace IX.Math.Registration
             }
 
             this.Name = name;
+            this.SupportedReturnType = SupportableValueType.All;
         }
 
         /// <summary>
@@ -57,10 +59,10 @@ namespace IX.Math.Registration
         public SupportedValueType ReturnType { get; private set; }
 
         /// <summary>
-        /// Gets the type of the supported return.
+        /// Gets the supported return types.
         /// </summary>
         /// <value>
-        /// The type of the supported return.
+        /// The supported return types.
         /// </value>
         public SupportableValueType SupportedReturnType { get; private set; }
 
@@ -94,6 +96,37 @@ namespace IX.Math.Registration
         }
 
         /// <summary>
+        /// Limits the possible types of this parameter.
+        /// </summary>
+        /// <param name="limit">The limit.</param>
+        /// <exception cref="ArgumentException">the limit is invalid.</exception>
+        /// <exception cref="ExpressionNotValidLogicallyException">The expression reduces the parameter to no supported type.</exception>
+        public void LimitPossibleType(SupportableValueType limit)
+        {
+            if (limit == SupportableValueType.None)
+            {
+                throw new ArgumentException(string.Format(Resources.ParameterTypeNotRecognized, nameof(limit)), nameof(limit));
+            }
+
+            var newVal = limit & this.SupportedReturnType;
+            if (newVal == SupportableValueType.None)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+
+            this.SupportedReturnType = newVal;
+
+            int iVal = (int)newVal;
+
+            if (Enum.IsDefined(
+                typeof(SupportedValueType),
+                iVal))
+            {
+                this.DetermineType((SupportedValueType)iVal);
+            }
+        }
+
+        /// <summary>
         /// Determines the type of the parameter.
         /// </summary>
         /// <param name="newType">The new type.</param>
@@ -123,7 +156,7 @@ namespace IX.Math.Registration
                     return;
 
                 default:
-                    throw new ArgumentException(string.Format(Resources.ParameterTypeNotRecognized, this.Name));
+                    throw new ArgumentException(string.Format(Resources.ParameterTypeNotRecognized, this.Name), this.Name);
             }
 
             void ChangeReturnType(SupportedValueType newReturnType)
@@ -154,17 +187,15 @@ namespace IX.Math.Registration
         /// </summary>
         public void DetermineFloat()
         {
-            if (this.IsFloat == true)
+            switch (this.IsFloat)
             {
-                return;
-            }
-            else if (this.IsFloat == null)
-            {
-                this.IsFloat = true;
-            }
-            else
-            {
-                throw new ExpressionNotValidLogicallyException(string.Format(Resources.ParameterMustBeFloatButAlreadyRequiredToBeInteger, this.Name));
+                case true:
+                    return;
+                case null:
+                    this.IsFloat = true;
+                    break;
+                default:
+                    throw new ExpressionNotValidLogicallyException(string.Format(Resources.ParameterMustBeFloatButAlreadyRequiredToBeInteger, this.Name));
             }
         }
 
@@ -173,17 +204,15 @@ namespace IX.Math.Registration
         /// </summary>
         public void DetermineInteger()
         {
-            if (this.IsFloat == false)
+            switch (this.IsFloat)
             {
-                return;
-            }
-            else if (this.IsFloat == null)
-            {
-                this.IsFloat = false;
-            }
-            else
-            {
-                throw new ExpressionNotValidLogicallyException(string.Format(Resources.ParameterMustBeIntegerButAlreadyRequiredToBeFloat, this.Name));
+                case false:
+                    return;
+                case null:
+                    this.IsFloat = false;
+                    break;
+                default:
+                    throw new ExpressionNotValidLogicallyException(string.Format(Resources.ParameterMustBeIntegerButAlreadyRequiredToBeFloat, this.Name));
             }
         }
 

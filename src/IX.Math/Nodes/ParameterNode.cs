@@ -49,6 +49,14 @@ namespace IX.Math.Nodes
         public override SupportedValueType ReturnType => this.parametersRegistry.AdvertiseParameter(this.Name).ReturnType;
 
         /// <summary>
+        /// Gets the supported return types.
+        /// </summary>
+        /// <value>
+        /// The supported return types.
+        /// </value>
+        public SupportableValueType SupportedReturnType => this.parametersRegistry.AdvertiseParameter(this.Name).SupportedReturnType;
+
+        /// <summary>
         /// Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true"/> if the node is a constant, <see langword="false"/> otherwise.</value>
@@ -147,6 +155,17 @@ namespace IX.Math.Nodes
         public ParameterNode DetermineFloat()
         {
             this.parametersRegistry.AdvertiseParameter(this.Name).DetermineFloat();
+            return this;
+        }
+
+        /// <summary>
+        /// Limits the possible types of this parameter.
+        /// </summary>
+        /// <param name="limit">The limit.</param>
+        /// <returns>Returns reflexively.</returns>
+        public ParameterNode LimitPossibleType(SupportableValueType limit)
+        {
+            this.parametersRegistry.AdvertiseParameter(this.Name).LimitPossibleType(limit);
             return this;
         }
     }

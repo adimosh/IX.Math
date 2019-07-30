@@ -17,6 +17,7 @@ namespace IX.Math.Nodes.Operations.Unary
         {
             if (operand is ParameterNode op)
             {
+                op.LimitPossibleType(SupportableValueType.Boolean | SupportableValueType.Numeric);
                 if (op.ReturnType == SupportedValueType.Numeric || op.ReturnType == SupportedValueType.Unknown)
                 {
                     // If this is or can be a number, it has to be an integer number, as we cannot binary-negate a floating point expression
@@ -27,10 +28,13 @@ namespace IX.Math.Nodes.Operations.Unary
                     throw new ExpressionNotValidLogicallyException();
                 }
             }
-
-            if (operand.ReturnType != SupportedValueType.Numeric && operand.ReturnType != SupportedValueType.Boolean)
+            else
             {
-                throw new ExpressionNotValidLogicallyException();
+                if (operand.ReturnType != SupportedValueType.Numeric &&
+                    operand.ReturnType != SupportedValueType.Boolean)
+                {
+                    throw new ExpressionNotValidLogicallyException();
+                }
             }
         }
 

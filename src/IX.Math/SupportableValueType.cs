@@ -15,9 +15,9 @@ namespace IX.Math
     public enum SupportableValueType
     {
         /// <summary>
-        ///     Not known (pass as <see cref="object" />).
+        ///     No type supported.
         /// </summary>
-        Unknown = 0,
+        None = 0,
 
         /// <summary>
         ///     Numeric (depends on the numeric type).
