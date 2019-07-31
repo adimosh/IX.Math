@@ -2,18 +2,21 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using JetBrains.Annotations;
+
 namespace IX.Math.Nodes
 {
     /// <summary>
     /// A base class for constants.
     /// </summary>
     /// <seealso cref="NodeBase" />
+    [PublicAPI]
     public abstract class ConstantNodeBase : CachedExpressionNodeBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstantNodeBase"/> class.
         /// </summary>
-        internal ConstantNodeBase()
+        private protected ConstantNodeBase()
         {
         }
 
@@ -21,12 +24,13 @@ namespace IX.Math.Nodes
         /// Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true"/> if the node is a constant, <see langword="false"/> otherwise.</value>
-        public override bool IsConstant => true;
+        public sealed override bool IsConstant => true;
 
         /// <summary>
         /// Distills the value into a usable constant.
         /// </summary>
         /// <returns>A usable constant.</returns>
+        [NotNull]
         public abstract object DistillValue();
 
         /// <summary>

@@ -4,6 +4,7 @@
 
 using System;
 using IX.Math.Nodes.Constants;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes
 {
@@ -11,21 +12,15 @@ namespace IX.Math.Nodes
     /// A base class for a function node.
     /// </summary>
     /// <seealso cref="OperationNodeBase" />
+    [PublicAPI]
     public abstract class FunctionNodeBase : OperationNodeBase
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionNodeBase"/> class.
-        /// </summary>
-        protected FunctionNodeBase()
-        {
-        }
-
         /// <summary>
         /// Gets the concrete type of a parameter.
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <returns>The parameter type.</returns>
-        /// <exception cref="global::System.InvalidOperationException">The parameter could not be correctly recognized, or is undefined.</exception>
+        /// <exception cref="InvalidOperationException">The parameter could not be correctly recognized, or is undefined.</exception>
         protected static Type ParameterTypeFromParameter(NodeBase parameter)
         {
             Type parameterType;
@@ -45,14 +40,7 @@ namespace IX.Math.Nodes
                         switch (parameter)
                         {
                             case ParameterNode nn:
-                                if (nn.IsFloat == false)
-                                {
-                                    parameterType = typeof(long);
-                                }
-                                else
-                                {
-                                    parameterType = typeof(double);
-                                }
+                                parameterType = nn.IsFloat == false ? typeof(long) : typeof(double);
 
                                 break;
                             case NumericNode cn:
@@ -66,7 +54,6 @@ namespace IX.Math.Nodes
 
                     break;
 
-                case SupportedValueType.Unknown:
                 default:
                     throw new InvalidOperationException();
             }

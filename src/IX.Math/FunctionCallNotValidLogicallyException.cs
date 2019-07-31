@@ -6,16 +6,18 @@ using System;
 #if !STANDARD
 using System.Runtime.Serialization;
 #endif
+using JetBrains.Annotations;
 
 namespace IX.Math
 {
     /// <summary>
-    /// Thrown when an expression is not internally logical or consistent.
+    /// Thrown when a function call is not internally logical or consistent.
     /// </summary>
-    /// <seealso cref="global::System.Exception" />
+    /// <seealso cref="Exception" />
 #if !STANDARD
     [Serializable]
 #endif
+    [PublicAPI]
     public class FunctionCallNotValidLogicallyException : Exception
     {
         /// <summary>

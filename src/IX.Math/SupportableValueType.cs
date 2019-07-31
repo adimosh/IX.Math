@@ -1,7 +1,8 @@
-// <copyright file="SupportedValueType.cs" company="Adrian Mos">
+// <copyright file="SupportableValueType.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -10,12 +11,13 @@ namespace IX.Math
     ///     An enumeration of supported value types.
     /// </summary>
     [PublicAPI]
-    public enum SupportedValueType
+    [Flags]
+    public enum SupportableValueType
     {
         /// <summary>
-        ///     Not known (pass as <see cref="object" />).
+        ///     No type supported.
         /// </summary>
-        Unknown = 0,
+        None = 0,
 
         /// <summary>
         ///     Numeric (depends on the numeric type).
@@ -36,5 +38,10 @@ namespace IX.Math
         ///     Byte array (pass as <see cref="T:byte[]" />).
         /// </summary>
         ByteArray = 8,
+
+        /// <summary>
+        ///     All possible types.
+        /// </summary>
+        All = 15
     }
 }

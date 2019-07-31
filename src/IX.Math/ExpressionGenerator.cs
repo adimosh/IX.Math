@@ -4,15 +4,14 @@
 
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
+using IX.Math.Computation;
+using IX.Math.Computation.InitialExpressionParsers;
 using IX.Math.ExpressionState;
 using IX.Math.Extraction;
 using IX.Math.Formatters;
 using IX.Math.Generators;
 using IX.Math.Nodes;
-using IX.Math.Nodes.Operations.Binary;
-using IX.Math.Nodes.Operations.Unary;
 using IX.Math.Registration;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
@@ -21,15 +20,18 @@ namespace IX.Math
 {
     internal static class ExpressionGenerator
     {
-        internal static Tuple<NodeBase, IParameterRegistry> CreateBody(WorkingExpressionSet workingSet)
+        internal static ComputationBody CreateBody([NotNull] WorkingExpressionSet workingSet)
         {
             Contract.RequiresNotNullPrivate(
                 in workingSet,
                 nameof(workingSet));
 
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
+            if (workingSet.CancellationToken.IsCancellationRequested)
+            {
+                return ComputationBody.Empty;
+            }
 
-            // Extract constants
+            #region Extract constants
             foreach (Type extractorType in workingSet.Extractors.KeysByLevel.OrderBy(p => p.Key)
                 .SelectMany(p => p.Value).ToArray())
             {
@@ -39,13 +41,16 @@ namespace IX.Math
                     workingSet.ReverseConstantsTable,
                     workingSet.Definition);
 
-                if (extractorType == typeof(StringExtractor))
+                if (workingSet.CancellationToken.IsCancellationRequested)
                 {
-                    workingSet.Expression = SubExpressionFormatter.Cleanup(workingSet.Expression);
+                    return ComputationBody.Empty;
                 }
-
-                workingSet.CancellationToken.ThrowIfCancellationRequested();
             }
+
+            workingSet.Expression = SubExpressionFormatter.Cleanup(workingSet.Expression);
+            #endregion
+
+            #region Prepare inner set, as well ass expression
 
             // Start preparing expression
             workingSet.SymbolTable.Add(
@@ -58,8 +63,14 @@ namespace IX.Math
             workingSet.Initialize();
 
             workingSet.SymbolTable[string.Empty].Expression = workingSet.Expression;
+            #endregion
 
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
+            if (workingSet.CancellationToken.IsCancellationRequested)
+            {
+                return ComputationBody.Empty;
+            }
+
+            #region Replace functions
 
             // Break expression based on function calls
             FunctionsExtractor.ReplaceFunctions(
@@ -71,10 +82,14 @@ namespace IX.Math
                 workingSet.SymbolTable,
                 workingSet.ReverseSymbolTable,
                 workingSet.ParameterRegistry,
-                workingSet.Expression,
+                workingSet.SymbolTable[string.Empty].Expression,
                 workingSet.AllSymbols);
+            #endregion
 
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
+            if (workingSet.CancellationToken.IsCancellationRequested)
+            {
+                return ComputationBody.Empty;
+            }
 
             // We save a split expression for determining parameter order
             string[] splitExpression = workingSet.Expression.Split(
@@ -82,7 +97,7 @@ namespace IX.Math
                 StringSplitOptions.RemoveEmptyEntries);
 
             // Break by parentheses
-            ParenthesesExpressionGenerator.FormatParentheses(
+            ParenthesesParser.FormatParentheses(
                 workingSet.Definition.Parentheses.Item1,
                 workingSet.Definition.Parentheses.Item2,
                 workingSet.Definition.ParameterSeparator,
@@ -90,7 +105,10 @@ namespace IX.Math
                 workingSet.SymbolTable,
                 workingSet.ReverseSymbolTable);
 
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
+            if (workingSet.CancellationToken.IsCancellationRequested)
+            {
+                return ComputationBody.Empty;
+            }
 
             // Populating symbol tables
 #pragma warning disable HAA0401 // Possible allocation of reference type enumerator - This is OK
@@ -118,7 +136,10 @@ namespace IX.Math
                     paramForOrdering.Name);
             }
 
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
+            if (workingSet.CancellationToken.IsCancellationRequested)
+            {
+                return ComputationBody.Empty;
+            }
 
             // Generate expressions
             NodeBase body;
@@ -135,19 +156,17 @@ namespace IX.Math
             }
 #pragma warning restore ERP022 // Catching everything considered harmful.
 
-            if (body == null)
+            if (body == null || workingSet.CancellationToken.IsCancellationRequested)
             {
-                return null;
+                return ComputationBody.Empty;
             }
-
-            workingSet.CancellationToken.ThrowIfCancellationRequested();
 
             switch (body)
             {
                 // Set success values and possibly constant values
                 case ConstantNodeBase _ when workingSet.ParameterRegistry.Populated:
                     // Cannot have external parameters if the expression is itself constant; something somewhere doesn't make sense
-                    return null;
+                    return ComputationBody.Empty;
                 case ConstantNodeBase constantNodeBase:
                     workingSet.ValueIfConstant = constantNodeBase.DistillValue();
                     workingSet.Constant = true;
@@ -160,15 +179,15 @@ namespace IX.Math
             workingSet.InternallyValid = true;
             workingSet.Success = true;
 
-            return new Tuple<NodeBase, IParameterRegistry>(
+            return new ComputationBody(
                 body,
                 workingSet.ParameterRegistry);
         }
 
         [CanBeNull]
         private static NodeBase GenerateExpression(
-            string expression,
-            WorkingExpressionSet workingSet)
+            [NotNull] string expression,
+            [NotNull] WorkingExpressionSet workingSet)
         {
             Contract.RequiresNotNullOrWhitespacePrivate(
                 expression,
@@ -176,6 +195,12 @@ namespace IX.Math
             Contract.RequiresNotNullPrivate(
                 in workingSet,
                 nameof(workingSet));
+
+            if (workingSet.CancellationToken.IsCancellationRequested)
+            {
+                // Cancellation requested, let's exit gracefully
+                return null;
+            }
 
             // Expression might be an already-defined constant
             if (workingSet.ConstantsTable.TryGetValue(
@@ -242,16 +267,16 @@ namespace IX.Math
             }
 
             // Check whether the expression is a binary operator
-            foreach (Tuple<int, int, string> operatorPosition in OperatorSequenceGenerator
+            foreach (var (_, operatorPosition, @operator) in OperatorSequenceGenerator
                 .GetOperatorsInOrderInExpression(
                     expression,
-                    workingSet.BinaryOperators).OrderBy(p => p.Item1).ThenByDescending(p => p.Item2).ToArray())
+                    workingSet.BinaryOperators.KeysByLevel).OrderBy(p => p.Item1).ThenByDescending(p => p.Item2).ToArray())
             {
                 NodeBase exp = ExpressionByBinaryOperator(
                     workingSet,
                     expression,
-                    operatorPosition.Item2,
-                    operatorPosition.Item3);
+                    operatorPosition,
+                    @operator);
 
                 NodeBase ExpressionByBinaryOperator(
                     WorkingExpressionSet innerWorkingSet,
@@ -265,71 +290,59 @@ namespace IX.Math
                         return null;
                     }
 
-                    innerWorkingSet.CancellationToken.ThrowIfCancellationRequested();
-
-                    if (innerWorkingSet.BinaryOperators.TryGetValue(
-                        op,
-                        out Type t))
+                    if (innerWorkingSet.CancellationToken.IsCancellationRequested)
                     {
-                        // We have a normal, regular binary
-                        var eee = s.Substring(
-                            0,
-                            position);
-                        if (string.IsNullOrWhiteSpace(eee))
-                        {
-                            // Empty space before operator. Normally, this should never be hit.
-                            return null;
-                        }
-
-                        NodeBase left = GenerateExpression(
-                            eee,
-                            innerWorkingSet);
-                        if (left == null)
-                        {
-                            // Left expression is invalid.
-                            return null;
-                        }
-
-                        eee = s.Substring(position + op.Length);
-                        if (string.IsNullOrWhiteSpace(eee))
-                        {
-                            // Empty space after operator. Normally, this should never be hit.
-                            return null;
-                        }
-
-                        NodeBase right = GenerateExpression(
-                            eee,
-                            innerWorkingSet);
-                        if (right == null)
-                        {
-                            // Right expression is invalid.
-                            return null;
-                        }
-
-                        try
-                        {
-                            // TODO: Change Activator.CreateInstance to something offering higher performance and less TargetInvocationExceptions
-                            return ((BinaryOperationNodeBase)Activator.CreateInstance(
-                                t,
-                                left,
-                                right)).Simplify();
-                        }
-                        catch (MissingMemberException)
-                        {
-                            // The binary operator does not support the type of expression that would constitute the operand.
-                            return null;
-                        }
-                        catch (TargetInvocationException)
-                        {
-                            // The constructor has thrown an exception when trying to construct the node. It is possible that the binary operator might not be a good fit.
-#pragma warning disable ERP022 // Unobserved exception in generic exception handler - This is acceptable, as there's really nothing we can do about it
-                            return null;
-#pragma warning restore ERP022 // Unobserved exception in generic exception handler
-                        }
+                        // Cancellation requested, let's exit gracefully
+                        return null;
                     }
 
-                    // Binary operator not actually found.
-                    return null;
+                    if (!innerWorkingSet.BinaryOperators.TryGetValue(
+                        op,
+                        out Func<MathDefinition, NodeBase, NodeBase, NodeBase> t))
+                    {
+                        // Binary operator not actually found.
+                        return null;
+                    }
+
+                    // We have a normal, regular binary
+                    var eee = s.Substring(
+                        0,
+                        position);
+                    if (string.IsNullOrWhiteSpace(eee))
+                    {
+                        // Empty space before operator. Normally, this should never be hit.
+                        return null;
+                    }
+
+                    NodeBase left = GenerateExpression(
+                        eee,
+                        innerWorkingSet);
+                    if (left == null)
+                    {
+                        // Left expression is invalid.
+                        return null;
+                    }
+
+                    eee = s.Substring(position + op.Length);
+                    if (string.IsNullOrWhiteSpace(eee))
+                    {
+                        // Empty space after operator. Normally, this should never be hit.
+                        return null;
+                    }
+
+                    NodeBase right = GenerateExpression(
+                        eee,
+                        innerWorkingSet);
+                    if (right == null)
+                    {
+                        // Right expression is invalid.
+                        return null;
+                    }
+
+                    return t(
+                        innerWorkingSet.Definition,
+                        left,
+                        right).Simplify();
                 }
 
                 if (exp != null)
@@ -343,7 +356,7 @@ namespace IX.Math
             foreach (Tuple<int, int, string> operatorPosition in OperatorSequenceGenerator
                 .GetOperatorsInOrderInExpression(
                     expression,
-                    workingSet.UnaryOperators).OrderBy(p => p.Item1).ThenByDescending(p => p.Item2).ToArray())
+                    workingSet.UnaryOperators.KeysByLevel).OrderBy(p => p.Item1).ThenByDescending(p => p.Item2).ToArray())
             {
                 NodeBase exp = ExpressionByUnaryOperator(
                     workingSet,
@@ -355,46 +368,40 @@ namespace IX.Math
                     string s,
                     string op)
                 {
-                    innerWorkingSet.CancellationToken.ThrowIfCancellationRequested();
-
-                    if (s.StartsWith(op) && innerWorkingSet.UnaryOperators.TryGetValue(
-                            op,
-                            out Type t))
+                    if (innerWorkingSet.CancellationToken.IsCancellationRequested)
                     {
-                        // We have a valid unary operator and the expression starts with it.
-                        var eee = s.Substring(op.Length);
-                        NodeBase expr = GenerateExpression(
-                            string.IsNullOrWhiteSpace(eee) ? null : eee,
-                            innerWorkingSet);
-                        if (expr == null)
-                        {
-                            // The operand expression was not valid.
-                            return null;
-                        }
-
-                        try
-                        {
-                            // TODO: Change Activator.CreateInstance to something offering higher performance and less TargetInvocationExceptions
-                            return ((UnaryOperatorNodeBase)Activator.CreateInstance(
-                                t,
-                                expr)).Simplify();
-                        }
-                        catch (MissingMemberException)
-                        {
-                            // The unary operator does not support the type of expression that would constitute the operand.
-                            return null;
-                        }
-                        catch (TargetInvocationException)
-                        {
-                            // The constructor has thrown an exception when trying to construct the node. It is possible that the unary operator might not be a good fit.
-#pragma warning disable ERP022 // Unobserved exception in generic exception handler - This is acceptable, as there's really nothing we can do about it
-                            return null;
-#pragma warning restore ERP022 // Unobserved exception in generic exception handler
-                        }
+                        // Cancellation requested, let's stop
+                        return null;
                     }
 
-                    // The unary operator is not valid.
-                    return null;
+                    if (!s.StartsWith(op) || !innerWorkingSet.UnaryOperators.TryGetValue(
+                            op,
+                            out Func<MathDefinition, NodeBase, NodeBase> t))
+                    {
+                        // The unary operator is not valid.
+                        return null;
+                    }
+
+                    var eee = s.Substring(op.Length);
+                    if (string.IsNullOrWhiteSpace(eee))
+                    {
+                        // We might have a valid unary operator but attached to nothing - the expression cannot be evaluated any further on this branch
+                        return null;
+                    }
+
+                    // We have a valid unary operator and the expression starts with it.
+                    NodeBase expr = GenerateExpression(
+                        eee,
+                        innerWorkingSet);
+                    if (expr == null)
+                    {
+                        // The operand expression was not valid, or cancellation was requested.
+                        return null;
+                    }
+
+                    return t(
+                        innerWorkingSet.Definition,
+                        expr).Simplify();
                 }
 
                 if (exp != null)
@@ -410,6 +417,12 @@ namespace IX.Math
                 string possibleFunctionCallExpression,
                 WorkingExpressionSet innerWorkingSet)
             {
+                if (innerWorkingSet.CancellationToken.IsCancellationRequested)
+                {
+                    // Cancellation requested, let's exit gracefully
+                    return null;
+                }
+
                 Match match = innerWorkingSet.FunctionRegex.Match(possibleFunctionCallExpression);
 
                 try

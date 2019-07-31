@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
 {
@@ -13,19 +14,19 @@ namespace IX.Math.Nodes.Constants
     /// A binary value node. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="ConstantNodeBase" />
-    [DebuggerDisplay("{DisplayValue}")]
+    [DebuggerDisplay("{" + nameof(DisplayValue) + "}")]
+    [PublicAPI]
     public class ByteArrayNode : ConstantNodeBase
     {
-        private readonly byte[] value;
         private string cachedDistilledStringValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ByteArrayNode"/> class.
         /// </summary>
         /// <param name="value">The value of the constant.</param>
-        public ByteArrayNode(byte[] value)
+        public ByteArrayNode([NotNull] byte[] value)
         {
-            this.value = value ?? throw new ArgumentNullException(nameof(value));
+            this.Value = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         /// <summary>
@@ -37,24 +38,25 @@ namespace IX.Math.Nodes.Constants
         /// <summary>
         /// Gets the value of the node.
         /// </summary>
-        public byte[] Value => this.value;
+        public byte[] Value { get; }
 
         /// <summary>
         /// Gets the display value.
         /// </summary>
+        [NotNull]
         public string DisplayValue => this.DistillStringValue();
 
         /// <summary>
         /// Distills the value into a usable constant.
         /// </summary>
         /// <returns>A usable constant.</returns>
-        public override object DistillValue() => this.value;
+        public override object DistillValue() => this.Value;
 
         /// <summary>
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>A <see cref="ConstantExpression"/> with a boolean value.</returns>
-        public override Expression GenerateCachedExpression() => Expression.Constant(this.value, typeof(byte[]));
+        public override Expression GenerateCachedExpression() => Expression.Constant(this.Value, typeof(byte[]));
 
         /// <summary>
         /// Generates the expression that will be compiled into code as a string expression.
@@ -69,6 +71,7 @@ namespace IX.Math.Nodes.Constants
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) => new ByteArrayNode(this.Value);
 
+        [NotNull]
         private string DistillStringValue()
         {
             if (this.cachedDistilledStringValue != null)
@@ -80,13 +83,13 @@ namespace IX.Math.Nodes.Constants
 
             bldr.Append("0b");
 
-            if (this.value.Length == 0)
+            if (this.Value.Length == 0)
             {
                 bldr.Append("0");
             }
             else
             {
-                foreach (var b in this.value)
+                foreach (var b in this.Value)
                 {
                     bldr.Append(Convert.ToString(b, 2));
                 }

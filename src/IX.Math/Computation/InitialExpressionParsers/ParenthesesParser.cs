@@ -1,4 +1,4 @@
-// <copyright file="ParenthesesExpressionGenerator.cs" company="Adrian Mos">
+// <copyright file="ParenthesesParser.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -6,13 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using IX.Math.ExpressionState;
+using IX.Math.Generators;
 using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
-namespace IX.Math.Generators
+namespace IX.Math.Computation.InitialExpressionParsers
 {
-    internal static class ParenthesesExpressionGenerator
+    internal static class ParenthesesParser
     {
 #pragma warning disable HAA0603 // Delegate allocation from a method group - unavoidable
         internal static void FormatParentheses(
@@ -23,6 +24,7 @@ namespace IX.Math.Generators
             [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
             [NotNull] Dictionary<string, string> reverseSymbolTable)
         {
+            #region Contracts
             Contract.RequiresNotNullOrWhitespacePrivate(
                 openParenthesis,
                 nameof(openParenthesis));
@@ -41,34 +43,21 @@ namespace IX.Math.Generators
             Contract.RequiresNotNullPrivate(
                 in reverseSymbolTable,
                 nameof(reverseSymbolTable));
-
-            FormatParenthesis(
-                string.Empty,
-                openParenthesis,
-                closeParenthesis,
-                parameterSeparator,
-                allOperatorsInOrder,
-                symbolTable,
-                reverseSymbolTable);
+            #endregion
 
             var itemsToProcess = new List<string>();
 
-            var itemToProcess = symbolTable.Where(
+            KeyValuePair<string, ExpressionSymbol> itemToProcess;
+
+            // Select the first expression that hasn't already been parsed
+            while ((itemToProcess = symbolTable.Where(
                     (
                             p,
-                            itemsToProcessL1) => p.Key.StartsWith("item") && !itemsToProcessL1.Contains(p.Key),
-                    itemsToProcess)
-                .Select(p => new { p.Key, p.Value }).FirstOrDefault();
-
-            while (itemToProcess != default)
+                            itemsToProcessL1) => !itemsToProcessL1.Contains(p.Key) && !p.Value.IsFunctionCall,
+                    itemsToProcess).FirstOrDefault()).Value != null)
             {
                 try
                 {
-                    if (itemToProcess.Value.IsFunctionCall)
-                    {
-                        continue;
-                    }
-
                     FormatParenthesis(
                         itemToProcess.Key,
                         openParenthesis,
@@ -81,12 +70,6 @@ namespace IX.Math.Generators
                 finally
                 {
                     itemsToProcess.Add(itemToProcess.Key);
-
-                    itemToProcess = symbolTable.Where(
-                        (
-                                p,
-                                itemsToProcessL1) => p.Key.StartsWith("item") && !itemsToProcessL1.Contains(p.Key),
-                        itemsToProcess).Select(p => new { p.Key, p.Value }).FirstOrDefault();
                 }
             }
 
@@ -99,6 +82,7 @@ namespace IX.Math.Generators
                 Dictionary<string, ExpressionSymbol> symbolTableL1,
                 Dictionary<string, string> reverseSymbolTableL1)
             {
+                #region Contracts
                 Contract.RequiresNotNullPrivate(
                     in key,
                     nameof(key));
@@ -120,6 +104,7 @@ namespace IX.Math.Generators
                 Contract.RequiresNotNullPrivate(
                     in reverseSymbolTableL1,
                     nameof(reverseSymbolTableL1));
+                #endregion
 
                 ExpressionSymbol symbol = symbolTableL1[key];
                 if (symbol.IsFunctionCall)
@@ -152,6 +137,7 @@ namespace IX.Math.Generators
                     Dictionary<string, ExpressionSymbol> symbolTableL2,
                     Dictionary<string, string> reverseSymbolTableL2)
                 {
+                    #region Contracts
                     Contract.RequiresNotNullOrWhitespacePrivate(
                         openParenthesisL2,
                         nameof(openParenthesisL2));
@@ -170,6 +156,7 @@ namespace IX.Math.Generators
                     Contract.RequiresNotNullPrivate(
                         in reverseSymbolTableL2,
                         nameof(reverseSymbolTableL2));
+                    #endregion
 
                     if (string.IsNullOrWhiteSpace(source))
                     {

@@ -4,6 +4,7 @@
 
 using System.Diagnostics;
 using System.Linq.Expressions;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
 {
@@ -11,28 +12,24 @@ namespace IX.Math.Nodes.Constants
     /// A string node. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="ConstantNodeBase" />
-    [DebuggerDisplay("{Value}")]
+    [DebuggerDisplay("{" + nameof(Value) + "}")]
+    [PublicAPI]
     public sealed class StringNode : ConstantNodeBase
     {
-        /// <summary>
-        /// The value.
-        /// </summary>
-        private readonly string value;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="StringNode"/> class.
         /// </summary>
         /// <param name="value">The value.</param>
-        public StringNode(string value)
+        public StringNode([NotNull] string value)
         {
-            this.value = value;
+            this.Value = value;
         }
 
         /// <summary>
         /// Gets the value.
         /// </summary>
         /// <value>The value.</value>
-        public string Value => this.value;
+        public string Value { get; }
 
         /// <summary>
         /// Gets the return type of this node.
@@ -44,7 +41,7 @@ namespace IX.Math.Nodes.Constants
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>The expression.</returns>
-        public override Expression GenerateCachedExpression() => Expression.Constant(this.value, typeof(string));
+        public override Expression GenerateCachedExpression() => Expression.Constant(this.Value, typeof(string));
 
         /// <summary>
         /// Generates the expression that will be compiled into code as a string expression.
@@ -56,7 +53,7 @@ namespace IX.Math.Nodes.Constants
         /// Distills the value into a usable constant.
         /// </summary>
         /// <returns>A usable constant.</returns>
-        public override object DistillValue() => this.value;
+        public override object DistillValue() => this.Value;
 
         /// <summary>
         /// Creates a deep clone of the source object.

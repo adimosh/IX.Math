@@ -41,7 +41,7 @@ namespace IX.Math
         /// Initializes a new instance of the <see cref="CachedExpressionParsingService"/> class.
         /// </summary>
         /// <param name="definition">The math definition to use.</param>
-        public CachedExpressionParsingService(MathDefinition definition)
+        public CachedExpressionParsingService([NotNull] MathDefinition definition)
         {
             this.eps = new ExpressionParsingService(definition);
 

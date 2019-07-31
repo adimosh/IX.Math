@@ -37,9 +37,12 @@ namespace IX.UnitTests.IX.Math
         {
             new object[]
             {
-                "trimbody(\"abcde\", \"c\")",
-                null,
-                "abde"
+                "!x",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 32768,
+                },
+                -32769L,
             }
         };
 
@@ -63,11 +66,6 @@ namespace IX.UnitTests.IX.Math
             {
                 using (ComputedExpression del = service.Interpret(expression))
                 {
-                    if (del == null)
-                    {
-                        throw new InvalidOperationException("No computed expression was generated!");
-                    }
-
                     object result = del.Compute(parameters?.Values.ToArray() ?? new object[0]);
 
                     Assert.Equal(
@@ -99,11 +97,6 @@ namespace IX.UnitTests.IX.Math
 
                 using (ComputedExpression del = service.Interpret(expression))
                 {
-                    if (del == null)
-                    {
-                        throw new InvalidOperationException("No computed expression was generated!");
-                    }
-
                     if (parameters != null)
                     {
                         foreach (KeyValuePair<string, object> parameter in parameters)
@@ -224,11 +217,6 @@ namespace IX.UnitTests.IX.Math
 
                 using (ComputedExpression del = service.Interpret(expression))
                 {
-                    if (del == null)
-                    {
-                        throw new InvalidOperationException("No computed expression was generated!");
-                    }
-
                     if (parameters != null)
                     {
                         foreach (KeyValuePair<string, object> parameter in parameters)
@@ -321,10 +309,6 @@ namespace IX.UnitTests.IX.Math
                 var finder = new Mock<IDataFinder>(MockBehavior.Loose);
 
                 ComputedExpression del = this.fixture.Service.Interpret(expression);
-                if (del == null)
-                {
-                    throw new InvalidOperationException("No computed expression was generated!");
-                }
 
                 if (parameters != null)
                 {

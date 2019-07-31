@@ -1,4 +1,4 @@
-// <copyright file="FunctionNodeStringLength.cs" company="Adrian Mos">
+// <copyright file="FunctionNodeLength.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -12,11 +12,11 @@ using JetBrains.Annotations;
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
     [DebuggerDisplay("strlen({" + nameof(Parameter) + "})")]
-    [CallableMathematicsFunction("strlen")]
+    [CallableMathematicsFunction("length")]
     [UsedImplicitly]
-    internal sealed class FunctionNodeStringLength : UnaryFunctionNodeBase
+    internal sealed class FunctionNodeLength : UnaryFunctionNodeBase
     {
-        public FunctionNodeStringLength([NotNull] NodeBase parameter)
+        public FunctionNodeLength(NodeBase parameter)
             : base(parameter)
         {
         }

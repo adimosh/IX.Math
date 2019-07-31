@@ -6,6 +6,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.StandardExtensions;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes
 {
@@ -13,6 +14,7 @@ namespace IX.Math.Nodes
     /// A base class for a function that takes two parameters.
     /// </summary>
     /// <seealso cref="FunctionNodeBase" />
+    [PublicAPI]
     public abstract class BinaryFunctionNodeBase : FunctionNodeBase
     {
         /// <summary>
@@ -120,6 +122,45 @@ namespace IX.Math.Nodes
             if (e2.Type != secondParameterType)
             {
                 e2 = Expression.Convert(e2, secondParameterType);
+            }
+
+            return Expression.Call(mi, e1, e2);
+        }
+
+        /// <summary>
+        /// Generates a static binary function call with explicit parameter types.
+        /// </summary>
+        /// <typeparam name="TParam1">The type of the first parameter.</typeparam>
+        /// <typeparam name="TParam2">The type of the second parameter.</typeparam>
+        /// <param name="t">The type to call on.</param>
+        /// <param name="functionName">Name of the function.</param>
+        /// <returns>
+        /// The generated binary method call expression.
+        /// </returns>
+        /// <exception cref="ArgumentException">The function name is invalid.</exception>
+        protected Expression GenerateStaticBinaryFunctionCall<TParam1, TParam2>(Type t, string functionName)
+        {
+            if (string.IsNullOrWhiteSpace(functionName))
+            {
+                throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+            }
+
+            Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
+            Type secondParameterType = ParameterTypeFromParameter(this.SecondParameter);
+
+            MethodInfo mi = t.GetMethodWithExactParameters(functionName, typeof(TParam1), typeof(TParam2));
+
+            Expression e1 = this.FirstParameter.GenerateExpression();
+            Expression e2 = this.SecondParameter.GenerateExpression();
+
+            if (e1.Type != firstParameterType)
+            {
+                e1 = Expression.Convert(e1, typeof(TParam1));
+            }
+
+            if (e2.Type != secondParameterType)
+            {
+                e2 = Expression.Convert(e2, typeof(TParam2));
             }
 
             return Expression.Call(mi, e1, e2);

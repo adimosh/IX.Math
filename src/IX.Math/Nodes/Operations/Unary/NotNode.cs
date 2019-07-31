@@ -5,53 +5,40 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Unary
 {
-    [DebuggerDisplay("!{Operand}")]
+    [DebuggerDisplay("!{" + nameof(Operand) + "}")]
     internal sealed class NotNode : UnaryOperatorNodeBase
     {
-        public NotNode(NumericNode operand)
-            : base(operand)
+        public NotNode([NotNull] NodeBase operand)
+            : base(operand.Simplify())
         {
-        }
-
-        public NotNode(BoolNode operand)
-            : base(operand)
-        {
-        }
-
-        public NotNode(ParameterNode operand)
-            : base(operand)
-        {
-            if (operand.ReturnType == SupportedValueType.Numeric || operand.ReturnType == SupportedValueType.Unknown)
+            if (operand is ParameterNode op)
             {
-                operand.DetermineInteger();
-            }
-            else if (operand.ReturnType == SupportedValueType.Boolean)
-            {
+                op.LimitPossibleType(SupportableValueType.Boolean | SupportableValueType.Numeric);
+                if (op.ReturnType == SupportedValueType.Numeric || op.ReturnType == SupportedValueType.Unknown)
+                {
+                    // If this is or can be a number, it has to be an integer number, as we cannot binary-negate a floating point expression
+                    op.DetermineInteger();
+                }
+                else if (operand.ReturnType != SupportedValueType.Boolean)
+                {
+                    throw new ExpressionNotValidLogicallyException();
+                }
             }
             else
             {
-                throw new ExpressionNotValidLogicallyException();
+                if (operand.ReturnType != SupportedValueType.Numeric &&
+                    operand.ReturnType != SupportedValueType.Boolean)
+                {
+                    throw new ExpressionNotValidLogicallyException();
+                }
             }
         }
 
-        public NotNode(OperationNodeBase operand)
-            : base(operand)
-        {
-            if (operand?.ReturnType != SupportedValueType.Numeric && operand?.ReturnType != SupportedValueType.Boolean)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-        }
-
-        private NotNode(NodeBase operand)
-            : base(operand)
-        {
-        }
-
-        public override SupportedValueType ReturnType => this.Operand?.ReturnType ?? SupportedValueType.Unknown;
+        public override SupportedValueType ReturnType => this.Operand.ReturnType;
 
         public override NodeBase Simplify()
         {
