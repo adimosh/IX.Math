@@ -37,12 +37,12 @@ namespace IX.UnitTests.IX.Math
         {
             new object[]
             {
-                "!x",
+                "x*(x+1)*(x+2)",
                 new Dictionary<string, object>
                 {
-                    ["x"] = 32768,
+                    ["x"] = 5,
                 },
-                -32769L,
+                210D,
             }
         };
 

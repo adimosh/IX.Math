@@ -44,18 +44,24 @@ namespace IX.Math.Nodes
         /// Strongly determines the node's type, if possible.
         /// </summary>
         /// <param name="type">The type to determine to.</param>
-        /// <remarks>This method does nothing, as it is impossible to determine a constant.</remarks>
         public sealed override void DetermineStrongly(SupportedValueType type)
         {
+            if (type != this.ReturnType)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
         }
 
         /// <summary>
         /// Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible type left.
         /// </summary>
         /// <param name="type">The type or types to determine to.</param>
-        /// <remarks>This method does nothing, as it is impossible to determine a constant.</remarks>
         public sealed override void DetermineWeakly(SupportableValueType type)
         {
+            if ((type & (SupportableValueType)(int)this.ReturnType) == 0)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ using IX.StandardExtensions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
-    [DebuggerDisplay("{Left} + {Right}")]
+    [DebuggerDisplay("{" + nameof(Left) + "} + {" + nameof(Right) + "}")]
     internal sealed class AddNode : BinaryOperationNodeBase
     {
         public AddNode(
@@ -160,18 +160,18 @@ namespace IX.Math.Nodes.Operations.Binary
                 case SupportedValueType.Boolean:
                     throw new ExpressionNotValidLogicallyException();
                 case SupportedValueType.ByteArray:
-                    {
-                        this.Left.DetermineStrongly(SupportedValueType.ByteArray);
-                        this.Right.DetermineStrongly(SupportedValueType.ByteArray);
-                    }
+                {
+                    this.Left.DetermineStrongly(SupportedValueType.ByteArray);
+                    this.Right.DetermineStrongly(SupportedValueType.ByteArray);
+                }
 
                     break;
 
                 case SupportedValueType.Numeric:
-                    {
-                        this.Left.DetermineStrongly(SupportedValueType.Numeric);
-                        this.Right.DetermineStrongly(SupportedValueType.Numeric);
-                    }
+                {
+                    this.Left.DetermineStrongly(SupportedValueType.Numeric);
+                    this.Right.DetermineStrongly(SupportedValueType.Numeric);
+                }
 
                     break;
             }
@@ -221,7 +221,8 @@ namespace IX.Math.Nodes.Operations.Binary
             switch (left.ReturnType)
             {
                 case SupportedValueType.Numeric:
-                    if (right.ReturnType != SupportedValueType.Numeric && right.ReturnType != SupportedValueType.String)
+                    if (right.ReturnType != SupportedValueType.Numeric &&
+                        right.ReturnType != SupportedValueType.String && right.ReturnType != SupportedValueType.Unknown)
                     {
                         throw new ExpressionNotValidLogicallyException();
                     }
@@ -238,7 +239,7 @@ namespace IX.Math.Nodes.Operations.Binary
 
                 case SupportedValueType.ByteArray:
                     if (right.ReturnType != SupportedValueType.ByteArray &&
-                        right.ReturnType != SupportedValueType.String)
+                        right.ReturnType != SupportedValueType.String && right.ReturnType != SupportedValueType.Unknown)
                     {
                         throw new ExpressionNotValidLogicallyException();
                     }
@@ -253,7 +254,8 @@ namespace IX.Math.Nodes.Operations.Binary
             switch (right.ReturnType)
             {
                 case SupportedValueType.Numeric:
-                    if (left.ReturnType != SupportedValueType.Numeric && left.ReturnType != SupportedValueType.String)
+                    if (left.ReturnType != SupportedValueType.Numeric && left.ReturnType != SupportedValueType.String &&
+                        left.ReturnType != SupportedValueType.Unknown)
                     {
                         throw new ExpressionNotValidLogicallyException();
                     }
@@ -269,7 +271,8 @@ namespace IX.Math.Nodes.Operations.Binary
                     break;
 
                 case SupportedValueType.ByteArray:
-                    if (left.ReturnType != SupportedValueType.ByteArray && left.ReturnType != SupportedValueType.String)
+                    if (left.ReturnType != SupportedValueType.ByteArray &&
+                        left.ReturnType != SupportedValueType.String && left.ReturnType != SupportedValueType.Unknown)
                     {
                         throw new ExpressionNotValidLogicallyException();
                     }
