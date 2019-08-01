@@ -13,24 +13,36 @@ namespace IX.Math.Nodes.Operations.Binary
 
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
-        protected override void EnsureCompatibleOperands(ref NodeBase left, ref NodeBase right)
+        /// <summary>
+        /// Strongly determines the node's type, if possible.
+        /// </summary>
+        /// <param name="type">The type to determine to.</param>
+        public override void DetermineStrongly(SupportedValueType type)
         {
-            if (left is ParameterNode uLeft)
-            {
-                left = uLeft.DetermineNumeric();
-            }
-
-            if (right is ParameterNode uRight)
-            {
-                right = uRight.DetermineNumeric();
-            }
-
-            if (left.ReturnType != SupportedValueType.Numeric && left.ReturnType != SupportedValueType.Unknown)
+            if (type != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException();
             }
+        }
 
-            if (right.ReturnType != SupportedValueType.Numeric && right.ReturnType != SupportedValueType.Unknown)
+        /// <summary>
+        /// Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        public override void DetermineWeakly(SupportableValueType type)
+        {
+            if ((type & SupportableValueType.Numeric) == 0)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        protected override void EnsureCompatibleOperands(NodeBase left, NodeBase right)
+        {
+            left.DetermineStrongly(SupportedValueType.Numeric);
+            right.DetermineStrongly(SupportedValueType.Numeric);
+
+            if (left.ReturnType != SupportedValueType.Numeric || right.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException();
             }

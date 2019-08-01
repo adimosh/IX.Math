@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
-    [DebuggerDisplay("trim({Parameter})")]
+    [DebuggerDisplay("trim({" + nameof(Parameter) + "})")]
     [CallableMathematicsFunction("trim")]
     [UsedImplicitly]
     internal sealed class FunctionNodeTrim : UnaryFunctionNodeBase
@@ -35,12 +35,34 @@ namespace IX.Math.Nodes.Operations.Function.Unary
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new FunctionNodeTrim(this.Parameter.DeepClone(context));
 
-        protected override void EnsureCompatibleParameter(ref NodeBase parameter)
+        /// <summary>
+        ///     Strongly determines the node's type, if possible.
+        /// </summary>
+        /// <param name="type">The type to determine to.</param>
+        public override void DetermineStrongly(SupportedValueType type)
         {
-            if (parameter is ParameterNode upn)
+            if (type != SupportedValueType.String)
             {
-                parameter = upn.DetermineString();
+                throw new ExpressionNotValidLogicallyException();
             }
+        }
+
+        /// <summary>
+        ///     Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible
+        ///     type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        public override void DetermineWeakly(SupportableValueType type)
+        {
+            if ((type & SupportableValueType.String) == 0)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        protected override void EnsureCompatibleParameter(NodeBase parameter)
+        {
+            parameter.DetermineStrongly(SupportedValueType.String);
 
             if (parameter.ReturnType != SupportedValueType.String)
             {

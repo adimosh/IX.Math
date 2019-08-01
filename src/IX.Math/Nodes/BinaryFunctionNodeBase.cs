@@ -34,7 +34,7 @@ namespace IX.Math.Nodes
             NodeBase secondParameterTemp = secondParameter ?? throw new ArgumentNullException(nameof(secondParameter));
 
             // ReSharper disable once VirtualMemberCallInConstructor
-            this.EnsureCompatibleParameters(ref firstParameter, ref secondParameter);
+            this.EnsureCompatibleParameters(firstParameter, secondParameter);
 
             this.FirstParameter = firstParameterTemp.Simplify();
             this.SecondParameter = secondParameterTemp.Simplify();
@@ -57,7 +57,7 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
-        protected abstract void EnsureCompatibleParameters(ref NodeBase firstParameter, ref NodeBase secondParameter);
+        protected abstract void EnsureCompatibleParameters(NodeBase firstParameter, NodeBase secondParameter);
 
         /// <summary>
         /// Generates a static binary function call expression.

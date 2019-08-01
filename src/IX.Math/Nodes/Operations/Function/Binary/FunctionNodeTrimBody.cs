@@ -25,33 +25,33 @@ namespace IX.Math.Nodes.Operations.Function.Binary
                 stringParameter?.Simplify(),
                 numericParameter?.Simplify())
         {
-            if (stringParameter is ParameterNode sp)
-            {
-                sp.DetermineString();
-            }
-
-            if (numericParameter is ParameterNode np)
-            {
-                np.DetermineString();
-            }
-
-            if (stringParameter?.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-
-            if (numericParameter?.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
         }
 
+        /// <summary>
+        ///     Gets the return type of this node.
+        /// </summary>
+        /// <value>
+        ///     The node return type.
+        /// </value>
         public override SupportedValueType ReturnType => SupportedValueType.String;
 
+        /// <summary>
+        ///     Creates a deep clone of the source object.
+        /// </summary>
+        /// <param name="context">The deep cloning context.</param>
+        /// <returns>
+        ///     A deep clone.
+        /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeTrimBody(
             this.FirstParameter.DeepClone(context),
             this.SecondParameter.DeepClone(context));
 
+        /// <summary>
+        ///     Simplifies this node, if possible, reflexively returns otherwise.
+        /// </summary>
+        /// <returns>
+        ///     A simplified node, or this instance.
+        /// </returns>
         public override NodeBase Simplify() =>
             this.FirstParameter is StringNode stringParam && this.SecondParameter is StringNode charParam
                 ? new StringNode(
@@ -60,13 +60,58 @@ namespace IX.Math.Nodes.Operations.Function.Binary
                         string.Empty))
                 : (NodeBase)this;
 
-        protected override void EnsureCompatibleParameters(
-            ref NodeBase firstParameter,
-            ref NodeBase secondParameter)
+        /// <summary>
+        ///     Strongly determines the node's type, if possible.
+        /// </summary>
+        /// <param name="type">The type to determine to.</param>
+        public override void DetermineStrongly(SupportedValueType type)
         {
-            // Nothing needs to be done here
+            if (type != SupportedValueType.String)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
         }
 
+        /// <summary>
+        ///     Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible
+        ///     type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        public override void DetermineWeakly(SupportableValueType type)
+        {
+            if ((type & SupportableValueType.String) == 0)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        /// <summary>
+        ///     Ensures that the parameters that are received are compatible with the function, optionally allowing the parameter
+        ///     references to change.
+        /// </summary>
+        /// <param name="firstParameter">The first parameter.</param>
+        /// <param name="secondParameter">The second parameter.</param>
+        /// <exception cref="ExpressionNotValidLogicallyException">The expression is not valid, as its parameters are not strings.</exception>
+        protected override void EnsureCompatibleParameters(
+            NodeBase firstParameter,
+            NodeBase secondParameter)
+        {
+            firstParameter.DetermineStrongly(SupportedValueType.String);
+            secondParameter.DetermineStrongly(SupportedValueType.String);
+
+            if (firstParameter.ReturnType != SupportedValueType.String ||
+                secondParameter.ReturnType != SupportedValueType.String)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        /// <summary>
+        ///     Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <returns>
+        ///     The expression.
+        /// </returns>
         protected override Expression GenerateExpressionInternal()
         {
             MethodInfo mi = typeof(string).GetMethodWithExactParameters(

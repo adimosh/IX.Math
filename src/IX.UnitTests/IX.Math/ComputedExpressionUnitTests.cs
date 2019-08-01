@@ -1456,6 +1456,29 @@ namespace IX.UnitTests.IX.Math
                 },
                 false
             },
+            new object[]
+            {
+                "0b10010101+0b11010110",
+                null,
+                new byte[]
+                {
+                    0b10010101,
+                    0b11010110
+                }
+            },
+            new object[]
+            {
+                "0b10010101+x",
+                new Dictionary<string, object>
+                {
+                    ["x"] = (byte)0b10010101
+                },
+                new byte[]
+                {
+                    0b10010101,
+                    0b11010110
+                }
+            }
         };
 
         private static object GenerateFuncOutOfParameterValue(object tempParameter)

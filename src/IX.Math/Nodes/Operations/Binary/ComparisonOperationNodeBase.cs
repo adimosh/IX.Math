@@ -6,60 +6,74 @@ namespace IX.Math.Nodes.Operations.Binary
 {
     internal abstract class ComparisonOperationNodeBase : BinaryOperationNodeBase
     {
-        protected ComparisonOperationNodeBase(NodeBase left, NodeBase right)
-            : base(left, right)
+        protected ComparisonOperationNodeBase(
+            NodeBase left,
+            NodeBase right)
+            : base(
+                left,
+                right)
         {
         }
 
         public override SupportedValueType ReturnType => SupportedValueType.Boolean;
 
-        protected override void EnsureCompatibleOperands(ref NodeBase left, ref NodeBase right)
+        private static void DetermineChildren(
+            NodeBase parameter,
+            NodeBase other)
         {
-            if (left is ParameterNode uLeft)
+            if (other.ReturnType == SupportedValueType.Unknown)
             {
-                switch (right.ReturnType)
-                {
-                    case SupportedValueType.Boolean:
-                        left = uLeft.DetermineBoolean();
-                        break;
-                    case SupportedValueType.ByteArray:
-                        left = uLeft.DetermineByteArray();
-                        break;
-                    case SupportedValueType.Numeric:
-                        left = uLeft.DetermineNumeric();
-                        break;
-                    case SupportedValueType.String:
-                        left = uLeft.DetermineString();
-                        break;
-                    case SupportedValueType.Unknown:
-                        break;
-                    default:
-                        throw new ExpressionNotValidLogicallyException();
-                }
+                return;
             }
 
-            if (right is ParameterNode uRight)
-            {
-                switch (left.ReturnType)
-                {
-                    case SupportedValueType.Boolean:
-                        right = uRight.DetermineBoolean();
-                        break;
-                    case SupportedValueType.ByteArray:
-                        right = uRight.DetermineByteArray();
-                        break;
-                    case SupportedValueType.Numeric:
-                        right = uRight.DetermineNumeric();
-                        break;
-                    case SupportedValueType.String:
-                        right = uRight.DetermineString();
-                        break;
-                    case SupportedValueType.Unknown:
-                        break;
-                    default:
-                        throw new ExpressionNotValidLogicallyException();
-                }
-            }
+            parameter.DetermineStrongly(other.ReturnType);
+        }
+
+        /// <summary>
+        ///     Strongly determines the node's type, if possible.
+        /// </summary>
+        /// <param name="type">The type to determine to.</param>
+        public override void DetermineStrongly(SupportedValueType type)
+        {
+            this.Left.DetermineStrongly(type);
+            this.Right.DetermineStrongly(type);
+
+            this.EnsureCompatibleOperands(
+                this.Left,
+                this.Right);
+        }
+
+        /// <summary>
+        ///     Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible
+        ///     type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        public override void DetermineWeakly(SupportableValueType type)
+        {
+            this.Left.DetermineWeakly(type);
+            this.Right.DetermineWeakly(type);
+
+            this.EnsureCompatibleOperands(
+                this.Left,
+                this.Right);
+        }
+
+        protected override void EnsureCompatibleOperands(
+            NodeBase left,
+            NodeBase right)
+        {
+            DetermineChildren(
+                left,
+                right);
+            DetermineChildren(
+                right,
+                left);
+            DetermineChildren(
+                left,
+                right);
+            DetermineChildren(
+                right,
+                left);
 
             if (left.ReturnType != right.ReturnType)
             {

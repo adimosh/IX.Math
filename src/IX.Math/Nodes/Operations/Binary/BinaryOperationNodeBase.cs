@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Binary
             NodeBase leftTemp = left ?? throw new ArgumentNullException(nameof(left));
             NodeBase rightTemp = right ?? throw new ArgumentNullException(nameof(right));
 
-            this.EnsureCompatibleOperands(ref leftTemp, ref rightTemp);
+            this.EnsureCompatibleOperands(leftTemp, rightTemp);
 
             this.Left = leftTemp.Simplify();
             this.Right = rightTemp.Simplify();
@@ -24,7 +24,7 @@ namespace IX.Math.Nodes.Operations.Binary
 
         public NodeBase Right { get; protected set; }
 
-        protected abstract void EnsureCompatibleOperands(ref NodeBase left, ref NodeBase right);
+        protected abstract void EnsureCompatibleOperands(NodeBase left, NodeBase right);
 
         protected Tuple<Expression, Expression> GetExpressionsOfSameTypeFromOperands()
         {
@@ -40,7 +40,8 @@ namespace IX.Math.Nodes.Operations.Binary
             {
                 return new Tuple<Expression, Expression>(le, Expression.Convert(re, typeof(double)));
             }
-            else if (le.Type == typeof(long) && re.Type == typeof(double))
+
+            if (le.Type == typeof(long) && re.Type == typeof(double))
             {
                 return new Tuple<Expression, Expression>(Expression.Convert(le, typeof(double)), re);
             }

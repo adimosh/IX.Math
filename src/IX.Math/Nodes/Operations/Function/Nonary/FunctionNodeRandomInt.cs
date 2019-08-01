@@ -23,6 +23,31 @@ namespace IX.Math.Nodes.Operations.Function.Nonary
 
         public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeRandomInt();
 
+        /// <summary>
+        ///     Strongly determines the node's type, if possible.
+        /// </summary>
+        /// <param name="type">The type to determine to.</param>
+        public override void DetermineStrongly(SupportedValueType type)
+        {
+            if (type != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        /// <summary>
+        ///     Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible
+        ///     type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        public override void DetermineWeakly(SupportableValueType type)
+        {
+            if ((type & SupportableValueType.Numeric) == 0)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
         protected override Expression GenerateExpressionInternal() => this.GenerateStaticNonaryFunctionCall<FunctionNodeRandomInt>(nameof(GenerateRandom));
     }
 }

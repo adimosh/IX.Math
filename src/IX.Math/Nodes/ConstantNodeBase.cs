@@ -3,6 +3,7 @@
 // </copyright>
 
 using JetBrains.Annotations;
+using NotImplementedException = System.NotImplementedException;
 
 namespace IX.Math.Nodes
 {
@@ -38,5 +39,23 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <returns>A reflexive return.</returns>
         public sealed override NodeBase Simplify() => this;
+
+        /// <summary>
+        /// Strongly determines the node's type, if possible.
+        /// </summary>
+        /// <param name="type">The type to determine to.</param>
+        /// <remarks>This method does nothing, as it is impossible to determine a constant.</remarks>
+        public sealed override void DetermineStrongly(SupportedValueType type)
+        {
+        }
+
+        /// <summary>
+        /// Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        /// <remarks>This method does nothing, as it is impossible to determine a constant.</remarks>
+        public sealed override void DetermineWeakly(SupportableValueType type)
+        {
+        }
     }
 }

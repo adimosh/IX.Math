@@ -15,10 +15,7 @@ namespace IX.Math.Nodes.Operations.Unary
         public SubtractNode([NotNull] NodeBase operand)
             : base(operand.Simplify())
         {
-            if (operand is ParameterNode po)
-            {
-                po.DetermineNumeric();
-            }
+            operand.DetermineStrongly(SupportedValueType.Numeric);
 
             if (operand.ReturnType != SupportedValueType.Numeric)
             {
@@ -40,6 +37,30 @@ namespace IX.Math.Nodes.Operations.Unary
         }
 
         /// <summary>
+        /// Strongly determines the node's type, if possible.
+        /// </summary>
+        /// <param name="type">The type to determine to.</param>
+        public override void DetermineStrongly(SupportedValueType type)
+        {
+            if (type != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        /// <summary>
+        /// Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        public override void DetermineWeakly(SupportableValueType type)
+        {
+            if ((type & SupportableValueType.Numeric) == 0)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        /// <summary>
         /// Creates a deep clone of the source object.
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
@@ -47,7 +68,7 @@ namespace IX.Math.Nodes.Operations.Unary
         public override NodeBase DeepClone(NodeCloningContext context) => new SubtractNode(this.Operand.DeepClone(context));
 
 #pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - This is desired
-        protected override Expression GenerateExpressionInternal() => Expression.Subtract(Expression.Constant(0, typeof(long)), this.Operand.GenerateExpression());
+        protected override Expression GenerateExpressionInternal() => Expression.Subtract(Expression.Constant(0L, typeof(long)), this.Operand.GenerateExpression());
 #pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
     }
 }
