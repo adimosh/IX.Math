@@ -75,12 +75,17 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             NodeBase secondParameter)
         {
             firstParameter.DetermineStrongly(SupportedValueType.String);
-            secondParameter.DetermineStrongly(SupportedValueType.String);
+            secondParameter.DetermineStrongly(SupportedValueType.Numeric);
 
             if (firstParameter.ReturnType != SupportedValueType.String ||
-                secondParameter.ReturnType != SupportedValueType.String)
+                secondParameter.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException();
+            }
+
+            if (secondParameter is ParameterNode pn)
+            {
+                pn.DetermineInteger();
             }
         }
 

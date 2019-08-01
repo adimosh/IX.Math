@@ -35,12 +35,10 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <param name="type">The type to determine to.</param>
         public override void DetermineStrongly(SupportedValueType type)
         {
-            this.Left.DetermineStrongly(type);
-            this.Right.DetermineStrongly(type);
-
-            this.EnsureCompatibleOperands(
-                this.Left,
-                this.Right);
+            if (type != SupportedValueType.Boolean)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
         }
 
         /// <summary>
@@ -50,12 +48,10 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <param name="type">The type or types to determine to.</param>
         public override void DetermineWeakly(SupportableValueType type)
         {
-            this.Left.DetermineWeakly(type);
-            this.Right.DetermineWeakly(type);
-
-            this.EnsureCompatibleOperands(
-                this.Left,
-                this.Right);
+            if ((type & SupportableValueType.Boolean) == 0)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
         }
 
         protected override void EnsureCompatibleOperands(
