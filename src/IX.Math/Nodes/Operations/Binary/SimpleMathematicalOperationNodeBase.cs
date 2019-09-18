@@ -2,6 +2,8 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Linq.Expressions;
+
 namespace IX.Math.Nodes.Operations.Binary
 {
     internal abstract class SimpleMathematicalOperationNodeBase : BinaryOperationNodeBase
@@ -45,6 +47,46 @@ namespace IX.Math.Nodes.Operations.Binary
             if (left.ReturnType != SupportedValueType.Numeric || right.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        protected void EnsureCompatibleNumericExpressions(
+            ref Expression left,
+            ref Expression right)
+        {
+            if (left.Type == right.Type)
+            {
+                return;
+            }
+
+            if (left.Type == typeof(double))
+            {
+                right = Expression.Convert(
+                    right,
+                    typeof(double));
+                return;
+            }
+
+            if (right.Type == typeof(double))
+            {
+                left = Expression.Convert(
+                    left,
+                    typeof(double));
+                return;
+            }
+
+            if (left.Type != typeof(long))
+            {
+                right = Expression.Convert(
+                    right,
+                    typeof(long));
+            }
+
+            if (right.Type != typeof(long))
+            {
+                left = Expression.Convert(
+                    left,
+                    typeof(long));
             }
         }
     }

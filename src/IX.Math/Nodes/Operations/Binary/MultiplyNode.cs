@@ -33,7 +33,16 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) => new MultiplyNode(this.Left.DeepClone(context), this.Right.DeepClone(context));
 
-        protected override Expression GenerateExpressionInternal() =>
-            Expression.Multiply(Expression.Convert(this.Left.GenerateExpression(), typeof(double)), Expression.Convert(this.Right.GenerateExpression(), typeof(double)));
+        protected override Expression GenerateExpressionInternal()
+        {
+            var left = this.Left.GenerateExpression();
+            var right = this.Right.GenerateExpression();
+
+            this.EnsureCompatibleNumericExpressions(ref left, ref right);
+
+            return Expression.Multiply(
+                left,
+                right);
+        }
     }
 }

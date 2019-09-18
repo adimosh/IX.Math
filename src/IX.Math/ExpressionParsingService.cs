@@ -45,36 +45,7 @@ namespace IX.Math
         ///     object.
         /// </summary>
         public ExpressionParsingService()
-            : this(
-                new MathDefinition
-                {
-                    Parentheses = new Tuple<string, string>(
-                        "(",
-                        ")"),
-                    SpecialSymbolIndicators = new Tuple<string, string>(
-                        "[",
-                        "]"),
-                    StringIndicator = "\"",
-                    ParameterSeparator = ",",
-                    AddSymbol = "+",
-                    AndSymbol = "&",
-                    DivideSymbol = "/",
-                    NotEqualsSymbol = "!=",
-                    EqualsSymbol = "=",
-                    MultiplySymbol = "*",
-                    NotSymbol = "!",
-                    OrSymbol = "|",
-                    PowerSymbol = "^",
-                    SubtractSymbol = "-",
-                    XorSymbol = "#",
-                    GreaterThanOrEqualSymbol = ">=",
-                    GreaterThanSymbol = ">",
-                    LessThanOrEqualSymbol = "<=",
-                    LessThanSymbol = "<",
-                    RightShiftSymbol = ">>",
-                    LeftShiftSymbol = "<<",
-                    OperatorPrecedenceStyle = OperatorPrecedenceStyle.Mathematical
-                })
+            : this(MathDefinition.Default)
         {
         }
 
@@ -201,74 +172,44 @@ namespace IX.Math
                 bldr.Add($"{function.Key}()");
             }
 
-            foreach (KeyValuePair<string, Type> function in this.unaryFunctions)
-            {
-                foreach (ConstructorInfo constructor in function.Value.GetTypeInfo().DeclaredConstructors.ToArray())
-                {
-                    ParameterInfo[] parameters = constructor.GetParameters();
+            (from KeyValuePair<string, Type> function in this.unaryFunctions
+                from ConstructorInfo constructor in function.Value.GetTypeInfo().DeclaredConstructors
+                let parameters = constructor.GetParameters()
+                where parameters.Length == 1
+                let parameterName = parameters[0].Name
+                where parameterName != null
+                let functionName = function.Key
+                select (functionName, parameterName)).ForEach(
+                (
+                    parameter,
+                    bldrL1) => bldrL1.Add($"{parameter.functionName}({parameter.parameterName})"), bldr);
 
-                    if (parameters.Length != 1)
-                    {
-                        continue;
-                    }
+            (from KeyValuePair<string, Type> function in this.binaryFunctions
+                from ConstructorInfo constructor in function.Value.GetTypeInfo().DeclaredConstructors
+                let parameters = constructor.GetParameters()
+                where parameters.Length == 2
+                let parameterNameLeft = parameters[0].Name
+                let parameterNameRight = parameters[1].Name
+                where parameterNameLeft != null && parameterNameRight != null
+                let functionName = function.Key
+                select (functionName, parameterNameLeft, parameterNameRight)).ForEach(
+                (
+                    parameter,
+                    bldrL1) => bldrL1.Add($"{parameter.functionName}({parameter.parameterNameLeft}, {parameter.parameterNameRight})"), bldr);
 
-                    var parameterName = parameters[0].Name;
-
-                    if (parameterName == null)
-                    {
-                        continue;
-                    }
-
-                    bldr.Add($"{function.Key}({parameterName})");
-                }
-            }
-
-            foreach (KeyValuePair<string, Type> function in this.binaryFunctions)
-            {
-                foreach (ConstructorInfo constructor in function.Value.GetTypeInfo().DeclaredConstructors.ToArray())
-                {
-                    ParameterInfo[] parameters = constructor.GetParameters();
-
-                    if (parameters.Length != 2)
-                    {
-                        continue;
-                    }
-
-                    var parameterNameLeft = parameters[0].Name;
-                    var parameterNameRight = parameters[1].Name;
-
-                    if (parameterNameLeft == null || parameterNameRight == null)
-                    {
-                        continue;
-                    }
-
-                    bldr.Add($"{function.Key}({parameterNameLeft}, {parameterNameRight})");
-                }
-            }
-
-            foreach (KeyValuePair<string, Type> function in this.ternaryFunctions)
-            {
-                foreach (ConstructorInfo constructor in function.Value.GetTypeInfo().DeclaredConstructors.ToArray())
-                {
-                    ParameterInfo[] parameters = constructor.GetParameters();
-
-                    if (parameters.Length != 3)
-                    {
-                        continue;
-                    }
-
-                    var parameterNameLeft = parameters[0].Name;
-                    var parameterNameMiddle = parameters[1].Name;
-                    var parameterNameRight = parameters[2].Name;
-
-                    if (parameterNameLeft == null || parameterNameMiddle == null || parameterNameRight == null)
-                    {
-                        continue;
-                    }
-
-                    bldr.Add($"{function.Key}({parameterNameLeft}, {parameterNameMiddle}, {parameterNameRight})");
-                }
-            }
+            (from KeyValuePair<string, Type> function in this.ternaryFunctions
+                from ConstructorInfo constructor in function.Value.GetTypeInfo().DeclaredConstructors
+                let parameters = constructor.GetParameters()
+                where parameters.Length == 3
+                let parameterNameLeft = parameters[0].Name
+                let parameterNameMiddle = parameters[1].Name
+                let parameterNameRight = parameters[2].Name
+                where parameterNameLeft != null && parameterNameMiddle != null && parameterNameRight != null
+                let functionName = function.Key
+                select (functionName, parameterNameLeft, parameterNameMiddle, parameterNameRight)).ForEach(
+                (
+                    parameter,
+                    bldrL1) => bldrL1.Add($"{parameter.functionName}({parameter.parameterNameLeft}, {parameter.parameterNameMiddle}, {parameter.parameterNameRight})"), bldr);
 
             return bldr.ToArray();
         }
@@ -366,13 +307,13 @@ namespace IX.Math
 
         private void InitializeExtractorsDictionary()
         {
-#pragma warning disable IDISP003 // Dispose previous before re-assigning. - Not necessary, as the initializer checks beforehand
-            this.constantExtractors = new LevelDictionary<Type, IConstantsExtractor>
-            {
-                { typeof(StringExtractor), new StringExtractor(), 1000 },
-                { typeof(ScientificFormatNumberExtractor), new ScientificFormatNumberExtractor(), 2000 }
-            };
-#pragma warning restore IDISP003 // Dispose previous before re-assigning.
+            Interlocked.Exchange(
+                ref this.constantExtractors,
+                new LevelDictionary<Type, IConstantsExtractor>
+                {
+                    { typeof(StringExtractor), new StringExtractor(), 1000 },
+                    { typeof(ScientificFormatNumberExtractor), new ScientificFormatNumberExtractor(), 2000 }
+                })?.Dispose();
 
             var incrementer = 2001;
             this.assembliesToRegister.GetTypesAssignableFrom<IConstantsExtractor>()
@@ -402,9 +343,9 @@ namespace IX.Math
 
         private void InitializePassThroughExtractorsDictionary()
         {
-#pragma warning disable IDISP003 // Dispose previous before re-assigning. - Not necessary, as the initializer checks beforehand
-            this.constantPassThroughExtractors = new LevelDictionary<Type, IConstantPassThroughExtractor>();
-#pragma warning restore IDISP003 // Dispose previous before re-assigning.
+            Interlocked.Exchange(
+                ref this.constantPassThroughExtractors,
+                new LevelDictionary<Type, IConstantPassThroughExtractor>())?.Dispose();
 
             var incrementer = 2001;
             this.assembliesToRegister.GetTypesAssignableFrom<IConstantPassThroughExtractor>()

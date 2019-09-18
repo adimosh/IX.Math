@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.Serialization;
+using IX.Abstractions.Logging;
 using IX.StandardExtensions;
 
 namespace IX.Math
@@ -51,6 +52,42 @@ namespace IX.Math
             this.AutoConvertStringFormatSpecifier = definition.AutoConvertStringFormatSpecifier;
             this.OperatorPrecedenceStyle = definition.OperatorPrecedenceStyle;
         }
+
+        /// <summary>
+        /// Gets a copy of the default math definition.
+        /// </summary>
+        /// <value>
+        /// The default math definition.
+        /// </value>
+        public static MathDefinition Default => new MathDefinition
+        {
+            Parentheses = new Tuple<string, string>(
+                "(",
+                ")"),
+            SpecialSymbolIndicators = new Tuple<string, string>(
+                "[",
+                "]"),
+            StringIndicator = "\"",
+            ParameterSeparator = ",",
+            AddSymbol = "+",
+            AndSymbol = "&",
+            DivideSymbol = "/",
+            NotEqualsSymbol = "!=",
+            EqualsSymbol = "=",
+            MultiplySymbol = "*",
+            NotSymbol = "!",
+            OrSymbol = "|",
+            PowerSymbol = "^",
+            SubtractSymbol = "-",
+            XorSymbol = "#",
+            GreaterThanOrEqualSymbol = ">=",
+            GreaterThanSymbol = ">",
+            LessThanOrEqualSymbol = "<=",
+            LessThanSymbol = "<",
+            RightShiftSymbol = ">>",
+            LeftShiftSymbol = "<<",
+            OperatorPrecedenceStyle = OperatorPrecedenceStyle.Mathematical
+        };
 
         /// <summary>
         /// Gets or sets what should be interpreted as parentheses.
@@ -216,6 +253,16 @@ namespace IX.Math
         public OperatorPrecedenceStyle OperatorPrecedenceStyle { get; set; }
 
         /// <summary>
+        /// Gets or sets the diagnostics logger.
+        /// </summary>
+        /// <value>
+        /// The logger.
+        /// </value>
+        /// <remarks>The logger does not serialize, and cannot be cloned. It should be used for diagnostics only.</remarks>
+        [IgnoreDataMember]
+        public ILog Logger { get; set; }
+
+        /// <summary>
         /// Creates a deep clone of the source object.
         /// </summary>
         /// <returns>A deep clone.</returns>
@@ -244,7 +291,7 @@ namespace IX.Math
                 SubtractSymbol = this.SubtractSymbol,
                 XorSymbol = this.XorSymbol,
                 AutoConvertStringFormatSpecifier = this.AutoConvertStringFormatSpecifier,
-                OperatorPrecedenceStyle = this.OperatorPrecedenceStyle,
+                OperatorPrecedenceStyle = this.OperatorPrecedenceStyle
             };
     }
 }

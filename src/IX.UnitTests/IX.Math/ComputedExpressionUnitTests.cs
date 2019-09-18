@@ -346,7 +346,7 @@ namespace IX.UnitTests.IX.Math
                 {
                     ["x"] = 12,
                 },
-                6D,
+                6L,
             },
             new object[]
             {
@@ -383,7 +383,7 @@ namespace IX.UnitTests.IX.Math
                     ["x"] = 12,
                     ["y"] = 2,
                 },
-                10D,
+                10L
             },
             new object[]
             {
@@ -393,7 +393,7 @@ namespace IX.UnitTests.IX.Math
                     ["x"] = 12,
                     ["y"] = 2,
                 },
-                10D,
+                10L,
             },
             new object[]
             {
@@ -1272,7 +1272,7 @@ namespace IX.UnitTests.IX.Math
                 {
                     ["x"] = 5,
                 },
-                210D,
+                210L,
             },
             new object[]
             {
@@ -1471,7 +1471,7 @@ namespace IX.UnitTests.IX.Math
                 "0b10010101+x",
                 new Dictionary<string, object>
                 {
-                    ["x"] = (byte)0b10010101
+                    ["x"] = new byte[] { (byte)0b11010110 }
                 },
                 new byte[]
                 {

@@ -13,7 +13,7 @@ using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
-    [DebuggerDisplay("substring({FirstParameter}, {SecondParameter})")]
+    [DebuggerDisplay("substring({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
     [CallableMathematicsFunction("substr", "substring")]
     [UsedImplicitly]
     internal sealed class FunctionNodeSubstring : BinaryFunctionNodeBase

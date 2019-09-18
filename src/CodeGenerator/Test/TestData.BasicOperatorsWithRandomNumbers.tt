@@ -1,0 +1,60 @@
+<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#@ include file="TestInitializationData.tt" #>
+// <copyright file="TestData.BasicOperatorsWithRandomNumbers.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
+using System.Collections.Generic;
+using IX.StandardExtensions.TestUtils;
+
+namespace IX.UnitTests
+{
+    /// <summary>
+    ///     Test data for IX.Math tests.
+    /// </summary>
+    public static partial class TestData
+    {
+        /// <summary>
+        ///     Provides templated random text data for basic operators and parantheses.
+        /// </summary>
+        /// <returns>Test data.</returns>
+        public static List<object[]> BasicOperatorsWithRandomNumbers()
+        {
+            // Define and initialize
+            const int limit = 1000;
+            var tests = new List<object[]>();
+            int operand1, operand2, operand3;
+
+            // Tests
+<#
+            foreach (var op in GenerateThreeFoldTestData(operators))
+            { #>
+            operand1 = DataGenerator.RandomNonNegativeInteger(limit);
+            operand2 = DataGenerator.RandomNonNegativeInteger(limit);
+            operand3 = DataGenerator.RandomNonNegativeInteger(limit);
+
+            tests.Add(new object[]
+            {
+                $"<#= op.Item2 #>",
+<# if (op.Item3 == null)
+{#>
+                null,
+<#}
+else
+{#>
+                new Dictionary<string, object> { <#= op.Item3 #> },
+<#}#>
+                <#= op.Item1 #>
+            });
+
+<# } #>
+            // Return
+            return tests;
+        }
+    }
+}

@@ -1,16 +1,20 @@
-<!--EXTERNAL_PROPERTIES: TargetFramework-->
+﻿<!--EXTERNAL_PROPERTIES: TargetFramework-->
 <!--EXTERNAL_PROPERTIES: IxDevOpsBuild-->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks Condition="'$(IxDevOpsBuild)'=='true'">net452;net46;net461;net462;net47;net471;net472;netcoreapp2.0;netcoreapp2.1;netcoreapp2.2</TargetFrameworks>
-    <TargetFrameworks Condition="'$(IxDevOpsBuild)'!='true'">net452;net46;net461;net462;net47;net471;net472;net48;netcoreapp2.0;netcoreapp2.1;netcoreapp2.2</TargetFrameworks>
+    <TargetFrameworks Condition="'$(Configuration)|$(IxDevOpsBuild)'=='Release|true'">net452;net46;net461;net462;net47;net471;net472;netcoreapp2.0;netcoreapp2.1;netcoreapp2.2</TargetFrameworks>
+    <TargetFrameworks Condition="'$(Configuration)|$(IxDevOpsBuild)'!='Release|true'">netcoreapp2.2</TargetFrameworks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <PropertyGroup>
     <NoWarn>$(NoWarn);SA0001</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\CodeGenerator\Test\TestData.BasicOperatorsWithRandomNumbers.cs" Link="TestData.BasicOperatorsWithRandomNumbers.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeCoverage" Version="16.1.1" />
