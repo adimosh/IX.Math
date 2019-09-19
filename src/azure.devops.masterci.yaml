@@ -71,7 +71,7 @@ steps:
   displayName: 'Build in release'
   inputs:
     projects: src/IX.Math.sln
-    arguments: '-c Release --version-suffix alpha'
+    arguments: '-c Release --version-suffix alpha --verbosity d'
 
 - task: VSTest@2
   displayName: 'Unit tests for release'
