@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
-using IX.StandardExtensions;
+using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Function.Ternary

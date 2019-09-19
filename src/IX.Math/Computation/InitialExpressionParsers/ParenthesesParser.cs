@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using IX.Math.ExpressionState;
 using IX.Math.Generators;
-using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
+using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
 namespace IX.Math.Computation.InitialExpressionParsers

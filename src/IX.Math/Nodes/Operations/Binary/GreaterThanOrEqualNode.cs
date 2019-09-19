@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Nodes.Constants;
-using IX.StandardExtensions;
+using IX.StandardExtensions.Extensions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
@@ -72,7 +72,7 @@ namespace IX.Math.Nodes.Operations.Binary
             {
                 return Expression.GreaterThanOrEqual(
                     Expression.Call(
-                        typeof(ArraySequenceCompareWithMsbExtensions).GetMethodWithExactParameters(nameof(ArraySequenceCompareWithMsbExtensions.SequenceCompareWithMsb), typeof(byte[]), typeof(byte[])),
+                        typeof(ArrayExtensions).GetMethodWithExactParameters(nameof(ArrayExtensions.SequenceCompareWithMsb), typeof(byte[]), typeof(byte[])),
                         pars.Item1,
                         pars.Item2),
                     Expression.Constant(0, typeof(int)));

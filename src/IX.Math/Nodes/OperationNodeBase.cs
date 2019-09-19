@@ -4,7 +4,7 @@
 
 using System;
 using System.Linq.Expressions;
-using IX.StandardExtensions;
+using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes

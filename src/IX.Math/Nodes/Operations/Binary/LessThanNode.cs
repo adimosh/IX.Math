@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Nodes.Constants;
-using IX.StandardExtensions;
+using IX.StandardExtensions.Extensions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
@@ -25,22 +25,23 @@ namespace IX.Math.Nodes.Operations.Binary
             {
                 return new BoolNode(Convert.ToDouble(nnLeft.Value) < Convert.ToDouble(nnRight.Value));
             }
-            else if (this.Left is StringNode snLeft && this.Right is StringNode snRight)
+
+            if (this.Left is StringNode snLeft && this.Right is StringNode snRight)
             {
                 return new BoolNode(snLeft.Value.CompareTo(snRight.Value) < 0);
             }
-            else if (this.Left is BoolNode bnLeft && this.Right is BoolNode bnRight)
+
+            if (this.Left is BoolNode bnLeft && this.Right is BoolNode bnRight)
             {
-                return new BoolNode(bnLeft.Value ? bnRight.Value : false);
+                return new BoolNode(bnLeft.Value && bnRight.Value);
             }
-            else if (this.Left is ByteArrayNode baLeft && this.Right is ByteArrayNode baRight)
+
+            if (this.Left is ByteArrayNode baLeft && this.Right is ByteArrayNode baRight)
             {
                 return new BoolNode(baLeft.Value.SequenceCompareWithMsb(baRight.Value) < 0);
             }
-            else
-            {
-                return this;
-            }
+
+            return this;
         }
 
         /// <summary>
@@ -72,7 +73,7 @@ namespace IX.Math.Nodes.Operations.Binary
             {
                 return Expression.LessThan(
                     Expression.Call(
-                        typeof(ArraySequenceCompareWithMsbExtensions).GetMethodWithExactParameters(nameof(ArraySequenceCompareWithMsbExtensions.SequenceCompareWithMsb), typeof(byte[]), typeof(byte[])),
+                        typeof(ArrayExtensions).GetMethodWithExactParameters(nameof(ArrayExtensions.SequenceCompareWithMsb), typeof(byte[]), typeof(byte[])),
                         pars.Item1,
                         pars.Item2),
                     Expression.Constant(0, typeof(int)));
