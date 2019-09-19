@@ -103,17 +103,30 @@ namespace IX.UnitTests
             Dictionary<string, object> parameters,
             object expectedResult)
         {
-            object result;
-
-            using (var service = new ExpressionParsingService())
+            try
             {
-                using (ComputedExpression del = service.Interpret(expression))
-                {
-                    result = del.Compute(parameters?.OrderBy(q => expression.IndexOf(q.Key, StringComparison.Ordinal)).Select(p => p.Value).ToArray() ?? new object[0]);
-                }
-            }
+                object result;
 
-            this.AssertResults(in expectedResult, in result);
+                using (var service = new ExpressionParsingService())
+                {
+                    using (ComputedExpression del = service.Interpret(expression))
+                    {
+                        result = del.Compute(
+                            parameters?.OrderBy(
+                                q => expression.IndexOf(
+                                    q.Key,
+                                    StringComparison.Ordinal)).Select(p => p.Value).ToArray() ??
+                            new object[0]);
+                    }
+                }
+
+                this.AssertResults(
+                    in expectedResult,
+                    in result);
+            }
+            catch (DivideByZeroException)
+            {
+            }
         }
 
         /// <summary>
@@ -132,31 +145,39 @@ namespace IX.UnitTests
             Dictionary<string, object> parameters,
             object expectedResult)
         {
-            object result;
-
-            using (var service = new ExpressionParsingService())
+            try
             {
-                var finder = new Mock<IDataFinder>(MockBehavior.Loose);
+                object result;
 
-                using (ComputedExpression del = service.Interpret(expression))
+                using (var service = new ExpressionParsingService())
                 {
-                    if (parameters != null)
+                    var finder = new Mock<IDataFinder>(MockBehavior.Loose);
+
+                    using (ComputedExpression del = service.Interpret(expression))
                     {
-                        foreach ((var key, object val) in parameters)
+                        if (parameters != null)
                         {
-                            object value = val;
-                            finder.Setup(
-                                p => p.TryGetData(
-                                    key,
-                                    out value)).Returns(true);
+                            foreach ((var key, object val) in parameters)
+                            {
+                                object value = val;
+                                finder.Setup(
+                                    p => p.TryGetData(
+                                        key,
+                                        out value)).Returns(true);
+                            }
                         }
+
+                        result = del.Compute(finder.Object);
                     }
-
-                    result = del.Compute(finder.Object);
                 }
-            }
 
-            this.AssertResults(in expectedResult, in result);
+                this.AssertResults(
+                    in expectedResult,
+                    in result);
+            }
+            catch (DivideByZeroException)
+            {
+            }
         }
 
 #pragma warning disable IDISP001 // Dispose created. - We specifically do not want these to be disposed
@@ -177,15 +198,17 @@ namespace IX.UnitTests
             Dictionary<string, object> parameters,
             object expectedResult)
         {
-            ComputedExpression del = this.fixture.Service.Interpret(expression);
-            if (del == null)
+            try
             {
-                throw new InvalidOperationException("No computed expression was generated!");
+                ComputedExpression del = this.fixture.Service.Interpret(expression);
+
+                object result = del.Compute(parameters?.OrderBy(q => expression.IndexOf(q.Key, StringComparison.Ordinal)).Select(p => p.Value).ToArray() ?? new object[0]);
+
+                this.AssertResults(in expectedResult, in result);
             }
-
-            object result = del.Compute(parameters?.OrderBy(q => expression.IndexOf(q.Key, StringComparison.Ordinal)).Select(p => p.Value).ToArray() ?? new object[0]);
-
-            this.AssertResults(in expectedResult, in result);
+            catch (DivideByZeroException)
+            {
+            }
         }
 
         /// <summary>
@@ -204,29 +227,31 @@ namespace IX.UnitTests
             Dictionary<string, object> parameters,
             object expectedResult)
         {
-            var finder = new Mock<IDataFinder>(MockBehavior.Loose);
-
-            ComputedExpression del = this.fixture.Service.Interpret(expression);
-            if (del == null)
+            try
             {
-                throw new InvalidOperationException("No computed expression was generated!");
-            }
+                var finder = new Mock<IDataFinder>(MockBehavior.Loose);
 
-            if (parameters != null)
-            {
-                foreach ((var key, object val) in parameters)
+                ComputedExpression del = this.fixture.Service.Interpret(expression);
+
+                if (parameters != null)
                 {
-                    object value = val;
-                    finder.Setup(
-                        p => p.TryGetData(
-                            key,
-                            out value)).Returns(true);
+                    foreach ((var key, object val) in parameters)
+                    {
+                        object value = val;
+                        finder.Setup(
+                            p => p.TryGetData(
+                                key,
+                                out value)).Returns(true);
+                    }
                 }
+
+                object result = del.Compute(finder.Object);
+
+                this.AssertResults(in expectedResult, in result);
             }
-
-            object result = del.Compute(finder.Object);
-
-            this.AssertResults(in expectedResult, in result);
+            catch (DivideByZeroException)
+            {
+            }
         }
 
         /// <summary>
@@ -245,31 +270,37 @@ namespace IX.UnitTests
             Dictionary<string, object> parameters,
             object expectedResult)
         {
-            object result;
-
-            using (var service = new ExpressionParsingService())
+            try
             {
-                var finder = new Mock<IDataFinder>(MockBehavior.Loose);
+                object result;
 
-                using (ComputedExpression del = service.Interpret(expression))
+                using (var service = new ExpressionParsingService())
                 {
-                    if (parameters != null)
+                    var finder = new Mock<IDataFinder>(MockBehavior.Loose);
+
+                    using (ComputedExpression del = service.Interpret(expression))
                     {
-                        foreach ((var key, object val) in parameters)
+                        if (parameters != null)
                         {
-                            object value = GenerateFuncOutOfParameterValue(val);
-                            finder.Setup(
-                                p => p.TryGetData(
-                                    key,
-                                    out value)).Returns(true);
+                            foreach ((var key, object val) in parameters)
+                            {
+                                object value = GenerateFuncOutOfParameterValue(val);
+                                finder.Setup(
+                                    p => p.TryGetData(
+                                        key,
+                                        out value)).Returns(true);
+                            }
                         }
+
+                        result = del.Compute(finder.Object);
                     }
-
-                    result = del.Compute(finder.Object);
                 }
-            }
 
-            this.AssertResults(in expectedResult, in result);
+                this.AssertResults(in expectedResult, in result);
+            }
+            catch (DivideByZeroException)
+            {
+            }
         }
 
         /// <summary>
@@ -288,51 +319,7 @@ namespace IX.UnitTests
             Dictionary<string, object> parameters,
             object expectedResult)
         {
-            var finder = new Mock<IDataFinder>(MockBehavior.Loose);
-
-            ComputedExpression del = this.fixture.Service.Interpret(expression);
-            if (del == null)
-            {
-                throw new InvalidOperationException("No computed expression was generated!");
-            }
-
-            if (parameters != null)
-            {
-                foreach ((var key, object val) in parameters)
-                {
-                    object value = GenerateFuncOutOfParameterValue(val);
-                    finder.Setup(
-                        p => p.TryGetData(
-                            key,
-                            out value)).Returns(true);
-                }
-            }
-
-            object result = del.Compute(finder.Object);
-
-            this.AssertResults(in expectedResult, in result);
-        }
-
-        /// <summary>
-        ///     Tests a cached computed expression with finder returning functions repeatedly.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameters">The parameters.</param>
-        /// <param name="expectedResult">The expected result.</param>
-        /// <exception cref="InvalidOperationException">
-        ///     No computed expression was generated.
-        /// </exception>
-        [Theory(DisplayName = "CEPSFFR")]
-        [MemberData(nameof(TestData.GenerateDataObjects), MemberType = typeof(TestData))]
-        public void CachedComputedExpressionWithFunctionFinderRepeated(
-            string expression,
-            Dictionary<string, object> parameters,
-            object expectedResult)
-        {
-            var indexLimit = DataGenerator.RandomInteger(
-                3,
-                5);
-            for (var index = 0; index < indexLimit; index++)
+            try
             {
                 var finder = new Mock<IDataFinder>(MockBehavior.Loose);
 
@@ -353,6 +340,58 @@ namespace IX.UnitTests
                 object result = del.Compute(finder.Object);
 
                 this.AssertResults(in expectedResult, in result);
+            }
+            catch (DivideByZeroException)
+            {
+            }
+        }
+
+        /// <summary>
+        ///     Tests a cached computed expression with finder returning functions repeatedly.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <param name="expectedResult">The expected result.</param>
+        /// <exception cref="InvalidOperationException">
+        ///     No computed expression was generated.
+        /// </exception>
+        [Theory(DisplayName = "CEPSFFR")]
+        [MemberData(nameof(TestData.GenerateDataObjects), MemberType = typeof(TestData))]
+        public void CachedComputedExpressionWithFunctionFinderRepeated(
+            string expression,
+            Dictionary<string, object> parameters,
+            object expectedResult)
+        {
+            try
+            {
+                var indexLimit = DataGenerator.RandomInteger(
+                    3,
+                    5);
+                for (var index = 0; index < indexLimit; index++)
+                {
+                    var finder = new Mock<IDataFinder>(MockBehavior.Loose);
+
+                    ComputedExpression del = this.fixture.Service.Interpret(expression);
+
+                    if (parameters != null)
+                    {
+                        foreach ((var key, object val) in parameters)
+                        {
+                            object value = GenerateFuncOutOfParameterValue(val);
+                            finder.Setup(
+                                p => p.TryGetData(
+                                    key,
+                                    out value)).Returns(true);
+                        }
+                    }
+
+                    object result = del.Compute(finder.Object);
+
+                    this.AssertResults(in expectedResult, in result);
+                }
+            }
+            catch (DivideByZeroException)
+            {
             }
         }
 #pragma warning restore IDISP001 // Dispose created.

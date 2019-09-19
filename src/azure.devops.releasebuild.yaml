@@ -4,6 +4,8 @@ pool:
 
 trigger: none
 
+pr: none
+
 variables:
   IxDevOpsBuild: true
   system.debug: false

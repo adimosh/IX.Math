@@ -690,6 +690,10 @@ namespace IX.Math
             {
                 return del.DynamicInvoke(convertedArguments);
             }
+            catch (DivideByZeroException)
+            {
+                throw;
+            }
             catch
             {
                 // Dynamic invocation of generated expression failed.
