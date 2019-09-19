@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using IX.StandardExtensions;
+using ArrayExtensions = IX.StandardExtensions.Extensions.ArrayExtensions;
 
 namespace IX.UnitTests
 {
@@ -40,7 +41,7 @@ namespace IX.UnitTests
                             return false;
                         }
 
-                        return bx.SequenceEquals(by);
+                        return ArrayExtensions.SequenceEquals(bx, by);
                     }
 
                 case string sx:

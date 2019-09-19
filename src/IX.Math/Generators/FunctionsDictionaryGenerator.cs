@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using IX.Math.Extensibility;
 using IX.Math.Nodes;
-using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Contracts;
+using IX.StandardExtensions.Extensions;
 
 namespace IX.Math.Generators
 {
