@@ -1,4 +1,4 @@
-﻿<!--EXTERNAL_PROPERTIES: TargetFramework-->
+<!--EXTERNAL_PROPERTIES: TargetFramework-->
 <!--EXTERNAL_PROPERTIES: IxDevOpsBuild-->
 <Project Sdk="Microsoft.NET.Sdk">
 
@@ -56,7 +56,7 @@
   </ItemGroup>
 
   <!--Suppressions -->
-  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+  <ItemGroup>
     <Compile Include="..\Common\HeapAllocationAnalyzerSuppressions.cs" Link="HeapAllocationAnalyzerSuppressions.cs" />
   </ItemGroup>
 
