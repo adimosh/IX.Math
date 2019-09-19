@@ -13,115 +13,70 @@ namespace IX.Math.Nodes.Operations.Binary
 
         public override SupportedValueType ReturnType => this.Left.ReturnType;
 
-        protected override void EnsureCompatibleOperands(ref NodeBase left, ref NodeBase right)
+        private static void DetermineChildren(
+            NodeBase parameter,
+            NodeBase other)
         {
-            if (left is ParameterNode uLeft && uLeft.ReturnType == SupportedValueType.Unknown)
+            switch (other.ReturnType)
             {
-                if (right is ParameterNode uRightInternal && uRightInternal.ReturnType == SupportedValueType.Unknown)
-                {
-                    left = uLeft.DetermineInteger();
-                    right = uRightInternal.DetermineInteger();
-                }
-                else
-                {
-                    switch (right.ReturnType)
-                    {
-                        case SupportedValueType.Numeric:
-                            left = uLeft.DetermineNumeric().DetermineInteger();
-                            break;
-
-                        case SupportedValueType.Boolean:
-                            left = uLeft.DetermineBoolean();
-                            break;
-
-                        case SupportedValueType.Unknown:
-                            break;
-
-                        default:
-                            throw new ExpressionNotValidLogicallyException();
-                    }
-                }
-            }
-
-            if (right is ParameterNode uRight && uRight.ReturnType == SupportedValueType.Unknown)
-            {
-                switch (left.ReturnType)
-                {
-                    case SupportedValueType.Numeric:
-                        right = uRight.DetermineNumeric().DetermineInteger();
-                        break;
-
-                    case SupportedValueType.Boolean:
-                        right = uRight.DetermineBoolean();
-                        break;
-
-                    case SupportedValueType.Unknown:
-                        break;
-
-                    default:
-                        throw new ExpressionNotValidLogicallyException();
-                }
-            }
-
-            switch (left.ReturnType)
-            {
-                case SupportedValueType.Unknown:
-                    if (right.ReturnType != SupportedValueType.Numeric && right.ReturnType != SupportedValueType.Boolean && right.ReturnType != SupportedValueType.Unknown)
-                    {
-                        throw new ExpressionNotValidLogicallyException();
-                    }
-
-                    break;
-
-                case SupportedValueType.Numeric:
-                    if (right.ReturnType != SupportedValueType.Numeric && right.ReturnType != SupportedValueType.Unknown)
-                    {
-                        throw new ExpressionNotValidLogicallyException();
-                    }
-
-                    break;
-
                 case SupportedValueType.Boolean:
-                    if (right.ReturnType != SupportedValueType.Boolean && right.ReturnType != SupportedValueType.Unknown)
-                    {
-                        throw new ExpressionNotValidLogicallyException();
-                    }
-
+                    parameter.DetermineStrongly(SupportedValueType.Boolean);
                     break;
-
+                case SupportedValueType.Numeric:
+                    parameter.DetermineStrongly(SupportedValueType.Numeric);
+                    break;
+                case SupportedValueType.Unknown:
+                    break;
                 default:
                     throw new ExpressionNotValidLogicallyException();
             }
+        }
 
-            switch (right.ReturnType)
+        /// <summary>
+        /// Strongly determines the node's type, if possible.
+        /// </summary>
+        /// <param name="type">The type to determine to.</param>
+        public override void DetermineStrongly(SupportedValueType type)
+        {
+            if (type == SupportedValueType.Boolean || type == SupportedValueType.Numeric)
             {
-                case SupportedValueType.Unknown:
-                    if (left.ReturnType != SupportedValueType.Numeric && left.ReturnType != SupportedValueType.Boolean && left.ReturnType != SupportedValueType.Unknown)
-                    {
-                        throw new ExpressionNotValidLogicallyException();
-                    }
+                this.Left.DetermineStrongly(type);
+                this.Right.DetermineStrongly(type);
 
-                    break;
-
-                case SupportedValueType.Numeric:
-                    if (left.ReturnType != SupportedValueType.Numeric && left.ReturnType != SupportedValueType.Unknown)
-                    {
-                        throw new ExpressionNotValidLogicallyException();
-                    }
-
-                    break;
-
-                case SupportedValueType.Boolean:
-                    if (left.ReturnType != SupportedValueType.Boolean && left.ReturnType != SupportedValueType.Unknown)
-                    {
-                        throw new ExpressionNotValidLogicallyException();
-                    }
-
-                    break;
-
-                default:
-                    throw new ExpressionNotValidLogicallyException();
+                this.EnsureCompatibleOperands(this.Left, this.Right);
             }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        /// <summary>
+        /// Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        public override void DetermineWeakly(SupportableValueType type)
+        {
+            if ((type & SupportableValueType.Numeric) == 0 && (type & SupportableValueType.Boolean) == 0)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+
+            this.Left.DetermineWeakly(type);
+            this.Right.DetermineWeakly(type);
+
+            this.EnsureCompatibleOperands(this.Left, this.Right);
+        }
+
+        protected override void EnsureCompatibleOperands(NodeBase left, NodeBase right)
+        {
+            left.DetermineWeakly(SupportableValueType.Boolean | SupportableValueType.Numeric);
+            right.DetermineWeakly(SupportableValueType.Boolean | SupportableValueType.Numeric);
+
+            DetermineChildren(left, right);
+            DetermineChildren(right, left);
+            DetermineChildren(left, right);
+            DetermineChildren(right, left);
         }
     }
 }

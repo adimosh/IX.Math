@@ -1,55 +1,4 @@
-<!--EXTERNAL_PROPERTIES: IxDevOpsBuild;IxVersionPrefix;IxVersionSuffix;FailObsoleteTargetFrameworks;TargetFramework-->
 <Project>
-
-  <!-- Language version -->
-  <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-
-  <!-- Versions -->
-  <PropertyGroup>
-    <VersionPrefix Condition="'$(IxVersionPrefix)' == ''">0.1.0.0</VersionPrefix>
-    <VersionPrefix Condition="'$(IxVersionPrefix)' != ''">$(IxVersionPrefix)</VersionPrefix>
-    <VersionSuffix Condition="'$(IxVersionSuffix)' != ''">$(IxVersionSuffix)</VersionSuffix>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyVersion>$([System.String]::Join(".", $(VersionPrefix.Split('.')[0]), $(VersionPrefix.Split('.')[1]), $(VersionPrefix.Split('.')[2]))).0</AssemblyVersion>
-    <FileVersion>$(VersionPrefix)</FileVersion>
-  </PropertyGroup>
-
-  <!-- Documentation file -->
-  <PropertyGroup>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-  </PropertyGroup>
-
-  <!-- SourceLink -->
-  <PropertyGroup>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(IxDevOpsBuild)' == 'true'">
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-    <DeterministicSourcePaths>true</DeterministicSourcePaths>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19270-01" PrivateAssets="All"/>
-  </ItemGroup>
-
-  <!-- Debug and packaging -->
-  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DefineConstants>$(DefineConstants);IXCONTRACTSNONPUBLIC</DefineConstants>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-  </PropertyGroup>
 
   <!-- Targets and symbols -->
   
@@ -176,14 +125,6 @@
     <TargetFrameworkIsStandard2>true</TargetFrameworkIsStandard2>
     <DefineConstants>$(DefineConstants);NETSTANDARD2_0;STANDARD_GT_12;STANDARD_GT_13;STANDARD_GT_14;STANDARD_GT_15;STANDARD_GT_16</DefineConstants>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFrameworkIsStandard2)'!='true'">
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
-  </PropertyGroup>
   
   <!-- Extra debug symbols for target framework type -->
   <PropertyGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">
@@ -197,25 +138,5 @@
   <PropertyGroup Condition="'$(TargetFrameworkIsStandard2)'=='true'">
     <DefineConstants>$(DefineConstants);STANDARD2</DefineConstants>
   </PropertyGroup>
-
-  <!-- Do not include VS Code-specific files -->
-  <ItemGroup>
-    <Compile Remove=".vscode\**" />
-    <EmbeddedResource Remove=".vscode\**" />
-    <None Remove=".vscode\**" />
-  </ItemGroup>
-
-  <!-- Resharper -->
-  <PropertyGroup>
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2019.1.1" />
-  </ItemGroup>
-
-  <!-- Error on obsolete target frameworks, if it was requested -->
-  <Target Name="ErrorOnObsoleteFrameworks" BeforeTargets="Build;Rebuild">
-    <Error Condition="'$(TargetFrameworkIsObsolete)|$(FailObsoleteTargetFrameworks)'=='true|true'" Text="The target framework $(TargetFramework) is considered obsolete, and should be avoided." />
-  </Target>
 
 </Project>

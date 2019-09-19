@@ -2,8 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using IX.Math.Nodes.Constants;
-
 namespace IX.Math.Nodes.Operations.Binary
 {
     internal abstract class ByteShiftOperationNodeBase : BinaryOperationNodeBase
@@ -15,37 +13,46 @@ namespace IX.Math.Nodes.Operations.Binary
 
         public override SupportedValueType ReturnType => this.Left.ReturnType;
 
-        protected override void EnsureCompatibleOperands(ref NodeBase left, ref NodeBase right)
+        /// <summary>
+        /// Strongly determines the node's type, if possible.
+        /// </summary>
+        /// <param name="type">The type to determine to.</param>
+        public override void DetermineStrongly(SupportedValueType type)
         {
-            if (left is ParameterNode uLeft && uLeft.ReturnType == SupportedValueType.Unknown)
+            if (type != SupportedValueType.Numeric)
             {
-                left = uLeft.DetermineInteger();
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        /// <summary>
+        /// Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        public override void DetermineWeakly(SupportableValueType type)
+        {
+            if ((type & SupportableValueType.Numeric) == 0)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        protected override void EnsureCompatibleOperands(NodeBase left, NodeBase right)
+        {
+            left.DetermineStrongly(SupportedValueType.Numeric);
+            right.DetermineStrongly(SupportedValueType.Numeric);
+
+            if (left is ParameterNode uLeft)
+            {
+                uLeft.DetermineInteger();
             }
 
-            switch (right)
+            if (right is ParameterNode uRight)
             {
-                case ParameterNode uRight:
-                    right = uRight.DetermineNumeric().DetermineInteger();
-                    break;
-
-                case NumericNode cRight:
-                    // This check is done to ensure that an int can actually be extracted from the right-hand constant
-                    cRight.ExtractInt();
-                    break;
-
-                case OperationNodeBase oRight:
-                    if (oRight.ReturnType != SupportedValueType.Numeric && oRight.ReturnType != SupportedValueType.Unknown)
-                    {
-                        throw new ExpressionNotValidLogicallyException();
-                    }
-
-                    break;
-
-                default:
-                    throw new ExpressionNotValidLogicallyException();
+                uRight.DetermineInteger();
             }
 
-            if (left.ReturnType != SupportedValueType.Numeric && left.ReturnType != SupportedValueType.ByteArray && left.ReturnType != SupportedValueType.Unknown)
+            if (left.ReturnType != SupportedValueType.Numeric || right.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException();
             }

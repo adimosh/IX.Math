@@ -25,25 +25,6 @@ namespace IX.Math.Nodes.Operations.Function.Binary
                 stringParameter?.Simplify(),
                 numericParameter?.Simplify())
         {
-            if (stringParameter is ParameterNode sp)
-            {
-                sp.DetermineString();
-            }
-
-            if (numericParameter is ParameterNode np)
-            {
-                np.DetermineString();
-            }
-
-            if (stringParameter?.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-
-            if (numericParameter?.ReturnType != SupportedValueType.String)
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
         }
 
         public override SupportedValueType ReturnType => SupportedValueType.String;
@@ -57,11 +38,50 @@ namespace IX.Math.Nodes.Operations.Function.Binary
                 ? (NodeBase)new StringNode(stringParam.Value.Trim(charParam.Value.ToCharArray()))
                 : this;
 
-        protected override void EnsureCompatibleParameters(
-            ref NodeBase firstParameter,
-            ref NodeBase secondParameter)
+        /// <summary>
+        ///     Strongly determines the node's type, if possible.
+        /// </summary>
+        /// <param name="type">The type to determine to.</param>
+        public override void DetermineStrongly(SupportedValueType type)
         {
-            // Nothing needs to be done here
+            if (type != SupportedValueType.String)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        /// <summary>
+        ///     Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible
+        ///     type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        public override void DetermineWeakly(SupportableValueType type)
+        {
+            if ((type & SupportableValueType.String) == 0)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        /// <summary>
+        ///     Ensures that the parameters that are received are compatible with the function, optionally allowing the parameter
+        ///     references to change.
+        /// </summary>
+        /// <param name="firstParameter">The first parameter.</param>
+        /// <param name="secondParameter">The second parameter.</param>
+        /// <exception cref="ExpressionNotValidLogicallyException">The expression is not valid, as its parameters are not strings.</exception>
+        protected override void EnsureCompatibleParameters(
+            NodeBase firstParameter,
+            NodeBase secondParameter)
+        {
+            firstParameter.DetermineStrongly(SupportedValueType.String);
+            secondParameter.DetermineStrongly(SupportedValueType.String);
+
+            if (firstParameter.ReturnType != SupportedValueType.String ||
+                secondParameter.ReturnType != SupportedValueType.String)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
         }
 
         protected override Expression GenerateExpressionInternal()

@@ -346,7 +346,7 @@ namespace IX.UnitTests.IX.Math
                 {
                     ["x"] = 12,
                 },
-                6D,
+                6L,
             },
             new object[]
             {
@@ -383,7 +383,7 @@ namespace IX.UnitTests.IX.Math
                     ["x"] = 12,
                     ["y"] = 2,
                 },
-                10D,
+                10L
             },
             new object[]
             {
@@ -393,7 +393,7 @@ namespace IX.UnitTests.IX.Math
                     ["x"] = 12,
                     ["y"] = 2,
                 },
-                10D,
+                10L,
             },
             new object[]
             {
@@ -1272,7 +1272,7 @@ namespace IX.UnitTests.IX.Math
                 {
                     ["x"] = 5,
                 },
-                210D,
+                210L,
             },
             new object[]
             {
@@ -1456,6 +1456,29 @@ namespace IX.UnitTests.IX.Math
                 },
                 false
             },
+            new object[]
+            {
+                "0b10010101+0b11010110",
+                null,
+                new byte[]
+                {
+                    0b10010101,
+                    0b11010110
+                }
+            },
+            new object[]
+            {
+                "0b10010101+x",
+                new Dictionary<string, object>
+                {
+                    ["x"] = new byte[] { (byte)0b11010110 }
+                },
+                new byte[]
+                {
+                    0b10010101,
+                    0b11010110
+                }
+            }
         };
 
         private static object GenerateFuncOutOfParameterValue(object tempParameter)

@@ -1,0 +1,60 @@
+pool:
+  name: Hosted Windows 2019 with VS2019
+  demands: vstest
+
+trigger:
+  branches:
+    include:
+    - dev
+  paths:
+    exclude:
+    - doc/*
+    - src/*.yaml
+    - README.md
+    - LICENSE.md
+    - .gitignore
+    - src/.editorconfig
+    - IXLogo.png
+    - src/QuickDirtyTests/*
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+    - dev
+  paths:
+    exclude:
+    - doc/*
+    - src/*.yaml
+    - README.md
+    - LICENSE.md
+    - .gitignore
+    - src/.editorconfig
+    - IXLogo.png
+    - src/QuickDirtyTests/*
+
+variables:
+  IxDevOpsBuild: true
+  IxVersionPrefix: 0.5.0
+  IxVersionSuffix:
+  system.debug: false
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: 'Restore interdependencies (project system)'
+  inputs:
+    command: restore
+    projects: src/IX.Math.sln
+    verbosityRestore: Minimal
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build in debug'
+  inputs:
+    projects: src/IX.Math.sln
+    arguments: '-c Debug --version-suffix alpha'
+
+- task: VSTest@2
+  displayName: 'Unit tests for debug'
+  inputs:
+    codeCoverageEnabled: true
+    diagnosticsEnabled: True

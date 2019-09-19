@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Function.Unary
 {
-    [DebuggerDisplay("abs({Parameter})")]
+    [DebuggerDisplay("abs({" + nameof(Parameter) + "})")]
     [CallableMathematicsFunction("abs", "absolute")]
     [UsedImplicitly]
     internal sealed class FunctionNodeAbsolute : NumericUnaryFunctionNodeBase

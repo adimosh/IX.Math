@@ -99,46 +99,6 @@ namespace IX.Math.Nodes
         public override NodeBase Simplify() => this;
 
         /// <summary>
-        /// Determines the parameter to be numeric, if possible.
-        /// </summary>
-        /// <returns>Returns reflexively.</returns>
-        public ParameterNode DetermineNumeric()
-        {
-            this.parametersRegistry.AdvertiseParameter(this.Name).DetermineType(SupportedValueType.Numeric);
-            return this;
-        }
-
-        /// <summary>
-        /// Determines the parameter to be string, if possible.
-        /// </summary>
-        /// <returns>Returns reflexively.</returns>
-        public ParameterNode DetermineString()
-        {
-            this.parametersRegistry.AdvertiseParameter(this.Name).DetermineType(SupportedValueType.String);
-            return this;
-        }
-
-        /// <summary>
-        /// Determines the parameter to be binary, if possible.
-        /// </summary>
-        /// <returns>Returns reflexively.</returns>
-        public ParameterNode DetermineByteArray()
-        {
-            this.parametersRegistry.AdvertiseParameter(this.Name).DetermineType(SupportedValueType.ByteArray);
-            return this;
-        }
-
-        /// <summary>
-        /// Determines the parameter to be numeric, if possible.
-        /// </summary>
-        /// <returns>Returns reflexively.</returns>
-        public ParameterNode DetermineBoolean()
-        {
-            this.parametersRegistry.AdvertiseParameter(this.Name).DetermineType(SupportedValueType.Boolean);
-            return this;
-        }
-
-        /// <summary>
         /// If the parameter will be numeric, determine it to be an integer.
         /// </summary>
         /// <returns>Returns reflexively.</returns>
@@ -159,14 +119,15 @@ namespace IX.Math.Nodes
         }
 
         /// <summary>
-        /// Limits the possible types of this parameter.
+        /// Strongly determines the node's type, if possible.
         /// </summary>
-        /// <param name="limit">The limit.</param>
-        /// <returns>Returns reflexively.</returns>
-        public ParameterNode LimitPossibleType(SupportableValueType limit)
-        {
-            this.parametersRegistry.AdvertiseParameter(this.Name).LimitPossibleType(limit);
-            return this;
-        }
+        /// <param name="type">The type to determine to.</param>
+        public override void DetermineStrongly(SupportedValueType type) => this.parametersRegistry.AdvertiseParameter(this.Name).DetermineType(type);
+
+        /// <summary>
+        /// Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        public override void DetermineWeakly(SupportableValueType type) => this.parametersRegistry.AdvertiseParameter(this.Name).LimitPossibleType(type);
     }
 }

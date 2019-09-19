@@ -118,13 +118,15 @@ namespace IX.Math.Registration
 
             int iVal = (int)newVal;
 
+#pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - nothing to be done here
             if (Enum.IsDefined(
                 typeof(SupportedValueType),
                 iVal))
             {
                 this.DetermineType((SupportedValueType)iVal);
             }
-        }
+ #pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
+       }
 
         /// <summary>
         /// Determines the type of the parameter.
@@ -173,7 +175,15 @@ namespace IX.Math.Registration
                         throw new InvalidOperationException(string.Format(Resources.ParameterAlreadyCompiled, this.Name));
                     }
 
+                    int i1 = (int)newReturnType, i2 = (int)this.SupportedReturnType;
+
+                    if ((i1 & i2) == 0)
+                    {
+                        throw new ExpressionNotValidLogicallyException(string.Format(Resources.ParameterRequiredOfMismatchedTypes, this.Name));
+                    }
+
                     this.ReturnType = newReturnType;
+                    this.SupportedReturnType = (SupportableValueType)i1;
                 }
                 else
                 {
@@ -262,24 +272,24 @@ namespace IX.Math.Registration
                     throw new ExpressionNotValidLogicallyException();
             }
 
-            ParameterExpression expression = Expression.Parameter(type, this.Name);
+            ParameterExpression parameterExpression = Expression.Parameter(type, this.Name);
 
-            this.parameterDefinitionExpression = expression;
+            this.parameterDefinitionExpression = parameterExpression;
 
             if (this.FuncParameter)
             {
-                this.expression = Expression.Invoke(expression);
+                this.expression = Expression.Invoke(parameterExpression);
             }
             else
             {
-                this.expression = expression;
+                this.expression = parameterExpression;
             }
 
             this.stringExpression =
                 (this.ReturnType == SupportedValueType.String) ?
                 this.expression :
                 Expression.Call(this.expression, typeof(object).GetMethodWithExactParameters(
-                    nameof(object.ToString),
+                    nameof(this.ToString),
 #if STANDARD2 || NET461
                     Array.Empty<Type>()));
 #else

@@ -1,32 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-
-<!--EXTERNAL_PROPERTIES: TargetFrameworkIsFramework-->
-<!--EXTERNAL_PROPERTIES: TargetFrameworkIsStandard-->
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Build configuration -->
   <PropertyGroup>
     <TargetFrameworks>net45;net461;netstandard1.2;netstandard2.0</TargetFrameworks>
     <FailObsoleteTargetFrameworks>true</FailObsoleteTargetFrameworks>
   </PropertyGroup>
 
-  <PropertyGroup>
-    
-  </PropertyGroup>
-
+  <!-- Package metadata -->
   <PropertyGroup>
     <Title>IX Mathematics</Title>
     <Description>A library for transforming text expressions containing mathematical operations into executable delegates.</Description>
   </PropertyGroup>
 
-  <Import Project="..\IXTargets.targets" />
-
-  <Import Project="..\Branding.props" />
-
-  <Import Project="..\StyleCop.targets" />
-
+  <!-- References -->
   <ItemGroup>
-    <PackageReference Include="IX.Abstractions.Collections" Version="0.5.0.86" />
-    <PackageReference Include="IX.StandardExtensions" Version="0.5.0.86" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="IX.Abstractions.Collections" Version="0.5.0.123" />
+    <PackageReference Include="IX.StandardExtensions" Version="0.5.0.123" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">
@@ -53,13 +44,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AsyncUsageAnalyzers" Version="1.0.0-alpha003" PrivateAssets="all" />
   </ItemGroup>
 
+  <!-- Resources -->
   <ItemGroup>
     <Compile Update="Resources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -97,6 +85,14 @@
     <EmbeddedResource Update="Resources.se.resx">
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <!-- Project system and dependencies -->
+  <ItemGroup>
+    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

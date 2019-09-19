@@ -27,20 +27,6 @@ namespace IX.Math.Nodes.Operations.Function.Ternary
                 numericParameter?.Simplify(),
                 secondNumericParameter?.Simplify())
         {
-            if (stringParameter is ParameterNode pn)
-            {
-                pn.DetermineString();
-            }
-
-            if (numericParameter is ParameterNode np1)
-            {
-                np1.DetermineNumeric().DetermineInteger();
-            }
-
-            if (secondNumericParameter is ParameterNode np2)
-            {
-                np2.DetermineNumeric().DetermineInteger();
-            }
         }
 
         public override SupportedValueType ReturnType => SupportedValueType.String;
@@ -62,6 +48,63 @@ namespace IX.Math.Nodes.Operations.Function.Ternary
             }
 
             return this;
+        }
+
+        /// <summary>
+        ///     Strongly determines the node's type, if possible.
+        /// </summary>
+        /// <param name="type">The type to determine to.</param>
+        public override void DetermineStrongly(SupportedValueType type)
+        {
+            if (type != SupportedValueType.String)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        /// <summary>
+        ///     Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible
+        ///     type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        public override void DetermineWeakly(SupportableValueType type)
+        {
+            if ((type & SupportableValueType.String) == 0)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        /// <summary>
+        /// Ensures the parameters are compatible for this node.
+        /// </summary>
+        /// <param name="first">The first.</param>
+        /// <param name="second">The second.</param>
+        /// <param name="third">The third.</param>
+        protected override void EnsureCompatibleParameters(
+            NodeBase first,
+            NodeBase second,
+            NodeBase third)
+        {
+            first.DetermineStrongly(SupportedValueType.String);
+            second.DetermineStrongly(SupportedValueType.Numeric);
+            third.DetermineStrongly(SupportedValueType.Numeric);
+
+            if (first.ReturnType != SupportedValueType.String || second.ReturnType != SupportedValueType.Numeric ||
+                third.ReturnType != SupportedValueType.Numeric)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+
+            if (second is ParameterNode pn)
+            {
+                pn.DetermineInteger();
+            }
+
+            if (third is ParameterNode pn2)
+            {
+                pn2.DetermineInteger();
+            }
         }
 
         protected override Expression GenerateExpressionInternal()

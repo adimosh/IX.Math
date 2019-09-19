@@ -1,0 +1,100 @@
+<#
+    Dictionary<string, bool> operators = new Dictionary<string, bool>
+    {
+        ["+"] = false,
+        ["-"] = false,
+        ["*"] = false,
+        ["/"] = true,
+        ["&"] = false,
+        ["|"] = false
+    };
+#><#+
+    IEnumerable<Tuple<string, string, string>> GenerateThreeFoldTestData(Dictionary<string, bool> operators)
+    {
+        List<Tuple<string, string, string, bool>> initialStage = new List<Tuple<string, string, string, bool>>();
+        foreach (var op in operators.Keys)
+        {
+            initialStage.Add(
+                new Tuple<string, string, string, bool>(
+                    operators[op] ?
+                        $"(double)operand1 {op} (double)operand2":
+                        $"operand1 {op} operand2",
+                    $"{{operand1}} {op} {{operand2}}",
+                    null,
+                    operators[op]));
+            initialStage.Add(
+                new Tuple<string, string, string, bool>(
+                    operators[op] ?
+                        $"(double)operand1 {op} (double)operand2":
+                        $"operand1 {op} operand2",
+                    $"x {op} {{operand2}}",
+                    @"[""x""] = operand1",
+                    operators[op]));
+            initialStage.Add(
+                new Tuple<string, string, string, bool>(
+                    operators[op] ?
+                        $"(double)operand1 {op} (double)operand2":
+                        $"operand1 {op} operand2",
+                    $"{{operand1}} {op} y",
+                    @"[""y""] = operand2",
+                    operators[op]));
+            initialStage.Add(
+                new Tuple<string, string, string, bool>(
+                    operators[op] ?
+                        $"(double)operand1 {op} (double)operand2":
+                        $"operand1 {op} operand2",
+                    $"x {op} y",
+                    @"[""x""] = operand1, [""y""] = operand2",
+                    operators[op]));
+        }
+
+        List<Tuple<string, string, string>> secondStage = new List<Tuple<string, string, string>>();
+        foreach (var op in operators.Keys)
+        {
+            foreach (var xy in initialStage)
+            {
+                secondStage.Add(new Tuple<string, string, string>(xy.Item1, xy.Item2, xy.Item3));
+
+                if (xy.Item4 != operators[op])
+                {
+                    continue;
+                }
+
+                secondStage.Add(
+                    new Tuple<string, string, string>(
+                        operators[op] ?
+                            $"(double)operand3 {op} (double)({xy.Item1})":
+                            $"operand3 {op} ({xy.Item1})",
+                        $"{{operand3}} {op} ({xy.Item2})",
+                        xy.Item3));
+                secondStage.Add(
+                    new Tuple<string, string, string>(
+                        operators[op] ?
+                            $"(double)({xy.Item1}) {op} (double)operand3":
+                            $"({xy.Item1}) {op} operand3",
+                        $"({xy.Item2}) {op} {{operand3}}",
+                        xy.Item3));
+                secondStage.Add(
+                    new Tuple<string, string, string>(
+                        operators[op] ?
+                            $"(double)operand3 {op} (double)({xy.Item1})":
+                            $"operand3 {op} ({xy.Item1})",
+                        $"z {op} ({xy.Item2})",
+                        xy.Item3 == null ?
+                            @"[""z""] = operand3" :
+                            @"[""z""] = operand3, " + xy.Item3));
+                secondStage.Add(
+                    new Tuple<string, string, string>(
+                        operators[op] ?
+                            $"(double)({xy.Item1}) {op} (double)operand3":
+                            $"({xy.Item1}) {op} operand3",
+                        $"({xy.Item2}) {op} z",
+                        xy.Item3 == null ?
+                            @"[""z""] = operand3" :
+                            @"[""z""] = operand3, " + xy.Item3));
+            }
+        }
+
+        return secondStage;
+    }
+#>

@@ -29,6 +29,8 @@ namespace IX.Math.Nodes
             this.FirstParameter = firstParameter ?? throw new ArgumentNullException(nameof(firstParameter));
             this.SecondParameter = secondParameter ?? throw new ArgumentNullException(nameof(secondParameter));
             this.ThirdParameter = thirdParameter ?? throw new ArgumentNullException(nameof(thirdParameter));
+
+            this.EnsureCompatibleParameters(firstParameter, secondParameter, thirdParameter);
         }
 
         /// <summary>
@@ -48,5 +50,16 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <value>The third parameter.</value>
         public NodeBase ThirdParameter { get; protected set; }
+
+        /// <summary>
+        /// Ensures the parameters are compatible for this node.
+        /// </summary>
+        /// <param name="first">The first.</param>
+        /// <param name="second">The second.</param>
+        /// <param name="third">The third.</param>
+        protected abstract void EnsureCompatibleParameters(
+            NodeBase first,
+            NodeBase second,
+            NodeBase third);
     }
 }

@@ -13,12 +13,34 @@ namespace IX.Math.Nodes.Operations.Function.Unary
 
         public sealed override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
-        protected sealed override void EnsureCompatibleParameter(ref NodeBase parameter)
+        /// <summary>
+        ///     Strongly determines the node's type, if possible.
+        /// </summary>
+        /// <param name="type">The type to determine to.</param>
+        public sealed override void DetermineStrongly(SupportedValueType type)
         {
-            if (parameter is ParameterNode up)
+            if (type != SupportedValueType.Numeric)
             {
-                parameter = up.DetermineNumeric();
+                throw new ExpressionNotValidLogicallyException();
             }
+        }
+
+        /// <summary>
+        ///     Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible
+        ///     type left.
+        /// </summary>
+        /// <param name="type">The type or types to determine to.</param>
+        public override void DetermineWeakly(SupportableValueType type)
+        {
+            if ((type & SupportableValueType.Numeric) == 0)
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+        }
+
+        protected sealed override void EnsureCompatibleParameter(NodeBase parameter)
+        {
+            parameter.DetermineStrongly(SupportedValueType.Numeric);
 
             if (parameter.ReturnType != SupportedValueType.Numeric)
             {
