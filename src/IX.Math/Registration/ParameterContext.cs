@@ -3,16 +3,15 @@
 // </copyright>
 
 using System;
-using System.ComponentModel;
 using System.Linq.Expressions;
-using IX.StandardExtensions;
+using IX.StandardExtensions.Extensions;
 
 namespace IX.Math.Registration
 {
     /// <summary>
     /// A data model for a parameter's context of existence.
     /// </summary>
-    public class ParameterContext : IDeepCloneable<ParameterContext>, IEquatable<ParameterContext>
+    public class ParameterContext : StandardExtensions.IDeepCloneable<ParameterContext>, IEquatable<ParameterContext>
     {
         private bool alreadyCompiled;
         private ParameterExpression parameterDefinitionExpression;

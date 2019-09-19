@@ -13,9 +13,9 @@ using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.Math.Registration;
-using IX.StandardExtensions;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Contracts;
+using IX.StandardExtensions.Extensions;
 using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 

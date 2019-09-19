@@ -9,8 +9,8 @@ using IX.Math.ExpressionState;
 using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Registration;
-using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
+using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
 namespace IX.Math.Extraction

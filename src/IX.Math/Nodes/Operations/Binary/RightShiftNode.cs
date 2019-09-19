@@ -5,7 +5,7 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
-using IX.StandardExtensions;
+using IX.StandardExtensions.Extensions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {

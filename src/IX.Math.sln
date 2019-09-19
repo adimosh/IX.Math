@@ -37,12 +37,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IDE Configurations", "IDE C
 		stylecop.json = stylecop.json
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Global props and targets", "Global props and targets", "{D591E54C-A642-4C87-9D74-A70B8A2D7A1B}"
-	ProjectSection(SolutionItems) = preProject
-		Directory.Build.props = Directory.Build.props
-		Directory.Build.targets = Directory.Build.targets
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,7 +67,6 @@ Global
 		{F78E1A2A-D448-4840-B7DF-29AF28CA0004} = {FB2F5864-DF6D-455C-8E79-3721590BF98E}
 		{98AF7216-D401-44A4-A5DA-F55535868971} = {FB2F5864-DF6D-455C-8E79-3721590BF98E}
 		{C5056E2B-0D45-45A7-88E6-930E98CA7752} = {5E05B9C5-6765-44FC-8A6E-BEE018BDEA9B}
-		{D591E54C-A642-4C87-9D74-A70B8A2D7A1B} = {5E05B9C5-6765-44FC-8A6E-BEE018BDEA9B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E982D088-16DA-46BF-A043-B1326577DB77}
