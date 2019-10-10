@@ -12,7 +12,7 @@ variables:
 
 jobs:
 - job:
-  timeoutInMinutes: 10
+  timeoutInMinutes: 20
   pool:
     name: Azure Pipelines
     vmImage: windows-latest
