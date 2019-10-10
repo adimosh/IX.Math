@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -70,6 +71,7 @@ namespace IX.Math
         /// </summary>
         /// <param name="arguments">The arguments with which to invoke the execution of the expression.</param>
         /// <returns>The computed result, or, if the expression is not recognized correctly, the expression as a <see cref="string"/>.</returns>
+        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1101:Prefix local calls with this", Justification = "TODO: Analyzer error")]
         public object Compute(params object[] arguments)
         {
             this.ThrowIfCurrentObjectDisposed();

@@ -45,7 +45,7 @@ namespace IX.Math.Nodes
         /// <remarks>Since it is not possible for this node to be a constant node, the function <see cref="object.ToString"/> is called in whatever the node outputs.</remarks>
         public override Expression GenerateCachedStringExpression() => Expression.Call(this.GenerateExpression(), typeof(object).GetMethodWithExactParameters(
             nameof(this.ToString),
-#if !STANDARD && !NET45
+#if !STANDARD && !NET452
             Array.Empty<Type>()));
 #else
             new Type[0]));
