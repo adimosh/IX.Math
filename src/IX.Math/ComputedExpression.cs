@@ -72,6 +72,7 @@ namespace IX.Math
         /// <param name="arguments">The arguments with which to invoke the execution of the expression.</param>
         /// <returns>The computed result, or, if the expression is not recognized correctly, the expression as a <see cref="string"/>.</returns>
         [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1101:Prefix local calls with this", Justification = "TODO: Analyzer error")]
+        [SuppressMessage("CodeSmell", "ERP022:Unobserved exception in generic exception handler", Justification = "We want this in this case.")]
         public object Compute(params object[] arguments)
         {
             this.ThrowIfCurrentObjectDisposed();
@@ -677,10 +678,9 @@ namespace IX.Math
             }
             catch
             {
+                // Expression is somehow not valid
                 del = null;
-#pragma warning disable ERP022 // Catching everything considered harmful. - This is the intention
             }
-#pragma warning restore ERP022 // Catching everything considered harmful.
 
             if (del == null)
             {
@@ -692,6 +692,10 @@ namespace IX.Math
             {
                 return del.DynamicInvoke(convertedArguments);
             }
+            catch (OutOfMemoryException)
+            {
+                throw;
+            }
             catch (DivideByZeroException)
             {
                 throw;
@@ -699,9 +703,7 @@ namespace IX.Math
             catch
             {
                 // Dynamic invocation of generated expression failed.
-#pragma warning disable ERP022 // Catching everything considered harmful. - This is the intention
                 return this.initialExpression;
-#pragma warning restore ERP022 // Catching everything considered harmful.
             }
         }
 #pragma warning restore HAA0301 // Closure Allocation Source

@@ -386,8 +386,16 @@ namespace IX.Math.Nodes.Constants
         {
             if (global::System.Math.Floor(value) == value)
             {
-                this.integerValue = Convert.ToInt64(value);
-                this.isFloat = false;
+                try
+                {
+                    this.integerValue = Convert.ToInt64(value);
+                    this.isFloat = false;
+                }
+                catch (OverflowException)
+                {
+                    this.floatValue = value;
+                    this.isFloat = true;
+                }
             }
             else
             {
