@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
 
@@ -80,13 +81,32 @@ namespace IX.Math.Nodes.Constants
         /// <value>Always <see cref="SupportedValueType.Numeric"/>.</value>
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
-#pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - This is actually desired
         /// <summary>
-        /// Gets the value.
+        /// Gets a value indicating whether this instance is a floating point number.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is float; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsFloat => this.isFloat;
+
+        /// <summary>
+        /// Gets the value of this constant numeric node.
         /// </summary>
         /// <value>The value.</value>
-        public object Value => this.isFloat ? this.floatValue : this.integerValue;
-#pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
+        [SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "This is desired.")]
+        public object Value
+        {
+            [NotNull]
+            get
+            {
+                if (this.isFloat)
+                {
+                    return this.floatValue;
+                }
+
+                return this.integerValue;
+            }
+        }
 
         /// <summary>
         /// Does an addition between two numeric nodes.
