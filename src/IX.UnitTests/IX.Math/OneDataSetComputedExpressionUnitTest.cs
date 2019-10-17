@@ -37,14 +37,13 @@ namespace IX.UnitTests.IX.Math
         {
             new object[]
             {
-                "(2*max(x,500)-y)/pow(x,2)",
+                "round(x, 2)=2.12",
                 new Dictionary<string, object>
                 {
-                    ["x"] = 217,
-                    ["y"] = 323,
+                    ["x"] = 2.1247154D,
                 },
-                0.014377030729045,
-            }
+                true
+            },
         };
 
         /// <summary>

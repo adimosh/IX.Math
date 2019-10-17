@@ -155,10 +155,20 @@ namespace IX.Math.Nodes
 
             if (e1.Type != firstParameterType)
             {
-                e1 = Expression.Convert(e1, typeof(TParam1));
+                e1 = Expression.Convert(e1, firstParameterType);
             }
 
             if (e2.Type != secondParameterType)
+            {
+                e2 = Expression.Convert(e2, secondParameterType);
+            }
+
+            if (e1.Type != typeof(TParam1))
+            {
+                e1 = Expression.Convert(e1, typeof(TParam1));
+            }
+
+            if (e2.Type != typeof(TParam2))
             {
                 e2 = Expression.Convert(e2, typeof(TParam2));
             }

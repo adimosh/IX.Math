@@ -301,6 +301,10 @@ namespace IX.Math.Nodes.Constants
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "This is desired.")]
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "ReSharper",
+            "CompareOfFloatsByEqualityOperator",
+            Justification = "If we're reaching the precision loss boundary, it means we're rounding to an integer anyway, so it's acceptable.")]
         [NotNull]
         public Expression GenerateLongExpression()
         {
@@ -322,6 +326,10 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <returns>An integer value.</returns>
         /// <exception cref="InvalidCastException">The current value is floating-point and cannot be transformed.</exception>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "ReSharper",
+            "CompareOfFloatsByEqualityOperator",
+            Justification = "If we're reaching the precision loss boundary, it means we're rounding to an integer anyway, so it's acceptable.")]
         public long ExtractInteger()
         {
             if (!this.IsFloat)
@@ -348,7 +356,7 @@ namespace IX.Math.Nodes.Constants
                 return this.floatValue;
             }
 
-            return this.integerValue;
+            return Convert.ToDouble(this.integerValue);
         }
 
         /// <summary>
@@ -356,6 +364,10 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <returns>A 32-bit integer value.</returns>
         /// <exception cref="InvalidCastException">The value is either floating-point or larger than 32-bit.</exception>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "ReSharper",
+            "CompareOfFloatsByEqualityOperator",
+            Justification = "If we're reaching the precision loss boundary, it means we're rounding to an integer anyway, so it's acceptable.")]
         public int ExtractInt()
         {
             if (!this.IsFloat)
@@ -409,6 +421,10 @@ namespace IX.Math.Nodes.Constants
         /// Initializes the specified value.
         /// </summary>
         /// <param name="value">The value.</param>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "ReSharper",
+            "CompareOfFloatsByEqualityOperator",
+            Justification = "If we're reaching the precision loss boundary, it means we're rounding to an integer anyway, so it's acceptable.")]
         private void Initialize(double value)
         {
             if (global::System.Math.Floor(value) == value)
