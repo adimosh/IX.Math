@@ -44,7 +44,7 @@ namespace IX.Math.Nodes
 
                                 break;
                             case NumericNode cn:
-                                parameterType = cn.Value.GetType();
+                                parameterType = cn.IsFloat == false ? typeof(long) : typeof(double);
                                 break;
                             default:
                                 parameterType = typeof(double);

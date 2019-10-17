@@ -4,7 +4,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
 
@@ -27,11 +26,6 @@ namespace IX.Math.Nodes.Constants
         /// The float value.
         /// </summary>
         private double floatValue;
-
-        /// <summary>
-        /// Whether or not the number is floating-point.
-        /// </summary>
-        private bool isFloat;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NumericNode"/> class.
@@ -87,19 +81,22 @@ namespace IX.Math.Nodes.Constants
         /// <value>
         ///   <c>true</c> if this instance is float; otherwise, <c>false</c>.
         /// </value>
-        public bool IsFloat => this.isFloat;
+        public bool IsFloat { get; private set; }
 
         /// <summary>
         /// Gets the value of this constant numeric node.
         /// </summary>
         /// <value>The value.</value>
-        [SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "This is desired.")]
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "This is desired.")]
         public object Value
         {
             [NotNull]
             get
             {
-                if (this.isFloat)
+                if (this.IsFloat)
                 {
                     return this.floatValue;
                 }
@@ -117,17 +114,17 @@ namespace IX.Math.Nodes.Constants
         [NotNull]
         public static NumericNode Add([NotNull] NumericNode left, [NotNull] NumericNode right)
         {
-            if (left.isFloat && right.isFloat)
+            if (left.IsFloat && right.IsFloat)
             {
                 return new NumericNode(left.floatValue + right.floatValue);
             }
 
-            if (left.isFloat && !right.isFloat)
+            if (left.IsFloat && !right.IsFloat)
             {
                 return new NumericNode(left.floatValue + Convert.ToDouble(right.integerValue));
             }
 
-            if (!left.isFloat && right.isFloat)
+            if (!left.IsFloat && right.IsFloat)
             {
                 return new NumericNode(Convert.ToDouble(left.integerValue) + right.floatValue);
             }
@@ -144,17 +141,17 @@ namespace IX.Math.Nodes.Constants
         [NotNull]
         public static NumericNode Subtract([NotNull] NumericNode left, [NotNull] NumericNode right)
         {
-            if (left.isFloat && right.isFloat)
+            if (left.IsFloat && right.IsFloat)
             {
                 return new NumericNode(left.floatValue - right.floatValue);
             }
 
-            if (left.isFloat && !right.isFloat)
+            if (left.IsFloat && !right.IsFloat)
             {
                 return new NumericNode(left.floatValue - Convert.ToDouble(right.integerValue));
             }
 
-            if (!left.isFloat && right.isFloat)
+            if (!left.IsFloat && right.IsFloat)
             {
                 return new NumericNode(Convert.ToDouble(left.integerValue) - right.floatValue);
             }
@@ -171,17 +168,17 @@ namespace IX.Math.Nodes.Constants
         [NotNull]
         public static NumericNode Multiply([NotNull] NumericNode left, [NotNull] NumericNode right)
         {
-            if (left.isFloat && right.isFloat)
+            if (left.IsFloat && right.IsFloat)
             {
                 return new NumericNode(left.floatValue * right.floatValue);
             }
 
-            if (left.isFloat && !right.isFloat)
+            if (left.IsFloat && !right.IsFloat)
             {
                 return new NumericNode(left.floatValue * Convert.ToDouble(right.integerValue));
             }
 
-            if (!left.isFloat && right.isFloat)
+            if (!left.IsFloat && right.IsFloat)
             {
                 return new NumericNode(Convert.ToDouble(left.integerValue) * right.floatValue);
             }
@@ -254,17 +251,17 @@ namespace IX.Math.Nodes.Constants
         [NotNull]
         internal static Tuple<double, double> ExtractFloats([NotNull] NumericNode left, [NotNull] NumericNode right)
         {
-            if (left.isFloat && right.isFloat)
+            if (left.IsFloat && right.IsFloat)
             {
                 return new Tuple<double, double>(left.floatValue, right.floatValue);
             }
 
-            if (left.isFloat && !right.isFloat)
+            if (left.IsFloat && !right.IsFloat)
             {
                 return new Tuple<double, double>(left.floatValue, Convert.ToDouble(right.integerValue));
             }
 
-            if (!left.isFloat && right.isFloat)
+            if (!left.IsFloat && right.IsFloat)
             {
                 return new Tuple<double, double>(Convert.ToDouble(left.integerValue), right.floatValue);
             }
@@ -272,12 +269,15 @@ namespace IX.Math.Nodes.Constants
             return new Tuple<double, double>(Convert.ToDouble(left.integerValue), Convert.ToDouble(right.integerValue));
         }
 
-#pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - This is required here, as we are generating an expression tree.
         /// <summary>
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>The expression.</returns>
-        public override Expression GenerateCachedExpression() => this.isFloat ?
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "This is desired.")]
+        public override Expression GenerateCachedExpression() => this.IsFloat ?
             Expression.Constant(this.floatValue, typeof(double)) :
             Expression.Constant(this.integerValue, typeof(long));
 
@@ -285,18 +285,26 @@ namespace IX.Math.Nodes.Constants
         /// Generates a floating-point expression.
         /// </summary>
         /// <returns>The expression.</returns>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "This is desired.")]
         [NotNull]
-        public Expression GenerateFloatExpression() => this.isFloat ? this.GenerateExpression() : Expression.Constant(Convert.ToDouble(this.floatValue), typeof(double));
+        public Expression GenerateFloatExpression() => this.IsFloat ? this.GenerateExpression() : Expression.Constant(Convert.ToDouble(this.floatValue), typeof(double));
 
         /// <summary>
         /// Generates an integer expression.
         /// </summary>
         /// <returns>The expression.</returns>
         /// <exception cref="InvalidCastException">The node is floating-point and cannot be transformed.</exception>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "This is desired.")]
         [NotNull]
         public Expression GenerateLongExpression()
         {
-            if (!this.isFloat)
+            if (!this.IsFloat)
             {
                 return this.GenerateExpression();
             }
@@ -308,7 +316,6 @@ namespace IX.Math.Nodes.Constants
 
             return Expression.Constant(Convert.ToInt64(this.floatValue), typeof(long));
         }
-#pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
 
         /// <summary>
         /// Extracts an integer.
@@ -317,7 +324,7 @@ namespace IX.Math.Nodes.Constants
         /// <exception cref="InvalidCastException">The current value is floating-point and cannot be transformed.</exception>
         public long ExtractInteger()
         {
-            if (!this.isFloat)
+            if (!this.IsFloat)
             {
                 return this.integerValue;
             }
@@ -336,7 +343,7 @@ namespace IX.Math.Nodes.Constants
         /// <returns>A floating-point value.</returns>
         public double ExtractFloat()
         {
-            if (this.isFloat)
+            if (this.IsFloat)
             {
                 return this.floatValue;
             }
@@ -351,7 +358,7 @@ namespace IX.Math.Nodes.Constants
         /// <exception cref="InvalidCastException">The value is either floating-point or larger than 32-bit.</exception>
         public int ExtractInt()
         {
-            if (!this.isFloat)
+            if (!this.IsFloat)
             {
                 return Convert.ToInt32(this.integerValue);
             }
@@ -385,7 +392,7 @@ namespace IX.Math.Nodes.Constants
         {
             integerValue = this.integerValue,
             floatValue = this.floatValue,
-            isFloat = this.isFloat,
+            IsFloat = this.IsFloat,
         };
 
         /// <summary>
@@ -395,7 +402,7 @@ namespace IX.Math.Nodes.Constants
         private void Initialize(long value)
         {
             this.integerValue = value;
-            this.isFloat = false;
+            this.IsFloat = false;
         }
 
         /// <summary>
@@ -409,18 +416,18 @@ namespace IX.Math.Nodes.Constants
                 try
                 {
                     this.integerValue = Convert.ToInt64(value);
-                    this.isFloat = false;
+                    this.IsFloat = false;
                 }
                 catch (OverflowException)
                 {
                     this.floatValue = value;
-                    this.isFloat = true;
+                    this.IsFloat = true;
                 }
             }
             else
             {
                 this.floatValue = value;
-                this.isFloat = true;
+                this.IsFloat = true;
             }
         }
     }
