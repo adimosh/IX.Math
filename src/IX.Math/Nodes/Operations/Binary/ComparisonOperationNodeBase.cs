@@ -2,6 +2,11 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Linq.Expressions;
+using System.Reflection;
+using IX.StandardExtensions.Extensions;
+using JetBrains.Annotations;
+
 namespace IX.Math.Nodes.Operations.Binary
 {
     internal abstract class ComparisonOperationNodeBase : BinaryOperationNodeBase
@@ -75,6 +80,96 @@ namespace IX.Math.Nodes.Operations.Binary
             {
                 throw new ExpressionNotValidLogicallyException();
             }
+        }
+
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "We want it this way.")]
+        protected Expression GenerateNumericalToleranceEquateExpression([NotNull] Expression leftExpression, [NotNull] Expression rightExpression, [NotNull] Tolerance tolerance)
+        {
+            if (tolerance.IntegerToleranceRangeLowerBound != null ||
+                tolerance.IntegerToleranceRangeUpperBound != null)
+            {
+                // Integer tolerance
+                MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
+                    nameof(ToleranceFunctions.EquateRangeTolerant),
+                    leftExpression.Type,
+                    rightExpression.Type,
+                    typeof(long),
+                    typeof(long));
+
+                return Expression.Call(
+                    mi,
+                    leftExpression,
+                    rightExpression,
+                    Expression.Constant(
+                        tolerance.IntegerToleranceRangeLowerBound ?? 0L,
+                        typeof(long)),
+                    Expression.Constant(
+                        tolerance.IntegerToleranceRangeUpperBound ?? 0L,
+                        typeof(long)));
+            }
+
+            if (tolerance.ToleranceRangeLowerBound != null || tolerance.ToleranceRangeUpperBound != null)
+            {
+                // Floating-point tolerance
+                MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
+                    nameof(ToleranceFunctions.EquateRangeTolerant),
+                    leftExpression.Type,
+                    rightExpression.Type,
+                    typeof(double),
+                    typeof(double));
+
+                return Expression.Call(
+                    mi,
+                    leftExpression,
+                    rightExpression,
+                    Expression.Constant(
+                        tolerance.ToleranceRangeLowerBound ?? 0D,
+                        typeof(double)),
+                    Expression.Constant(
+                        tolerance.ToleranceRangeUpperBound ?? 0D,
+                        typeof(double)));
+            }
+
+            if (tolerance.ProportionalTolerance != null)
+            {
+                if (tolerance.ProportionalTolerance.Value > 1D)
+                {
+                    // Proportional tolerance
+                    MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
+                        nameof(ToleranceFunctions.EquateProportionTolerant),
+                        leftExpression.Type,
+                        rightExpression.Type,
+                        typeof(double));
+
+                    return Expression.Call(
+                        mi,
+                        leftExpression,
+                        rightExpression,
+                        Expression.Constant(
+                            tolerance.ProportionalTolerance ?? 0D,
+                            typeof(double)));
+                }
+
+                if (tolerance.ProportionalTolerance.Value < 1D && tolerance.ProportionalTolerance.Value > 0D)
+                {
+                    // Percentage tolerance
+                    MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
+                        nameof(ToleranceFunctions.EquatePercentageTolerant),
+                        leftExpression.Type,
+                        rightExpression.Type,
+                        typeof(double));
+
+                    return Expression.Call(
+                        mi,
+                        leftExpression,
+                        rightExpression,
+                        Expression.Constant(
+                            tolerance.ProportionalTolerance ?? 0D,
+                            typeof(double)));
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -125,6 +125,21 @@ namespace IX.Math.Nodes.Operations.Binary
                         typeof(bool)));
             }
 
+            if (this.Left.ReturnType == SupportedValueType.Numeric &&
+                this.Right.ReturnType == SupportedValueType.Numeric)
+            {
+                var possibleTolerantExpression = this.GenerateNumericalToleranceEquateExpression(
+                    leftExpression,
+                    rightExpression,
+                    tolerance);
+
+                if (possibleTolerantExpression != null)
+                {
+                    // Valid tolerance expression
+                    return Expression.NotEqual(possibleTolerantExpression, Expression.Constant(true, typeof(bool)));
+                }
+            }
+
             return Expression.NotEqual(
                 leftExpression,
                 rightExpression);

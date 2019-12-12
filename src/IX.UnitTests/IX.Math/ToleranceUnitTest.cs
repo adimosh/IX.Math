@@ -35,6 +35,7 @@ namespace IX.UnitTests.IX.Math
         // ReSharper disable once MemberCanBePrivate.Global - It really cannot
         public static object[][] ProvideDataForTheory() => new[]
         {
+            // Equation
             new object[]
             {
                 "x=y",
@@ -176,6 +177,151 @@ namespace IX.UnitTests.IX.Math
                     ["y"] = 1.5D,
                 },
                 true,
+                new Tolerance { ProportionalTolerance = 2 },
+            },
+
+            // Negative equation
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1.7D,
+                    ["y"] = 1.9D,
+                },
+                false,
+                new Tolerance { ToleranceRangeLowerBound = 0.2, ToleranceRangeUpperBound = 0.2 },
+            },
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1.7D,
+                    ["y"] = 1.9D,
+                },
+                true,
+                new Tolerance { ToleranceRangeLowerBound = 0.1, ToleranceRangeUpperBound = 0.1 },
+            },
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1.7D,
+                    ["y"] = 1.9D,
+                },
+                false,
+                new Tolerance { ToleranceRangeLowerBound = 0.2 },
+            },
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1.7D,
+                    ["y"] = 1.9D,
+                },
+                true,
+                new Tolerance { ToleranceRangeUpperBound = 0.2 },
+            },
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1.7D,
+                    ["y"] = 1.9D,
+                },
+                false,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1, IntegerToleranceRangeUpperBound = 1 },
+            },
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1.7D,
+                    ["y"] = 1.9D,
+                },
+                false,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1 },
+            },
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1.7D,
+                    ["y"] = 1.9D,
+                },
+                true,
+                new Tolerance { IntegerToleranceRangeUpperBound = 1 },
+            },
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 0.7D,
+                    ["y"] = 1.9D,
+                },
+                true,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1, IntegerToleranceRangeUpperBound = 1 },
+            },
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1.7D,
+                    ["y"] = 2.9D,
+                },
+                true,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1, IntegerToleranceRangeUpperBound = 1 },
+            },
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                true,
+                new Tolerance { ProportionalTolerance = 0.1 },
+            },
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                false,
+                new Tolerance { ProportionalTolerance = 0.5 },
+            },
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                true,
+                new Tolerance { ProportionalTolerance = 1.1 },
+            },
+            new object[]
+            {
+                "x!=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                false,
                 new Tolerance { ProportionalTolerance = 2 },
             },
         };
