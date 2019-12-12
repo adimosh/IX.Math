@@ -60,7 +60,7 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <summary>
         /// Gets the expressions of same type from operands.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The left and right operand expressions.</returns>
         protected Tuple<Expression, Expression> GetExpressionsOfSameTypeFromOperands()
         {
             if (this.Left.ReturnType == SupportedValueType.String || this.Right.ReturnType == SupportedValueType.String)
@@ -88,7 +88,7 @@ namespace IX.Math.Nodes.Operations.Binary
         /// Gets the expressions of same type from operands.
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
-        /// <returns></returns>
+        /// <returns>The left and right operand expressions.</returns>
         protected Tuple<Expression, Expression> GetExpressionsOfSameTypeFromOperands(Tolerance tolerance)
         {
             if (this.Left.ReturnType == SupportedValueType.String || this.Right.ReturnType == SupportedValueType.String)
