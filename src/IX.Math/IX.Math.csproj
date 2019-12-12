@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Build configuration -->
@@ -25,8 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.Abstractions.Collections" Version="0.5.1.1" />
-    <PackageReference Include="IX.StandardExtensions" Version="0.5.1.1" />
+    <PackageReference Include="IX.Abstractions.Collections" Version="[0.5.1.1,0.5.2)" />
+    <PackageReference Include="IX.StandardExtensions" Version="[0.5.1.1,0.5.2)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">
@@ -36,20 +36,24 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIsStandard)'=='true'">
-    <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.Tools" Version="4.3.0" />
-    <PackageReference Include="System.Globalization" Version="4.3.0" />
-    <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
-    <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
-    <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
-    <PackageReference Include="System.Runtime" Version="4.3.1" />
-    <PackageReference Include="System.Runtime.Extensions" Version="4.3.1" />
-    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-    <PackageReference Include="System.Threading" Version="4.3.0" />
+    <PackageReference Include="System.Collections" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Collections.Concurrent" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Diagnostics.Debug" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Diagnostics.Tools" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Globalization" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Linq" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Linq.Expressions" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Reflection.Extensions" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Resources.ResourceManager" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Runtime" Version="[4.3.1,5)" />
+    <PackageReference Include="System.Runtime.Extensions" Version="[4.3.1,5)" />
+    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="[4.3.0,5)" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="[4.3.1,5)" />
+    <PackageReference Include="System.Threading" Version="[4.3.0,5)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'!='netstandard2.1'">
+    <PackageReference Include="System.Memory" Version="[4.5.0,5)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -98,7 +102,7 @@
 
   <!-- Project system and dependencies -->
   <ItemGroup>
-    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.0.10">
+    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

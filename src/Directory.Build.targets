@@ -2,12 +2,12 @@
 
   <!-- SourceLink -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19367-01" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
   </ItemGroup>
 
   <!-- StyleCop -->
   <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.66" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.113" PrivateAssets="all" />
     <PackageReference Include="Microsoft.DotNet.Analyzers.Compatibility" Version="0.2.12-alpha" PrivateAssets="all" />
 
     <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
@@ -15,7 +15,7 @@
 
   <!-- IDisposable analyzer -->
   <ItemGroup>
-    <PackageReference Include="IDisposableAnalyzers" Version="2.1.2" PrivateAssets="all" />
+    <PackageReference Include="IDisposableAnalyzers" Version="3.2.0" PrivateAssets="all" />
   </ItemGroup>
 
   <!-- ErrorProne.Net - only in debug, as it tends to be rather heavy -->
