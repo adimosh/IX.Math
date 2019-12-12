@@ -22,7 +22,7 @@ namespace IX.Math
     /// A representation of a computed expression, resulting from a string expression.
     /// </summary>
     [PublicAPI]
-    public class ComputedExpression : DisposableBase, IDeepCloneable<ComputedExpression>
+    public sealed class ComputedExpression : DisposableBase, IDeepCloneable<ComputedExpression>
     {
         private readonly IParameterRegistry parametersRegistry;
 
@@ -64,16 +64,28 @@ namespace IX.Math
         /// </summary>
         public string[] ParameterNames => this.parametersRegistry.Dump().Select(p => p.Name).ToArray();
 
-#pragma warning disable HAA0302 // Display class allocation to capture closure - Currently unavoidable
-#pragma warning disable HAA0301 // Closure Allocation Source
         /// <summary>
         /// Computes the expression and returns a result.
         /// </summary>
         /// <param name="arguments">The arguments with which to invoke the execution of the expression.</param>
         /// <returns>The computed result, or, if the expression is not recognized correctly, the expression as a <see cref="string"/>.</returns>
-        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1101:Prefix local calls with this", Justification = "TODO: Analyzer error")]
+        public object Compute(params object[] arguments) =>
+            this.Compute(
+                null,
+                arguments);
+
+        /// <summary>
+        /// Computes the expression and returns a result, with tolerance.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <param name="arguments">The arguments with which to invoke the execution of the expression.</param>
+        /// <returns>
+        /// The computed result, or, if the expression is not recognized correctly, the expression as a <see cref="string" />.
+        /// </returns>
         [SuppressMessage("CodeSmell", "ERP022:Unobserved exception in generic exception handler", Justification = "We want this in this case.")]
-        public object Compute(params object[] arguments)
+        [SuppressMessage("Performance", "HAA0302:Display class allocation to capture closure", Justification = "Unavoidable for now.")]
+        [SuppressMessage("Performance", "HAA0301:Closure Allocation Source", Justification = "Unavoidable for now.")]
+        public object Compute(Tolerance tolerance, params object[] arguments)
         {
             this.ThrowIfCurrentObjectDisposed();
 
@@ -673,7 +685,7 @@ namespace IX.Math
             try
             {
                 del = Expression.Lambda(
-                    this.body.GenerateExpression(),
+                    tolerance == null ? this.body.GenerateExpression() : this.body.GenerateExpression(tolerance),
                     this.parametersRegistry.Dump().Select(p => p.ParameterExpression)).Compile();
             }
             catch
@@ -706,15 +718,26 @@ namespace IX.Math
                 return this.initialExpression;
             }
         }
-#pragma warning restore HAA0301 // Closure Allocation Source
-#pragma warning restore HAA0302 // Display class allocation to capture closure
 
         /// <summary>
         /// Computes the expression and returns a result.
         /// </summary>
         /// <param name="dataFinder">The data finder for the arguments with which to invoke execution of the expression.</param>
         /// <returns>The computed result, or, if the expression is not recognized correctly, the expression as a <see cref="string"/>.</returns>
-        public object Compute(IDataFinder dataFinder)
+        public object Compute(IDataFinder dataFinder) =>
+            this.Compute(
+                null,
+                dataFinder);
+
+        /// <summary>
+        /// Computes the expression and returns a result.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <param name="dataFinder">The data finder for the arguments with which to invoke execution of the expression.</param>
+        /// <returns>
+        /// The computed result, or, if the expression is not recognized correctly, the expression as a <see cref="string" />.
+        /// </returns>
+        public object Compute([CanBeNull] Tolerance tolerance, IDataFinder dataFinder)
         {
             this.ThrowIfCurrentObjectDisposed();
 
@@ -735,7 +758,7 @@ namespace IX.Math
                 pars.Add(data);
             }
 
-            return pars.Any(p => p == null) ? this.initialExpression : this.Compute(pars.ToArray());
+            return pars.Any(p => p == null) ? this.initialExpression : this.Compute(tolerance, pars.ToArray());
         }
 
         /// <summary>

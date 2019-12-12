@@ -3,16 +3,25 @@
 // </copyright>
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
-using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Unary
 {
+    /// <summary>
+    ///     A node for negation operations.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.Operations.Unary.UnaryOperatorNodeBase" />
     [DebuggerDisplay("-{" + nameof(Operand) + "}")]
     internal sealed class SubtractNode : UnaryOperatorNodeBase
     {
-        public SubtractNode([NotNull] NodeBase operand)
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="SubtractNode" /> class.
+        /// </summary>
+        /// <param name="operand">The operand.</param>
+        /// <exception cref="ExpressionNotValidLogicallyException">The expression is not logically valid.</exception>
+        public SubtractNode([JetBrains.Annotations.NotNull] NodeBase operand)
             : base(operand.Simplify())
         {
             operand.DetermineStrongly(SupportedValueType.Numeric);
@@ -23,21 +32,31 @@ namespace IX.Math.Nodes.Operations.Unary
             }
         }
 
+        /// <summary>
+        ///     Gets the return type of this node.
+        /// </summary>
+        /// <value>
+        ///     The node return type.
+        /// </value>
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
-        public override NodeBase Simplify()
-        {
-            switch (this.Operand)
+        /// <summary>
+        ///     Simplifies this node, if possible, reflexively returns otherwise.
+        /// </summary>
+        /// <returns>
+        ///     A simplified node, or this instance.
+        /// </returns>
+        public override NodeBase Simplify() =>
+            this.Operand switch
             {
-                case NumericNode numericNode:
-                    return NumericNode.Subtract(new NumericNode(0), numericNode);
-                default:
-                    return this;
-            }
-        }
+                NumericNode numericNode => NumericNode.Subtract(
+                    new NumericNode(0),
+                    numericNode),
+                _ => this
+            };
 
         /// <summary>
-        /// Strongly determines the node's type, if possible.
+        ///     Strongly determines the node's type, if possible.
         /// </summary>
         /// <param name="type">The type to determine to.</param>
         public override void DetermineStrongly(SupportedValueType type)
@@ -49,7 +68,8 @@ namespace IX.Math.Nodes.Operations.Unary
         }
 
         /// <summary>
-        /// Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible type left.
+        ///     Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible
+        ///     type left.
         /// </summary>
         /// <param name="type">The type or types to determine to.</param>
         public override void DetermineWeakly(SupportableValueType type)
@@ -61,14 +81,44 @@ namespace IX.Math.Nodes.Operations.Unary
         }
 
         /// <summary>
-        /// Creates a deep clone of the source object.
+        ///     Creates a deep clone of the source object.
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new SubtractNode(this.Operand.DeepClone(context));
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new SubtractNode(this.Operand.DeepClone(context));
 
-#pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - This is desired
-        protected override Expression GenerateExpressionInternal() => Expression.Subtract(Expression.Constant(0L, typeof(long)), this.Operand.GenerateExpression());
-#pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
+        /// <summary>
+        ///     Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <returns>
+        ///     The expression.
+        /// </returns>
+        [SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "We want this to happen.")]
+        protected override Expression GenerateExpressionInternal() =>
+            Expression.Subtract(
+                Expression.Constant(
+                    0L,
+                    typeof(long)),
+                this.Operand.GenerateExpression());
+
+        /// <summary>
+        ///     Generates the expression with tolerance that will be compiled into code.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>The expression.</returns>
+        [SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "We want this to happen.")]
+        protected override Expression GenerateExpressionInternal(Tolerance tolerance) =>
+            Expression.Subtract(
+                Expression.Constant(
+                    0L,
+                    typeof(long)),
+                this.Operand.GenerateExpression(tolerance));
     }
 }

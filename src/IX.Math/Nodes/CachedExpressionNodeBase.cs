@@ -22,14 +22,25 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <returns>The generated <see cref="Expression" />.</returns>
         public sealed override Expression GenerateExpression() =>
-            this.generatedExpression ?? (this.generatedExpression = this.GenerateCachedExpression());
+            this.generatedExpression ??= this.GenerateCachedExpression();
+
+        /// <summary>
+        ///     Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>
+        ///     The generated <see cref="Expression" />.
+        /// </returns>
+        public sealed override Expression GenerateExpression(Tolerance tolerance) =>
+            this.generatedExpression ??= this.GenerateCachedExpression(tolerance);
+
 
         /// <summary>
         ///     Generates the expression that will be compiled into code as a string expression.
         /// </summary>
         /// <returns>The generated <see cref="Expression" /> that gives the values as a string.</returns>
         public sealed override Expression GenerateStringExpression() =>
-            this.generatedStringExpression ?? (this.generatedStringExpression = this.GenerateCachedStringExpression());
+            this.generatedStringExpression ??= this.GenerateCachedStringExpression();
 
         /// <summary>
         ///     Generates an expression that will be cached before being compiled.
@@ -37,6 +48,16 @@ namespace IX.Math.Nodes
         /// <returns>The generated <see cref="Expression" /> to be cached.</returns>
         [NotNull]
         public abstract Expression GenerateCachedExpression();
+
+        /// <summary>
+        ///     Generates an expression with tolerance that will be cached before being compiled.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>
+        ///     The generated <see cref="Expression" /> to be cached.
+        /// </returns>
+        [NotNull]
+        public virtual Expression GenerateCachedExpression(Tolerance tolerance) => this.GenerateCachedExpression();
 
         /// <summary>
         ///     Generates a string expression that will be cached before being compiled.

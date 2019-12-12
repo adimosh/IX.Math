@@ -43,6 +43,16 @@ namespace IX.Math.Nodes
         public abstract Expression GenerateExpression();
 
         /// <summary>
+        ///     Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>
+        ///     The generated <see cref="Expression" />.
+        /// </returns>
+        [NotNull]
+        public virtual Expression GenerateExpression(Tolerance tolerance) => this.GenerateExpression();
+
+        /// <summary>
         ///     Generates the expression that will be compiled into code as a string expression.
         /// </summary>
         /// <returns>The generated <see cref="Expression" /> that gives the values as a string.</returns>

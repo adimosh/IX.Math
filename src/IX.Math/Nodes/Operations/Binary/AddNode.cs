@@ -11,9 +11,18 @@ using IX.StandardExtensions.Extensions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
+    /// <summary>
+    ///     A node representing an addition operation.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.Operations.Binary.BinaryOperationNodeBase" />
     [DebuggerDisplay("{" + nameof(Left) + "} + {" + nameof(Right) + "}")]
     internal sealed class AddNode : BinaryOperationNodeBase
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="AddNode" /> class.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
         public AddNode(
             NodeBase left,
             NodeBase right)
@@ -23,6 +32,12 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        /// <summary>
+        ///     Gets the return type of this node.
+        /// </summary>
+        /// <value>
+        ///     The node return type.
+        /// </value>
         public override SupportedValueType ReturnType
         {
             get
@@ -49,6 +64,11 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
+        /// <summary>
+        ///     Determines the children in the correct types.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <param name="other">The other.</param>
         private static void DetermineChildren(
             NodeBase parameter,
             NodeBase other)
@@ -67,6 +87,12 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
+        /// <summary>
+        ///     Stitches the specified byte arrays.
+        /// </summary>
+        /// <param name="left">The left array operand.</param>
+        /// <param name="right">The right array operand.</param>
+        /// <returns>A stitched array of bytes.</returns>
         private static byte[] Stitch(
             byte[] left,
             byte[] right)
@@ -85,6 +111,12 @@ namespace IX.Math.Nodes.Operations.Binary
             return r;
         }
 
+        /// <summary>
+        ///     Simplifies this node, if possible, reflexively returns otherwise.
+        /// </summary>
+        /// <returns>
+        ///     A simplified node, or this instance.
+        /// </returns>
         public override NodeBase Simplify()
         {
             if (this.Left.IsConstant != this.Right.IsConstant)
@@ -97,47 +129,27 @@ namespace IX.Math.Nodes.Operations.Binary
                 return this;
             }
 
-            if (this.Left is NumericNode nn1Left && this.Right is NumericNode nn1Right)
+            return this.Left switch
             {
-                return NumericNode.Add(
+                NumericNode nn1Left when this.Right is NumericNode nn1Right => NumericNode.Add(
                     nn1Left,
-                    nn1Right);
-            }
-
-            if (this.Left is StringNode sn1Left && this.Right is StringNode sn1Right)
-            {
-                return new StringNode(sn1Left.Value + sn1Right.Value);
-            }
-
-            if (this.Left is NumericNode nn2Left && this.Right is StringNode sn2Right)
-            {
-                return new StringNode($"{nn2Left.Value}{sn2Right.Value}");
-            }
-
-            if (this.Left is StringNode sn3Left && this.Right is NumericNode nn3Right)
-            {
-                return new StringNode($"{sn3Left.Value}{nn3Right.Value}");
-            }
-
-            if (this.Left is BoolNode bn4Left && this.Right is StringNode sn4Right)
-            {
-                return new StringNode($"{bn4Left.Value.ToString()}{sn4Right.Value}");
-            }
-
-            if (this.Left is StringNode sn5Left && this.Right is BoolNode bn5Right)
-            {
-                return new StringNode($"{sn5Left.Value}{bn5Right.Value.ToString()}");
-            }
-
-            if (this.Left is ByteArrayNode ban5Left && this.Right is ByteArrayNode ban5Right)
-            {
-                return new ByteArrayNode(
+                    nn1Right),
+                StringNode sn1Left when this.Right is StringNode sn1Right => new StringNode(
+                    sn1Left.Value + sn1Right.Value),
+                NumericNode nn2Left when this.Right is StringNode sn2Right => new StringNode(
+                    $"{nn2Left.Value}{sn2Right.Value}"),
+                StringNode sn3Left when this.Right is NumericNode nn3Right => new StringNode(
+                    $"{sn3Left.Value}{nn3Right.Value}"),
+                BoolNode bn4Left when this.Right is StringNode sn4Right => new StringNode(
+                    $"{bn4Left.Value.ToString()}{sn4Right.Value}"),
+                StringNode sn5Left when this.Right is BoolNode bn5Right => new StringNode(
+                    $"{sn5Left.Value}{bn5Right.Value.ToString()}"),
+                ByteArrayNode ban5Left when this.Right is ByteArrayNode ban5Right => new ByteArrayNode(
                     Stitch(
                         ban5Left.Value,
-                        ban5Right.Value));
-            }
-
-            return this;
+                        ban5Right.Value)),
+                _ => this
+            };
         }
 
         /// <summary>
@@ -145,9 +157,10 @@ namespace IX.Math.Nodes.Operations.Binary
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new AddNode(
-            this.Left.DeepClone(context),
-            this.Right.DeepClone(context));
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new AddNode(
+                this.Left.DeepClone(context),
+                this.Right.DeepClone(context));
 
         /// <summary>
         ///     Strongly determines the node's type, if possible.
@@ -160,18 +173,18 @@ namespace IX.Math.Nodes.Operations.Binary
                 case SupportedValueType.Boolean:
                     throw new ExpressionNotValidLogicallyException();
                 case SupportedValueType.ByteArray:
-                    {
-                        this.Left.DetermineStrongly(SupportedValueType.ByteArray);
-                        this.Right.DetermineStrongly(SupportedValueType.ByteArray);
-                    }
+                {
+                    this.Left.DetermineStrongly(SupportedValueType.ByteArray);
+                    this.Right.DetermineStrongly(SupportedValueType.ByteArray);
+                }
 
                     break;
 
                 case SupportedValueType.Numeric:
-                    {
-                        this.Left.DetermineStrongly(SupportedValueType.Numeric);
-                        this.Right.DetermineStrongly(SupportedValueType.Numeric);
-                    }
+                {
+                    this.Left.DetermineStrongly(SupportedValueType.Numeric);
+                    this.Right.DetermineStrongly(SupportedValueType.Numeric);
+                }
 
                     break;
             }
@@ -201,6 +214,11 @@ namespace IX.Math.Nodes.Operations.Binary
                 this.Right);
         }
 
+        /// <summary>
+        ///     Ensures that the operands are compatible.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
         protected override void EnsureCompatibleOperands(
             NodeBase left,
             NodeBase right)
@@ -222,7 +240,8 @@ namespace IX.Math.Nodes.Operations.Binary
             {
                 case SupportedValueType.Numeric:
                     if (right.ReturnType != SupportedValueType.Numeric &&
-                        right.ReturnType != SupportedValueType.String && right.ReturnType != SupportedValueType.Unknown)
+                        right.ReturnType != SupportedValueType.String &&
+                        right.ReturnType != SupportedValueType.Unknown)
                     {
                         throw new ExpressionNotValidLogicallyException();
                     }
@@ -239,7 +258,8 @@ namespace IX.Math.Nodes.Operations.Binary
 
                 case SupportedValueType.ByteArray:
                     if (right.ReturnType != SupportedValueType.ByteArray &&
-                        right.ReturnType != SupportedValueType.String && right.ReturnType != SupportedValueType.Unknown)
+                        right.ReturnType != SupportedValueType.String &&
+                        right.ReturnType != SupportedValueType.Unknown)
                     {
                         throw new ExpressionNotValidLogicallyException();
                     }
@@ -254,7 +274,8 @@ namespace IX.Math.Nodes.Operations.Binary
             switch (right.ReturnType)
             {
                 case SupportedValueType.Numeric:
-                    if (left.ReturnType != SupportedValueType.Numeric && left.ReturnType != SupportedValueType.String &&
+                    if (left.ReturnType != SupportedValueType.Numeric &&
+                        left.ReturnType != SupportedValueType.String &&
                         left.ReturnType != SupportedValueType.Unknown)
                     {
                         throw new ExpressionNotValidLogicallyException();
@@ -272,7 +293,8 @@ namespace IX.Math.Nodes.Operations.Binary
 
                 case SupportedValueType.ByteArray:
                     if (left.ReturnType != SupportedValueType.ByteArray &&
-                        left.ReturnType != SupportedValueType.String && left.ReturnType != SupportedValueType.Unknown)
+                        left.ReturnType != SupportedValueType.String &&
+                        left.ReturnType != SupportedValueType.Unknown)
                     {
                         throw new ExpressionNotValidLogicallyException();
                     }
@@ -285,9 +307,15 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
+        /// <summary>
+        ///     Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <returns>
+        ///     The expression.
+        /// </returns>
         protected override Expression GenerateExpressionInternal()
         {
-            Tuple<Expression, Expression> pars = this.GetExpressionsOfSameTypeFromOperands();
+            (Expression leftExpression, Expression rightExpression) = this.GetExpressionsOfSameTypeFromOperands();
 
             switch (this.ReturnType)
             {
@@ -298,8 +326,8 @@ namespace IX.Math.Nodes.Operations.Binary
                         typeof(string));
                     return Expression.Call(
                         mi1,
-                        pars.Item1,
-                        pars.Item2);
+                        leftExpression,
+                        rightExpression);
                 case SupportedValueType.ByteArray:
                     MethodInfo mi2 = typeof(AddNode).GetMethodWithExactParameters(
                         nameof(Stitch),
@@ -307,12 +335,49 @@ namespace IX.Math.Nodes.Operations.Binary
                         typeof(byte[]));
                     return Expression.Call(
                         mi2,
-                        pars.Item1,
-                        pars.Item2);
+                        leftExpression,
+                        rightExpression);
                 default:
                     return Expression.Add(
-                        pars.Item1,
-                        pars.Item2);
+                        leftExpression,
+                        rightExpression);
+            }
+        }
+
+        /// <summary>
+        ///     Generates the expression with tolerance that will be compiled into code.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>The expression.</returns>
+        protected override Expression GenerateExpressionInternal(Tolerance tolerance)
+        {
+            (Expression leftExpression, Expression rightExpression) =
+                this.GetExpressionsOfSameTypeFromOperands(tolerance);
+
+            switch (this.ReturnType)
+            {
+                case SupportedValueType.String:
+                    MethodInfo mi1 = typeof(string).GetMethodWithExactParameters(
+                        nameof(string.Concat),
+                        typeof(string),
+                        typeof(string));
+                    return Expression.Call(
+                        mi1,
+                        leftExpression,
+                        rightExpression);
+                case SupportedValueType.ByteArray:
+                    MethodInfo mi2 = typeof(AddNode).GetMethodWithExactParameters(
+                        nameof(Stitch),
+                        typeof(byte[]),
+                        typeof(byte[]));
+                    return Expression.Call(
+                        mi2,
+                        leftExpression,
+                        rightExpression);
+                default:
+                    return Expression.Add(
+                        leftExpression,
+                        rightExpression);
             }
         }
     }

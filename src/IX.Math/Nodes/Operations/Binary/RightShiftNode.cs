@@ -9,55 +9,105 @@ using IX.StandardExtensions.Extensions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
-    [DebuggerDisplay("{Left} >> {Right}")]
+    /// <summary>
+    ///     A node for a bitwise right-shift operation.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.Operations.Binary.ByteShiftOperationNodeBase" />
+    [DebuggerDisplay("{" + nameof(Left) + "} >> {" + nameof(Right) + "}")]
     internal sealed class RightShiftNode : ByteShiftOperationNodeBase
     {
-        public RightShiftNode(NodeBase left, NodeBase right)
-            : base(left?.Simplify(), right?.Simplify())
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="RightShiftNode" /> class.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        public RightShiftNode(
+            NodeBase left,
+            NodeBase right)
+            : base(
+                left?.Simplify(),
+                right?.Simplify())
         {
-        }
-
-        public override NodeBase Simplify()
-        {
-            if (this.Left is NumericNode nLeft && this.Right is NumericNode nRight)
-            {
-                return NumericNode.RightShift(nLeft, nRight);
-            }
-            else if (this.Left is ByteArrayNode baLeft && this.Right is NumericNode baRight)
-            {
-                return new ByteArrayNode(baLeft.Value.RightShift(baRight.ExtractInt()));
-            }
-            else
-            {
-                return this;
-            }
         }
 
         /// <summary>
-        /// Creates a deep clone of the source object.
+        ///     Simplifies this node, if possible, reflexively returns otherwise.
+        /// </summary>
+        /// <returns>
+        ///     A simplified node, or this instance.
+        /// </returns>
+        public override NodeBase Simplify() =>
+            this.Left switch
+            {
+                NumericNode nLeft when this.Right is NumericNode nRight => NumericNode.RightShift(
+                    nLeft,
+                    nRight),
+                ByteArrayNode baLeft when this.Right is NumericNode baRight => new ByteArrayNode(
+                    baLeft.Value.RightShift(baRight.ExtractInt())),
+                _ => this
+            };
+
+        /// <summary>
+        ///     Creates a deep clone of the source object.
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new RightShiftNode(this.Left.DeepClone(context), this.Right.DeepClone(context));
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new RightShiftNode(
+                this.Left.DeepClone(context),
+                this.Right.DeepClone(context));
 
+        /// <summary>
+        ///     Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <returns>
+        ///     The expression.
+        /// </returns>
         protected override Expression GenerateExpressionInternal()
         {
-            Expression rightExpression = Expression.Convert(this.Right.GenerateExpression(), typeof(int));
-            if (this.Left.ReturnType == SupportedValueType.Numeric)
+            Expression rightExpression = Expression.Convert(
+                this.Right.GenerateExpression(),
+                typeof(int));
+            return this.Left.ReturnType switch
             {
-                return Expression.RightShift(this.Left.GenerateExpression(), rightExpression);
-            }
-            else if (this.Left.ReturnType == SupportedValueType.ByteArray)
-            {
-                return Expression.Call(
-                    typeof(BitwiseExtensions).GetMethodWithExactParameters(nameof(BitwiseExtensions.RightShift), typeof(byte[]), typeof(int)),
+                SupportedValueType.Numeric => Expression.RightShift(
                     this.Left.GenerateExpression(),
-                    rightExpression);
-            }
-            else
+                    rightExpression),
+                SupportedValueType.ByteArray => Expression.Call(
+                    typeof(BitwiseExtensions).GetMethodWithExactParameters(
+                        nameof(BitwiseExtensions.RightShift),
+                        typeof(byte[]),
+                        typeof(int)),
+                    this.Left.GenerateExpression(),
+                    rightExpression),
+                _ => throw new ExpressionNotValidLogicallyException()
+            };
+        }
+
+        /// <summary>
+        ///     Generates the expression with tolerance that will be compiled into code.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>The expression.</returns>
+        protected override Expression GenerateExpressionInternal(Tolerance tolerance)
+        {
+            Expression rightExpression = Expression.Convert(
+                this.Right.GenerateExpression(tolerance),
+                typeof(int));
+            return this.Left.ReturnType switch
             {
-                throw new ExpressionNotValidLogicallyException();
-            }
+                SupportedValueType.Numeric => Expression.RightShift(
+                    this.Left.GenerateExpression(tolerance),
+                    rightExpression),
+                SupportedValueType.ByteArray => Expression.Call(
+                    typeof(BitwiseExtensions).GetMethodWithExactParameters(
+                        nameof(BitwiseExtensions.RightShift),
+                        typeof(byte[]),
+                        typeof(int)),
+                    this.Left.GenerateExpression(tolerance),
+                    rightExpression),
+                _ => throw new ExpressionNotValidLogicallyException()
+            };
         }
     }
 }

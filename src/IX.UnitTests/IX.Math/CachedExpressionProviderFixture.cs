@@ -11,7 +11,7 @@ namespace IX.UnitTests.IX.Math
     ///     A fixture for a cached expression provider test suite.
     /// </summary>
     /// <seealso cref="IDisposable" />
-    public class CachedExpressionProviderFixture : IDisposable
+    public sealed class CachedExpressionProviderFixture : IDisposable
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="CachedExpressionProviderFixture" /> class.

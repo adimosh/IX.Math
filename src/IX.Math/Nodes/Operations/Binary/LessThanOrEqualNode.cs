@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Nodes.Constants;
@@ -11,76 +12,183 @@ using IX.StandardExtensions.Extensions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
-    [DebuggerDisplay("{Left} <= {Right}")]
+    /// <summary>
+    ///     A node representing a less than or equal to expression.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.Operations.Binary.ComparisonOperationNodeBase" />
+    [DebuggerDisplay("{" + nameof(Left) + "} <= {" + nameof(Right) + "}")]
     internal sealed class LessThanOrEqualNode : ComparisonOperationNodeBase
     {
-        public LessThanOrEqualNode(NodeBase left, NodeBase right)
-            : base(left?.Simplify(), right?.Simplify())
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="LessThanOrEqualNode" /> class.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        public LessThanOrEqualNode(
+            NodeBase left,
+            NodeBase right)
+            : base(
+                left?.Simplify(),
+                right?.Simplify())
         {
-        }
-
-        public override NodeBase Simplify()
-        {
-            if (this.Left is NumericNode nnLeft && this.Right is NumericNode nnRight)
-            {
-                return new BoolNode(Convert.ToDouble(nnLeft.Value) <= Convert.ToDouble(nnRight.Value));
-            }
-            else if (this.Left is StringNode snLeft && this.Right is StringNode snRight)
-            {
-                return new BoolNode(snLeft.Value.CompareTo(snRight.Value) <= 0);
-            }
-            else if (this.Left is BoolNode bnLeft && this.Right is BoolNode bnRight)
-            {
-                return new BoolNode(bnLeft.Value ? bnRight.Value : true);
-            }
-            else if (this.Left is ByteArrayNode baLeft && this.Right is ByteArrayNode baRight)
-            {
-                return new BoolNode(baLeft.Value.SequenceCompareWithMsb(baRight.Value) <= 0);
-            }
-            else
-            {
-                return this;
-            }
         }
 
         /// <summary>
-        /// Creates a deep clone of the source object.
+        ///     Simplifies this node, if possible, reflexively returns otherwise.
+        /// </summary>
+        /// <returns>
+        ///     A simplified node, or this instance.
+        /// </returns>
+        public override NodeBase Simplify() =>
+            this.Left switch
+            {
+                NumericNode nnLeft when this.Right is NumericNode nnRight => new BoolNode(
+                    Convert.ToDouble(nnLeft.Value) <= Convert.ToDouble(nnRight.Value)),
+                StringNode snLeft when this.Right is StringNode snRight => new BoolNode(
+                    snLeft.Value.CompareTo(snRight.Value) <= 0),
+                BoolNode bnLeft when this.Right is BoolNode bnRight => new BoolNode(!bnLeft.Value || bnRight.Value),
+                ByteArrayNode baLeft when this.Right is ByteArrayNode baRight => new BoolNode(
+                    baLeft.Value.SequenceCompareWithMsb(baRight.Value) <= 0),
+                _ => this
+            };
+
+        /// <summary>
+        ///     Creates a deep clone of the source object.
         /// </summary>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new LessThanOrEqualNode(this.Left.DeepClone(context), this.Right.DeepClone(context));
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new LessThanOrEqualNode(
+                this.Left.DeepClone(context),
+                this.Right.DeepClone(context));
 
+        /// <summary>
+        ///     Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <returns>
+        ///     The expression.
+        /// </returns>
+        [SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "We want this to happen.")]
         protected override Expression GenerateExpressionInternal()
         {
-#pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - This is desired
-            Tuple<Expression, Expression> pars = this.GetExpressionsOfSameTypeFromOperands();
-            if (pars.Item1.Type == typeof(string))
+            (Expression leftExpression, Expression rightExpression) = this.GetExpressionsOfSameTypeFromOperands();
+            if (leftExpression.Type == typeof(string))
             {
-                MethodInfo mi = typeof(string).GetMethodWithExactParameters(nameof(string.Compare), typeof(string), typeof(string));
+                MethodInfo mi = typeof(string).GetMethodWithExactParameters(
+                    nameof(string.Compare),
+                    typeof(string),
+                    typeof(string));
                 return Expression.LessThanOrEqual(
-                    Expression.Call(mi, this.Left.GenerateStringExpression(), this.Right.GenerateStringExpression()),
-                    Expression.Constant(0, typeof(int)));
+                    Expression.Call(
+                        mi,
+                        this.Left.GenerateStringExpression(),
+                        this.Right.GenerateStringExpression()),
+                    Expression.Constant(
+                        0,
+                        typeof(int)));
             }
-            else if (this.Left.ReturnType == SupportedValueType.Boolean || this.Right.ReturnType == SupportedValueType.Boolean)
+
+            if (this.Left.ReturnType == SupportedValueType.Boolean ||
+                this.Right.ReturnType == SupportedValueType.Boolean)
             {
                 return Expression.Condition(
-                    Expression.Equal(pars.Item1, Expression.Constant(true, typeof(bool))),
-                    pars.Item2,
-                    Expression.Constant(true, typeof(bool)));
+                    Expression.Equal(
+                        leftExpression,
+                        Expression.Constant(
+                            true,
+                            typeof(bool))),
+                    rightExpression,
+                    Expression.Constant(
+                        true,
+                        typeof(bool)));
             }
-            else if (this.Left.ReturnType == SupportedValueType.ByteArray || this.Right.ReturnType == SupportedValueType.ByteArray)
+
+            if (this.Left.ReturnType == SupportedValueType.ByteArray ||
+                this.Right.ReturnType == SupportedValueType.ByteArray)
             {
                 return Expression.LessThanOrEqual(
                     Expression.Call(
-                        typeof(ArrayExtensions).GetMethodWithExactParameters(nameof(ArrayExtensions.SequenceCompareWithMsb), typeof(byte[]), typeof(byte[])),
-                        pars.Item1,
-                        pars.Item2),
-                    Expression.Constant(0, typeof(int)));
+                        typeof(ArrayExtensions).GetMethodWithExactParameters(
+                            nameof(ArrayExtensions.SequenceCompareWithMsb),
+                            typeof(byte[]),
+                            typeof(byte[])),
+                        leftExpression,
+                        rightExpression),
+                    Expression.Constant(
+                        0,
+                        typeof(int)));
             }
-            else
+
+            return Expression.LessThanOrEqual(
+                leftExpression,
+                rightExpression);
+        }
+
+        /// <summary>
+        ///     Generates the expression with tolerance that will be compiled into code.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>The expression.</returns>
+        [SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "We want this to happen.")]
+        protected override Expression GenerateExpressionInternal(Tolerance tolerance)
+        {
+            (Expression leftExpression, Expression rightExpression) =
+                this.GetExpressionsOfSameTypeFromOperands(tolerance);
+            if (leftExpression.Type == typeof(string))
             {
-                return Expression.LessThanOrEqual(pars.Item1, pars.Item2);
+                MethodInfo mi = typeof(string).GetMethodWithExactParameters(
+                    nameof(string.Compare),
+                    typeof(string),
+                    typeof(string));
+                return Expression.LessThanOrEqual(
+                    Expression.Call(
+                        mi,
+                        this.Left.GenerateStringExpression(),
+                        this.Right.GenerateStringExpression()),
+                    Expression.Constant(
+                        0,
+                        typeof(int)));
             }
-#pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
+
+            if (this.Left.ReturnType == SupportedValueType.Boolean ||
+                this.Right.ReturnType == SupportedValueType.Boolean)
+            {
+                return Expression.Condition(
+                    Expression.Equal(
+                        leftExpression,
+                        Expression.Constant(
+                            true,
+                            typeof(bool))),
+                    rightExpression,
+                    Expression.Constant(
+                        true,
+                        typeof(bool)));
+            }
+
+            if (this.Left.ReturnType == SupportedValueType.ByteArray ||
+                this.Right.ReturnType == SupportedValueType.ByteArray)
+            {
+                return Expression.LessThanOrEqual(
+                    Expression.Call(
+                        typeof(ArrayExtensions).GetMethodWithExactParameters(
+                            nameof(ArrayExtensions.SequenceCompareWithMsb),
+                            typeof(byte[]),
+                            typeof(byte[])),
+                        leftExpression,
+                        rightExpression),
+                    Expression.Constant(
+                        0,
+                        typeof(int)));
+            }
+
+            return Expression.LessThanOrEqual(
+                leftExpression,
+                rightExpression);
         }
     }
 }
