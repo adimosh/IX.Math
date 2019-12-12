@@ -324,6 +324,322 @@ namespace IX.UnitTests.IX.Math
                 false,
                 new Tolerance { ProportionalTolerance = 2 },
             },
+
+            // Greater than
+            new object[]
+            {
+                "x>y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                true,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1L },
+            },
+            new object[]
+            {
+                "x>y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                true,
+                new Tolerance { ToleranceRangeLowerBound = 1D },
+            },
+            new object[]
+            {
+                "x>y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                false,
+                new Tolerance { ToleranceRangeLowerBound = 0.5D },
+            },
+            new object[]
+            {
+                "x>y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                false,
+                new Tolerance { ProportionalTolerance = 0.2D },
+            },
+            new object[]
+            {
+                "x>y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                true,
+                new Tolerance { ProportionalTolerance = 0.5D },
+            },
+            new object[]
+            {
+                "x>y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                false,
+                new Tolerance { ProportionalTolerance = 1.1D },
+            },
+            new object[]
+            {
+                "x>y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                true,
+                new Tolerance { ProportionalTolerance = 2D },
+            },
+
+            // Greater than or equal
+            new object[]
+            {
+                "x>=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                true,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1L },
+            },
+            new object[]
+            {
+                "x>=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                true,
+                new Tolerance { ToleranceRangeLowerBound = 1D },
+            },
+            new object[]
+            {
+                "x>=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                true,
+                new Tolerance { ToleranceRangeLowerBound = 0.5D },
+            },
+            new object[]
+            {
+                "x>=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                false,
+                new Tolerance { ProportionalTolerance = 0.2D },
+            },
+            new object[]
+            {
+                "x>=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                true,
+                new Tolerance { ProportionalTolerance = 0.5D },
+            },
+            new object[]
+            {
+                "x>=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                false,
+                new Tolerance { ProportionalTolerance = 1.1D },
+            },
+            new object[]
+            {
+                "x>=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = 1D,
+                    ["y"] = 1.5D,
+                },
+                true,
+                new Tolerance { ProportionalTolerance = 2D },
+            },
+
+            // Less than
+            new object[]
+            {
+                "y<x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                true,
+                new Tolerance { IntegerToleranceRangeUpperBound = 1L },
+            },
+            new object[]
+            {
+                "y<x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                true,
+                new Tolerance { ToleranceRangeUpperBound = 1D },
+            },
+            new object[]
+            {
+                "y<x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                false,
+                new Tolerance { ToleranceRangeUpperBound = 0.5D },
+            },
+            new object[]
+            {
+                "y<x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                false,
+                new Tolerance { ProportionalTolerance = 0.2D },
+            },
+            new object[]
+            {
+                "y<x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                false,
+                new Tolerance { ProportionalTolerance = 0.5D },
+            },
+            new object[]
+            {
+                "y<x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                false,
+                new Tolerance { ProportionalTolerance = 1.1D },
+            },
+            new object[]
+            {
+                "y<x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                true,
+                new Tolerance { ProportionalTolerance = 2D },
+            },
+
+            // Less than or equal
+            new object[]
+            {
+                "y<=x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                true,
+                new Tolerance { IntegerToleranceRangeUpperBound = 1L },
+            },
+            new object[]
+            {
+                "y<=x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                true,
+                new Tolerance { ToleranceRangeUpperBound = 1D },
+            },
+            new object[]
+            {
+                "y<=x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                true,
+                new Tolerance { ToleranceRangeUpperBound = 0.5D },
+            },
+            new object[]
+            {
+                "y<=x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                false,
+                new Tolerance { ProportionalTolerance = 0.2D },
+            },
+            new object[]
+            {
+                "y<=x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                true,
+                new Tolerance { ProportionalTolerance = 0.5D },
+            },
+            new object[]
+            {
+                "y<=x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                false,
+                new Tolerance { ProportionalTolerance = 1.1D },
+            },
+            new object[]
+            {
+                "y<=x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 1.5D,
+                    ["x"] = 1D,
+                },
+                true,
+                new Tolerance { ProportionalTolerance = 2D },
+            },
         };
 
         /// <summary>
@@ -342,17 +658,14 @@ namespace IX.UnitTests.IX.Math
             object expectedResult,
             Tolerance tolerance)
         {
-            using (var service = new ExpressionParsingService())
-            {
-                using (ComputedExpression del = service.Interpret(expression))
-                {
-                    object result = del.Compute(tolerance, parameters?.Values.ToArray() ?? new object[0]);
+            using var service = new ExpressionParsingService();
+            using ComputedExpression del = service.Interpret(expression);
 
-                    Assert.Equal(
-                        expectedResult,
-                        result);
-                }
-            }
+            object result = del.Compute(tolerance, parameters?.Values.ToArray() ?? new object[0]);
+
+            Assert.Equal(
+                expectedResult,
+                result);
         }
 
         /// <summary>
@@ -371,32 +684,30 @@ namespace IX.UnitTests.IX.Math
             object expectedResult,
             Tolerance tolerance)
         {
-            using (var service = new ExpressionParsingService())
+            using var service = new ExpressionParsingService();
+
+            var finder = new Mock<IDataFinder>(MockBehavior.Loose);
+
+            using ComputedExpression del = service.Interpret(expression);
+
+            if (parameters != null)
             {
-                var finder = new Mock<IDataFinder>(MockBehavior.Loose);
-
-                using (ComputedExpression del = service.Interpret(expression))
+                foreach (KeyValuePair<string, object> parameter in parameters)
                 {
-                    if (parameters != null)
-                    {
-                        foreach (KeyValuePair<string, object> parameter in parameters)
-                        {
-                            var key = parameter.Key;
-                            object value = parameter.Value;
-                            finder.Setup(
-                                p => p.TryGetData(
-                                    key,
-                                    out value)).Returns(true);
-                        }
-                    }
-
-                    object result = del.Compute(tolerance, finder.Object);
-
-                    Assert.Equal(
-                        expectedResult,
-                        result);
+                    var key = parameter.Key;
+                    object value = parameter.Value;
+                    finder.Setup(
+                        p => p.TryGetData(
+                            key,
+                            out value)).Returns(true);
                 }
             }
+
+            object result = del.Compute(tolerance, finder.Object);
+
+            Assert.Equal(
+                expectedResult,
+                result);
         }
 
 #pragma warning disable IDISP001 // Dispose created. - We specifically do not want these to be disposed
@@ -491,32 +802,30 @@ namespace IX.UnitTests.IX.Math
             object expectedResult,
             Tolerance tolerance)
         {
-            using (var service = new ExpressionParsingService())
+            using var service = new ExpressionParsingService();
+
+            var finder = new Mock<IDataFinder>(MockBehavior.Loose);
+
+            using ComputedExpression del = service.Interpret(expression);
+
+            if (parameters != null)
             {
-                var finder = new Mock<IDataFinder>(MockBehavior.Loose);
-
-                using (ComputedExpression del = service.Interpret(expression))
+                foreach (KeyValuePair<string, object> parameter in parameters)
                 {
-                    if (parameters != null)
-                    {
-                        foreach (KeyValuePair<string, object> parameter in parameters)
-                        {
-                            var key = parameter.Key;
-                            object value = this.GenerateFuncOutOfParameterValue(parameter.Value);
-                            finder.Setup(
-                                p => p.TryGetData(
-                                    key,
-                                    out value)).Returns(true);
-                        }
-                    }
-
-                    object result = del.Compute(tolerance, finder.Object);
-
-                    Assert.Equal(
-                        expectedResult,
-                        result);
+                    var key = parameter.Key;
+                    object value = this.GenerateFuncOutOfParameterValue(parameter.Value);
+                    finder.Setup(
+                        p => p.TryGetData(
+                            key,
+                            out value)).Returns(true);
                 }
             }
+
+            object result = del.Compute(tolerance, finder.Object);
+
+            Assert.Equal(
+                expectedResult,
+                result);
         }
 
 #pragma warning disable IDISP001 // Dispose created. - We specifically do not want these to be disposed

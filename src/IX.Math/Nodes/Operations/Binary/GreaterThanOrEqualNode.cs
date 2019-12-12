@@ -4,11 +4,12 @@
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Extensions;
+using JetBrains.Annotations;
+using SuppressMessage = System.Diagnostics.CodeAnalysis.SuppressMessageAttribute;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
@@ -187,9 +188,105 @@ namespace IX.Math.Nodes.Operations.Binary
                         typeof(int)));
             }
 
+            if (this.Left.ReturnType == SupportedValueType.Numeric &&
+                this.Right.ReturnType == SupportedValueType.Numeric)
+            {
+                var possibleTolerantExpression = this.PossibleToleranceExpression(
+                    leftExpression,
+                    rightExpression,
+                    tolerance);
+
+                if (possibleTolerantExpression != null)
+                {
+                    // Valid tolerance expression
+                    return possibleTolerantExpression;
+                }
+            }
+
             return Expression.GreaterThanOrEqual(
                 leftExpression,
                 rightExpression);
+        }
+
+        [SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "We want it this way.")]
+        private Expression PossibleToleranceExpression([NotNull] Expression leftExpression, [NotNull] Expression rightExpression, [NotNull] Tolerance tolerance)
+        {
+            if (tolerance.IntegerToleranceRangeLowerBound != null)
+            {
+                // Integer tolerance
+                MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
+                    nameof(ToleranceFunctions.GreaterThanOrEqualRangeTolerant),
+                    leftExpression.Type,
+                    rightExpression.Type,
+                    typeof(long));
+
+                return Expression.Call(
+                    mi,
+                    leftExpression,
+                    rightExpression,
+                    Expression.Constant(
+                        tolerance.IntegerToleranceRangeLowerBound ?? 0L,
+                        typeof(long)));
+            }
+
+            if (tolerance.ToleranceRangeLowerBound != null)
+            {
+                // Floating-point tolerance
+                MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
+                    nameof(ToleranceFunctions.GreaterThanOrEqualRangeTolerant),
+                    leftExpression.Type,
+                    rightExpression.Type,
+                    typeof(double));
+
+                return Expression.Call(
+                    mi,
+                    leftExpression,
+                    rightExpression,
+                    Expression.Constant(
+                        tolerance.ToleranceRangeLowerBound ?? 0D,
+                        typeof(double)));
+            }
+
+            if (tolerance.ProportionalTolerance != null)
+            {
+                if (tolerance.ProportionalTolerance.Value > 1D)
+                {
+                    // Proportional tolerance
+                    MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
+                        nameof(ToleranceFunctions.GreaterThanOrEqualProportionTolerant),
+                        leftExpression.Type,
+                        rightExpression.Type,
+                        typeof(double));
+
+                    return Expression.Call(
+                        mi,
+                        leftExpression,
+                        rightExpression,
+                        Expression.Constant(
+                            tolerance.ProportionalTolerance ?? 0D,
+                            typeof(double)));
+                }
+
+                if (tolerance.ProportionalTolerance.Value < 1D && tolerance.ProportionalTolerance.Value > 0D)
+                {
+                    // Percentage tolerance
+                    MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
+                        nameof(ToleranceFunctions.GreaterThanOrEqualPercentageTolerant),
+                        leftExpression.Type,
+                        rightExpression.Type,
+                        typeof(double));
+
+                    return Expression.Call(
+                        mi,
+                        leftExpression,
+                        rightExpression,
+                        Expression.Constant(
+                            tolerance.ProportionalTolerance ?? 0D,
+                            typeof(double)));
+                }
+            }
+
+            return null;
         }
     }
 }
