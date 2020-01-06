@@ -48,19 +48,16 @@ namespace IX.Math.Nodes.Operations.Binary
                     return SupportedValueType.String;
                 }
 
-                switch (this.Left.ReturnType)
+                return this.Left.ReturnType switch
                 {
-                    case SupportedValueType.ByteArray:
-                        return this.Right.ReturnType == SupportedValueType.ByteArray
-                            ? SupportedValueType.ByteArray
-                            : SupportedValueType.Unknown;
-                    case SupportedValueType.Numeric:
-                        return this.Right.ReturnType == SupportedValueType.Numeric
-                            ? SupportedValueType.Numeric
-                            : SupportedValueType.Unknown;
-                    default:
-                        return SupportedValueType.Unknown;
-                }
+                    SupportedValueType.ByteArray => this.Right.ReturnType == SupportedValueType.ByteArray
+                                                ? SupportedValueType.ByteArray
+                                                : SupportedValueType.Unknown,
+                    SupportedValueType.Numeric => this.Right.ReturnType == SupportedValueType.Numeric
+                                                ? SupportedValueType.Numeric
+                                                : SupportedValueType.Unknown,
+                    _ => SupportedValueType.Unknown,
+                };
             }
         }
 

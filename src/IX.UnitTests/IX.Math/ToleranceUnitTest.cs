@@ -1,4 +1,4 @@
-// <copyright file="OneDataSetComputedExpressionUnitTest.cs" company="Adrian Mos">
+// <copyright file="ToleranceUnitTest.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -32,7 +32,6 @@ namespace IX.UnitTests.IX.Math
         ///     Provides the data for theory.
         /// </summary>
         /// <returns>Theory data.</returns>
-        // ReSharper disable once MemberCanBePrivate.Global - It really cannot
         public static object[][] ProvideDataForTheory() => new[]
         {
             // Equation
@@ -49,12 +48,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.7=1.9",
+                null,
+                true,
+                new Tolerance { ToleranceRangeLowerBound = 0.2, ToleranceRangeUpperBound = 0.2 },
+            },
+            new object[]
+            {
                 "x=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1.7D,
                     ["y"] = 1.9D,
                 },
+                false,
+                new Tolerance { ToleranceRangeLowerBound = 0.1, ToleranceRangeUpperBound = 0.1 },
+            },
+            new object[]
+            {
+                "1.7=1.9",
+                null,
                 false,
                 new Tolerance { ToleranceRangeLowerBound = 0.1, ToleranceRangeUpperBound = 0.1 },
             },
@@ -71,12 +84,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.7=1.9",
+                null,
+                true,
+                new Tolerance { ToleranceRangeLowerBound = 0.2 },
+            },
+            new object[]
+            {
                 "x=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1.7D,
                     ["y"] = 1.9D,
                 },
+                false,
+                new Tolerance { ToleranceRangeUpperBound = 0.2 },
+            },
+            new object[]
+            {
+                "1.7=1.9",
+                null,
                 false,
                 new Tolerance { ToleranceRangeUpperBound = 0.2 },
             },
@@ -93,12 +120,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.7=1.9",
+                null,
+                true,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1, IntegerToleranceRangeUpperBound = 1 },
+            },
+            new object[]
+            {
                 "x=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1.7D,
                     ["y"] = 1.9D,
                 },
+                true,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1 },
+            },
+            new object[]
+            {
+                "1.7=1.9",
+                null,
                 true,
                 new Tolerance { IntegerToleranceRangeLowerBound = 1 },
             },
@@ -115,12 +156,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.7=1.9",
+                null,
+                false,
+                new Tolerance { IntegerToleranceRangeUpperBound = 1 },
+            },
+            new object[]
+            {
                 "x=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 0.7D,
                     ["y"] = 1.9D,
                 },
+                false,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1, IntegerToleranceRangeUpperBound = 1 },
+            },
+            new object[]
+            {
+                "0.7=1.9",
+                null,
                 false,
                 new Tolerance { IntegerToleranceRangeLowerBound = 1, IntegerToleranceRangeUpperBound = 1 },
             },
@@ -137,12 +192,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.7=2.9",
+                null,
+                false,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1, IntegerToleranceRangeUpperBound = 1 },
+            },
+            new object[]
+            {
                 "x=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1D,
                     ["y"] = 1.5D,
                 },
+                false,
+                new Tolerance { ProportionalTolerance = 0.1 },
+            },
+            new object[]
+            {
+                "1=1.5",
+                null,
                 false,
                 new Tolerance { ProportionalTolerance = 0.1 },
             },
@@ -159,6 +228,13 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1=1.5",
+                null,
+                true,
+                new Tolerance { ProportionalTolerance = 0.5 },
+            },
+            new object[]
+            {
                 "x=y",
                 new Dictionary<string, object>
                 {
@@ -170,12 +246,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1=1.5",
+                null,
+                false,
+                new Tolerance { ProportionalTolerance = 1.1 },
+            },
+            new object[]
+            {
                 "x=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1D,
                     ["y"] = 1.5D,
                 },
+                true,
+                new Tolerance { ProportionalTolerance = 2 },
+            },
+            new object[]
+            {
+                "1=1.5",
+                null,
                 true,
                 new Tolerance { ProportionalTolerance = 2 },
             },
@@ -194,12 +284,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.7!=1.9",
+                null,
+                false,
+                new Tolerance { ToleranceRangeLowerBound = 0.2, ToleranceRangeUpperBound = 0.2 },
+            },
+            new object[]
+            {
                 "x!=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1.7D,
                     ["y"] = 1.9D,
                 },
+                true,
+                new Tolerance { ToleranceRangeLowerBound = 0.1, ToleranceRangeUpperBound = 0.1 },
+            },
+            new object[]
+            {
+                "1.7!=1.9",
+                null,
                 true,
                 new Tolerance { ToleranceRangeLowerBound = 0.1, ToleranceRangeUpperBound = 0.1 },
             },
@@ -216,12 +320,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.7!=1.9",
+                null,
+                false,
+                new Tolerance { ToleranceRangeLowerBound = 0.2 },
+            },
+            new object[]
+            {
                 "x!=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1.7D,
                     ["y"] = 1.9D,
                 },
+                true,
+                new Tolerance { ToleranceRangeUpperBound = 0.2 },
+            },
+            new object[]
+            {
+                "1.7!=1.9",
+                null,
                 true,
                 new Tolerance { ToleranceRangeUpperBound = 0.2 },
             },
@@ -238,12 +356,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.7!=1.9",
+                null,
+                false,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1, IntegerToleranceRangeUpperBound = 1 },
+            },
+            new object[]
+            {
                 "x!=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1.7D,
                     ["y"] = 1.9D,
                 },
+                false,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1 },
+            },
+            new object[]
+            {
+                "1.7!=1.9",
+                null,
                 false,
                 new Tolerance { IntegerToleranceRangeLowerBound = 1 },
             },
@@ -260,12 +392,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.7!=1.9",
+                null,
+                true,
+                new Tolerance { IntegerToleranceRangeUpperBound = 1 },
+            },
+            new object[]
+            {
                 "x!=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 0.7D,
                     ["y"] = 1.9D,
                 },
+                true,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1, IntegerToleranceRangeUpperBound = 1 },
+            },
+            new object[]
+            {
+                "0.7!=1.9",
+                null,
                 true,
                 new Tolerance { IntegerToleranceRangeLowerBound = 1, IntegerToleranceRangeUpperBound = 1 },
             },
@@ -282,12 +428,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.7!=2.9",
+                null,
+                true,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1, IntegerToleranceRangeUpperBound = 1 },
+            },
+            new object[]
+            {
                 "x!=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1D,
                     ["y"] = 1.5D,
                 },
+                true,
+                new Tolerance { ProportionalTolerance = 0.1 },
+            },
+            new object[]
+            {
+                "1!=1.5",
+                null,
                 true,
                 new Tolerance { ProportionalTolerance = 0.1 },
             },
@@ -304,6 +464,13 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1!=1.5",
+                null,
+                false,
+                new Tolerance { ProportionalTolerance = 0.5 },
+            },
+            new object[]
+            {
                 "x!=y",
                 new Dictionary<string, object>
                 {
@@ -315,12 +482,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1!=1.5",
+                null,
+                true,
+                new Tolerance { ProportionalTolerance = 1.1 },
+            },
+            new object[]
+            {
                 "x!=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1D,
                     ["y"] = 1.5D,
                 },
+                false,
+                new Tolerance { ProportionalTolerance = 2 },
+            },
+            new object[]
+            {
+                "1!=1.5",
+                null,
                 false,
                 new Tolerance { ProportionalTolerance = 2 },
             },
@@ -339,12 +520,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1>1.5",
+                null,
+                true,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1L },
+            },
+            new object[]
+            {
                 "x>y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1D,
                     ["y"] = 1.5D,
                 },
+                true,
+                new Tolerance { ToleranceRangeLowerBound = 1D },
+            },
+            new object[]
+            {
+                "1>1.5",
+                null,
                 true,
                 new Tolerance { ToleranceRangeLowerBound = 1D },
             },
@@ -361,12 +556,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1>1.5",
+                null,
+                false,
+                new Tolerance { ToleranceRangeLowerBound = 0.5D },
+            },
+            new object[]
+            {
                 "x>y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1D,
                     ["y"] = 1.5D,
                 },
+                false,
+                new Tolerance { ProportionalTolerance = 0.2D },
+            },
+            new object[]
+            {
+                "1>1.5",
+                null,
                 false,
                 new Tolerance { ProportionalTolerance = 0.2D },
             },
@@ -383,6 +592,13 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1>1.5",
+                null,
+                true,
+                new Tolerance { ProportionalTolerance = 0.5D },
+            },
+            new object[]
+            {
                 "x>y",
                 new Dictionary<string, object>
                 {
@@ -394,12 +610,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1>1.5",
+                null,
+                false,
+                new Tolerance { ProportionalTolerance = 1.1D },
+            },
+            new object[]
+            {
                 "x>y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1D,
                     ["y"] = 1.5D,
                 },
+                true,
+                new Tolerance { ProportionalTolerance = 2D },
+            },
+            new object[]
+            {
+                "1>1.5",
+                null,
                 true,
                 new Tolerance { ProportionalTolerance = 2D },
             },
@@ -418,12 +648,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1>=1.5",
+                null,
+                true,
+                new Tolerance { IntegerToleranceRangeLowerBound = 1L },
+            },
+            new object[]
+            {
                 "x>=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1D,
                     ["y"] = 1.5D,
                 },
+                true,
+                new Tolerance { ToleranceRangeLowerBound = 1D },
+            },
+            new object[]
+            {
+                "1>=1.5",
+                null,
                 true,
                 new Tolerance { ToleranceRangeLowerBound = 1D },
             },
@@ -440,12 +684,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1>=1.5",
+                null,
+                true,
+                new Tolerance { ToleranceRangeLowerBound = 0.5D },
+            },
+            new object[]
+            {
                 "x>=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1D,
                     ["y"] = 1.5D,
                 },
+                false,
+                new Tolerance { ProportionalTolerance = 0.2D },
+            },
+            new object[]
+            {
+                "1>=1.5",
+                null,
                 false,
                 new Tolerance { ProportionalTolerance = 0.2D },
             },
@@ -462,6 +720,13 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1>=1.5",
+                null,
+                true,
+                new Tolerance { ProportionalTolerance = 0.5D },
+            },
+            new object[]
+            {
                 "x>=y",
                 new Dictionary<string, object>
                 {
@@ -473,12 +738,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1>=1.5",
+                null,
+                false,
+                new Tolerance { ProportionalTolerance = 1.1D },
+            },
+            new object[]
+            {
                 "x>=y",
                 new Dictionary<string, object>
                 {
                     ["x"] = 1D,
                     ["y"] = 1.5D,
                 },
+                true,
+                new Tolerance { ProportionalTolerance = 2D },
+            },
+            new object[]
+            {
+                "1>=1.5",
+                null,
                 true,
                 new Tolerance { ProportionalTolerance = 2D },
             },
@@ -497,12 +776,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.5<1",
+                null,
+                true,
+                new Tolerance { IntegerToleranceRangeUpperBound = 1L },
+            },
+            new object[]
+            {
                 "y<x",
                 new Dictionary<string, object>
                 {
                     ["y"] = 1.5D,
                     ["x"] = 1D,
                 },
+                true,
+                new Tolerance { ToleranceRangeUpperBound = 1D },
+            },
+            new object[]
+            {
+                "1.5<1",
+                null,
                 true,
                 new Tolerance { ToleranceRangeUpperBound = 1D },
             },
@@ -519,12 +812,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.5<1",
+                null,
+                false,
+                new Tolerance { ToleranceRangeUpperBound = 0.5D },
+            },
+            new object[]
+            {
                 "y<x",
                 new Dictionary<string, object>
                 {
                     ["y"] = 1.5D,
                     ["x"] = 1D,
                 },
+                false,
+                new Tolerance { ProportionalTolerance = 0.2D },
+            },
+            new object[]
+            {
+                "1.5<1",
+                null,
                 false,
                 new Tolerance { ProportionalTolerance = 0.2D },
             },
@@ -541,6 +848,13 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.5<1",
+                null,
+                false,
+                new Tolerance { ProportionalTolerance = 0.5D },
+            },
+            new object[]
+            {
                 "y<x",
                 new Dictionary<string, object>
                 {
@@ -552,12 +866,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.5<1",
+                null,
+                false,
+                new Tolerance { ProportionalTolerance = 1.1D },
+            },
+            new object[]
+            {
                 "y<x",
                 new Dictionary<string, object>
                 {
                     ["y"] = 1.5D,
                     ["x"] = 1D,
                 },
+                true,
+                new Tolerance { ProportionalTolerance = 2D },
+            },
+            new object[]
+            {
+                "1.5<1",
+                null,
                 true,
                 new Tolerance { ProportionalTolerance = 2D },
             },
@@ -576,12 +904,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.5<=1",
+                null,
+                true,
+                new Tolerance { IntegerToleranceRangeUpperBound = 1L },
+            },
+            new object[]
+            {
                 "y<=x",
                 new Dictionary<string, object>
                 {
                     ["y"] = 1.5D,
                     ["x"] = 1D,
                 },
+                true,
+                new Tolerance { ToleranceRangeUpperBound = 1D },
+            },
+            new object[]
+            {
+                "1.5<=1",
+                null,
                 true,
                 new Tolerance { ToleranceRangeUpperBound = 1D },
             },
@@ -598,12 +940,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.5<=1",
+                null,
+                true,
+                new Tolerance { ToleranceRangeUpperBound = 0.5D },
+            },
+            new object[]
+            {
                 "y<=x",
                 new Dictionary<string, object>
                 {
                     ["y"] = 1.5D,
                     ["x"] = 1D,
                 },
+                false,
+                new Tolerance { ProportionalTolerance = 0.2D },
+            },
+            new object[]
+            {
+                "1.5<=1",
+                null,
                 false,
                 new Tolerance { ProportionalTolerance = 0.2D },
             },
@@ -620,6 +976,13 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.5<=1",
+                null,
+                true,
+                new Tolerance { ProportionalTolerance = 0.5D },
+            },
+            new object[]
+            {
                 "y<=x",
                 new Dictionary<string, object>
                 {
@@ -631,12 +994,26 @@ namespace IX.UnitTests.IX.Math
             },
             new object[]
             {
+                "1.5<=1",
+                null,
+                false,
+                new Tolerance { ProportionalTolerance = 1.1D },
+            },
+            new object[]
+            {
                 "y<=x",
                 new Dictionary<string, object>
                 {
                     ["y"] = 1.5D,
                     ["x"] = 1D,
                 },
+                true,
+                new Tolerance { ProportionalTolerance = 2D },
+            },
+            new object[]
+            {
+                "1.5<=1",
+                null,
                 true,
                 new Tolerance { ProportionalTolerance = 2D },
             },

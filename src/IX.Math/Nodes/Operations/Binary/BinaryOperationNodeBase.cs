@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 namespace IX.Math.Nodes.Operations.Binary
@@ -22,7 +23,9 @@ namespace IX.Math.Nodes.Operations.Binary
         /// left
         /// or
         /// right
+        /// is <c>null</c> (<c>Nothing</c> in Visual Basic).
         /// </exception>
+        [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor", Justification = "We specifically want this to happen.")]
         protected BinaryOperationNodeBase(NodeBase left, NodeBase right)
         {
             NodeBase leftTemp = left ?? throw new ArgumentNullException(nameof(left));
@@ -35,20 +38,20 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         /// <summary>
-        /// Gets or sets the left operand.
+        /// Gets the left operand.
         /// </summary>
         /// <value>
         /// The left operand.
         /// </value>
-        public NodeBase Left { get; protected set; }
+        protected NodeBase Left { get; }
 
         /// <summary>
-        /// Gets or sets the right operand.
+        /// Gets the right operand.
         /// </summary>
         /// <value>
         /// The right operand.
         /// </value>
-        public NodeBase Right { get; protected set; }
+        protected NodeBase Right { get; }
 
         /// <summary>
         /// Ensures that the operands are compatible.

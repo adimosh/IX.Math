@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.StandardExtensions.Extensions;
@@ -9,8 +10,17 @@ using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
+    /// <summary>
+    ///     A base node for comparison operations.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.Operations.Binary.BinaryOperationNodeBase" />
     internal abstract class ComparisonOperationNodeBase : BinaryOperationNodeBase
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ComparisonOperationNodeBase" /> class.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
         protected ComparisonOperationNodeBase(
             NodeBase left,
             NodeBase right)
@@ -20,6 +30,12 @@ namespace IX.Math.Nodes.Operations.Binary
         {
         }
 
+        /// <summary>
+        ///     Gets the return type of this node.
+        /// </summary>
+        /// <value>
+        ///     The node return type.
+        /// </value>
         public override SupportedValueType ReturnType => SupportedValueType.Boolean;
 
         private static void DetermineChildren(
@@ -59,6 +75,12 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
+        /// <summary>
+        ///     Ensures that the operands are compatible.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <exception cref="ExpressionNotValidLogicallyException"></exception>
         protected override void EnsureCompatibleOperands(
             NodeBase left,
             NodeBase right)
@@ -82,11 +104,23 @@ namespace IX.Math.Nodes.Operations.Binary
             }
         }
 
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "We want it this way.")]
-        protected Expression GenerateNumericalToleranceEquateExpression([NotNull] Expression leftExpression, [NotNull] Expression rightExpression, [NotNull] Tolerance tolerance)
+        /// <summary>
+        ///     Generates the numerical tolerance equation expression.
+        /// </summary>
+        /// <param name="leftExpression">The left expression.</param>
+        /// <param name="rightExpression">The right expression.</param>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>A compilable expression.</returns>
+        [SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "We want it this way.")]
+        protected Expression GenerateNumericalToleranceEquateExpression(
+            [NotNull] Expression leftExpression,
+            [NotNull] Expression rightExpression,
+            [NotNull] Tolerance tolerance)
         {
-            if (tolerance.IntegerToleranceRangeLowerBound != null ||
-                tolerance.IntegerToleranceRangeUpperBound != null)
+            if (tolerance.IntegerToleranceRangeLowerBound != null || tolerance.IntegerToleranceRangeUpperBound != null)
             {
                 // Integer tolerance
                 MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(

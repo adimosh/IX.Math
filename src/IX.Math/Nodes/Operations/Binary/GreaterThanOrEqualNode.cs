@@ -43,12 +43,12 @@ namespace IX.Math.Nodes.Operations.Binary
         public override NodeBase Simplify() =>
             this.Left switch
             {
-                NumericNode nnLeft when this.Right is NumericNode nnRight => new BoolNode(
-                    Convert.ToDouble(nnLeft.Value) >= Convert.ToDouble(nnRight.Value)),
+                // NumericNode nnLeft when this.Right is NumericNode nnRight => new BoolNode(
+                //    Convert.ToDouble(nnLeft.Value) >= Convert.ToDouble(nnRight.Value)),
                 StringNode snLeft when this.Right is StringNode snRight => new BoolNode(
                     snLeft.Value.CompareTo(snRight.Value) >= 0),
                 BoolNode bnLeft when this.Right is BoolNode bnRight => new BoolNode(
-                    bnLeft.Value ? true : !bnRight.Value),
+                    bnLeft.Value || !bnRight.Value),
                 ByteArrayNode baLeft when this.Right is ByteArrayNode baRight => new BoolNode(
                     baLeft.Value.SequenceCompareWithMsb(baRight.Value) >= 0),
                 _ => this
