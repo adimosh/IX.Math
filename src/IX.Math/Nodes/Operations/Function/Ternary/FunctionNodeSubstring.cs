@@ -13,11 +13,30 @@ using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Function.Ternary
 {
-    [DebuggerDisplay("substring({FirstParameter}, {SecondParameter}, {ThirdParameter})")]
-    [CallableMathematicsFunction("substr", "substring")]
+    /// <summary>
+    ///     A node representing the substring function.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.TernaryFunctionNodeBase" />
+    [DebuggerDisplay(
+        "substring({" +
+        nameof(FirstParameter) +
+        "}, {" +
+        nameof(SecondParameter) +
+        "}, {" +
+        nameof(ThirdParameter) +
+        "})")]
+    [CallableMathematicsFunction(
+        "substr",
+        "substring")]
     [UsedImplicitly]
     internal sealed class FunctionNodeSubstring : TernaryFunctionNodeBase
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="FunctionNodeSubstring" /> class.
+        /// </summary>
+        /// <param name="stringParameter">The string parameter.</param>
+        /// <param name="numericParameter">The numeric parameter.</param>
+        /// <param name="secondNumericParameter">The second numeric parameter.</param>
         public FunctionNodeSubstring(
             NodeBase stringParameter,
             NodeBase numericParameter,
@@ -29,16 +48,37 @@ namespace IX.Math.Nodes.Operations.Function.Ternary
         {
         }
 
+        /// <summary>
+        ///     Gets the return type of this node.
+        /// </summary>
+        /// <value>
+        ///     The node return type.
+        /// </value>
         public override SupportedValueType ReturnType => SupportedValueType.String;
 
-        public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeSubstring(
-            this.FirstParameter.DeepClone(context),
-            this.SecondParameter.DeepClone(context),
-            this.ThirdParameter.DeepClone(context));
+        /// <summary>
+        ///     Creates a deep clone of the source object.
+        /// </summary>
+        /// <param name="context">The deep cloning context.</param>
+        /// <returns>
+        ///     A deep clone.
+        /// </returns>
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new FunctionNodeSubstring(
+                this.FirstParameter.DeepClone(context),
+                this.SecondParameter.DeepClone(context),
+                this.ThirdParameter.DeepClone(context));
 
+        /// <summary>
+        ///     Simplifies this node, if possible, reflexively returns otherwise.
+        /// </summary>
+        /// <returns>
+        ///     A simplified node, or this instance.
+        /// </returns>
         public override NodeBase Simplify()
         {
-            if (this.FirstParameter is StringNode stringParam && this.SecondParameter is NumericNode numericParam &&
+            if (this.FirstParameter is StringNode stringParam &&
+                this.SecondParameter is NumericNode numericParam &&
                 this.ThirdParameter is NumericNode secondNumericParam)
             {
                 return new StringNode(
@@ -76,7 +116,7 @@ namespace IX.Math.Nodes.Operations.Function.Ternary
         }
 
         /// <summary>
-        /// Ensures the parameters are compatible for this node.
+        ///     Ensures the parameters are compatible for this node.
         /// </summary>
         /// <param name="first">The first.</param>
         /// <param name="second">The second.</param>
@@ -90,7 +130,8 @@ namespace IX.Math.Nodes.Operations.Function.Ternary
             second.DetermineStrongly(SupportedValueType.Numeric);
             third.DetermineStrongly(SupportedValueType.Numeric);
 
-            if (first.ReturnType != SupportedValueType.String || second.ReturnType != SupportedValueType.Numeric ||
+            if (first.ReturnType != SupportedValueType.String ||
+                second.ReturnType != SupportedValueType.Numeric ||
                 third.ReturnType != SupportedValueType.Numeric)
             {
                 throw new ExpressionNotValidLogicallyException();
@@ -107,7 +148,20 @@ namespace IX.Math.Nodes.Operations.Function.Ternary
             }
         }
 
-        protected override Expression GenerateExpressionInternal()
+        /// <summary>
+        ///     Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <returns>
+        ///     The expression.
+        /// </returns>
+        protected override Expression GenerateExpressionInternal() => this.GenerateExpressionInternal(null);
+
+        /// <summary>
+        ///     Generates the expression with tolerance that will be compiled into code.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>The expression.</returns>
+        protected override Expression GenerateExpressionInternal(Tolerance tolerance)
         {
             Type firstParameterType = typeof(string);
             Type secondParameterType = typeof(int);
@@ -127,9 +181,19 @@ namespace IX.Math.Nodes.Operations.Function.Ternary
                         functionName));
             }
 
-            Expression e1 = this.FirstParameter.GenerateExpression();
-            Expression e2 = this.SecondParameter.GenerateExpression();
-            Expression e3 = this.ThirdParameter.GenerateExpression();
+            Expression e1, e2, e3;
+            if (tolerance == null)
+            {
+                e1 = this.FirstParameter.GenerateExpression();
+                e2 = this.SecondParameter.GenerateExpression();
+                e3 = this.ThirdParameter.GenerateExpression();
+            }
+            else
+            {
+                e1 = this.FirstParameter.GenerateExpression(tolerance);
+                e2 = this.SecondParameter.GenerateExpression(tolerance);
+                e3 = this.ThirdParameter.GenerateExpression(tolerance);
+            }
 
             if (e1.Type != firstParameterType)
             {

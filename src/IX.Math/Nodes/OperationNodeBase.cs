@@ -33,7 +33,7 @@ namespace IX.Math.Nodes
         /// <remarks>
         /// <para>This method works by first attempting to simplify this node.</para>
         /// <para>If the node can be simplified, <see cref="M:GenerateExpression"/> is called on the new node and returned in lieu of this expression.</para>
-        /// <para>If this node cannot be simplified, or its simplification method returns reflexively, <see cref="GenerateExpressionInternal"/> is called.</para>
+        /// <para>If this node cannot be simplified, or its simplification method returns reflexively, <see cref="GenerateExpressionInternal()"/> is called.</para>
         /// </remarks>
         public sealed override Expression GenerateCachedExpression()
         {
@@ -52,7 +52,7 @@ namespace IX.Math.Nodes
         /// <remarks>
         /// <para>This method works by first attempting to simplify this node.</para>
         /// <para>If the node can be simplified, <see cref="M:GenerateExpression" /> is called on the new node and returned in lieu of this expression.</para>
-        /// <para>If this node cannot be simplified, or its simplification method returns reflexively, <see cref="GenerateExpressionInternal" /> is called.</para>
+        /// <para>If this node cannot be simplified, or its simplification method returns reflexively, <see cref="GenerateExpressionInternal(Tolerance)" /> is called.</para>
         /// </remarks>
         public sealed override Expression GenerateCachedExpression(Tolerance tolerance)
         {

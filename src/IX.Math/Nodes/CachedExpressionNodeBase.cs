@@ -34,7 +34,6 @@ namespace IX.Math.Nodes
         public sealed override Expression GenerateExpression(Tolerance tolerance) =>
             this.generatedExpression ??= this.GenerateCachedExpression(tolerance);
 
-
         /// <summary>
         ///     Generates the expression that will be compiled into code as a string expression.
         /// </summary>

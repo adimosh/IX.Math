@@ -10,17 +10,45 @@ using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Function.Nonary
 {
+    /// <summary>
+    ///     A node representing the random integer function.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.NonaryFunctionNodeBase" />
     [DebuggerDisplay("randomint()")]
     [CallableMathematicsFunction("randomint")]
     [UsedImplicitly]
     internal sealed class FunctionNodeRandomInt : NonaryFunctionNodeBase
     {
+        /// <summary>
+        ///     Gets the return type of this node.
+        /// </summary>
+        /// <value>
+        ///     The node return type.
+        /// </value>
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
+        /// <summary>
+        ///     Generates a random number.
+        /// </summary>
+        /// <returns>A random number.</returns>
+        [UsedImplicitly]
         public static long GenerateRandom() => RandomNumberGenerator.GenerateInt();
 
+        /// <summary>
+        ///     Simplifies this node, if possible, reflexively returns otherwise.
+        /// </summary>
+        /// <returns>
+        ///     A simplified node, or this instance.
+        /// </returns>
         public override NodeBase Simplify() => this;
 
+        /// <summary>
+        ///     Creates a deep clone of the source object.
+        /// </summary>
+        /// <param name="context">The deep cloning context.</param>
+        /// <returns>
+        ///     A deep clone.
+        /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeRandomInt();
 
         /// <summary>
@@ -48,6 +76,13 @@ namespace IX.Math.Nodes.Operations.Function.Nonary
             }
         }
 
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticNonaryFunctionCall<FunctionNodeRandomInt>(nameof(GenerateRandom));
+        /// <summary>
+        ///     Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <returns>
+        ///     The expression.
+        /// </returns>
+        protected override Expression GenerateExpressionInternal() =>
+            this.GenerateStaticNonaryFunctionCall<FunctionNodeRandomInt>(nameof(GenerateRandom));
     }
 }

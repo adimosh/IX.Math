@@ -170,19 +170,13 @@ namespace IX.Math.Nodes.Operations.Binary
                 case SupportedValueType.Boolean:
                     throw new ExpressionNotValidLogicallyException();
                 case SupportedValueType.ByteArray:
-                {
                     this.Left.DetermineStrongly(SupportedValueType.ByteArray);
                     this.Right.DetermineStrongly(SupportedValueType.ByteArray);
-                }
-
                     break;
 
                 case SupportedValueType.Numeric:
-                {
                     this.Left.DetermineStrongly(SupportedValueType.Numeric);
                     this.Right.DetermineStrongly(SupportedValueType.Numeric);
-                }
-
                     break;
             }
 

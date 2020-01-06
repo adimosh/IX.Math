@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Extensibility;
@@ -10,6 +11,10 @@ using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Function.Nonary
 {
+    /// <summary>
+    ///     A node representing the <see cref="Random.NextDouble" /> function.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.NonaryFunctionNodeBase" />
     [DebuggerDisplay("random()")]
     [CallableMathematicsFunction("rand", "random")]
     [UsedImplicitly]
@@ -27,6 +32,7 @@ namespace IX.Math.Nodes.Operations.Function.Nonary
         ///     Generates a random number.
         /// </summary>
         /// <returns>A randomly-generated number.</returns>
+        [UsedImplicitly]
         public static double GenerateRandom() => RandomNumberGenerator.Generate();
 
         /// <summary>
