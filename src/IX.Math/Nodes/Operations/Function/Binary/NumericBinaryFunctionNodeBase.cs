@@ -4,8 +4,17 @@
 
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
+    /// <summary>
+    ///     A base class for numeric binary functions.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.BinaryFunctionNodeBase" />
     internal abstract class NumericBinaryFunctionNodeBase : BinaryFunctionNodeBase
     {
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="NumericBinaryFunctionNodeBase" /> class.
+        /// </summary>
+        /// <param name="firstParameter">The first parameter.</param>
+        /// <param name="secondParameter">The second parameter.</param>
         protected NumericBinaryFunctionNodeBase(
             NodeBase firstParameter,
             NodeBase secondParameter)
@@ -48,6 +57,15 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             }
         }
 
+        /// <summary>
+        ///     Ensures that the parameters that are received are compatible with the function, optionally allowing the parameter
+        ///     references to change.
+        /// </summary>
+        /// <param name="firstParameter">The first parameter.</param>
+        /// <param name="secondParameter">The second parameter.</param>
+        /// <exception cref="ExpressionNotValidLogicallyException">
+        ///     The expression is not valid logically.
+        /// </exception>
         protected sealed override void EnsureCompatibleParameters(
             NodeBase firstParameter,
             NodeBase secondParameter)

@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.StandardExtensions.Extensions;
@@ -28,12 +29,12 @@ namespace IX.Math.Nodes
         /// <paramref name="secondParameter"/>
         /// is <see langword="null"/> (<see langword="Nothing"/> in Visual Basic).
         /// </exception>
+        [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor", Justification = "We specifically want this to happen.")]
         protected BinaryFunctionNodeBase(NodeBase firstParameter, NodeBase secondParameter)
         {
             NodeBase firstParameterTemp = firstParameter ?? throw new ArgumentNullException(nameof(firstParameter));
             NodeBase secondParameterTemp = secondParameter ?? throw new ArgumentNullException(nameof(secondParameter));
 
-            // ReSharper disable once VirtualMemberCallInConstructor
             this.EnsureCompatibleParameters(firstParameter, secondParameter);
 
             this.FirstParameter = firstParameterTemp.Simplify();
@@ -65,7 +66,16 @@ namespace IX.Math.Nodes
         /// <typeparam name="T">The type to call on.</typeparam>
         /// <param name="functionName">Name of the function.</param>
         /// <returns>An expression representing the call.</returns>
-        protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName) => this.GenerateStaticBinaryFunctionCall(typeof(T), functionName);
+        protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName) => this.GenerateStaticBinaryFunctionCall(typeof(T), functionName, null);
+
+        /// <summary>
+        /// Generates a static binary function call expression.
+        /// </summary>
+        /// <typeparam name="T">The type to call on.</typeparam>
+        /// <param name="functionName">Name of the function.</param>
+        /// <param name="tolerance">The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
+        /// <returns>An expression representing the call.</returns>
+        protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName, Tolerance tolerance) => this.GenerateStaticBinaryFunctionCall(typeof(T), functionName, tolerance);
 
         /// <summary>
         /// Generates a static binary function call expression.
@@ -75,6 +85,17 @@ namespace IX.Math.Nodes
         /// <returns>Expression.</returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
         protected Expression GenerateStaticBinaryFunctionCall(Type t, string functionName)
+            => this.GenerateStaticBinaryFunctionCall(t, functionName, null);
+
+        /// <summary>
+        /// Generates a static binary function call expression.
+        /// </summary>
+        /// <param name="t">The type to call on.</param>
+        /// <param name="functionName">Name of the function.</param>
+        /// <param name="tolerance">The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
+        /// <returns>Expression.</returns>
+        /// <exception cref="ArgumentException">The function name is invalid.</exception>
+        protected Expression GenerateStaticBinaryFunctionCall(Type t, string functionName, Tolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
@@ -111,8 +132,17 @@ namespace IX.Math.Nodes
                 }
             }
 
-            Expression e1 = this.FirstParameter.GenerateExpression();
-            Expression e2 = this.SecondParameter.GenerateExpression();
+            Expression e1, e2;
+            if (tolerance == null)
+            {
+                e1 = this.FirstParameter.GenerateExpression();
+                e2 = this.SecondParameter.GenerateExpression();
+            }
+            else
+            {
+                e1 = this.FirstParameter.GenerateExpression(tolerance);
+                e2 = this.SecondParameter.GenerateExpression(tolerance);
+            }
 
             if (e1.Type != firstParameterType)
             {
@@ -139,6 +169,21 @@ namespace IX.Math.Nodes
         /// </returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
         protected Expression GenerateStaticBinaryFunctionCall<TParam1, TParam2>(Type t, string functionName)
+            => this.GenerateStaticBinaryFunctionCall<TParam1, TParam2>(t, functionName, null);
+
+        /// <summary>
+        /// Generates a static binary function call with explicit parameter types.
+        /// </summary>
+        /// <typeparam name="TParam1">The type of the first parameter.</typeparam>
+        /// <typeparam name="TParam2">The type of the second parameter.</typeparam>
+        /// <param name="t">The type to call on.</param>
+        /// <param name="functionName">Name of the function.</param>
+        /// <param name="tolerance">The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
+        /// <returns>
+        /// The generated binary method call expression.
+        /// </returns>
+        /// <exception cref="ArgumentException">The function name is invalid.</exception>
+        protected Expression GenerateStaticBinaryFunctionCall<TParam1, TParam2>(Type t, string functionName, Tolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
@@ -150,8 +195,17 @@ namespace IX.Math.Nodes
 
             MethodInfo mi = t.GetMethodWithExactParameters(functionName, typeof(TParam1), typeof(TParam2));
 
-            Expression e1 = this.FirstParameter.GenerateExpression();
-            Expression e2 = this.SecondParameter.GenerateExpression();
+            Expression e1, e2;
+            if (tolerance == null)
+            {
+                e1 = this.FirstParameter.GenerateExpression();
+                e2 = this.SecondParameter.GenerateExpression();
+            }
+            else
+            {
+                e1 = this.FirstParameter.GenerateExpression(tolerance);
+                e2 = this.SecondParameter.GenerateExpression(tolerance);
+            }
 
             if (e1.Type != firstParameterType)
             {
@@ -182,7 +236,11 @@ namespace IX.Math.Nodes
         /// <typeparam name="T">The type to call on.</typeparam>
         /// <param name="functionName">Name of the function.</param>
         /// <returns>An expression representing the call.</returns>
-        protected Expression GenerateBinaryFunctionCallFirstParameterInstance<T>(string functionName) => this.GenerateBinaryFunctionCallFirstParameterInstance(typeof(T), functionName);
+        protected Expression GenerateBinaryFunctionCallFirstParameterInstance<T>(string functionName) =>
+            this.GenerateBinaryFunctionCallFirstParameterInstance(
+                typeof(T),
+                functionName,
+                null);
 
         /// <summary>
         /// Generates a static binary function call expression.
@@ -191,7 +249,25 @@ namespace IX.Math.Nodes
         /// <param name="functionName">Name of the function.</param>
         /// <returns>Expression.</returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
-        protected Expression GenerateBinaryFunctionCallFirstParameterInstance(Type t, string functionName)
+        protected Expression GenerateBinaryFunctionCallFirstParameterInstance(
+            Type t,
+            string functionName) =>
+            this.GenerateBinaryFunctionCallFirstParameterInstance(
+                t,
+                functionName,
+                null);
+
+        /// <summary>
+        /// Generates a static binary function call expression.
+        /// </summary>
+        /// <param name="t">The type to call on.</param>
+        /// <param name="functionName">Name of the function.</param>
+        /// <param name="tolerance">The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
+        /// <returns>
+        /// Expression.
+        /// </returns>
+        /// <exception cref="ArgumentException">The function name is invalid.</exception>
+        protected Expression GenerateBinaryFunctionCallFirstParameterInstance(Type t, string functionName, Tolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
@@ -236,8 +312,17 @@ namespace IX.Math.Nodes
                 }
             }
 
-            Expression e1 = this.FirstParameter.GenerateExpression();
-            Expression e2 = this.SecondParameter.GenerateExpression();
+            Expression e1, e2;
+            if (tolerance == null)
+            {
+                e1 = this.FirstParameter.GenerateExpression();
+                e2 = this.SecondParameter.GenerateExpression();
+            }
+            else
+            {
+                e1 = this.FirstParameter.GenerateExpression(tolerance);
+                e2 = this.SecondParameter.GenerateExpression(tolerance);
+            }
 
             if (e1.Type != firstParameterType)
             {

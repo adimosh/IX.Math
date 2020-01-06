@@ -13,7 +13,11 @@ using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
-    [DebuggerDisplay("trimbody({FirstParameter}, {SecondParameter})")]
+    /// <summary>
+    ///     A node representing a function.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.BinaryFunctionNodeBase" />
+    [DebuggerDisplay("trimbody({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
     [CallableMathematicsFunction("trimbody")]
     [UsedImplicitly]
     internal sealed class FunctionNodeTrimBody : BinaryFunctionNodeBase
@@ -107,12 +111,20 @@ namespace IX.Math.Nodes.Operations.Function.Binary
         }
 
         /// <summary>
-        ///     Generates the expression that will be compiled into code.
+        /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>
-        ///     The expression.
+        /// The expression.
         /// </returns>
         protected override Expression GenerateExpressionInternal()
+            => this.GenerateExpressionInternal(null);
+
+        /// <summary>
+        /// Generates the expression with tolerance that will be compiled into code.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>The expression.</returns>
+        protected override Expression GenerateExpressionInternal(Tolerance tolerance)
         {
             MethodInfo mi = typeof(string).GetMethodWithExactParameters(
                 nameof(string.Replace),
@@ -127,8 +139,17 @@ namespace IX.Math.Nodes.Operations.Function.Binary
                         nameof(string.Replace)));
             }
 
-            Expression e1 = this.FirstParameter.GenerateExpression();
-            Expression e2 = this.SecondParameter.GenerateExpression();
+            Expression e1, e2;
+            if (tolerance == null)
+            {
+                e1 = this.FirstParameter.GenerateExpression();
+                e2 = this.SecondParameter.GenerateExpression();
+            }
+            else
+            {
+                e1 = this.FirstParameter.GenerateExpression(tolerance);
+                e2 = this.SecondParameter.GenerateExpression(tolerance);
+            }
 
             if (e1.Type != typeof(string))
             {

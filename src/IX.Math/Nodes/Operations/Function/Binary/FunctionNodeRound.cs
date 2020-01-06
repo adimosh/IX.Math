@@ -7,9 +7,14 @@ using System.Linq.Expressions;
 using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using JetBrains.Annotations;
+using GlobalSystem = System;
 
 namespace IX.Math.Nodes.Operations.Function.Binary
 {
+    /// <summary>
+    ///     A node representing the <see cref="GlobalSystem.Math.Round(double, int)" /> function.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.Operations.Function.Binary.NumericBinaryFunctionNodeBase" />
     [DebuggerDisplay("round({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
     [CallableMathematicsFunction("round")]
     [UsedImplicitly]
@@ -42,7 +47,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
             if (this.FirstParameter is NumericNode fln && this.SecondParameter is NumericNode inn)
             {
                 return new NumericNode(
-                    global::System.Math.Round(
+                    GlobalSystem.Math.Round(
                         fln.ExtractFloat(),
                         inn.ExtractInt()));
             }
@@ -56,7 +61,18 @@ namespace IX.Math.Nodes.Operations.Function.Binary
         /// <returns>The expression.</returns>
         protected override Expression GenerateExpressionInternal() =>
             this.GenerateStaticBinaryFunctionCall<double, int>(
-                typeof(global::System.Math),
-                nameof(global::System.Math.Round));
+                typeof(GlobalSystem.Math),
+                nameof(GlobalSystem.Math.Round));
+
+        /// <summary>
+        /// Generates the expression with tolerance that will be compiled into code.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>The expression.</returns>
+        protected override Expression GenerateExpressionInternal(Tolerance tolerance) =>
+            this.GenerateStaticBinaryFunctionCall<double, int>(
+                typeof(GlobalSystem.Math),
+                nameof(GlobalSystem.Math.Round),
+                tolerance);
     }
 }
