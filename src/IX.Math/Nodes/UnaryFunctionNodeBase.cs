@@ -57,7 +57,25 @@ namespace IX.Math.Nodes
         protected Expression GenerateStaticUnaryFunctionCall<T>([NotNull] string functionName) =>
             this.GenerateStaticUnaryFunctionCall(
                 typeof(T),
-                functionName);
+                functionName,
+                null);
+
+        /// <summary>
+        ///     Generates a static unary function call.
+        /// </summary>
+        /// <typeparam name="T">The type to call the method from.</typeparam>
+        /// <param name="functionName">Name of the function.</param>
+        /// <param name="tolerance">The tolerance for this expression. Can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
+        /// <returns>An expression representing the static function call.</returns>
+        /// <exception cref="ArgumentException"><paramref name="functionName" /> represents a function that cannot be found.</exception>
+        [NotNull]
+        protected Expression GenerateStaticUnaryFunctionCall<T>(
+            [NotNull] string functionName,
+            Tolerance tolerance) =>
+            this.GenerateStaticUnaryFunctionCall(
+                typeof(T),
+                functionName,
+                tolerance);
 
         /// <summary>
         ///     Generates a static unary function call.
@@ -69,14 +87,35 @@ namespace IX.Math.Nodes
         [NotNull]
         protected Expression GenerateStaticUnaryFunctionCall(
             [NotNull] Type t,
-            [NotNull] string functionName)
+            [NotNull] string functionName) =>
+            this.GenerateStaticUnaryFunctionCall(
+                t,
+                functionName,
+                null);
+
+        /// <summary>
+        ///     Generates a static unary function call.
+        /// </summary>
+        /// <param name="t">The type to call the method from.</param>
+        /// <param name="functionName">Name of the function.</param>
+        /// <param name="tolerance">The tolerance for this expression. Can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
+        /// <returns>
+        ///     An expression representing the static function call.
+        /// </returns>
+        /// <exception cref="ArgumentException"><paramref name="functionName" /> represents a function that cannot be found.</exception>
+        [NotNull]
+        protected Expression GenerateStaticUnaryFunctionCall(
+            [NotNull] Type t,
+            [NotNull] string functionName,
+            [CanBeNull] Tolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
                 throw new ArgumentException(
                     string.Format(
                         Resources.FunctionCouldNotBeFound,
-                        functionName), nameof(functionName));
+                        functionName),
+                    nameof(functionName));
             }
 
             Type parameterType = ParameterTypeFromParameter(this.Parameter);
@@ -107,15 +146,19 @@ namespace IX.Math.Nodes
 
                         mi = t.GetMethodWithExactParameters(
                                  functionName,
-                                 parameterType) ?? throw new ArgumentException(
+                                 parameterType) ??
+                             throw new ArgumentException(
                                  string.Format(
                                      Resources.FunctionCouldNotBeFound,
-                                     functionName), nameof(functionName));
+                                     functionName),
+                                 nameof(functionName));
                     }
                 }
             }
 
-            Expression e = this.Parameter.GenerateExpression();
+            Expression e = tolerance == null
+                ? this.Parameter.GenerateExpression()
+                : this.Parameter.GenerateExpression(tolerance);
 
             if (e.Type != parameterType)
             {
@@ -137,23 +180,42 @@ namespace IX.Math.Nodes
         /// <returns>An expression representing a property call.</returns>
         /// <exception cref="ArgumentException"><paramref name="propertyName" /> represents a property that cannot be found.</exception>
         [NotNull]
-        protected Expression GenerateParameterPropertyCall<T>([NotNull] string propertyName)
+        protected Expression GenerateParameterPropertyCall<T>([NotNull] string propertyName) =>
+            this.GenerateParameterPropertyCall<T>(
+                propertyName,
+                null);
+
+        /// <summary>
+        ///     Generates a property call on the parameter.
+        /// </summary>
+        /// <typeparam name="T">The type to call the property from.</typeparam>
+        /// <param name="propertyName">Name of the parameter.</param>
+        /// <param name="tolerance">The tolerance for this expression. Can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
+        /// <returns>An expression representing a property call.</returns>
+        /// <exception cref="ArgumentException"><paramref name="propertyName" /> represents a property that cannot be found.</exception>
+        [NotNull]
+        protected Expression GenerateParameterPropertyCall<T>(
+            [NotNull] string propertyName,
+            [CanBeNull] Tolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
             {
                 throw new ArgumentException(
                     string.Format(
                         Resources.FunctionCouldNotBeFound,
-                        propertyName), nameof(propertyName));
+                        propertyName),
+                    nameof(propertyName));
             }
 
-            PropertyInfo pi = typeof(T).GetRuntimeProperty(propertyName) ?? throw new ArgumentException(
+            PropertyInfo pi = typeof(T).GetRuntimeProperty(propertyName) ??
+                              throw new ArgumentException(
                                   string.Format(
                                       Resources.FunctionCouldNotBeFound,
-                                      propertyName), nameof(propertyName));
+                                      propertyName),
+                                  nameof(propertyName));
 
             return Expression.Property(
-                this.Parameter.GenerateExpression(),
+                tolerance == null ? this.Parameter.GenerateExpression() : this.Parameter.GenerateExpression(tolerance),
                 pi);
         }
 
@@ -165,26 +227,49 @@ namespace IX.Math.Nodes
         /// <returns>An expression representing a property call.</returns>
         /// <exception cref="ArgumentException"><paramref name="methodName" /> represents a property that cannot be found.</exception>
         [NotNull]
-        protected Expression GenerateParameterMethodCall<T>([NotNull] string methodName)
+        protected Expression GenerateParameterMethodCall<T>([NotNull] string methodName) =>
+            this.GenerateParameterPropertyCall<T>(
+                methodName,
+                null);
+
+        /// <summary>
+        ///     Generates a property call on the parameter.
+        /// </summary>
+        /// <typeparam name="T">The type to call the property from.</typeparam>
+        /// <param name="methodName">Name of the parameter.</param>
+        /// <param name="tolerance">The tolerance for this expression. Can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
+        /// <returns>An expression representing a property call.</returns>
+        /// <exception cref="ArgumentException"><paramref name="methodName" /> represents a property that cannot be found.</exception>
+        [NotNull]
+        protected Expression GenerateParameterMethodCall<T>(
+            [NotNull] string methodName,
+            [CanBeNull] Tolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(methodName))
             {
                 throw new ArgumentException(
                     string.Format(
                         Resources.FunctionCouldNotBeFound,
-                        methodName), nameof(methodName));
+                        methodName),
+                    nameof(methodName));
             }
 
             MethodInfo mi = typeof(T).GetRuntimeMethod(
                                 methodName,
-                                new Type[0]) ?? throw new ArgumentException(
+                                new Type[0]) ??
+                            throw new ArgumentException(
                                 string.Format(
                                     Resources.FunctionCouldNotBeFound,
-                                    methodName), nameof(methodName));
+                                    methodName),
+                                nameof(methodName));
 
-            return Expression.Call(
-                this.Parameter.GenerateExpression(),
-                mi);
+            return tolerance == null
+                ? Expression.Call(
+                    this.Parameter.GenerateExpression(),
+                    mi)
+                : Expression.Call(
+                    this.Parameter.GenerateExpression(tolerance),
+                    mi);
         }
     }
 }

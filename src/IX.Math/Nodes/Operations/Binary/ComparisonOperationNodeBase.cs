@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.StandardExtensions.Extensions;
@@ -80,7 +79,7 @@ namespace IX.Math.Nodes.Operations.Binary
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
-        /// <exception cref="ExpressionNotValidLogicallyException"></exception>
+        /// <exception cref="ExpressionNotValidLogicallyException">Expression is not valid logically.</exception>
         protected override void EnsureCompatibleOperands(
             NodeBase left,
             NodeBase right)
@@ -111,7 +110,7 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <param name="rightExpression">The right expression.</param>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>A compilable expression.</returns>
-        [SuppressMessage(
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "We want it this way.")]
