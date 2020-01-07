@@ -16,7 +16,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
     /// <summary>
     ///     A node representing the substring function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.BinaryFunctionNodeBase" />
+    /// <seealso cref="BinaryFunctionNodeBase" />
     [DebuggerDisplay("substring({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
     [CallableMathematicsFunction("substr", "substring")]
     [UsedImplicitly]

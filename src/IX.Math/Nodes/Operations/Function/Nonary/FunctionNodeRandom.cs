@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Function.Nonary
     /// <summary>
     ///     A node representing the <see cref="Random.NextDouble" /> function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.NonaryFunctionNodeBase" />
+    /// <seealso cref="NonaryFunctionNodeBase" />
     [DebuggerDisplay("random()")]
     [CallableMathematicsFunction("rand", "random")]
     [UsedImplicitly]

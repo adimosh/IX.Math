@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
     /// <summary>
     ///     A node representing the <see cref="GlobalSystem.Random.Next(int)" /> function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.Unary.NumericUnaryFunctionNodeBase" />
+    /// <seealso cref="NumericUnaryFunctionNodeBase" />
     [DebuggerDisplay("randomint({" + nameof(Parameter) + "})")]
     [CallableMathematicsFunction("randomint")]
     [UsedImplicitly]

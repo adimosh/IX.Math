@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
     /// <summary>
     ///     A node representing the <see cref="GlobalSystem.Math.Cos(double)" /> function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.Unary.NumericUnaryFunctionNodeBase" />
+    /// <seealso cref="NumericUnaryFunctionNodeBase" />
     [DebuggerDisplay("cos({" + nameof(Parameter) + "})")]
     [CallableMathematicsFunction(
         "cos",

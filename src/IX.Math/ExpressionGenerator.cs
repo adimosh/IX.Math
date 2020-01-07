@@ -15,11 +15,20 @@ using IX.Math.Nodes;
 using IX.Math.Registration;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
+using DiagCA = System.Diagnostics.CodeAnalysis;
 
 namespace IX.Math
 {
     internal static class ExpressionGenerator
     {
+        [DiagCA.SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "Not avoidable for now.")]
+        [DiagCA.SuppressMessage(
+            "CodeSmell",
+            "ERP022:Unobserved exception in generic exception handler",
+            Justification = "We want this to happen.")]
         internal static ComputationBody CreateBody([NotNull] WorkingExpressionSet workingSet)
         {
             Contract.RequiresNotNullPrivate(
@@ -31,7 +40,6 @@ namespace IX.Math
                 return ComputationBody.Empty;
             }
 
-            #region Extract constants
             foreach (Type extractorType in workingSet.Extractors.KeysByLevel.OrderBy(p => p.Key)
                 .SelectMany(p => p.Value).ToArray())
             {
@@ -48,9 +56,6 @@ namespace IX.Math
             }
 
             workingSet.Expression = SubExpressionFormatter.Cleanup(workingSet.Expression);
-            #endregion
-
-            #region Prepare inner set, as well ass expression
 
             // Start preparing expression
             workingSet.SymbolTable.Add(
@@ -63,14 +68,11 @@ namespace IX.Math
             workingSet.Initialize();
 
             workingSet.SymbolTable[string.Empty].Expression = workingSet.Expression;
-            #endregion
 
             if (workingSet.CancellationToken.IsCancellationRequested)
             {
                 return ComputationBody.Empty;
             }
-
-            #region Replace functions
 
             // Break expression based on function calls
             FunctionsExtractor.ReplaceFunctions(
@@ -84,7 +86,6 @@ namespace IX.Math
                 workingSet.ParameterRegistry,
                 workingSet.SymbolTable[string.Empty].Expression,
                 workingSet.AllSymbols);
-            #endregion
 
             if (workingSet.CancellationToken.IsCancellationRequested)
             {
@@ -111,10 +112,8 @@ namespace IX.Math
             }
 
             // Populating symbol tables
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator - This is OK
             foreach (var p in workingSet.SymbolTable.Where(p => !p.Value.IsFunctionCall)
                 .Select(p => p.Value.Expression))
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
             {
                 TablePopulationGenerator.PopulateTables(
                     p,
@@ -152,31 +151,18 @@ namespace IX.Math
             catch
             {
                 body = null;
-#pragma warning disable ERP022 // Catching everything considered harmful. - This is OK
             }
-#pragma warning restore ERP022 // Catching everything considered harmful.
 
             if (body == null || workingSet.CancellationToken.IsCancellationRequested)
             {
                 return ComputationBody.Empty;
             }
 
-            switch (body)
+            if (body is ConstantNodeBase && workingSet.ParameterRegistry.Populated)
             {
-                // Set success values and possibly constant values
-                case ConstantNodeBase _ when workingSet.ParameterRegistry.Populated:
-                    // Cannot have external parameters if the expression is itself constant; something somewhere doesn't make sense
-                    return ComputationBody.Empty;
-                case ConstantNodeBase constantNodeBase:
-                    workingSet.ValueIfConstant = constantNodeBase.DistillValue();
-                    workingSet.Constant = true;
-                    break;
-                case ParameterNode _:
-                    workingSet.PossibleString = true;
-                    break;
+                return ComputationBody.Empty;
             }
 
-            workingSet.InternallyValid = true;
             workingSet.Success = true;
 
             return new ComputationBody(
@@ -185,6 +171,10 @@ namespace IX.Math
         }
 
         [CanBeNull]
+        [DiagCA.SuppressMessage(
+            "CodeSmell",
+            "ERP022:Unobserved exception in generic exception handler",
+            Justification = "We want that.")]
         private static NodeBase GenerateExpression(
             [NotNull] string expression,
             [NotNull] WorkingExpressionSet workingSet)
@@ -450,14 +440,10 @@ namespace IX.Math
                         switch (parameterExpressions.Length)
                         {
                             case 0:
-                                if (innerWorkingSet.NonaryFunctions.TryGetValue(
+                                return innerWorkingSet.NonaryFunctions.TryGetValue(
                                     functionName,
-                                    out Type t))
-                                {
-                                    return ((NonaryFunctionNodeBase)Activator.CreateInstance(t)).Simplify();
-                                }
+                                    out Type t) ? ((NonaryFunctionNodeBase)Activator.CreateInstance(t)).Simplify() : null;
 
-                                return null;
                             case 1:
                                 if (innerWorkingSet.UnaryFunctions.TryGetValue(
                                     functionName,
@@ -510,9 +496,7 @@ namespace IX.Math
                 }
                 catch (Exception)
                 {
-#pragma warning disable ERP022 // Catching everything considered harmful. - We actually want this to happen
                     return null;
-#pragma warning restore ERP022 // Catching everything considered harmful.
                 }
 
                 return null;

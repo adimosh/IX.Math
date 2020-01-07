@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Binary
     /// <summary>
     ///     A node representing an addition operation.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Binary.BinaryOperationNodeBase" />
+    /// <seealso cref="BinaryOperationNodeBase" />
     [DebuggerDisplay("{" + nameof(Left) + "} + {" + nameof(Right) + "}")]
     internal sealed class AddNode : BinaryOperationNodeBase
     {

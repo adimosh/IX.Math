@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Binary
     /// <summary>
     ///     A node representing a not equal operation.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Binary.ComparisonOperationNodeBase" />
+    /// <seealso cref="ComparisonOperationNodeBase" />
     [DebuggerDisplay("{" + nameof(Left) + "} != {" + nameof(Right) + "}")]
     internal sealed class NotEqualsNode : ComparisonOperationNodeBase
     {

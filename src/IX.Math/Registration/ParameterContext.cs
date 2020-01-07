@@ -235,7 +235,7 @@ namespace IX.Math.Registration
         /// </summary>
         /// <returns>A LINQ expression representing the parameter.</returns>
         /// <exception cref="InvalidOperationException">The parameter was already compiled, but it is <see langword="null"/>.</exception>
-        /// <exception cref="IX.Math.ExpressionNotValidLogicallyException">The parameter is still undefined.</exception>
+        /// <exception cref="ExpressionNotValidLogicallyException">The parameter is still undefined.</exception>
         public Expression Compile()
         {
             if (this.alreadyCompiled)

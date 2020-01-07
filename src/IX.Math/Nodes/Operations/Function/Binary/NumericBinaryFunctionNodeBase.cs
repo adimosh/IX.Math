@@ -7,7 +7,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
     /// <summary>
     ///     A base class for numeric binary functions.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.BinaryFunctionNodeBase" />
+    /// <seealso cref="BinaryFunctionNodeBase" />
     internal abstract class NumericBinaryFunctionNodeBase : BinaryFunctionNodeBase
     {
         /// <summary>

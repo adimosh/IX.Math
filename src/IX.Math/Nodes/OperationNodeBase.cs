@@ -12,7 +12,7 @@ namespace IX.Math.Nodes
     /// <summary>
     /// A base class for a node representing an operation.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.NodeBase" />
+    /// <seealso cref="NodeBase" />
     [PublicAPI]
     public abstract class OperationNodeBase : CachedExpressionNodeBase
     {

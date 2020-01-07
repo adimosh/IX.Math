@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
     /// <summary>
     ///     A node representing the <see cref="GlobalSystem.Math.Sinh(double)" /> function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.Unary.NumericUnaryFunctionNodeBase" />
+    /// <seealso cref="NumericUnaryFunctionNodeBase" />
     [DebuggerDisplay("sinh({" + nameof(Parameter) + "})")]
     [CallableMathematicsFunction("sinh")]
     [UsedImplicitly]

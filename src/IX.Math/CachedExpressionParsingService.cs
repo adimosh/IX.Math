@@ -8,28 +8,36 @@ using System.Threading;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Efficiency;
 using JetBrains.Annotations;
+using DiagCA = System.Diagnostics.CodeAnalysis;
 
 namespace IX.Math
 {
     /// <summary>
-    /// A service that is able to parse strings containing mathematical expressions and solve them in a cached way.
+    ///     A service that is able to parse strings containing mathematical expressions and solve them in a cached way.
     /// </summary>
     /// <remarks>
-    /// <para>This service also caches expressions so that they can be garbage-collected after a specific time period with no use.</para>
+    ///     <para>
+    ///         This service also caches expressions so that they can be garbage-collected after a specific time period with
+    ///         no use.
+    ///     </para>
     /// </remarks>
     [PublicAPI]
     public class CachedExpressionParsingService : DisposableBase, IExpressionParsingService
     {
-#pragma warning disable IDISP002 // Dispose member. - It is
-#pragma warning disable IDISP006 // Implement IDisposable. - It is
-        private ExpressionParsingService eps;
-#pragma warning restore IDISP006 // Implement IDisposable.
-#pragma warning restore IDISP002 // Dispose member.
-
         private ConcurrentDictionary<string, ComputedExpression> cachedComputedExpressions;
 
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP002:Dispose member.",
+            Justification = "It is properly disposed, but the analyzer can't tell this properly.")]
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP006:Implement IDisposable.",
+            Justification = "It is properly implemented, but the analyzer can't tell this properly.")]
+        private ExpressionParsingService eps;
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="CachedExpressionParsingService"/> class.
+        ///     Initializes a new instance of the <see cref="CachedExpressionParsingService" /> class.
         /// </summary>
         public CachedExpressionParsingService()
         {
@@ -38,7 +46,7 @@ namespace IX.Math
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CachedExpressionParsingService"/> class.
+        ///     Initializes a new instance of the <see cref="CachedExpressionParsingService" /> class.
         /// </summary>
         /// <param name="definition">The math definition to use.</param>
         public CachedExpressionParsingService([NotNull] MathDefinition definition)
@@ -49,23 +57,41 @@ namespace IX.Math
         }
 
         /// <summary>
-        /// Interprets the mathematical expression and returns a container that can be invoked for solving using specific mathematical types.
+        ///     Interprets the mathematical expression and returns a container that can be invoked for solving using specific
+        ///     mathematical types.
         /// </summary>
         /// <param name="expression">The expression to interpret.</param>
         /// <param name="cancellationToken">The cancellation token for this operation.</param>
-        /// <returns>A <see cref="ComputedExpression"/> that represents the interpreted expression.</returns>
+        /// <returns>A <see cref="ComputedExpression" /> that represents the interpreted expression.</returns>
         /// <remarks>
-        /// <para>Due to the specifics of executing multiple expressions, the returned object will always be a clone of the originally-interpreted object, unless any of the following conditions are met:</para>
-        /// <list type="bullet">
-        /// <item>The expression is constant</item>
-        /// <item>The expression has no parameters</item>
-        /// <item>The expression has not been recognized correctly.</item>
-        /// </list>
-        /// <para>This way, a computed expression that has parameters which depend on outside influence will not be subject to reinterpretation, but will execute without having to force undefined parameters into specific types.</para>
+        ///     <para>
+        ///         Due to the specifics of executing multiple expressions, the returned object will always be a clone of the
+        ///         originally-interpreted object, unless any of the following conditions are met:
+        ///     </para>
+        ///     <list type="bullet">
+        ///         <item>The expression is constant</item>
+        ///         <item>The expression has no parameters</item>
+        ///         <item>The expression has not been recognized correctly.</item>
+        ///     </list>
+        ///     <para>
+        ///         This way, a computed expression that has parameters which depend on outside influence will not be subject to
+        ///         reinterpretation, but will execute without having to force undefined parameters into specific types.
+        ///     </para>
         /// </remarks>
-        public ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default)
+        public ComputedExpression Interpret(
+            string expression,
+            CancellationToken cancellationToken = default)
         {
-            ComputedExpression expr = this.cachedComputedExpressions.GetOrAdd(expression, (ex, st) => st.Item1.eps.Interpret(ex, st.Item2), new Tuple<CachedExpressionParsingService, CancellationToken>(this, cancellationToken));
+            ComputedExpression expr = this.cachedComputedExpressions.GetOrAdd(
+                expression,
+                (
+                    ex,
+                    st) => st.Item1.eps.Interpret(
+                    ex,
+                    st.Item2),
+                new Tuple<CachedExpressionParsingService, CancellationToken>(
+                    this,
+                    cancellationToken));
 
             if (!expr.RecognizedCorrectly || expr.IsConstant)
             {
@@ -76,19 +102,19 @@ namespace IX.Math
         }
 
         /// <summary>
-        /// Registers an assembly to extract compatible functions from.
+        ///     Registers an assembly to extract compatible functions from.
         /// </summary>
         /// <param name="assembly">The assembly to register.</param>
         public void RegisterFunctionsAssembly(Assembly assembly) => this.eps.RegisterFunctionsAssembly(assembly);
 
         /// <summary>
-        /// Returns the prototypes of all registered functions.
+        ///     Returns the prototypes of all registered functions.
         /// </summary>
         /// <returns>All function names, with all possible combinations of input and output data.</returns>
         public string[] GetRegisteredFunctions() => this.eps.GetRegisteredFunctions();
 
         /// <summary>
-        /// Disposes in the managed context.
+        ///     Disposes in the managed context.
         /// </summary>
         protected override void DisposeManagedContext()
         {
@@ -99,14 +125,23 @@ namespace IX.Math
         }
 
         /// <summary>
-        /// Disposes in the general (managed and unmanaged) context.
+        ///     Disposes in the general (managed and unmanaged) context.
         /// </summary>
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP003:Dispose previous before re-assigning.",
+            Justification = "It is disposed.")]
         protected override void DisposeGeneralContext()
         {
             base.DisposeGeneralContext();
 
-            Interlocked.Exchange(ref this.cachedComputedExpressions, null);
-            Interlocked.Exchange(ref this.eps, null)?.Dispose();
+            Interlocked.Exchange(
+                ref this.cachedComputedExpressions,
+                null);
+            Interlocked.Exchange(
+                    ref this.eps,
+                    null)
+                ?.Dispose();
         }
     }
 }

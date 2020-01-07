@@ -16,7 +16,7 @@ namespace IX.Math.Nodes.Operations.Binary
     /// <summary>
     ///     A node representing a less than or equal to expression.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Binary.ComparisonOperationNodeBase" />
+    /// <seealso cref="ComparisonOperationNodeBase" />
     [DebuggerDisplay("{" + nameof(Left) + "} <= {" + nameof(Right) + "}")]
     internal sealed class LessThanOrEqualNode : ComparisonOperationNodeBase
     {

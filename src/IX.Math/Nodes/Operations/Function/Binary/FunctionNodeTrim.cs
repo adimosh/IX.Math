@@ -16,7 +16,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
     /// <summary>
     ///     A node representing the trim function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.BinaryFunctionNodeBase" />
+    /// <seealso cref="BinaryFunctionNodeBase" />
     [DebuggerDisplay("trim({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
     [CallableMathematicsFunction("trim")]
     [UsedImplicitly]

@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
     /// <summary>
     ///     A node representing the <see cref="GlobalSystem.Math.Ceiling(double)" /> function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.Unary.NumericUnaryFunctionNodeBase" />
+    /// <seealso cref="NumericUnaryFunctionNodeBase" />
     [DebuggerDisplay("sqrt({" + nameof(Parameter) + "})")]
     [CallableMathematicsFunction(
         "sqrt",

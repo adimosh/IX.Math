@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
     /// <summary>
     ///     A node representing the <see cref="GlobalSystem.Math.Tanh(double)" /> function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.Unary.NumericUnaryFunctionNodeBase" />
+    /// <seealso cref="NumericUnaryFunctionNodeBase" />
     [DebuggerDisplay("tanh({" + nameof(Parameter) + "})")]
     [CallableMathematicsFunction("tanh")]
     [UsedImplicitly]

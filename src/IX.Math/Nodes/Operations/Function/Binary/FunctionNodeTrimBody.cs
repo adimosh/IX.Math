@@ -16,7 +16,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
     /// <summary>
     ///     A node representing a function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.BinaryFunctionNodeBase" />
+    /// <seealso cref="BinaryFunctionNodeBase" />
     [DebuggerDisplay("trimbody({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
     [CallableMathematicsFunction("trimbody")]
     [UsedImplicitly]

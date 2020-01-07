@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
     /// <summary>
     ///     A node representing the random function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.Binary.NumericBinaryFunctionNodeBase" />
+    /// <seealso cref="NumericBinaryFunctionNodeBase" />
     [DebuggerDisplay("random({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
     [CallableMathematicsFunction("rand", "random")]
     [UsedImplicitly]

@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
     /// <summary>
     ///     A node representing the <see cref="GlobalSystem.Math.Pow(double, double)" /> function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.Binary.NumericBinaryFunctionNodeBase" />
+    /// <seealso cref="NumericBinaryFunctionNodeBase" />
     [DebuggerDisplay("pow({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
     [CallableMathematicsFunction("pow", "power")]
     [UsedImplicitly]

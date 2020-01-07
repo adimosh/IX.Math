@@ -13,7 +13,7 @@ namespace IX.Math.Nodes.Operations.Function.Nonary
     /// <summary>
     ///     A node representing the random integer function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.NonaryFunctionNodeBase" />
+    /// <seealso cref="NonaryFunctionNodeBase" />
     [DebuggerDisplay("randomint()")]
     [CallableMathematicsFunction("randomint")]
     [UsedImplicitly]

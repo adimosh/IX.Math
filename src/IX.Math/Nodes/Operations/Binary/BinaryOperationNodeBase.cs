@@ -11,7 +11,7 @@ namespace IX.Math.Nodes.Operations.Binary
     /// <summary>
     /// A node base for binary operations.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.OperationNodeBase" />
+    /// <seealso cref="OperationNodeBase" />
     internal abstract class BinaryOperationNodeBase : OperationNodeBase
     {
         /// <summary>

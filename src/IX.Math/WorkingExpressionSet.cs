@@ -11,59 +11,51 @@ using IX.Math.ExpressionState;
 using IX.Math.Extraction;
 using IX.Math.Generators;
 using IX.Math.Nodes;
+using IX.Math.Nodes.Operations.Binary;
+using IX.Math.Nodes.Operations.Unary;
 using IX.Math.Registration;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Extensions;
 using IX.System.Collections.Generic;
+using DiagCA = System.Diagnostics.CodeAnalysis;
+using SubtractNode = IX.Math.Nodes.Operations.Binary.SubtractNode;
 
 namespace IX.Math
 {
+    [DiagCA.SuppressMessage(
+        "IDisposableAnalyzers.Correctness",
+        "IDISP008:Don't assign member with injected and created disposables.",
+        Justification = "It is OK, but the analyzer can't tell.")]
     internal class WorkingExpressionSet : DisposableBase
     {
-        // Definition
-#pragma warning disable SA1401 // Fields must be private
-        internal MathDefinition Definition;
+        // Operators
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP002:Dispose member.",
+            Justification = "This is correct, but the analyzer can't tell.")]
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP006:Implement IDisposable.",
+            Justification = "This is correct, but the analyzer can't tell.")]
+        private LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, NodeBase>> binaryOperators;
 
-        internal string[] AllOperatorsInOrder;
-        internal string[] AllSymbols;
-        internal Regex FunctionRegex;
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP002:Dispose member.",
+            Justification = "This is correct, but the analyzer can't tell.")]
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP006:Implement IDisposable.",
+            Justification = "This is correct, but the analyzer can't tell.")]
+        private LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase>> unaryOperators;
 
-        // Initial data
-        internal string InitialExpression;
-        internal CancellationToken CancellationToken;
+        // Constants
+        private Dictionary<string, ConstantNodeBase> constantsTable;
+        private Dictionary<string, string> reverseConstantsTable;
 
-        // Working domain
-        internal Dictionary<string, ConstantNodeBase> ConstantsTable;
-        internal Dictionary<string, string> ReverseConstantsTable;
-        internal Dictionary<string, ExpressionSymbol> SymbolTable;
-        internal Dictionary<string, string> ReverseSymbolTable;
-        internal string Expression;
-        internal IParameterRegistry ParameterRegistry;
-
-        // Scrap
-#pragma warning disable IDISP002 // Dispose member.
-#pragma warning disable IDISP006 // Implement IDisposable.
-#pragma warning disable IDISP008 // Don't assign member with injected and created disposables.
-        internal LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase>> UnaryOperators;
-        internal LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, NodeBase>> BinaryOperators;
-        internal LevelDictionary<Type, IConstantsExtractor> Extractors;
-        internal LevelDictionary<Type, IConstantPassThroughExtractor> PassThroughExtractors;
-#pragma warning restore IDISP008 // Don't assign member with injected and created disposables.
-#pragma warning restore IDISP006 // Implement IDisposable.
-#pragma warning restore IDISP002 // Dispose member.
-
-        internal Dictionary<string, Type> NonaryFunctions;
-        internal Dictionary<string, Type> UnaryFunctions;
-        internal Dictionary<string, Type> BinaryFunctions;
-        internal Dictionary<string, Type> TernaryFunctions;
-
-        // Results
-        internal object ValueIfConstant;
-        internal bool Success = false;
-        internal bool InternallyValid = false;
-        internal bool Constant = false;
-        internal bool PossibleString = false;
-#pragma warning restore SA1401 // Fields must be private
+        // Symbols
+        private Dictionary<string, ExpressionSymbol> symbolTable;
+        private Dictionary<string, string> reverseSymbolTable;
 
         private bool initialized;
 
@@ -75,7 +67,6 @@ namespace IX.Math
             Dictionary<string, Type> binaryFunctions,
             Dictionary<string, Type> ternaryFunctions,
             LevelDictionary<Type, IConstantsExtractor> extractors,
-            LevelDictionary<Type, IConstantPassThroughExtractor> passThroughExtractors,
             CancellationToken cancellationToken)
         {
             this.ParameterRegistry = new StandardParameterRegistry();
@@ -84,7 +75,6 @@ namespace IX.Math
             this.SymbolTable = new Dictionary<string, ExpressionSymbol>();
             this.ReverseSymbolTable = new Dictionary<string, string>();
 
-            this.InitialExpression = expression;
             this.CancellationToken = cancellationToken;
             this.Expression = expression;
             this.Definition = mathDefinition;
@@ -107,7 +97,7 @@ namespace IX.Math
                 this.Definition.PowerSymbol,
                 this.Definition.LeftShiftSymbol,
                 this.Definition.RightShiftSymbol,
-                this.Definition.NotSymbol,
+                this.Definition.NotSymbol
             };
 
             this.NonaryFunctions = nonaryFunctions;
@@ -116,11 +106,214 @@ namespace IX.Math
             this.TernaryFunctions = ternaryFunctions;
 
             this.Extractors = extractors;
-            this.PassThroughExtractors = passThroughExtractors;
 
-            this.FunctionRegex = new Regex($@"(?'functionName'.*?){Regex.Escape(this.Definition.Parentheses.Item1)}(?'expression'.*?){Regex.Escape(this.Definition.Parentheses.Item2)}");
+            this.FunctionRegex = new Regex(
+                $@"(?'functionName'.*?){Regex.Escape(this.Definition.Parentheses.Item1)}(?'expression'.*?){Regex.Escape(this.Definition.Parentheses.Item2)}");
         }
 
+        /// <summary>
+        ///     Gets all operators in order.
+        /// </summary>
+        /// <value>
+        ///     All operators in order.
+        /// </value>
+        internal string[] AllOperatorsInOrder { get; }
+
+        /// <summary>
+        ///     Gets the binary functions.
+        /// </summary>
+        /// <value>
+        ///     The binary functions.
+        /// </value>
+        internal Dictionary<string, Type> BinaryFunctions { get; }
+
+        /// <summary>
+        ///     Gets the cancellation token.
+        /// </summary>
+        /// <value>
+        ///     The cancellation token.
+        /// </value>
+        internal CancellationToken CancellationToken { get; }
+
+        /// <summary>
+        ///     Gets the definition.
+        /// </summary>
+        /// <value>
+        ///     The definition.
+        /// </value>
+        internal MathDefinition Definition { get; }
+
+        /// <summary>
+        ///     Gets the extractors.
+        /// </summary>
+        /// <value>
+        ///     The extractors.
+        /// </value>
+        internal LevelDictionary<Type, IConstantsExtractor> Extractors { get; }
+
+        /// <summary>
+        ///     Gets the function regex.
+        /// </summary>
+        /// <value>
+        ///     The function regex.
+        /// </value>
+        internal Regex FunctionRegex { get; }
+
+        /// <summary>
+        ///     Gets the nonary functions.
+        /// </summary>
+        /// <value>
+        ///     The nonary functions.
+        /// </value>
+        internal Dictionary<string, Type> NonaryFunctions { get; }
+
+        /// <summary>
+        ///     Gets the parameter registry.
+        /// </summary>
+        /// <value>
+        ///     The parameter registry.
+        /// </value>
+        internal IParameterRegistry ParameterRegistry { get; }
+
+        /// <summary>
+        ///     Gets the ternary functions.
+        /// </summary>
+        /// <value>
+        ///     The ternary functions.
+        /// </value>
+        internal Dictionary<string, Type> TernaryFunctions { get; }
+
+        /// <summary>
+        ///     Gets the unary functions.
+        /// </summary>
+        /// <value>
+        ///     The unary functions.
+        /// </value>
+        internal Dictionary<string, Type> UnaryFunctions { get; }
+
+        /// <summary>
+        ///     Gets all symbols.
+        /// </summary>
+        /// <value>
+        ///     All symbols.
+        /// </value>
+        internal string[] AllSymbols { get; private set; }
+
+        /// <summary>
+        ///     Gets the binary operators.
+        /// </summary>
+        /// <value>
+        ///     The binary operators.
+        /// </value>
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP002:Dispose member.",
+            Justification = "This is correct, but the analyzer can't tell.")]
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP006:Implement IDisposable.",
+            Justification = "This is correct, but the analyzer can't tell.")]
+        internal LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, NodeBase>> BinaryOperators
+        {
+            get => this.binaryOperators;
+            private set => this.binaryOperators = value;
+        }
+
+        /// <summary>
+        ///     Gets the constants table.
+        /// </summary>
+        /// <value>
+        ///     The constants table.
+        /// </value>
+        internal Dictionary<string, ConstantNodeBase> ConstantsTable
+        {
+            get => this.constantsTable;
+            private set => this.constantsTable = value;
+        }
+
+        /// <summary>
+        ///     Gets or sets the expression.
+        /// </summary>
+        /// <value>
+        ///     The expression.
+        /// </value>
+        internal string Expression { get; set; }
+
+        /// <summary>
+        ///     Gets the reverse constants table.
+        /// </summary>
+        /// <value>
+        ///     The reverse constants table.
+        /// </value>
+        internal Dictionary<string, string> ReverseConstantsTable
+        {
+            get => this.reverseConstantsTable;
+            private set => this.reverseConstantsTable = value;
+        }
+
+        /// <summary>
+        ///     Gets the reverse symbol table.
+        /// </summary>
+        /// <value>
+        ///     The reverse symbol table.
+        /// </value>
+        internal Dictionary<string, string> ReverseSymbolTable
+        {
+            get => this.reverseSymbolTable;
+            private set => this.reverseSymbolTable = value;
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether this <see cref="WorkingExpressionSet" /> is success.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if success; otherwise, <c>false</c>.
+        /// </value>
+        internal bool Success { get; set; }
+
+        /// <summary>
+        ///     Gets the symbol table.
+        /// </summary>
+        /// <value>
+        ///     The symbol table.
+        /// </value>
+        internal Dictionary<string, ExpressionSymbol> SymbolTable
+        {
+            get => this.symbolTable;
+            private set => this.symbolTable = value;
+        }
+
+        /// <summary>
+        ///     Gets the unary operators.
+        /// </summary>
+        /// <value>
+        ///     The unary operators.
+        /// </value>
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP002:Dispose member.",
+            Justification = "This is correct, but the analyzer can't tell.")]
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP006:Implement IDisposable.",
+            Justification = "This is correct, but the analyzer can't tell.")]
+        internal LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase>> UnaryOperators
+        {
+            get => this.unaryOperators;
+            private set => this.unaryOperators = value;
+        }
+
+        /// <summary>
+        ///     Initializes this instance. This method shuld be called after initialization and extraction of major constants.
+        /// </summary>
+        [DiagCA.SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "Too much LINQ.")]
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP003:Dispose previous before re-assigning.",
+            Justification = "It is, but the analyzer cannot tell.")]
         internal void Initialize()
         {
             if (this.initialized)
@@ -131,18 +324,27 @@ namespace IX.Math
             this.initialized = true;
 
             var i = 1;
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator - Acceptable in this case
-            foreach (var op in this.AllOperatorsInOrder
-                .OrderByDescending(p => p.Length)
-                .Where((p, thisL1) => thisL1.AllOperatorsInOrder.Any((q, pL2) => q.Length < pL2.Length && pL2.Contains(q), p), this)
+            foreach (var op in this.AllOperatorsInOrder.OrderByDescending(p => p.Length)
+                .Where(
+                    (
+                        p,
+                        thisL1) => thisL1.AllOperatorsInOrder.Any(
+                        (
+                                q,
+                                pL2) => q.Length < pL2.Length && pL2.Contains(q),
+                        p),
+                    this)
                 .OrderByDescending(p => p.Length))
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
             {
                 var s = $"@op{i.ToString()}@";
 
-                this.Expression = this.Expression.Replace(op, s);
+                this.Expression = this.Expression.Replace(
+                    op,
+                    s);
 
-                var allIndex = Array.IndexOf(this.AllOperatorsInOrder, op);
+                var allIndex = Array.IndexOf(
+                    this.AllOperatorsInOrder,
+                    op);
                 if (allIndex != -1)
                 {
                     this.AllOperatorsInOrder[allIndex] = s;
@@ -238,57 +440,193 @@ namespace IX.Math
 
             // Operator string interpretation support
             // ======================================
-#pragma warning disable IDISP003 // Dispose previous before re-assigning. - Not an issue, as Initialize is repeat-checked
 
             // Binary operators
             this.BinaryOperators = new LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, NodeBase>>
             {
                 // First tier - Comparison and equation operators
-                { this.Definition.GreaterThanOrEqualSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.GreaterThanOrEqualNode(leftOperand, rightOperand), 10 },
-                { this.Definition.LessThanOrEqualSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.LessThanOrEqualNode(leftOperand, rightOperand), 10 },
-                { this.Definition.GreaterThanSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.GreaterThanNode(leftOperand, rightOperand), 10 },
-                { this.Definition.LessThanSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.LessThanNode(leftOperand, rightOperand), 10 },
-                { this.Definition.NotEqualsSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.NotEqualsNode(leftOperand, rightOperand), 10 },
-                { this.Definition.EqualsSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.EqualsNode(leftOperand, rightOperand), 10 },
+                {
+                    this.Definition.GreaterThanOrEqualSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new GreaterThanOrEqualNode(
+                        leftOperand,
+                        rightOperand),
+                    10
+                },
+                {
+                    this.Definition.LessThanOrEqualSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new LessThanOrEqualNode(
+                        leftOperand,
+                        rightOperand),
+                    10
+                },
+                {
+                    this.Definition.GreaterThanSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new GreaterThanNode(
+                        leftOperand,
+                        rightOperand),
+                    10
+                },
+                {
+                    this.Definition.LessThanSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new LessThanNode(
+                        leftOperand,
+                        rightOperand),
+                    10
+                },
+                {
+                    this.Definition.NotEqualsSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new NotEqualsNode(
+                        leftOperand,
+                        rightOperand),
+                    10
+                },
+                {
+                    this.Definition.EqualsSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new EqualsNode(
+                        leftOperand,
+                        rightOperand),
+                    10
+                },
 
                 // Second tier - Logical operators
-                { this.Definition.OrSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.OrNode(leftOperand, rightOperand), 20 },
-                { this.Definition.XorSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.XorNode(leftOperand, rightOperand), this.Definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 21 : 20 },
-                { this.Definition.AndSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.AndNode(leftOperand, rightOperand), this.Definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 22 : 20 },
+                {
+                    this.Definition.OrSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new OrNode(
+                        leftOperand,
+                        rightOperand),
+                    20
+                },
+                {
+                    this.Definition.XorSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new XorNode(
+                        leftOperand,
+                        rightOperand),
+                    this.Definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 21 : 20
+                },
+                {
+                    this.Definition.AndSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new AndNode(
+                        leftOperand,
+                        rightOperand),
+                    this.Definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 22 : 20
+                },
 
                 // Third tier - Arithmetic second-rank operators
-                { this.Definition.AddSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.AddNode(leftOperand, rightOperand), 30 },
-                { this.Definition.SubtractSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.SubtractNode(leftOperand, rightOperand), 30 },
+                {
+                    this.Definition.AddSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new AddNode(
+                        leftOperand,
+                        rightOperand),
+                    30
+                },
+                {
+                    this.Definition.SubtractSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new SubtractNode(
+                        leftOperand,
+                        rightOperand),
+                    30
+                },
 
                 // Fourth tier - Arithmetic first-rank operators
-                { this.Definition.DivideSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.DivideNode(leftOperand, rightOperand), 40 },
-                { this.Definition.MultiplySymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.MultiplyNode(leftOperand, rightOperand), 40 },
+                {
+                    this.Definition.DivideSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new DivideNode(
+                        leftOperand,
+                        rightOperand),
+                    40
+                },
+                {
+                    this.Definition.MultiplySymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new MultiplyNode(
+                        leftOperand,
+                        rightOperand),
+                    40
+                },
 
                 // Fifth tier - Power operator
-                { this.Definition.PowerSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.PowerNode(leftOperand, rightOperand), 50 },
+                {
+                    this.Definition.PowerSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new PowerNode(
+                        leftOperand,
+                        rightOperand),
+                    50
+                },
 
                 // Sixth tier - Bitwise shift operators
-                { this.Definition.LeftShiftSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.LeftShiftNode(leftOperand, rightOperand), 60 },
-                { this.Definition.RightShiftSymbol, (definition, leftOperand, rightOperand) => new Nodes.Operations.Binary.RightShiftNode(leftOperand, rightOperand), 60 },
+                {
+                    this.Definition.LeftShiftSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new LeftShiftNode(
+                        leftOperand,
+                        rightOperand),
+                    60
+                },
+                {
+                    this.Definition.RightShiftSymbol, (
+                        definition,
+                        leftOperand,
+                        rightOperand) => new RightShiftNode(
+                        leftOperand,
+                        rightOperand),
+                    60
+                }
             };
 
             // Unary operators
             this.UnaryOperators = new LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase>>
             {
                 // First tier - Negation and inversion
-                { this.Definition.SubtractSymbol, (definition, operand) => new Nodes.Operations.Unary.SubtractNode(operand), 1 },
-                { this.Definition.NotSymbol, (definition, operand) => new Nodes.Operations.Unary.NotNode(operand), 1 },
+                {
+                    this.Definition.SubtractSymbol, (
+                        definition,
+                        operand) => new Nodes.Operations.Unary.SubtractNode(operand),
+                    1
+                },
+                {
+                    this.Definition.NotSymbol, (
+                        definition,
+                        operand) => new NotNode(operand),
+                    1
+                }
             };
-#pragma warning restore IDISP003 // Dispose previous before re-assigning.
 
             // All symbols
-            this.AllSymbols = this.AllOperatorsInOrder
-                .Union(new[]
-                {
-                    this.Definition.ParameterSeparator,
-                    this.Definition.Parentheses.Item1,
-                    this.Definition.Parentheses.Item2,
-                })
+            this.AllSymbols = this.AllOperatorsInOrder.Union(
+                    new[]
+                    {
+                        this.Definition.ParameterSeparator,
+                        this.Definition.Parentheses.Item1,
+                        this.Definition.Parentheses.Item2
+                    })
                 .ToArray();
 
             // Special symbols
@@ -341,16 +679,41 @@ namespace IX.Math
                 $"{this.Definition.SpecialSymbolIndicators.Item1}lambda{this.Definition.SpecialSymbolIndicators.Item2}");
         }
 
+        /// <summary>
+        /// Disposes in the managed context.
+        /// </summary>
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP003:Dispose previous before re-assigning.",
+            Justification = "It is, but the analyzer can't tell.")]
         protected override void DisposeManagedContext()
         {
             base.DisposeManagedContext();
 
-            Interlocked.Exchange(ref this.ConstantsTable, null).Clear();
-            Interlocked.Exchange(ref this.ReverseConstantsTable, null).Clear();
-            Interlocked.Exchange(ref this.SymbolTable, null)?.Clear();
-            Interlocked.Exchange(ref this.ReverseSymbolTable, null)?.Clear();
-            Interlocked.Exchange(ref this.UnaryOperators, null)?.Dispose();
-            Interlocked.Exchange(ref this.BinaryOperators, null)?.Dispose();
+            Interlocked.Exchange(
+                    ref this.constantsTable,
+                    null)
+                .Clear();
+            Interlocked.Exchange(
+                    ref this.reverseConstantsTable,
+                    null)
+                .Clear();
+            Interlocked.Exchange(
+                    ref this.symbolTable,
+                    null)
+                ?.Clear();
+            Interlocked.Exchange(
+                    ref this.reverseSymbolTable,
+                    null)
+                ?.Clear();
+            Interlocked.Exchange(
+                    ref this.unaryOperators,
+                    null)
+                ?.Dispose();
+            Interlocked.Exchange(
+                    ref this.binaryOperators,
+                    null)
+                ?.Dispose();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
     /// <summary>
     ///     A node representing the random integer function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.Binary.NumericBinaryFunctionNodeBase" />
+    /// <seealso cref="NumericBinaryFunctionNodeBase" />
     [DebuggerDisplay("randomint({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
     [CallableMathematicsFunction("randomint")]
     [UsedImplicitly]

@@ -11,7 +11,7 @@ namespace IX.Math.Nodes.Operations.Binary
     /// <summary>
     ///     A node representing a division operation.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Binary.SimpleMathematicalOperationNodeBase" />
+    /// <seealso cref="SimpleMathematicalOperationNodeBase" />
     [DebuggerDisplay("{" + nameof(Left) + "} / {" + nameof(Right) + "}")]
     internal sealed class DivideNode : SimpleMathematicalOperationNodeBase
     {

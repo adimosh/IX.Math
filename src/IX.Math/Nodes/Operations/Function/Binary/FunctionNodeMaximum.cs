@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
     /// <summary>
     ///     A node representing the <see cref="GlobalSystem.Math.Max(double, double)" /> function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.Binary.NumericBinaryFunctionNodeBase" />
+    /// <seealso cref="NumericBinaryFunctionNodeBase" />
     [DebuggerDisplay("max({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
     [CallableMathematicsFunction(
         "max",

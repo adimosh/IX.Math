@@ -12,7 +12,7 @@ namespace IX.Math.Nodes.Operations.Unary
     /// <summary>
     ///     A node for negation operations.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Unary.UnaryOperatorNodeBase" />
+    /// <seealso cref="UnaryOperatorNodeBase" />
     [DebuggerDisplay("-{" + nameof(Operand) + "}")]
     internal sealed class SubtractNode : UnaryOperatorNodeBase
     {

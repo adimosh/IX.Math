@@ -12,7 +12,7 @@ namespace IX.Math.Nodes.Operations.Unary
     /// <summary>
     ///     A node for a binary negation operation.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Unary.UnaryOperatorNodeBase" />
+    /// <seealso cref="UnaryOperatorNodeBase" />
     [DebuggerDisplay("!{" + nameof(Operand) + "}")]
     internal sealed class NotNode : UnaryOperatorNodeBase
     {

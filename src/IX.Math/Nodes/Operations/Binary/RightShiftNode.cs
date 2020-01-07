@@ -12,7 +12,7 @@ namespace IX.Math.Nodes.Operations.Binary
     /// <summary>
     ///     A node for a bitwise right-shift operation.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Binary.ByteShiftOperationNodeBase" />
+    /// <seealso cref="ByteShiftOperationNodeBase" />
     [DebuggerDisplay("{" + nameof(Left) + "} >> {" + nameof(Right) + "}")]
     internal sealed class RightShiftNode : ByteShiftOperationNodeBase
     {

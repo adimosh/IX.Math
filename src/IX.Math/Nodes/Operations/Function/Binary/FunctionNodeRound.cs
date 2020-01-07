@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Function.Binary
     /// <summary>
     ///     A node representing the <see cref="GlobalSystem.Math.Round(double, int)" /> function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Function.Binary.NumericBinaryFunctionNodeBase" />
+    /// <seealso cref="NumericBinaryFunctionNodeBase" />
     [DebuggerDisplay("round({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
     [CallableMathematicsFunction("round")]
     [UsedImplicitly]

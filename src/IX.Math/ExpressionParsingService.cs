@@ -18,6 +18,7 @@ using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
 using IX.System.Collections.Generic;
 using JetBrains.Annotations;
+using DiagCA = System.Diagnostics.CodeAnalysis;
 
 namespace IX.Math
 {
@@ -29,16 +30,13 @@ namespace IX.Math
     {
         private List<Assembly> assembliesToRegister;
         private Dictionary<string, Type> binaryFunctions;
+
+        private LevelDictionary<Type, IConstantsExtractor> constantExtractors;
+        private LevelDictionary<Type, IConstantPassThroughExtractor> constantPassThroughExtractors;
         private Dictionary<string, Type> nonaryFunctions;
         private Dictionary<string, Type> ternaryFunctions;
         private Dictionary<string, Type> unaryFunctions;
         private MathDefinition workingDefinition;
-#pragma warning disable IDISP002 // Dispose member. - It is
-#pragma warning disable IDISP006 // Implement IDisposable. - It is
-        private LevelDictionary<Type, IConstantsExtractor> constantExtractors;
-        private LevelDictionary<Type, IConstantPassThroughExtractor> constantPassThroughExtractors;
-#pragma warning restore IDISP006 // Implement IDisposable.
-#pragma warning restore IDISP002 // Dispose member.
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ExpressionParsingService" /> class with a standard math definition
@@ -60,7 +58,8 @@ namespace IX.Math
 
             this.assembliesToRegister = new List<Assembly>
             {
-                typeof(ExpressionParsingService).GetTypeInfo().Assembly
+                typeof(ExpressionParsingService).GetTypeInfo()
+                    .Assembly
             };
         }
 
@@ -75,6 +74,10 @@ namespace IX.Math
         ///     expression itself makes sense.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="expression" /> is either null, empty or whitespace-only.</exception>
+        [DiagCA.SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "Unavoidable here.")]
         public ComputedExpression Interpret(
             string expression,
             CancellationToken cancellationToken = default)
@@ -90,11 +93,10 @@ namespace IX.Math
                 this.InitializePassThroughExtractorsDictionary();
             }
 
-#pragma warning disable HAA0401 // Possible allocation of reference type enumerator - Nothing to be done about it
             foreach (Type cpteKey in this.constantPassThroughExtractors.KeysByLevel.SelectMany(p => p.Value))
-#pragma warning restore HAA0401 // Possible allocation of reference type enumerator
             {
-                if (this.constantPassThroughExtractors[cpteKey].Evaluate(expression))
+                if (this.constantPassThroughExtractors[cpteKey]
+                    .Evaluate(expression))
                 {
                     return new ComputedExpression(
                         expression,
@@ -105,7 +107,9 @@ namespace IX.Math
                 }
             }
 
-            if (this.nonaryFunctions == null || this.unaryFunctions == null || this.binaryFunctions == null ||
+            if (this.nonaryFunctions == null ||
+                this.unaryFunctions == null ||
+                this.binaryFunctions == null ||
                 this.ternaryFunctions == null)
             {
                 this.InitializeFunctionsDictionary();
@@ -125,7 +129,6 @@ namespace IX.Math
                 this.binaryFunctions,
                 this.ternaryFunctions,
                 this.constantExtractors,
-                this.constantPassThroughExtractors,
                 cancellationToken))
             {
                 (NodeBase node, IParameterRegistry parameterRegistry) = ExpressionGenerator.CreateBody(workingSet);
@@ -158,14 +161,21 @@ namespace IX.Math
         {
             this.ThrowIfCurrentObjectDisposed();
 
-            if (this.nonaryFunctions == null || this.unaryFunctions == null || this.binaryFunctions == null ||
+            if (this.nonaryFunctions == null ||
+                this.unaryFunctions == null ||
+                this.binaryFunctions == null ||
                 this.ternaryFunctions == null)
             {
                 this.InitializeFunctionsDictionary();
             }
 
             // Capacity is sum of all, times 3; the "3" number was chosen as a good-enough average of how many overloads are defined, on average
-            var bldr = new List<string>((this.nonaryFunctions.Count + this.unaryFunctions.Count + this.binaryFunctions.Count + this.ternaryFunctions.Count) * 3);
+            var bldr = new List<string>(
+                (this.nonaryFunctions.Count +
+                 this.unaryFunctions.Count +
+                 this.binaryFunctions.Count +
+                 this.ternaryFunctions.Count) *
+                3);
 
             foreach (KeyValuePair<string, Type> function in this.nonaryFunctions)
             {
@@ -173,43 +183,57 @@ namespace IX.Math
             }
 
             (from KeyValuePair<string, Type> function in this.unaryFunctions
-                from ConstructorInfo constructor in function.Value.GetTypeInfo().DeclaredConstructors
+                from ConstructorInfo constructor in function.Value.GetTypeInfo()
+                    .DeclaredConstructors
                 let parameters = constructor.GetParameters()
                 where parameters.Length == 1
-                let parameterName = parameters[0].Name
+                let parameterName = parameters[0]
+                    .Name
                 where parameterName != null
                 let functionName = function.Key
                 select (functionName, parameterName)).ForEach(
                 (
                     parameter,
-                    bldrL1) => bldrL1.Add($"{parameter.functionName}({parameter.parameterName})"), bldr);
+                    bldrL1) => bldrL1.Add($"{parameter.functionName}({parameter.parameterName})"),
+                bldr);
 
             (from KeyValuePair<string, Type> function in this.binaryFunctions
-                from ConstructorInfo constructor in function.Value.GetTypeInfo().DeclaredConstructors
+                from ConstructorInfo constructor in function.Value.GetTypeInfo()
+                    .DeclaredConstructors
                 let parameters = constructor.GetParameters()
                 where parameters.Length == 2
-                let parameterNameLeft = parameters[0].Name
-                let parameterNameRight = parameters[1].Name
+                let parameterNameLeft = parameters[0]
+                    .Name
+                let parameterNameRight = parameters[1]
+                    .Name
                 where parameterNameLeft != null && parameterNameRight != null
                 let functionName = function.Key
                 select (functionName, parameterNameLeft, parameterNameRight)).ForEach(
                 (
                     parameter,
-                    bldrL1) => bldrL1.Add($"{parameter.functionName}({parameter.parameterNameLeft}, {parameter.parameterNameRight})"), bldr);
+                    bldrL1) => bldrL1.Add(
+                    $"{parameter.functionName}({parameter.parameterNameLeft}, {parameter.parameterNameRight})"),
+                bldr);
 
             (from KeyValuePair<string, Type> function in this.ternaryFunctions
-                from ConstructorInfo constructor in function.Value.GetTypeInfo().DeclaredConstructors
+                from ConstructorInfo constructor in function.Value.GetTypeInfo()
+                    .DeclaredConstructors
                 let parameters = constructor.GetParameters()
                 where parameters.Length == 3
-                let parameterNameLeft = parameters[0].Name
-                let parameterNameMiddle = parameters[1].Name
-                let parameterNameRight = parameters[2].Name
+                let parameterNameLeft = parameters[0]
+                    .Name
+                let parameterNameMiddle = parameters[1]
+                    .Name
+                let parameterNameRight = parameters[2]
+                    .Name
                 where parameterNameLeft != null && parameterNameMiddle != null && parameterNameRight != null
                 let functionName = function.Key
                 select (functionName, parameterNameLeft, parameterNameMiddle, parameterNameRight)).ForEach(
                 (
                     parameter,
-                    bldrL1) => bldrL1.Add($"{parameter.functionName}({parameter.parameterNameLeft}, {parameter.parameterNameMiddle}, {parameter.parameterNameRight})"), bldr);
+                    bldrL1) => bldrL1.Add(
+                    $"{parameter.functionName}({parameter.parameterNameLeft}, {parameter.parameterNameMiddle}, {parameter.parameterNameRight})"),
+                bldr);
 
             return bldr.ToArray();
         }
@@ -285,19 +309,19 @@ namespace IX.Math
         private void InitializeFunctionsDictionary()
         {
             Interlocked.Exchange(
-                ref this.nonaryFunctions,
-                FunctionsDictionaryGenerator.GenerateInternalNonaryFunctionsDictionary(this.assembliesToRegister))
-            ?.Clear();
+                    ref this.nonaryFunctions,
+                    FunctionsDictionaryGenerator.GenerateInternalNonaryFunctionsDictionary(this.assembliesToRegister))
+                ?.Clear();
 
             Interlocked.Exchange(
-                ref this.unaryFunctions,
-                FunctionsDictionaryGenerator.GenerateInternalUnaryFunctionsDictionary(this.assembliesToRegister))
-            ?.Clear();
+                    ref this.unaryFunctions,
+                    FunctionsDictionaryGenerator.GenerateInternalUnaryFunctionsDictionary(this.assembliesToRegister))
+                ?.Clear();
 
             Interlocked.Exchange(
-                ref this.binaryFunctions,
-                FunctionsDictionaryGenerator.GenerateInternalBinaryFunctionsDictionary(this.assembliesToRegister))
-            ?.Clear();
+                    ref this.binaryFunctions,
+                    FunctionsDictionaryGenerator.GenerateInternalBinaryFunctionsDictionary(this.assembliesToRegister))
+                ?.Clear();
 
             Interlocked.Exchange(
                     ref this.ternaryFunctions,
@@ -305,30 +329,44 @@ namespace IX.Math
                 ?.Clear();
         }
 
+        [DiagCA.SuppressMessage(
+            "StyleCop.CSharp.ReadabilityRules",
+            "SA1118:Parameter should not span multiple lines",
+            Justification = "Parameters are very complex in this method.")]
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP004:Don't ignore created IDisposable.",
+            Justification = "Objects are correctly disposed, but the analyzer can't tell.")]
         private void InitializeExtractorsDictionary()
         {
             Interlocked.Exchange(
-                ref this.constantExtractors,
-                new LevelDictionary<Type, IConstantsExtractor>
-                {
-                    { typeof(StringExtractor), new StringExtractor(), 1000 },
-                    { typeof(ScientificFormatNumberExtractor), new ScientificFormatNumberExtractor(), 2000 }
-                })?.Dispose();
+                    ref this.constantExtractors,
+                    new LevelDictionary<Type, IConstantsExtractor>
+                    {
+                        { typeof(StringExtractor), new StringExtractor(), 1000 },
+                        { typeof(ScientificFormatNumberExtractor), new ScientificFormatNumberExtractor(), 2000 }
+                    })
+                ?.Dispose();
 
             var incrementer = 2001;
             this.assembliesToRegister.GetTypesAssignableFrom<IConstantsExtractor>()
                 .Where(
-                    p => p.IsClass && !p.IsAbstract && !p.IsGenericTypeDefinition &&
-                         p.HasPublicParameterlessConstructor()).Select(p => p.AsType()).Where(
+                    p => p.IsClass &&
+                         !p.IsAbstract &&
+                         !p.IsGenericTypeDefinition &&
+                         p.HasPublicParameterlessConstructor())
+                .Select(p => p.AsType())
+                .Where(
                     (
                         p,
-                        thisL1) => !thisL1.constantExtractors.ContainsKey(p), this).ForEach(
+                        thisL1) => !thisL1.constantExtractors.ContainsKey(p),
+                    this)
+                .ForEach(
                     (
                         Type p,
                         ref int i,
                         ExpressionParsingService thisL1) =>
                     {
-#pragma warning disable SA1118 // Parameter should not span multiple lines - It should, when it's this complex
                         thisL1.constantExtractors.Add(
                             p,
                             (IConstantsExtractor)p.Instantiate(),
@@ -336,31 +374,45 @@ namespace IX.Math
                                 out var explicitLevel)
                                 ? explicitLevel
                                 : Interlocked.Increment(ref i));
-#pragma warning restore SA1118 // Parameter should not span multiple lines
-                    }, ref incrementer,
+                    },
+                    ref incrementer,
                     this);
         }
 
+        [DiagCA.SuppressMessage(
+            "StyleCop.CSharp.ReadabilityRules",
+            "SA1118:Parameter should not span multiple lines",
+            Justification = "Parameters are very complex in this method.")]
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP004:Don't ignore created IDisposable.",
+            Justification = "We're not ignoring it, but the analysis can't tell.")]
         private void InitializePassThroughExtractorsDictionary()
         {
             Interlocked.Exchange(
-                ref this.constantPassThroughExtractors,
-                new LevelDictionary<Type, IConstantPassThroughExtractor>())?.Dispose();
+                    ref this.constantPassThroughExtractors,
+                    new LevelDictionary<Type, IConstantPassThroughExtractor>())
+                ?.Dispose();
 
             var incrementer = 2001;
             this.assembliesToRegister.GetTypesAssignableFrom<IConstantPassThroughExtractor>()
                 .Where(
-                    p => p.IsClass && !p.IsAbstract && !p.IsGenericTypeDefinition &&
-                         p.HasPublicParameterlessConstructor()).Select(p => p.AsType()).Where(
+                    p => p.IsClass &&
+                         !p.IsAbstract &&
+                         !p.IsGenericTypeDefinition &&
+                         p.HasPublicParameterlessConstructor())
+                .Select(p => p.AsType())
+                .Where(
                     (
                         p,
-                        thisL1) => !thisL1.constantPassThroughExtractors.ContainsKey(p), this).ForEach(
+                        thisL1) => !thisL1.constantPassThroughExtractors.ContainsKey(p),
+                    this)
+                .ForEach(
                     (
                         Type p,
                         ref int i,
                         ExpressionParsingService thisL1) =>
                     {
-#pragma warning disable SA1118 // Parameter should not span multiple lines - It should, when it's this complex
                         thisL1.constantPassThroughExtractors.Add(
                             p,
                             (IConstantPassThroughExtractor)p.Instantiate(),
@@ -368,8 +420,8 @@ namespace IX.Math
                                 out var explicitLevel)
                                 ? explicitLevel
                                 : Interlocked.Increment(ref i));
-#pragma warning restore SA1118 // Parameter should not span multiple lines
-                    }, ref incrementer,
+                    },
+                    ref incrementer,
                     this);
         }
     }

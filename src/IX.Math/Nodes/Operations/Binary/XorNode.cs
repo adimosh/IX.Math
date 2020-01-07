@@ -11,7 +11,7 @@ namespace IX.Math.Nodes.Operations.Binary
     /// <summary>
     ///     A node for exclusive or operations.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Binary.LogicalOperationNodeBase" />
+    /// <seealso cref="LogicalOperationNodeBase" />
     [DebuggerDisplay("{Left} ~ {Right}")]
     internal sealed class XorNode : LogicalOperationNodeBase
     {

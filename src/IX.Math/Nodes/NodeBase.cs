@@ -11,7 +11,7 @@ namespace IX.Math.Nodes
     /// <summary>
     ///     A base class for mathematics nodes.
     /// </summary>
-    /// <seealso cref="IX.StandardExtensions.IDeepCloneable{T}" />
+    /// <seealso cref="IDeepCloneable{T}" />
     [PublicAPI]
     public abstract class NodeBase : IContextAwareDeepCloneable<NodeCloningContext, NodeBase>
     {

@@ -12,7 +12,7 @@ namespace IX.Math.Nodes.Operations.Binary
     /// <summary>
     ///     A base node for comparison operations.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Binary.BinaryOperationNodeBase" />
+    /// <seealso cref="BinaryOperationNodeBase" />
     internal abstract class ComparisonOperationNodeBase : BinaryOperationNodeBase
     {
         /// <summary>

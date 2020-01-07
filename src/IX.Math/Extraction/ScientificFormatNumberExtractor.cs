@@ -14,7 +14,7 @@ namespace IX.Math.Extraction
     /// <summary>
     ///     An extractor for scientific notation of numbers. This class cannot be inherited.
     /// </summary>
-    /// <seealso cref="IX.Math.Extraction.IConstantsExtractor" />
+    /// <seealso cref="IConstantsExtractor" />
     internal sealed class ScientificFormatNumberExtractor : IConstantsExtractor
     {
         private readonly Regex exponentialNotationRegex = new Regex(@"[0-9.,]+(?:e\+|E\+|e\-|E\-|e|E)[0-9]+");

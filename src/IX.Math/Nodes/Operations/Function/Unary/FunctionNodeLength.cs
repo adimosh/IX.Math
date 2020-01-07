@@ -14,7 +14,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
     /// <summary>
     ///     A node representing the string length function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.UnaryFunctionNodeBase" />
+    /// <seealso cref="UnaryFunctionNodeBase" />
     [DebuggerDisplay("length({" + nameof(Parameter) + "})")]
     [CallableMathematicsFunction("length")]
     [UsedImplicitly]

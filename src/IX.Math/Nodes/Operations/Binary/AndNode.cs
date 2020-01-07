@@ -11,7 +11,7 @@ namespace IX.Math.Nodes.Operations.Binary
     /// <summary>
     ///     A node representing a logical and operation.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.Operations.Binary.LogicalOperationNodeBase" />
+    /// <seealso cref="LogicalOperationNodeBase" />
     [DebuggerDisplay("{" + nameof(Left) + "} & {" + nameof(Right) + "}")]
     internal sealed class AndNode : LogicalOperationNodeBase
     {

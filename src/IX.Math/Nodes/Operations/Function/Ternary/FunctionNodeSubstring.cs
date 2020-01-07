@@ -16,7 +16,7 @@ namespace IX.Math.Nodes.Operations.Function.Ternary
     /// <summary>
     ///     A node representing the substring function.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.TernaryFunctionNodeBase" />
+    /// <seealso cref="TernaryFunctionNodeBase" />
     [DebuggerDisplay(
         "substring({" +
         nameof(FirstParameter) +

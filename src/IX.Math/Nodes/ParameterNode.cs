@@ -11,7 +11,7 @@ namespace IX.Math.Nodes
     /// <summary>
     /// A node representing a parameter.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.NodeBase" />
+    /// <seealso cref="NodeBase" />
     public class ParameterNode : NodeBase
     {
         private readonly IParameterRegistry parametersRegistry;

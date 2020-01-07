@@ -7,7 +7,7 @@ namespace IX.Math.Nodes.Operations.Function.Unary
     /// <summary>
     ///     A base class for numeric unary functions.
     /// </summary>
-    /// <seealso cref="IX.Math.Nodes.UnaryFunctionNodeBase" />
+    /// <seealso cref="UnaryFunctionNodeBase" />
     internal abstract class NumericUnaryFunctionNodeBase : UnaryFunctionNodeBase
     {
         /// <summary>
