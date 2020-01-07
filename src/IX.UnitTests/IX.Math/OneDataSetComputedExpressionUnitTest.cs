@@ -37,12 +37,12 @@ namespace IX.UnitTests.IX.Math
         {
             new object[]
             {
-                "round(x, 2)=2.12",
+                "trim(x)",
                 new Dictionary<string, object>
                 {
-                    ["x"] = 2.1247154D,
+                    ["x"] = "   a   ",
                 },
-                true
+                "a",
             },
         };
 

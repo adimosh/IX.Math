@@ -228,7 +228,7 @@ namespace IX.Math.Nodes
         /// <exception cref="ArgumentException"><paramref name="methodName" /> represents a property that cannot be found.</exception>
         [NotNull]
         protected Expression GenerateParameterMethodCall<T>([NotNull] string methodName) =>
-            this.GenerateParameterPropertyCall<T>(
+            this.GenerateParameterMethodCall<T>(
                 methodName,
                 null);
 
