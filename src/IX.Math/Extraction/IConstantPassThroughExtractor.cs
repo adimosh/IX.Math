@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using JetBrains.Annotations;
 
 namespace IX.Math.Extraction
@@ -10,13 +11,8 @@ namespace IX.Math.Extraction
     ///     A service contract for extracting pass-through constants.
     /// </summary>
     [PublicAPI]
-    public interface IConstantPassThroughExtractor
+    [Obsolete("This has been moved to the IX.Math.Extensibility namespace, please use the interface there.")]
+    public interface IConstantPassThroughExtractor : Extensibility.IConstantPassThroughExtractor
     {
-        /// <summary>
-        ///     Evaluates an expression and decides whether or not it should be a pass-through constant.
-        /// </summary>
-        /// <param name="expression">The expression to evaluate.</param>
-        /// <returns><c>true</c> if the expression is a pass-through constant, <c>false</c> otherwise.</returns>
-        bool Evaluate(string expression);
     }
 }

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using IX.Math.ExpressionState;
-using IX.Math.Extraction;
+using IX.Math.Extensibility;
 using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Operations.Binary;

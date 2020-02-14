@@ -19,6 +19,8 @@ using IX.StandardExtensions.Extensions;
 using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 using DiagCA = System.Diagnostics.CodeAnalysis;
+using IConstantPassThroughExtractor = IX.Math.Extensibility.IConstantPassThroughExtractor;
+using IConstantsExtractor = IX.Math.Extensibility.IConstantsExtractor;
 
 namespace IX.Math
 {
@@ -33,6 +35,7 @@ namespace IX.Math
 
         private LevelDictionary<Type, IConstantsExtractor> constantExtractors;
         private LevelDictionary<Type, IConstantPassThroughExtractor> constantPassThroughExtractors;
+        private LevelDictionary<Type, IConstantInterpreter> constantInterpreters;
         private Dictionary<string, Type> nonaryFunctions;
         private Dictionary<string, Type> ternaryFunctions;
         private Dictionary<string, Type> unaryFunctions;
@@ -118,6 +121,11 @@ namespace IX.Math
             if (this.constantExtractors == null)
             {
                 this.InitializeExtractorsDictionary();
+            }
+
+            if (this.constantInterpreters == null)
+            {
+                this.InitializeInterpretersDictionary();
             }
 
             ComputedExpression result;
@@ -417,6 +425,52 @@ namespace IX.Math
                             p,
                             (IConstantPassThroughExtractor)p.Instantiate(),
                             p.GetAttributeDataByTypeWithoutVersionBinding<ConstantsPassThroughExtractorAttribute, int>(
+                                out var explicitLevel)
+                                ? explicitLevel
+                                : Interlocked.Increment(ref i));
+                    },
+                    ref incrementer,
+                    this);
+        }
+
+        [DiagCA.SuppressMessage(
+            "StyleCop.CSharp.ReadabilityRules",
+            "SA1118:Parameter should not span multiple lines",
+            Justification = "Parameters are very complex in this method.")]
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP004:Don't ignore created IDisposable.",
+            Justification = "Objects are correctly disposed, but the analyzer can't tell.")]
+        private void InitializeInterpretersDictionary()
+        {
+            Interlocked.Exchange(
+                    ref this.constantInterpreters,
+                    new LevelDictionary<Type, IConstantInterpreter>())
+                ?.Dispose();
+
+            var incrementer = 2001;
+            this.assembliesToRegister.GetTypesAssignableFrom<IConstantInterpreter>()
+                .Where(
+                    p => p.IsClass &&
+                         !p.IsAbstract &&
+                         !p.IsGenericTypeDefinition &&
+                         p.HasPublicParameterlessConstructor())
+                .Select(p => p.AsType())
+                .Where(
+                    (
+                        p,
+                        thisL1) => !thisL1.constantInterpreters.ContainsKey(p),
+                    this)
+                .ForEach(
+                    (
+                        Type p,
+                        ref int i,
+                        ExpressionParsingService thisL1) =>
+                    {
+                        thisL1.constantInterpreters.Add(
+                            p,
+                            (IConstantInterpreter)p.Instantiate(),
+                            p.GetAttributeDataByTypeWithoutVersionBinding<ConstantsInterpreterAttribute, int>(
                                 out var explicitLevel)
                                 ? explicitLevel
                                 : Interlocked.Increment(ref i));

@@ -13,7 +13,7 @@ namespace IX.Math.Extraction
     /// <summary>
     ///     An extractor for strings. This class cannot be inherited.
     /// </summary>
-    internal sealed class StringExtractor : IConstantsExtractor
+    internal sealed class StringExtractor : Extensibility.IConstantsExtractor
     {
         /// <summary>
         ///     Extracts the string constants and replaces them with expression placeholders.

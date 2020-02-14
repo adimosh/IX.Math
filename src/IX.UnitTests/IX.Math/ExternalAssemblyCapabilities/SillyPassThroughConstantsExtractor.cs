@@ -3,8 +3,8 @@
 // </copyright>
 
 using IX.Math.Extensibility;
-using IX.Math.Extraction;
 using IX.StandardExtensions.Globalization;
+using JetBrains.Annotations;
 
 namespace IX.UnitTests.IX.Math.ExternalAssemblyCapabilities
 {
@@ -12,6 +12,7 @@ namespace IX.UnitTests.IX.Math.ExternalAssemblyCapabilities
     /// Test pass-through extractor baby.
     /// </summary>
     [ConstantsPassThroughExtractor]
+    [UsedImplicitly]
     public class SillyPassThroughConstantsExtractor : IConstantPassThroughExtractor
     {
         /// <summary>

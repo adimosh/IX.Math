@@ -6,16 +6,17 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using IX.Math;
 using IX.Math.Extensibility;
-using IX.Math.Extraction;
 using IX.Math.Nodes;
+using JetBrains.Annotations;
 
 namespace IX.UnitTests.IX.Math.ExternalAssemblyCapabilities
 {
     /// <summary>
     /// A constants extractor used for testing purposes.
     /// </summary>
-    /// <seealso cref="IX.Math.Extraction.IConstantsExtractor" />
+    /// <seealso cref="IConstantsExtractor" />
     [ConstantsExtractor(Level = 1)]
+    [UsedImplicitly]
     public class SillyStringConstantsExtractorWithSpecificOrder : IConstantsExtractor
     {
         private readonly Regex exponentialNotationRegex = new Regex(@"silly");
