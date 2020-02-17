@@ -19,66 +19,80 @@ namespace IX.UnitTests.IX.Math
         [Fact(DisplayName = "Test extractors from external libraries")]
         public void Test1()
         {
-            using (var eps = new ExpressionParsingService())
-            {
-                eps.RegisterFunctionsAssembly(typeof(ExternalExtractorUnitTests).GetTypeInfo().Assembly);
+            using var eps = new ExpressionParsingService();
 
-                using (ComputedExpression interpreted = eps.Interpret("1+silly+3"))
-                {
-                    Assert.NotNull(interpreted);
-                    Assert.True(interpreted.RecognizedCorrectly);
-                    Assert.Contains(
-                        interpreted.ParameterNames,
-                        p => p == "stupid");
-                    Assert.DoesNotContain(
-                        interpreted.ParameterNames,
-                        p => p == "silly");
-                }
-            }
+            eps.RegisterFunctionsAssembly(typeof(ExternalExtractorUnitTests).GetTypeInfo().Assembly);
+
+            using ComputedExpression interpreted = eps.Interpret("1+silly+3");
+
+            Assert.NotNull(interpreted);
+            Assert.True(interpreted.RecognizedCorrectly);
+            Assert.Contains(
+                interpreted.ParameterNames,
+                p => p == "stupid");
+            Assert.DoesNotContain(
+                interpreted.ParameterNames,
+                p => p == "silly");
         }
 
         /// <summary>
-        ///     Tests extractors from external libraries.
+        ///     Tests extractors from external libraries with ordering.
         /// </summary>
         [Fact(DisplayName = "Test extractors from external libraries with ordering")]
         public void Test2()
         {
-            using (var eps = new ExpressionParsingService())
-            {
-                eps.RegisterFunctionsAssembly(typeof(ExternalExtractorUnitTests).GetTypeInfo().Assembly);
+            using var eps = new ExpressionParsingService();
 
-                using (ComputedExpression interpreted = eps.Interpret("\"I am silly very much\""))
-                {
-                    Assert.NotNull(interpreted);
-                    Assert.True(interpreted.RecognizedCorrectly);
-                    Assert.True(interpreted.IsConstant);
-                    Assert.Equal(
-                        "I am stupid very much",
-                        interpreted.Compute());
-                }
-            }
+            eps.RegisterFunctionsAssembly(typeof(ExternalExtractorUnitTests).GetTypeInfo().Assembly);
+
+            using ComputedExpression interpreted = eps.Interpret("\"I am silly very much\"");
+
+            Assert.NotNull(interpreted);
+            Assert.True(interpreted.RecognizedCorrectly);
+            Assert.True(interpreted.IsConstant);
+            Assert.Equal(
+                "I am stupid very much",
+                interpreted.Compute());
         }
 
         /// <summary>
-        ///     Tests extractors from external libraries.
+        ///     Tests pass-through extractors from external libraries.
         /// </summary>
         [Fact(DisplayName = "Test pass-through extractors from external libraries")]
         public void Test3()
         {
-            using (var eps = new ExpressionParsingService())
-            {
-                eps.RegisterFunctionsAssembly(typeof(ExternalExtractorUnitTests).GetTypeInfo().Assembly);
+            using var eps = new ExpressionParsingService();
 
-                using (ComputedExpression interpreted = eps.Interpret("1+2"))
-                {
-                    Assert.NotNull(interpreted);
-                    Assert.True(interpreted.RecognizedCorrectly);
-                    Assert.True(interpreted.IsConstant);
-                    Assert.Equal(
-                        "1+2",
-                        interpreted.Compute());
-                }
-            }
+            eps.RegisterFunctionsAssembly(typeof(ExternalExtractorUnitTests).GetTypeInfo().Assembly);
+
+            using ComputedExpression interpreted = eps.Interpret("1+2");
+
+            Assert.NotNull(interpreted);
+            Assert.True(interpreted.RecognizedCorrectly);
+            Assert.True(interpreted.IsConstant);
+            Assert.Equal(
+                "1+2",
+                interpreted.Compute());
+        }
+
+        /// <summary>
+        ///     Tests interpreters from external libraries.
+        /// </summary>
+        [Fact(DisplayName = "Test interpreters from external libraries")]
+        public void Test4()
+        {
+            using var eps = new ExpressionParsingService();
+
+            eps.RegisterFunctionsAssembly(typeof(ExternalExtractorUnitTests).GetTypeInfo().Assembly);
+
+            using ComputedExpression interpreted = eps.Interpret("substring(\"alabalaportocala\",bumbly dumb)");
+
+            Assert.NotNull(interpreted);
+            Assert.True(interpreted.RecognizedCorrectly);
+            Assert.True(interpreted.IsConstant);
+            Assert.Equal(
+                "abalaportocala",
+                interpreted.Compute());
         }
     }
 }
