@@ -83,6 +83,7 @@ namespace IX.Math
                 workingSet.ReverseConstantsTable,
                 workingSet.SymbolTable,
                 workingSet.ReverseSymbolTable,
+                workingSet.Interpreters,
                 workingSet.ParameterRegistry,
                 workingSet.SymbolTable[string.Empty].Expression,
                 workingSet.AllSymbols);
@@ -122,6 +123,7 @@ namespace IX.Math
                     workingSet.SymbolTable,
                     workingSet.ReverseSymbolTable,
                     workingSet.ParameterRegistry,
+                    workingSet.Interpreters,
                     workingSet.Expression,
                     workingSet.Definition.Parentheses.Item1,
                     workingSet.AllSymbols);

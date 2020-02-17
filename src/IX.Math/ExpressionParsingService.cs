@@ -137,6 +137,7 @@ namespace IX.Math
                 this.binaryFunctions,
                 this.ternaryFunctions,
                 this.constantExtractors,
+                this.constantInterpreters,
                 cancellationToken))
             {
                 (NodeBase node, IParameterRegistry parameterRegistry) = ExpressionGenerator.CreateBody(workingSet);

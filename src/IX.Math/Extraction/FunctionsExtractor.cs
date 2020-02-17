@@ -6,11 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using IX.Math.ExpressionState;
+using IX.Math.Extensibility;
 using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Registration;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
+using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace IX.Math.Extraction
@@ -30,6 +32,7 @@ namespace IX.Math.Extraction
         /// <param name="reverseConstantsTable">The reverse-lookup constants table.</param>
         /// <param name="symbolTable">The symbols table.</param>
         /// <param name="reverseSymbolTable">The reverse-lookup symbols table.</param>
+        /// <param name="interpreters">The constant interpreters.</param>
         /// <param name="parametersTable">The parameters table.</param>
         /// <param name="expression">The expression before processing.</param>
         /// <param name="allSymbols">All symbols.</param>
@@ -41,10 +44,12 @@ namespace IX.Math.Extraction
             [NotNull] Dictionary<string, string> reverseConstantsTable,
             [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
             [NotNull] Dictionary<string, string> reverseSymbolTable,
+            [NotNull] LevelDictionary<Type, IConstantInterpreter> interpreters,
             [NotNull] IParameterRegistry parametersTable,
             [NotNull] string expression,
             [NotNull] string[] allSymbols)
         {
+            // Validate parameters
             Contract.RequiresNotNullOrWhitespacePrivate(
                 openParenthesis,
                 nameof(openParenthesis));
@@ -67,6 +72,9 @@ namespace IX.Math.Extraction
                 in reverseSymbolTable,
                 nameof(reverseSymbolTable));
             Contract.RequiresNotNullPrivate(
+                in interpreters,
+                nameof(interpreters));
+            Contract.RequiresNotNullPrivate(
                 in parametersTable,
                 nameof(parametersTable));
             Contract.RequiresNotNullOrWhitespacePrivate(
@@ -76,6 +84,7 @@ namespace IX.Math.Extraction
                 in allSymbols,
                 nameof(allSymbols));
 
+            // Replace the main expression
             ReplaceOneFunction(
                 string.Empty,
                 openParenthesis,
@@ -85,11 +94,14 @@ namespace IX.Math.Extraction
                 reverseConstantsTable,
                 symbolTable,
                 reverseSymbolTable,
+                interpreters,
                 parametersTable,
                 expression,
                 allSymbols);
+
             for (var i = 1; i < symbolTable.Count; i++)
             {
+                // Replace sub-expressions
                 ReplaceOneFunction(
                     $"item{i.ToString().PadLeft(4, '0')}",
                     openParenthesis,
@@ -99,12 +111,13 @@ namespace IX.Math.Extraction
                     reverseConstantsTable,
                     symbolTable,
                     reverseSymbolTable,
+                    interpreters,
                     parametersTable,
                     expression,
                     allSymbols);
             }
 
-            void ReplaceOneFunction(
+            static void ReplaceOneFunction(
                 string key,
                 string outerOpenParanthesisSymbol,
                 string outerCloseParanthesisSymbol,
@@ -113,6 +126,7 @@ namespace IX.Math.Extraction
                 Dictionary<string, string> outerReverseConstantsTableReference,
                 Dictionary<string, ExpressionSymbol> outerSymbolTableReference,
                 Dictionary<string, string> outerReverseSymbolTableRefeerence,
+                LevelDictionary<Type, IConstantInterpreter> interpreters,
                 IParameterRegistry outerParametersTableReference,
                 string outerExpressionSymbol,
                 string[] outerAllSymbolsSymbols)
@@ -136,12 +150,13 @@ namespace IX.Math.Extraction
                         outerReverseConstantsTableReference,
                         outerSymbolTableReference,
                         outerReverseSymbolTableRefeerence,
+                        interpreters,
                         outerParametersTableReference,
                         outerExpressionSymbol,
                         outerAllSymbolsSymbols);
                 }
 
-                string ReplaceFunctions(
+                static string ReplaceFunctions(
                     string source,
                     string openParanthesisSymbol,
                     string closeParanthesisSymbol,
@@ -150,6 +165,7 @@ namespace IX.Math.Extraction
                     Dictionary<string, string> reverseConstantsTableReference,
                     Dictionary<string, ExpressionSymbol> symbolTableReference,
                     Dictionary<string, string> reverseSymbolTableReference,
+                    LevelDictionary<Type, IConstantInterpreter> interpretersReference,
                     IParameterRegistry parametersTableReference,
                     string expressionSymbol,
                     string[] allSymbolsSymbols)
@@ -235,6 +251,7 @@ namespace IX.Math.Extraction
                                 reverseConstantsTableReference,
                                 symbolTableReference,
                                 reverseSymbolTableReference,
+                                interpretersReference,
                                 parametersTableReference,
                                 expressionSymbol,
                                 allSymbolsSymbols);
@@ -252,6 +269,7 @@ namespace IX.Math.Extraction
                                 symbolTableReference,
                                 reverseSymbolTableReference,
                                 parametersTableReference,
+                                interpretersReference,
                                 expressionSymbol,
                                 openParanthesisSymbol,
                                 allSymbolsSymbols);
@@ -261,6 +279,7 @@ namespace IX.Math.Extraction
                                 ConstantsGenerator.CheckAndAdd(
                                     constantsTableReference,
                                     reverseConstantsTableReference,
+                                    interpretersReference,
                                     expressionSymbol,
                                     s) ?? (!parametersTableReference.Exists(s)
                                     ? SymbolExpressionGenerator.GenerateSymbolExpression(

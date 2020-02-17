@@ -67,6 +67,7 @@ namespace IX.Math
             Dictionary<string, Type> binaryFunctions,
             Dictionary<string, Type> ternaryFunctions,
             LevelDictionary<Type, IConstantsExtractor> extractors,
+            LevelDictionary<Type, IConstantInterpreter> interpreters,
             CancellationToken cancellationToken)
         {
             this.ParameterRegistry = new StandardParameterRegistry();
@@ -81,23 +82,23 @@ namespace IX.Math
 
             this.AllOperatorsInOrder = new[]
             {
-                this.Definition.GreaterThanOrEqualSymbol,
-                this.Definition.LessThanOrEqualSymbol,
-                this.Definition.GreaterThanSymbol,
-                this.Definition.LessThanSymbol,
-                this.Definition.NotEqualsSymbol,
-                this.Definition.EqualsSymbol,
-                this.Definition.XorSymbol,
-                this.Definition.OrSymbol,
-                this.Definition.AndSymbol,
-                this.Definition.AddSymbol,
-                this.Definition.SubtractSymbol,
-                this.Definition.DivideSymbol,
-                this.Definition.MultiplySymbol,
-                this.Definition.PowerSymbol,
-                this.Definition.LeftShiftSymbol,
-                this.Definition.RightShiftSymbol,
-                this.Definition.NotSymbol
+                mathDefinition.GreaterThanOrEqualSymbol,
+                mathDefinition.LessThanOrEqualSymbol,
+                mathDefinition.GreaterThanSymbol,
+                mathDefinition.LessThanSymbol,
+                mathDefinition.NotEqualsSymbol,
+                mathDefinition.EqualsSymbol,
+                mathDefinition.XorSymbol,
+                mathDefinition.OrSymbol,
+                mathDefinition.AndSymbol,
+                mathDefinition.AddSymbol,
+                mathDefinition.SubtractSymbol,
+                mathDefinition.DivideSymbol,
+                mathDefinition.MultiplySymbol,
+                mathDefinition.PowerSymbol,
+                mathDefinition.LeftShiftSymbol,
+                mathDefinition.RightShiftSymbol,
+                mathDefinition.NotSymbol
             };
 
             this.NonaryFunctions = nonaryFunctions;
@@ -106,9 +107,10 @@ namespace IX.Math
             this.TernaryFunctions = ternaryFunctions;
 
             this.Extractors = extractors;
+            this.Interpreters = interpreters;
 
             this.FunctionRegex = new Regex(
-                $@"(?'functionName'.*?){Regex.Escape(this.Definition.Parentheses.Item1)}(?'expression'.*?){Regex.Escape(this.Definition.Parentheses.Item2)}");
+                $@"(?'functionName'.*?){Regex.Escape(mathDefinition.Parentheses.Item1)}(?'expression'.*?){Regex.Escape(mathDefinition.Parentheses.Item2)}");
         }
 
         /// <summary>
@@ -144,12 +146,20 @@ namespace IX.Math
         internal MathDefinition Definition { get; }
 
         /// <summary>
-        ///     Gets the extractors.
+        ///     Gets the constant extractors.
         /// </summary>
         /// <value>
-        ///     The extractors.
+        ///     The constant extractors.
         /// </value>
         internal LevelDictionary<Type, IConstantsExtractor> Extractors { get; }
+
+        /// <summary>
+        ///     Gets the constant interpreters.
+        /// </summary>
+        /// <value>
+        ///     The constant interpreters.
+        /// </value>
+        internal LevelDictionary<Type, IConstantInterpreter> Interpreters { get; }
 
         /// <summary>
         ///     Gets the function regex.
@@ -324,16 +334,19 @@ namespace IX.Math
             this.initialized = true;
 
             var i = 1;
-            foreach (var op in this.AllOperatorsInOrder.OrderByDescending(p => p.Length)
+            var allOperatorsInOrder = this.AllOperatorsInOrder;
+            var definition = this.Definition;
+
+            foreach (var op in allOperatorsInOrder.OrderByDescending(p => p.Length)
                 .Where(
                     (
                         p,
-                        thisL1) => thisL1.AllOperatorsInOrder.Any(
+                        allOperatorsInOrderL1) => allOperatorsInOrderL1.Any(
                         (
                                 q,
                                 pL2) => q.Length < pL2.Length && pL2.Contains(q),
                         p),
-                    this)
+                    allOperatorsInOrder)
                 .OrderByDescending(p => p.Length))
             {
                 var s = $"@op{i.ToString()}@";
@@ -343,96 +356,96 @@ namespace IX.Math
                     s);
 
                 var allIndex = Array.IndexOf(
-                    this.AllOperatorsInOrder,
+                    allOperatorsInOrder,
                     op);
                 if (allIndex != -1)
                 {
-                    this.AllOperatorsInOrder[allIndex] = s;
+                    allOperatorsInOrder[allIndex] = s;
                 }
 
-                if (this.Definition.AddSymbol == op)
+                if (definition.AddSymbol == op)
                 {
-                    this.Definition.AddSymbol = s;
+                    definition.AddSymbol = s;
                 }
 
-                if (this.Definition.AndSymbol == op)
+                if (definition.AndSymbol == op)
                 {
-                    this.Definition.AndSymbol = s;
+                    definition.AndSymbol = s;
                 }
 
-                if (this.Definition.DivideSymbol == op)
+                if (definition.DivideSymbol == op)
                 {
-                    this.Definition.DivideSymbol = s;
+                    definition.DivideSymbol = s;
                 }
 
-                if (this.Definition.NotEqualsSymbol == op)
+                if (definition.NotEqualsSymbol == op)
                 {
-                    this.Definition.NotEqualsSymbol = s;
+                    definition.NotEqualsSymbol = s;
                 }
 
-                if (this.Definition.EqualsSymbol == op)
+                if (definition.EqualsSymbol == op)
                 {
-                    this.Definition.EqualsSymbol = s;
+                    definition.EqualsSymbol = s;
                 }
 
-                if (this.Definition.GreaterThanOrEqualSymbol == op)
+                if (definition.GreaterThanOrEqualSymbol == op)
                 {
-                    this.Definition.GreaterThanOrEqualSymbol = s;
+                    definition.GreaterThanOrEqualSymbol = s;
                 }
 
-                if (this.Definition.GreaterThanSymbol == op)
+                if (definition.GreaterThanSymbol == op)
                 {
-                    this.Definition.GreaterThanSymbol = s;
+                    definition.GreaterThanSymbol = s;
                 }
 
-                if (this.Definition.LessThanOrEqualSymbol == op)
+                if (definition.LessThanOrEqualSymbol == op)
                 {
-                    this.Definition.LessThanOrEqualSymbol = s;
+                    definition.LessThanOrEqualSymbol = s;
                 }
 
-                if (this.Definition.LessThanSymbol == op)
+                if (definition.LessThanSymbol == op)
                 {
-                    this.Definition.LessThanSymbol = s;
+                    definition.LessThanSymbol = s;
                 }
 
-                if (this.Definition.MultiplySymbol == op)
+                if (definition.MultiplySymbol == op)
                 {
-                    this.Definition.MultiplySymbol = s;
+                    definition.MultiplySymbol = s;
                 }
 
-                if (this.Definition.NotSymbol == op)
+                if (definition.NotSymbol == op)
                 {
-                    this.Definition.NotSymbol = s;
+                    definition.NotSymbol = s;
                 }
 
-                if (this.Definition.OrSymbol == op)
+                if (definition.OrSymbol == op)
                 {
-                    this.Definition.OrSymbol = s;
+                    definition.OrSymbol = s;
                 }
 
-                if (this.Definition.PowerSymbol == op)
+                if (definition.PowerSymbol == op)
                 {
-                    this.Definition.PowerSymbol = s;
+                    definition.PowerSymbol = s;
                 }
 
-                if (this.Definition.LeftShiftSymbol == op)
+                if (definition.LeftShiftSymbol == op)
                 {
-                    this.Definition.LeftShiftSymbol = s;
+                    definition.LeftShiftSymbol = s;
                 }
 
-                if (this.Definition.RightShiftSymbol == op)
+                if (definition.RightShiftSymbol == op)
                 {
-                    this.Definition.RightShiftSymbol = s;
+                    definition.RightShiftSymbol = s;
                 }
 
-                if (this.Definition.SubtractSymbol == op)
+                if (definition.SubtractSymbol == op)
                 {
-                    this.Definition.SubtractSymbol = s;
+                    definition.SubtractSymbol = s;
                 }
 
-                if (this.Definition.XorSymbol == op)
+                if (definition.XorSymbol == op)
                 {
-                    this.Definition.XorSymbol = s;
+                    definition.XorSymbol = s;
                 }
 
                 i++;
@@ -446,8 +459,8 @@ namespace IX.Math
             {
                 // First tier - Comparison and equation operators
                 {
-                    this.Definition.GreaterThanOrEqualSymbol, (
-                        definition,
+                    definition.GreaterThanOrEqualSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new GreaterThanOrEqualNode(
                         leftOperand,
@@ -455,8 +468,8 @@ namespace IX.Math
                     10
                 },
                 {
-                    this.Definition.LessThanOrEqualSymbol, (
-                        definition,
+                    definition.LessThanOrEqualSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new LessThanOrEqualNode(
                         leftOperand,
@@ -464,8 +477,8 @@ namespace IX.Math
                     10
                 },
                 {
-                    this.Definition.GreaterThanSymbol, (
-                        definition,
+                    definition.GreaterThanSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new GreaterThanNode(
                         leftOperand,
@@ -473,8 +486,8 @@ namespace IX.Math
                     10
                 },
                 {
-                    this.Definition.LessThanSymbol, (
-                        definition,
+                    definition.LessThanSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new LessThanNode(
                         leftOperand,
@@ -482,8 +495,8 @@ namespace IX.Math
                     10
                 },
                 {
-                    this.Definition.NotEqualsSymbol, (
-                        definition,
+                    definition.NotEqualsSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new NotEqualsNode(
                         leftOperand,
@@ -491,8 +504,8 @@ namespace IX.Math
                     10
                 },
                 {
-                    this.Definition.EqualsSymbol, (
-                        definition,
+                    definition.EqualsSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new EqualsNode(
                         leftOperand,
@@ -502,8 +515,8 @@ namespace IX.Math
 
                 // Second tier - Logical operators
                 {
-                    this.Definition.OrSymbol, (
-                        definition,
+                    definition.OrSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new OrNode(
                         leftOperand,
@@ -511,28 +524,28 @@ namespace IX.Math
                     20
                 },
                 {
-                    this.Definition.XorSymbol, (
-                        definition,
+                    definition.XorSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new XorNode(
                         leftOperand,
                         rightOperand),
-                    this.Definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 21 : 20
+                    definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 21 : 20
                 },
                 {
-                    this.Definition.AndSymbol, (
-                        definition,
+                    definition.AndSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new AndNode(
                         leftOperand,
                         rightOperand),
-                    this.Definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 22 : 20
+                    definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 22 : 20
                 },
 
                 // Third tier - Arithmetic second-rank operators
                 {
-                    this.Definition.AddSymbol, (
-                        definition,
+                    definition.AddSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new AddNode(
                         leftOperand,
@@ -540,8 +553,8 @@ namespace IX.Math
                     30
                 },
                 {
-                    this.Definition.SubtractSymbol, (
-                        definition,
+                    definition.SubtractSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new SubtractNode(
                         leftOperand,
@@ -551,8 +564,8 @@ namespace IX.Math
 
                 // Fourth tier - Arithmetic first-rank operators
                 {
-                    this.Definition.DivideSymbol, (
-                        definition,
+                    definition.DivideSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new DivideNode(
                         leftOperand,
@@ -560,8 +573,8 @@ namespace IX.Math
                     40
                 },
                 {
-                    this.Definition.MultiplySymbol, (
-                        definition,
+                    definition.MultiplySymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new MultiplyNode(
                         leftOperand,
@@ -571,8 +584,8 @@ namespace IX.Math
 
                 // Fifth tier - Power operator
                 {
-                    this.Definition.PowerSymbol, (
-                        definition,
+                    definition.PowerSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new PowerNode(
                         leftOperand,
@@ -582,8 +595,8 @@ namespace IX.Math
 
                 // Sixth tier - Bitwise shift operators
                 {
-                    this.Definition.LeftShiftSymbol, (
-                        definition,
+                    definition.LeftShiftSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new LeftShiftNode(
                         leftOperand,
@@ -591,8 +604,8 @@ namespace IX.Math
                     60
                 },
                 {
-                    this.Definition.RightShiftSymbol, (
-                        definition,
+                    definition.RightShiftSymbol, (
+                        definitionL1,
                         leftOperand,
                         rightOperand) => new RightShiftNode(
                         leftOperand,
@@ -606,26 +619,26 @@ namespace IX.Math
             {
                 // First tier - Negation and inversion
                 {
-                    this.Definition.SubtractSymbol, (
-                        definition,
+                    definition.SubtractSymbol, (
+                        definitionL1,
                         operand) => new Nodes.Operations.Unary.SubtractNode(operand),
                     1
                 },
                 {
-                    this.Definition.NotSymbol, (
-                        definition,
+                    definition.NotSymbol, (
+                        definitionL1,
                         operand) => new NotNode(operand),
                     1
                 }
             };
 
             // All symbols
-            this.AllSymbols = this.AllOperatorsInOrder.Union(
+            this.AllSymbols = allOperatorsInOrder.Union(
                     new[]
                     {
-                        this.Definition.ParameterSeparator,
-                        this.Definition.Parentheses.Item1,
-                        this.Definition.Parentheses.Item2
+                        definition.ParameterSeparator,
+                        definition.Parentheses.Item1,
+                        definition.Parentheses.Item2
                     })
                 .ToArray();
 
@@ -644,7 +657,7 @@ namespace IX.Math
                 this.ReverseConstantsTable,
                 "π",
                 global::System.Math.PI,
-                $"{this.Definition.SpecialSymbolIndicators.Item1}pi{this.Definition.SpecialSymbolIndicators.Item2}");
+                $"{definition.SpecialSymbolIndicators.Item1}pi{definition.SpecialSymbolIndicators.Item2}");
 
             // Golden ratio
             ConstantsGenerator.GenerateNamedNumericSymbol(
@@ -652,7 +665,7 @@ namespace IX.Math
                 this.ReverseConstantsTable,
                 "φ",
                 1.6180339887498948,
-                $"{this.Definition.SpecialSymbolIndicators.Item1}phi{this.Definition.SpecialSymbolIndicators.Item2}");
+                $"{definition.SpecialSymbolIndicators.Item1}phi{definition.SpecialSymbolIndicators.Item2}");
 
             // Bernstein constant
             ConstantsGenerator.GenerateNamedNumericSymbol(
@@ -660,7 +673,7 @@ namespace IX.Math
                 this.ReverseConstantsTable,
                 "β",
                 0.2801694990238691,
-                $"{this.Definition.SpecialSymbolIndicators.Item1}beta{this.Definition.SpecialSymbolIndicators.Item2}");
+                $"{definition.SpecialSymbolIndicators.Item1}beta{definition.SpecialSymbolIndicators.Item2}");
 
             // Euler-Mascheroni constant
             ConstantsGenerator.GenerateNamedNumericSymbol(
@@ -668,7 +681,7 @@ namespace IX.Math
                 this.ReverseConstantsTable,
                 "γ",
                 0.5772156649015328,
-                $"{this.Definition.SpecialSymbolIndicators.Item1}gamma{this.Definition.SpecialSymbolIndicators.Item2}");
+                $"{definition.SpecialSymbolIndicators.Item1}gamma{definition.SpecialSymbolIndicators.Item2}");
 
             // Gauss-Kuzmin-Wirsing constant
             ConstantsGenerator.GenerateNamedNumericSymbol(
@@ -676,7 +689,7 @@ namespace IX.Math
                 this.ReverseConstantsTable,
                 "λ",
                 0.3036630028987326,
-                $"{this.Definition.SpecialSymbolIndicators.Item1}lambda{this.Definition.SpecialSymbolIndicators.Item2}");
+                $"{definition.SpecialSymbolIndicators.Item1}lambda{definition.SpecialSymbolIndicators.Item2}");
         }
 
         /// <summary>
