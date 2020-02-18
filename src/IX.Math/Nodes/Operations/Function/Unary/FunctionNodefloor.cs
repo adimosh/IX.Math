@@ -39,7 +39,13 @@ namespace IX.Math.Nodes.Operations.Function.Unary
         {
             if (this.Parameter is NumericNode numericParam)
             {
-                return new NumericNode(GlobalSystem.Math.Floor(numericParam.ExtractFloat()));
+                switch (numericParam.Value)
+                {
+                    case long lv:
+                        return new NumericNode(lv);
+                    case double dv:
+                        return new NumericNode(GlobalSystem.Math.Floor(dv));
+                }
             }
 
             return this;

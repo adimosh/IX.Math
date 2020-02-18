@@ -450,7 +450,7 @@ namespace IX.UnitTests.IX.Math
             {
                 "2+sqrt(4)+2",
                 null,
-                6L,
+                6D,
             },
             new object[]
             {
@@ -496,13 +496,13 @@ namespace IX.UnitTests.IX.Math
             {
                 "sqrt(4)",
                 null,
-                2L,
+                2D,
             },
             new object[]
             {
                 "sqrt(4.0)",
                 null,
-                2L,
+                2D,
             },
             new object[]
             {
@@ -586,7 +586,7 @@ namespace IX.UnitTests.IX.Math
             {
                 "(sqrt(16)+1)*4-max(20,13)+(27*5-27*4 - sqrt(49))",
                 null,
-                20L,
+                20D,
             },
             new object[]
             {

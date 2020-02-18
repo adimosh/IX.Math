@@ -41,7 +41,13 @@ namespace IX.Math.Nodes.Operations.Function.Unary
         {
             if (this.Parameter is NumericNode numericParam)
             {
-                return new NumericNode(GlobalSystem.Math.Abs(numericParam.ExtractFloat()));
+                switch (numericParam.Value)
+                {
+                    case long lv:
+                        return new NumericNode(GlobalSystem.Math.Abs(lv));
+                    case double dv:
+                        return new NumericNode(GlobalSystem.Math.Abs(dv));
+                }
             }
 
             return this;
