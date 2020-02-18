@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
+using IX.Math.TypeHelpers;
 using JetBrains.Annotations;
 using GlobalSystem = System;
 
@@ -54,13 +55,33 @@ namespace IX.Math.Nodes.Operations.Function.Binary
         /// <returns>
         ///     A simplified node, or this instance.
         /// </returns>
-        public override NodeBase Simplify() =>
-            this.FirstParameter is NumericNode firstParam && this.SecondParameter is NumericNode secondParam
-                ? new NumericNode(
+        public override NodeBase Simplify()
+        {
+            if (!(this.FirstParameter is NumericNode firstParam) || !(this.SecondParameter is NumericNode secondParam))
+            {
+                // Not simplifyable
+                return this;
+            }
+
+            (object left, object right, bool isInteger) = NumericTypeHelper.DistillLowestCommonType(
+                firstParam.Value,
+                secondParam.Value);
+
+            if (isInteger)
+            {
+                // Both are integer
+                return new NumericNode(
                     GlobalSystem.Math.Max(
-                        firstParam.ExtractFloat(),
-                        secondParam.ExtractFloat()))
-                : (NodeBase)this;
+                        (long)left,
+                        (long)right));
+            }
+
+            // At least one is float
+            return new NumericNode(
+                GlobalSystem.Math.Max(
+                    (double)left,
+                    (double)right));
+        }
 
         /// <summary>
         ///     Generates the expression that will be compiled into code.

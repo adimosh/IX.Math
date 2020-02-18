@@ -37,13 +37,28 @@ namespace IX.UnitTests.IX.Math
         {
             new object[]
             {
-                "trim(x)",
-                new Dictionary<string, object>
-                {
-                    ["x"] = "   a   ",
-                },
-                "a",
+                "min(2,17)",
+                null,
+                2L,
             },
+        };
+
+        private static object GenerateFuncOutOfParameterValue(object tempParameter) => tempParameter switch
+        {
+            byte convertedValue => new Func<byte>(() => convertedValue),
+            sbyte convertedValue => new Func<sbyte>(() => convertedValue),
+            short convertedValue => new Func<short>(() => convertedValue),
+            ushort convertedValue => new Func<ushort>(() => convertedValue),
+            int convertedValue => new Func<int>(() => convertedValue),
+            uint convertedValue => new Func<uint>(() => convertedValue),
+            long convertedValue => new Func<long>(() => convertedValue),
+            ulong convertedValue => new Func<ulong>(() => convertedValue),
+            float convertedValue => new Func<float>(() => convertedValue),
+            double convertedValue => new Func<double>(() => convertedValue),
+            byte[] convertedValue => new Func<byte[]>(() => convertedValue),
+            string convertedValue => new Func<string>(() => convertedValue),
+            bool convertedValue => new Func<bool>(() => convertedValue),
+            _ => throw new InvalidOperationException(),
         };
 
         /// <summary>
@@ -62,17 +77,14 @@ namespace IX.UnitTests.IX.Math
             Dictionary<string, object> parameters,
             object expectedResult)
         {
-            using (var service = new ExpressionParsingService())
-            {
-                using (ComputedExpression del = service.Interpret(expression))
-                {
-                    object result = del.Compute(parameters?.Values.ToArray() ?? new object[0]);
+            using var service = new ExpressionParsingService();
+            using ComputedExpression del = service.Interpret(expression);
 
-                    Assert.Equal(
-                        expectedResult,
-                        result);
-                }
-            }
+            object result = del.Compute(parameters?.Values.ToArray() ?? new object[0]);
+
+            Assert.Equal(
+                expectedResult,
+                result);
         }
 
         /// <summary>
@@ -91,35 +103,29 @@ namespace IX.UnitTests.IX.Math
             Dictionary<string, object> parameters,
             object expectedResult)
         {
-            using (var service = new ExpressionParsingService())
+            using var service = new ExpressionParsingService();
+            var finder = new Mock<IDataFinder>(MockBehavior.Loose);
+            using ComputedExpression del = service.Interpret(expression);
+
+            if (parameters != null)
             {
-                var finder = new Mock<IDataFinder>(MockBehavior.Loose);
-
-                using (ComputedExpression del = service.Interpret(expression))
+                foreach (KeyValuePair<string, object> parameter in parameters)
                 {
-                    if (parameters != null)
-                    {
-                        foreach (KeyValuePair<string, object> parameter in parameters)
-                        {
-                            var key = parameter.Key;
-                            object value = parameter.Value;
-                            finder.Setup(
-                                p => p.TryGetData(
-                                    key,
-                                    out value)).Returns(true);
-                        }
-                    }
-
-                    object result = del.Compute(finder.Object);
-
-                    Assert.Equal(
-                        expectedResult,
-                        result);
+                    var key = parameter.Key;
+                    object value = parameter.Value;
+                    finder.Setup(
+                        p => p.TryGetData(
+                            key,
+                            out value)).Returns(true);
                 }
             }
-        }
 
-#pragma warning disable IDISP001 // Dispose created. - We specifically do not want these to be disposed
+            object result = del.Compute(finder.Object);
+
+            Assert.Equal(
+                expectedResult,
+                result);
+        }
 
         /// <summary>
         ///     Tests the cached computed expression with parameters.
@@ -193,7 +199,6 @@ namespace IX.UnitTests.IX.Math
                 expectedResult,
                 result);
         }
-#pragma warning restore IDISP001 // Dispose created.
 
         /// <summary>
         ///     Tests a computed expression with finder.
@@ -211,35 +216,29 @@ namespace IX.UnitTests.IX.Math
             Dictionary<string, object> parameters,
             object expectedResult)
         {
-            using (var service = new ExpressionParsingService())
+            using var service = new ExpressionParsingService();
+            var finder = new Mock<IDataFinder>(MockBehavior.Loose);
+            using ComputedExpression del = service.Interpret(expression);
+
+            if (parameters != null)
             {
-                var finder = new Mock<IDataFinder>(MockBehavior.Loose);
-
-                using (ComputedExpression del = service.Interpret(expression))
+                foreach (KeyValuePair<string, object> parameter in parameters)
                 {
-                    if (parameters != null)
-                    {
-                        foreach (KeyValuePair<string, object> parameter in parameters)
-                        {
-                            var key = parameter.Key;
-                            object value = this.GenerateFuncOutOfParameterValue(parameter.Value);
-                            finder.Setup(
-                                p => p.TryGetData(
-                                    key,
-                                    out value)).Returns(true);
-                        }
-                    }
-
-                    object result = del.Compute(finder.Object);
-
-                    Assert.Equal(
-                        expectedResult,
-                        result);
+                    var key = parameter.Key;
+                    object value = GenerateFuncOutOfParameterValue(parameter.Value);
+                    finder.Setup(
+                        p => p.TryGetData(
+                            key,
+                            out value)).Returns(true);
                 }
             }
-        }
 
-#pragma warning disable IDISP001 // Dispose created. - We specifically do not want these to be disposed
+            object result = del.Compute(finder.Object);
+
+            Assert.Equal(
+                expectedResult,
+                result);
+        }
 
         /// <summary>
         ///     Tests a cached computed expression with finder.
@@ -270,7 +269,7 @@ namespace IX.UnitTests.IX.Math
                 foreach (KeyValuePair<string, object> parameter in parameters)
                 {
                     var key = parameter.Key;
-                    object value = this.GenerateFuncOutOfParameterValue(parameter.Value);
+                    object value = GenerateFuncOutOfParameterValue(parameter.Value);
                     finder.Setup(
                         p => p.TryGetData(
                             key,
@@ -315,7 +314,7 @@ namespace IX.UnitTests.IX.Math
                     foreach (KeyValuePair<string, object> parameter in parameters)
                     {
                         var key = parameter.Key;
-                        object value = this.GenerateFuncOutOfParameterValue(parameter.Value);
+                        object value = GenerateFuncOutOfParameterValue(parameter.Value);
                         finder.Setup(
                             p => p.TryGetData(
                                 key,
@@ -328,42 +327,6 @@ namespace IX.UnitTests.IX.Math
                 Assert.Equal(
                     expectedResult,
                     result);
-            }
-        }
-#pragma warning restore IDISP001 // Dispose created.
-
-        private object GenerateFuncOutOfParameterValue(object tempParameter)
-        {
-            switch (tempParameter)
-            {
-                case byte convertedValue:
-                    return new Func<byte>(() => convertedValue);
-                case sbyte convertedValue:
-                    return new Func<sbyte>(() => convertedValue);
-                case short convertedValue:
-                    return new Func<short>(() => convertedValue);
-                case ushort convertedValue:
-                    return new Func<ushort>(() => convertedValue);
-                case int convertedValue:
-                    return new Func<int>(() => convertedValue);
-                case uint convertedValue:
-                    return new Func<uint>(() => convertedValue);
-                case long convertedValue:
-                    return new Func<long>(() => convertedValue);
-                case ulong convertedValue:
-                    return new Func<ulong>(() => convertedValue);
-                case float convertedValue:
-                    return new Func<float>(() => convertedValue);
-                case double convertedValue:
-                    return new Func<double>(() => convertedValue);
-                case byte[] convertedValue:
-                    return new Func<byte[]>(() => convertedValue);
-                case string convertedValue:
-                    return new Func<string>(() => convertedValue);
-                case bool convertedValue:
-                    return new Func<bool>(() => convertedValue);
-                default:
-                    throw new InvalidOperationException();
             }
         }
     }

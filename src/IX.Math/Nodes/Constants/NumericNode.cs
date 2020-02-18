@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.TypeHelpers;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
@@ -193,10 +194,21 @@ namespace IX.Math.Nodes.Constants
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
         [NotNull]
-        public static NumericNode Divide([NotNull] NumericNode left, [NotNull] NumericNode right)
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "This is of little consequence at this point.")]
+        public static NumericNode Divide(
+            [NotNull] NumericNode left,
+            [NotNull] NumericNode right)
         {
-            var (divided, divisor) = ExtractFloats(left, right);
-            return new NumericNode(divided / divisor);
+            var (divided, divisor, tryInteger) = NumericTypeHelper.ExtractFloats(
+                left.Value,
+                right.Value);
+
+            double result = divided / divisor;
+
+            return new NumericNode(tryInteger ? NumericTypeHelper.DistillIntegerIfPossible(result) : result);
         }
 
         /// <summary>
@@ -206,10 +218,23 @@ namespace IX.Math.Nodes.Constants
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
         [NotNull]
-        public static NumericNode Power([NotNull] NumericNode left, [NotNull] NumericNode right)
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "This is of little consequence at this point.")]
+        public static NumericNode Power(
+            [NotNull] NumericNode left,
+            [NotNull] NumericNode right)
         {
-            var (@base, pow) = ExtractFloats(left, right);
-            return new NumericNode(global::System.Math.Pow(@base, pow));
+            var (@base, pow, tryInteger) = NumericTypeHelper.ExtractFloats(
+                left.Value,
+                right.Value);
+
+            double result = global::System.Math.Pow(
+                @base,
+                pow);
+
+            return new NumericNode(tryInteger ? NumericTypeHelper.DistillIntegerIfPossible(result) : result);
         }
 
         /// <summary>
@@ -240,33 +265,6 @@ namespace IX.Math.Nodes.Constants
             var data = left.ExtractInteger();
 
             return new NumericNode(data >> by);
-        }
-
-        /// <summary>
-        /// Extracts the floating-point values from two nodes.
-        /// </summary>
-        /// <param name="left">The left node.</param>
-        /// <param name="right">The right node.</param>
-        /// <returns>A tuple of floating-point values.</returns>
-        [NotNull]
-        internal static Tuple<double, double> ExtractFloats([NotNull] NumericNode left, [NotNull] NumericNode right)
-        {
-            if (left.IsFloat && right.IsFloat)
-            {
-                return new Tuple<double, double>(left.floatValue, right.floatValue);
-            }
-
-            if (left.IsFloat && !right.IsFloat)
-            {
-                return new Tuple<double, double>(left.floatValue, Convert.ToDouble(right.integerValue));
-            }
-
-            if (!left.IsFloat && right.IsFloat)
-            {
-                return new Tuple<double, double>(Convert.ToDouble(left.integerValue), right.floatValue);
-            }
-
-            return new Tuple<double, double>(Convert.ToDouble(left.integerValue), Convert.ToDouble(right.integerValue));
         }
 
         /// <summary>
@@ -421,30 +419,10 @@ namespace IX.Math.Nodes.Constants
         /// Initializes the specified value.
         /// </summary>
         /// <param name="value">The value.</param>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "ReSharper",
-            "CompareOfFloatsByEqualityOperator",
-            Justification = "If we're reaching the precision loss boundary, it means we're rounding to an integer anyway, so it's acceptable.")]
         private void Initialize(double value)
         {
-            if (global::System.Math.Floor(value) == value)
-            {
-                try
-                {
-                    this.integerValue = Convert.ToInt64(value);
-                    this.IsFloat = false;
-                }
-                catch (OverflowException)
-                {
-                    this.floatValue = value;
-                    this.IsFloat = true;
-                }
-            }
-            else
-            {
-                this.floatValue = value;
-                this.IsFloat = true;
-            }
+            this.floatValue = value;
+            this.IsFloat = true;
         }
     }
 }
