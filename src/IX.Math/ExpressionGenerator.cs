@@ -428,7 +428,11 @@ namespace IX.Math
 
                         if (string.IsNullOrWhiteSpace(expressionValue))
                         {
+#if NET452
                             parameterExpressions = new string[0];
+#else
+                            parameterExpressions = Array.Empty<string>();
+#endif
                         }
                         else
                         {

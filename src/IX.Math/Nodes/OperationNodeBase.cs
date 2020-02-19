@@ -16,7 +16,7 @@ namespace IX.Math.Nodes
     [PublicAPI]
     public abstract class OperationNodeBase : CachedExpressionNodeBase
     {
-#if STANDARD || NET452
+#if NET452
         private static readonly Type[] EmptyTypeArray = new Type[0];
 #endif
 
@@ -29,10 +29,10 @@ namespace IX.Math.Nodes
         /// <summary>
         /// Generates an expression that will be cached before being compiled.
         /// </summary>
-        /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" /> to be cached.</returns>
+        /// <returns>The generated <see cref="Expression" /> to be cached.</returns>
         /// <remarks>
         /// <para>This method works by first attempting to simplify this node.</para>
-        /// <para>If the node can be simplified, <see cref="M:GenerateExpression"/> is called on the new node and returned in lieu of this expression.</para>
+        /// <para>If the node can be simplified, <see cref="CachedExpressionNodeBase.GenerateExpression()"/> is called on the new node and returned in lieu of this expression.</para>
         /// <para>If this node cannot be simplified, or its simplification method returns reflexively, <see cref="GenerateExpressionInternal()"/> is called.</para>
         /// </remarks>
         public sealed override Expression GenerateCachedExpression()
@@ -47,11 +47,11 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>
-        /// The generated <see cref="T:System.Linq.Expressions.Expression" /> to be cached.
+        /// The generated <see cref="Expression" /> to be cached.
         /// </returns>
         /// <remarks>
         /// <para>This method works by first attempting to simplify this node.</para>
-        /// <para>If the node can be simplified, <see cref="M:GenerateExpression" /> is called on the new node and returned in lieu of this expression.</para>
+        /// <para>If the node can be simplified, <see cref="CachedExpressionNodeBase.GenerateExpression()" /> is called on the new node and returned in lieu of this expression.</para>
         /// <para>If this node cannot be simplified, or its simplification method returns reflexively, <see cref="GenerateExpressionInternal(Tolerance)" /> is called.</para>
         /// </remarks>
         public sealed override Expression GenerateCachedExpression(Tolerance tolerance)
@@ -68,7 +68,7 @@ namespace IX.Math.Nodes
         /// <remarks>Since it is not possible for this node to be a constant node, the function <see cref="object.ToString"/> is called in whatever the node outputs.</remarks>
         public sealed override Expression GenerateCachedStringExpression() => Expression.Call(this.GenerateExpression(), typeof(object).GetMethodWithExactParameters(
             nameof(this.ToString),
-#if !STANDARD && !NET452
+#if !NET452
             Array.Empty<Type>()));
 #else
             EmptyTypeArray));

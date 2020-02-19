@@ -22,6 +22,10 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <exception cref="ArgumentNullException">parameter.</exception>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Usage",
+            "CA2214:Do not call overridable methods in constructors",
+            Justification = "This is OK and expected at this point.")]
         protected UnaryFunctionNodeBase([NotNull] NodeBase parameter)
         {
             NodeBase parameterTemp = parameter ?? throw new ArgumentNullException(nameof(parameter));
@@ -254,6 +258,7 @@ namespace IX.Math.Nodes
                     nameof(methodName));
             }
 
+#if NET452
             MethodInfo mi = typeof(T).GetRuntimeMethod(
                                 methodName,
                                 new Type[0]) ??
@@ -262,6 +267,16 @@ namespace IX.Math.Nodes
                                     Resources.FunctionCouldNotBeFound,
                                     methodName),
                                 nameof(methodName));
+#else
+            MethodInfo mi = typeof(T).GetRuntimeMethod(
+                                methodName,
+                                Array.Empty<Type>()) ??
+                            throw new ArgumentException(
+                                string.Format(
+                                    Resources.FunctionCouldNotBeFound,
+                                    methodName),
+                                nameof(methodName));
+#endif
 
             return tolerance == null
                 ? Expression.Call(

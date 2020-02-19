@@ -14,6 +14,7 @@ using IX.Math.Nodes;
 using IX.Math.Registration;
 using IX.StandardExtensions;
 using IX.StandardExtensions.ComponentModel;
+using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -38,7 +39,7 @@ namespace IX.Math
             this.body = body;
             this.RecognizedCorrectly = isRecognized;
             this.IsConstant = body?.IsConstant ?? false;
-            this.defaultStringFormat = string.IsNullOrWhiteSpace(defaultStringFormat) ? defaultStringFormat : null;
+            this.defaultStringFormat = string.IsNullOrWhiteSpace(defaultStringFormat) ? null : defaultStringFormat;
         }
 
         /// <summary>
@@ -60,9 +61,20 @@ namespace IX.Math
         public bool HasUndefinedParameters => this.parametersRegistry.Dump().Any(p => p.ReturnType == SupportedValueType.Unknown);
 
         /// <summary>
+        /// Gets the names of the parameters this expression requires, if any. This property is obsolete and should not be used anymore.
+        /// </summary>
+        /// <remarks>
+        /// <para>This property is obsolete and will be removed in a future version of the library.</para>
+        /// <para>The method <see cref="GetParameterNames"/> instead.</para>
+        /// </remarks>
+        [Obsolete("Please use the GetParameterNames method instead.")]
+        public string[] ParameterNames => this.GetParameterNames();
+
+        /// <summary>
         /// Gets the names of the parameters this expression requires, if any.
         /// </summary>
-        public string[] ParameterNames => this.parametersRegistry.Dump().Select(p => p.Name).ToArray();
+        /// <returns>An array of required parameter names.</returns>
+        public string[] GetParameterNames() => this.parametersRegistry.Dump().Select(p => p.Name).ToArray();
 
         /// <summary>
         /// Computes the expression and returns a result.
@@ -307,14 +319,11 @@ namespace IX.Math
                                     break;
 
                                 case SupportedValueType.String:
-#pragma warning disable SA1118 // Parameter should not span multiple lines
                                     paramValue = CreateValue(
                                         paraContext,
                                         this.defaultStringFormat == null ?
                                             convertedParam.ToString(CultureInfo.CurrentCulture) :
                                             convertedParam.ToString(this.defaultStringFormat));
-#pragma warning restore SA1118 // Parameter should not span multiple lines
-
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -747,6 +756,10 @@ namespace IX.Math
             }
 
             var pars = new List<object>();
+
+            Contract.RequiresNotNull(
+                in dataFinder,
+                nameof(dataFinder));
 
             foreach (ParameterContext p in this.parametersRegistry.Dump())
             {

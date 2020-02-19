@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
@@ -26,15 +27,20 @@ namespace IX.Math.Nodes.Operations.Binary
         /// is <c>null</c> (<c>Nothing</c> in Visual Basic).
         /// </exception>
         [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor", Justification = "We specifically want this to happen.")]
+        [SuppressMessage("Usage", "CA2214:Do not call overridable methods in constructors", Justification = "We specifically want this to happen.")]
         protected BinaryOperationNodeBase(NodeBase left, NodeBase right)
         {
-            NodeBase leftTemp = left ?? throw new ArgumentNullException(nameof(left));
-            NodeBase rightTemp = right ?? throw new ArgumentNullException(nameof(right));
+            Contract.RequiresNotNull(
+                in left,
+                nameof(left));
+            Contract.RequiresNotNull(
+                in right,
+                nameof(right));
 
-            this.EnsureCompatibleOperands(leftTemp, rightTemp);
+            this.EnsureCompatibleOperands(left, right);
 
-            this.Left = leftTemp.Simplify();
-            this.Right = rightTemp.Simplify();
+            this.Left = left.Simplify();
+            this.Right = right.Simplify();
         }
 
         /// <summary>

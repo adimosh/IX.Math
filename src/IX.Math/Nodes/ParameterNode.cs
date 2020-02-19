@@ -5,6 +5,7 @@
 using System;
 using System.Linq.Expressions;
 using IX.Math.Registration;
+using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Nodes
 {
@@ -75,6 +76,8 @@ namespace IX.Math.Nodes
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context)
         {
+            Contract.RequiresNotNull(in context, nameof(context));
+
             context.ParameterRegistry.CloneFrom(this.parametersRegistry.AdvertiseParameter(this.Name));
 
             return new ParameterNode(this.Name, context.ParameterRegistry);

@@ -43,7 +43,7 @@ namespace IX.Math.Nodes
 
             MethodInfo mi = t.GetMethodWithExactParameters(
                 functionName,
-#if STANDARD2
+#if !NET452
                 Array.Empty<Type>())
 #else
                 new Type[0])

@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -12,6 +13,14 @@ namespace IX.Math
     /// </summary>
     [PublicAPI]
     [Flags]
+    [SuppressMessage(
+        "Naming",
+        "CA1720:Identifier contains type name",
+        Justification = "This is OK, we're actually referring to string.")]
+    [SuppressMessage(
+        "Naming",
+        "CA1714:Flags enums should have plural names",
+        Justification = "This is OK, we're talking about types with pre-set names.")]
     public enum SupportableValueType
     {
         /// <summary>
@@ -35,7 +44,7 @@ namespace IX.Math
         String = 4,
 
         /// <summary>
-        ///     Byte array (pass as <see cref="T:byte[]" />).
+        ///     Byte array (pass as array of <see cref="byte" />).
         /// </summary>
         ByteArray = 8,
 
