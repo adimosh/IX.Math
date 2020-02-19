@@ -241,3 +241,23 @@ and should be read prior to taking on the task of creating a function:
 - [Expression Trees (C#)](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/expression-trees/)
 - [How to: Use Expression Trees to Build Dynamic Queries (C#)](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/expression-trees/how-to-use-expression-trees-to-build-dynamic-queries)
 - [Understanding Expression and Expression Trees](https://www.dotnettricks.com/learn/linq/understanding-expression-and-expression-trees)
+
+## Tolerance pass-through
+
+`GenerateExpressionInternal` has an overload which takes in a class of type `Tolerance`
+as a parameter. It is intended as a way to use and control pass-through of tolerance, when
+asked for by the caller.
+
+Basically, when dealing with a function that can do something with tolerance, the value
+of the tolerance specified in the calling context of the expression that is currently being
+interpreted can be used within this method.
+
+Also, pass-through is controller, which ensures that, if you have parameters for the
+function, they may or may not receive tolerance information, depending on the needs of
+the particular implementation.
+
+If tolerane isn't sent to parameters, any sub-expression that depends on it will not get
+access to it. Calculation will be done in the default way, meaning that exact matches
+will be performed. This, however, does not include sub-expressions that can get their
+tolerance information elsewhere, such as already-computed expressions which had access to
+tolerance.

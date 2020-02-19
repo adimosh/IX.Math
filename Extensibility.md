@@ -53,7 +53,7 @@ Constant extractors work on any unidentified symbols in the expression and have 
 ability to define symbols otherwise not recognized by the mathematics engine.
 
 In order to create a constant extractor, one needs to create a class in a scannable
-assembly, that implements the [IConstantsExtractor](src/IX.Math/Extraction/IConstantsExtractor.cs)
+assembly, that implements the [IConstantsExtractor](src/IX.Math/Extensibility/IConstantsExtractor.cs)
 interface, and is decorated with the [ConstantsExtractorAttribute](src/IX.Math/Extensibility/ConstantsExtractorAttribute.cs).
 
 The overridable method ```ExtractAllConstants``` will do all the work on extracting
@@ -102,24 +102,46 @@ whenever a method call for its interpretation happens, the shortest route is alw
 taken (that of the cache).
 
 In order to create a pass-through extractor, one needs to create a class in a scannable
-assembly, that implements the [IConstantPassThroughExtractor](src/IX.Math/Extraction/IConstantPassThroughExtractor.cs)
-interface, and is decorated with the [ConstantsPassThroughExtractorAttribute](src/IX.Math/Extensibility/ConstantsPassThroughExtractorAttribute.cs).
+assembly, that implements the [IConstantPassThroughExtractor](src/IX.Math/Extensibility/IConstantPassThroughExtractor.cs)
+interface, and is decorated with the [ConstantsPassThroughExtractorAttribute](src/IX.Math/Extensibility/ConstantsPassThroughExtractorAttribute.cs)
+in case the developer also wishes to specify an order of execution by way of the
+property `Level`.
 
 The only method that needs implemented in the extractor is the ```Evaluate``` method.
 The method receives the original expression as a parameter, and has a ```bool```
 return type. If the return value is ```true```, the expression is treated as a
 pass-through expression, and will always be returned as a string literal.
 
-## Parsing formatters
+## Constant interpreters
 
-_Under construction_
+A constant interpreter is a class that is used to evaluate a symbol found within an
+expression once that expression has been cleaned up by extractors and split by operators
+and functions. They begin their activity after the engine begins building the expression,
+and one should always assume that constant extractors and pass-through extractors have
+already executed by this point.
 
-Parsing formatters are not yet available to the general public, pending upgrading of the
-```[string]``` data type to be convertible to other types via special functions.
+In order to create a pass-through extractor, one needs to create a class in a scannable
+assembly, that implements the [IConstantInterpreter](src/IX.Math/Extensibility/IConstantInterpreter.cs)
+interface, and is decorated with the [ConstantsInterpreterAttribute](src/IX.Math/Extensibility/ConstantsInterpreterAttribute.cs)
+in case the developer also wishes to specify an order of execution by way of the
+property `Level`.
+
+The only method that needs implemented in the extractor is the ```EvaluateIsConstant```
+method. The method receives a part of the expression as a parameter, and has a tuple
+return type consisting of a `bool` (which signals success or failure) and a
+`ConstantNodeBase` that contains the constant value. If the success status is
+`true`, then that expression part is not evaluated again, nor is it evaluated any
+further down by other interpreters.
+
+If the success status is `false`, then the expression part is passed further down the
+chain, and may possibly come back in a later form to the same interpreter. A return
+value of `default` is expected if `false` is returned.
 
 ## Type formatters
 
 _Under construction_
+
+_Type formatters are not yet available to the public_
 
 Type formatters are, in a sense, the opposite of parsing formatters, as they aid when
 a non-string is transformed into a string.

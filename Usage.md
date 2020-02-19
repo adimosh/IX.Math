@@ -9,7 +9,7 @@ that just spits out delegates on demand
 parsing service that also caches its expressions
 
 There is one method that is implemented in both: Interpret. This method takes in one
-string (and an optional [CancellationToken](https://msdn.microsoft.com/en-us/library/system.threading.cancellationtoken.aspx))
+string (and an optional [CancellationToken](https://docs.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken))
 and generates a ComputedExpression object which can afterwards be used to calculate the
 result of the expression.
 
