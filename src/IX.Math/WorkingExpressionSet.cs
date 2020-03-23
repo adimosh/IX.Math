@@ -68,13 +68,15 @@ namespace IX.Math
             Dictionary<string, Type> ternaryFunctions,
             LevelDictionary<Type, IConstantsExtractor> extractors,
             LevelDictionary<Type, IConstantInterpreter> interpreters,
+            List<IStringFormatter> stringFormatters,
             CancellationToken cancellationToken)
         {
-            this.ParameterRegistry = new StandardParameterRegistry();
+            this.ParameterRegistry = new StandardParameterRegistry(stringFormatters);
             this.ConstantsTable = new Dictionary<string, ConstantNodeBase>();
             this.ReverseConstantsTable = new Dictionary<string, string>();
             this.SymbolTable = new Dictionary<string, ExpressionSymbol>();
             this.ReverseSymbolTable = new Dictionary<string, string>();
+            this.StringFormatters = stringFormatters;
 
             this.CancellationToken = cancellationToken;
             this.Expression = expression;
@@ -122,14 +124,6 @@ namespace IX.Math
         internal string[] AllOperatorsInOrder { get; }
 
         /// <summary>
-        ///     Gets the binary functions.
-        /// </summary>
-        /// <value>
-        ///     The binary functions.
-        /// </value>
-        internal Dictionary<string, Type> BinaryFunctions { get; }
-
-        /// <summary>
         ///     Gets the cancellation token.
         /// </summary>
         /// <value>
@@ -170,20 +164,20 @@ namespace IX.Math
         internal Regex FunctionRegex { get; }
 
         /// <summary>
-        ///     Gets the nonary functions.
-        /// </summary>
-        /// <value>
-        ///     The nonary functions.
-        /// </value>
-        internal Dictionary<string, Type> NonaryFunctions { get; }
-
-        /// <summary>
         ///     Gets the parameter registry.
         /// </summary>
         /// <value>
         ///     The parameter registry.
         /// </value>
         internal IParameterRegistry ParameterRegistry { get; }
+
+        /// <summary>
+        ///     Gets the nonary functions.
+        /// </summary>
+        /// <value>
+        ///     The nonary functions.
+        /// </value>
+        internal Dictionary<string, Type> NonaryFunctions { get; }
 
         /// <summary>
         ///     Gets the ternary functions.
@@ -200,6 +194,22 @@ namespace IX.Math
         ///     The unary functions.
         /// </value>
         internal Dictionary<string, Type> UnaryFunctions { get; }
+
+        /// <summary>
+        ///     Gets the binary functions.
+        /// </summary>
+        /// <value>
+        ///     The binary functions.
+        /// </value>
+        internal Dictionary<string, Type> BinaryFunctions { get; }
+
+        /// <summary>
+        /// Gets the string formatters.
+        /// </summary>
+        /// <value>
+        /// The string formatters.
+        /// </value>
+        internal List<IStringFormatter> StringFormatters { get; }
 
         /// <summary>
         ///     Gets all symbols.
@@ -314,6 +324,27 @@ namespace IX.Math
         }
 
         /// <summary>
+        /// Offers a reserved object type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns>An instance of a reserved type, if one exists.</returns>
+        /// <exception cref="NotSupportedException">The type requested is not supported.</exception>
+        internal object OfferReservedType(Type type)
+        {
+            if (type == typeof(WorkingExpressionSet))
+            {
+                return this;
+            }
+
+            if (type == typeof(IStringFormatter))
+            {
+                return this.StringFormatters;
+            }
+
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
         ///     Initializes this instance. This method shuld be called after initialization and extraction of major constants.
         /// </summary>
         [DiagCA.SuppressMessage(
@@ -324,6 +355,18 @@ namespace IX.Math
             "IDisposableAnalyzers.Correctness",
             "IDISP003:Dispose previous before re-assigning.",
             Justification = "It is, but the analyzer cannot tell.")]
+        [DiagCA.SuppressMessage(
+            "Performance",
+            "HAA0603:Delegate allocation from a method group",
+            Justification = "We actively want this to keep a reference to this working set.")]
+        [DiagCA.SuppressMessage(
+            "Performance",
+            "HAA0301:Closure Allocation Source",
+            Justification = "We actively want this to keep a reference to this working set.")]
+        [DiagCA.SuppressMessage(
+            "Performance",
+            "HAA0302:Display class allocation to capture closure",
+            Justification = "We actively want this to keep a reference to this working set.")]
         internal void Initialize()
         {
             if (this.initialized)
@@ -349,7 +392,7 @@ namespace IX.Math
                     allOperatorsInOrder)
                 .OrderByDescending(p => p.Length))
             {
-                var s = $"@op{i.ToString()}@";
+                var s = $"@op{i}@";
 
                 this.Expression = this.Expression.Replace(
                     op,
@@ -547,9 +590,14 @@ namespace IX.Math
                     definition.AddSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) => new AddNode(
-                        leftOperand,
-                        rightOperand),
+                        rightOperand) =>
+                    {
+                        var value = new AddNode(
+                            leftOperand,
+                            rightOperand);
+                        ((ISpecialRequestNode)value).SetRequestSpecialObjectFunction(this.OfferReservedType);
+                        return value;
+                    },
                     30
                 },
                 {

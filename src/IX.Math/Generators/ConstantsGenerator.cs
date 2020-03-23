@@ -11,6 +11,7 @@ using IX.Math.Formatters;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Contracts;
+using IX.StandardExtensions.Globalization;
 using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 
@@ -295,15 +296,15 @@ namespace IX.Math.Generators
                 nameof(keys));
 
             var index = int.Parse(
-                keys.Where(p => p.StartsWith("Const") && p.Length > 5).LastOrDefault()?.Substring(5) ?? "0");
+                keys.Where(p => p.CurrentCultureStartsWith("Const") && p.Length > 5).LastOrDefault()?.Substring(5) ?? "0", CultureInfo.CurrentCulture);
 
             do
             {
                 index++;
             }
-            while (originalExpression.Contains($"Const{index.ToString()}"));
+            while (originalExpression.Contains($"Const{index.ToString(CultureInfo.CurrentCulture)}"));
 
-            return $"Const{index.ToString()}";
+            return $"Const{index.ToString(CultureInfo.CurrentCulture)}";
         }
     }
 }

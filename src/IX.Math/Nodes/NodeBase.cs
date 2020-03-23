@@ -32,8 +32,7 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        [NotNull]
-        public abstract NodeBase DeepClone([NotNull] NodeCloningContext context);
+        public abstract NodeBase DeepClone(NodeCloningContext context);
 
         /// <summary>
         ///     Generates the expression that will be compiled into code.
@@ -58,6 +57,14 @@ namespace IX.Math.Nodes
         /// <returns>The generated <see cref="Expression" /> that gives the values as a string.</returns>
         [NotNull]
         public abstract Expression GenerateStringExpression();
+
+        /// <summary>
+        ///     Generates the expression that will be compiled into code as a string expression.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>The generated <see cref="Expression" /> that gives the values as a string.</returns>
+        [NotNull]
+        public virtual Expression GenerateStringExpression(Tolerance tolerance) => this.GenerateStringExpression();
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.

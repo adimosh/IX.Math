@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Extensibility;
@@ -157,6 +158,7 @@ namespace IX.Math.Nodes.Function.Ternary
             {
                 throw new InvalidOperationException(
                     string.Format(
+                        CultureInfo.CurrentCulture,
                         Resources.FunctionCouldNotBeFound,
                         nameof(string.Replace)));
             }
@@ -164,36 +166,15 @@ namespace IX.Math.Nodes.Function.Ternary
             Expression e1, e2, e3;
             if (tolerance == null)
             {
-                e1 = this.FirstParameter.GenerateExpression();
-                e2 = this.SecondParameter.GenerateExpression();
-                e3 = this.ThirdParameter.GenerateExpression();
+                e1 = this.FirstParameter.GenerateStringExpression();
+                e2 = this.SecondParameter.GenerateStringExpression();
+                e3 = this.ThirdParameter.GenerateStringExpression();
             }
             else
             {
-                e1 = this.FirstParameter.GenerateExpression(tolerance);
-                e2 = this.SecondParameter.GenerateExpression(tolerance);
-                e3 = this.ThirdParameter.GenerateExpression(tolerance);
-            }
-
-            if (e1.Type != typeof(string))
-            {
-                e1 = Expression.Convert(
-                    e1,
-                    typeof(string));
-            }
-
-            if (e2.Type != typeof(string))
-            {
-                e2 = Expression.Convert(
-                    e2,
-                    typeof(string));
-            }
-
-            if (e3.Type != typeof(string))
-            {
-                e3 = Expression.Convert(
-                    e3,
-                    typeof(string));
+                e1 = this.FirstParameter.GenerateStringExpression(tolerance);
+                e2 = this.SecondParameter.GenerateStringExpression(tolerance);
+                e3 = this.ThirdParameter.GenerateStringExpression(tolerance);
             }
 
             return Expression.Call(

@@ -8,16 +8,17 @@ using System.Text.RegularExpressions;
 using IX.Math.Computation;
 using IX.Math.Computation.InitialExpressionParsers;
 using IX.Math.ExpressionState;
+using IX.Math.Extensibility;
 using IX.Math.Extraction;
 using IX.Math.Formatters;
-using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Registration;
 using IX.StandardExtensions.Contracts;
+using IX.StandardExtensions.Globalization;
 using JetBrains.Annotations;
 using DiagCA = System.Diagnostics.CodeAnalysis;
 
-namespace IX.Math
+namespace IX.Math.Generators
 {
     internal static class ExpressionGenerator
     {
@@ -94,7 +95,7 @@ namespace IX.Math
             }
 
             // We save a split expression for determining parameter order
-            string[] splitExpression = workingSet.Expression.Split(
+            var splitExpression = workingSet.Expression.Split(
                 workingSet.AllSymbols.ToArray(),
                 StringSplitOptions.RemoveEmptyEntries);
 
@@ -270,7 +271,7 @@ namespace IX.Math
                     operatorPosition,
                     @operator);
 
-                NodeBase ExpressionByBinaryOperator(
+                static NodeBase ExpressionByBinaryOperator(
                     WorkingExpressionSet innerWorkingSet,
                     string s,
                     int position,
@@ -355,7 +356,7 @@ namespace IX.Math
                     expression,
                     operatorPosition.Item3);
 
-                NodeBase ExpressionByUnaryOperator(
+                static NodeBase ExpressionByUnaryOperator(
                     WorkingExpressionSet innerWorkingSet,
                     string s,
                     string op)
@@ -366,7 +367,7 @@ namespace IX.Math
                         return null;
                     }
 
-                    if (!s.StartsWith(op) || !innerWorkingSet.UnaryOperators.TryGetValue(
+                    if (!s.CurrentCultureStartsWith(op) || !innerWorkingSet.UnaryOperators.TryGetValue(
                             op,
                             out Func<MathDefinition, NodeBase, NodeBase> t))
                     {
@@ -405,7 +406,7 @@ namespace IX.Math
 
             return null;
 
-            NodeBase GenerateFunctionCallExpression(
+            static NodeBase GenerateFunctionCallExpression(
                 string possibleFunctionCallExpression,
                 WorkingExpressionSet innerWorkingSet)
             {
@@ -443,32 +444,39 @@ namespace IX.Math
                                 .ToArray();
                         }
 
+                        NodeBase returnValue;
                         switch (parameterExpressions.Length)
                         {
                             case 0:
-                                return innerWorkingSet.NonaryFunctions.TryGetValue(
+                                returnValue = innerWorkingSet.NonaryFunctions.TryGetValue(
                                     functionName,
                                     out Type t) ? ((NonaryFunctionNodeBase)Activator.CreateInstance(t)).Simplify() : null;
+                                break;
 
                             case 1:
                                 if (innerWorkingSet.UnaryFunctions.TryGetValue(
                                     functionName,
                                     out Type t1))
                                 {
-                                    return ((UnaryFunctionNodeBase)Activator.CreateInstance(
+                                    returnValue = ((UnaryFunctionNodeBase)Activator.CreateInstance(
                                         t1,
                                         GenerateExpression(
                                             parameterExpressions[0],
                                             innerWorkingSet))).Simplify();
                                 }
+                                else
+                                {
+                                    returnValue = null;
+                                }
 
-                                return null;
+                                break;
+
                             case 2:
                                 if (innerWorkingSet.BinaryFunctions.TryGetValue(
                                     functionName,
                                     out Type t2))
                                 {
-                                    return ((BinaryFunctionNodeBase)Activator.CreateInstance(
+                                    returnValue = ((BinaryFunctionNodeBase)Activator.CreateInstance(
                                         t2,
                                         GenerateExpression(
                                             parameterExpressions[0],
@@ -476,14 +484,19 @@ namespace IX.Math
                                             parameterExpressions[1],
                                             innerWorkingSet))).Simplify();
                                 }
+                                else
+                                {
+                                    returnValue = null;
+                                }
 
-                                return null;
+                                break;
+
                             case 3:
                                 if (innerWorkingSet.TernaryFunctions.TryGetValue(
                                     functionName,
                                     out Type t3))
                                 {
-                                    return ((TernaryFunctionNodeBase)Activator.CreateInstance(
+                                    returnValue = ((TernaryFunctionNodeBase)Activator.CreateInstance(
                                         t3,
                                         GenerateExpression(
                                             parameterExpressions[0],
@@ -493,11 +506,24 @@ namespace IX.Math
                                             parameterExpressions[2],
                                             innerWorkingSet))).Simplify();
                                 }
+                                else
+                                {
+                                    returnValue = null;
+                                }
 
-                                return null;
+                                break;
+
                             default:
-                                return null;
+                                returnValue = null;
+                                break;
                         }
+
+                        if (returnValue is ISpecialRequestNode srn)
+                        {
+                            srn.SetRequestSpecialObjectFunction(innerWorkingSet.OfferReservedType);
+                        }
+
+                        return returnValue;
                     }
                 }
                 catch (Exception)

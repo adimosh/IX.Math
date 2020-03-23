@@ -39,7 +39,10 @@ namespace IX.Math
         private Dictionary<string, Type> nonaryFunctions;
         private Dictionary<string, Type> ternaryFunctions;
         private Dictionary<string, Type> unaryFunctions;
+        private List<IStringFormatter> stringFormatters;
         private MathDefinition workingDefinition;
+
+        private int interpretationDone;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ExpressionParsingService" /> class with a standard math definition
@@ -64,6 +67,8 @@ namespace IX.Math
                 typeof(ExpressionParsingService).GetTypeInfo()
                     .Assembly
             };
+
+            this.stringFormatters = new List<IStringFormatter>();
         }
 
         /// <summary>
@@ -96,18 +101,21 @@ namespace IX.Math
                 this.InitializePassThroughExtractorsDictionary();
             }
 
-            foreach (Type cpteKey in this.constantPassThroughExtractors.KeysByLevel.SelectMany(p => p.Value))
+            if (this.constantPassThroughExtractors.KeysByLevel.SelectMany(p => p.Value)
+                .Any(ConstantPassThroughExtractorPredicate))
             {
-                if (this.constantPassThroughExtractors[cpteKey]
-                    .Evaluate(expression))
-                {
-                    return new ComputedExpression(
-                        expression,
-                        new StringNode(expression),
-                        true,
-                        new StandardParameterRegistry(),
-                        this.workingDefinition.AutoConvertStringFormatSpecifier);
-                }
+                return new ComputedExpression(
+                    expression,
+                    new StringNode(expression),
+                    true,
+                    new StandardParameterRegistry(this.stringFormatters),
+                    this.stringFormatters);
+            }
+
+            bool ConstantPassThroughExtractorPredicate(Type cpteKey)
+            {
+                return this.constantPassThroughExtractors[cpteKey]
+                    .Evaluate(expression);
             }
 
             if (this.nonaryFunctions == null ||
@@ -138,6 +146,7 @@ namespace IX.Math
                 this.ternaryFunctions,
                 this.constantExtractors,
                 this.constantInterpreters,
+                this.stringFormatters,
                 cancellationToken))
             {
                 (NodeBase node, IParameterRegistry parameterRegistry) = ExpressionGenerator.CreateBody(workingSet);
@@ -148,17 +157,20 @@ namespace IX.Math
                         null,
                         false,
                         null,
-                        null)
+                        this.stringFormatters)
                     : new ComputedExpression(
                         expression,
                         node,
                         true,
                         parameterRegistry,
-                        this.workingDefinition.AutoConvertStringFormatSpecifier);
+                        this.stringFormatters);
 
                 Interlocked.MemoryBarrier();
             }
 
+            Interlocked.Exchange(
+                ref this.interpretationDone,
+                1);
             return result;
         }
 
@@ -186,10 +198,7 @@ namespace IX.Math
                  this.ternaryFunctions.Count) *
                 3);
 
-            foreach (KeyValuePair<string, Type> function in this.nonaryFunctions)
-            {
-                bldr.Add($"{function.Key}()");
-            }
+            bldr.AddRange(this.nonaryFunctions.Select(function => $"{function.Key}()"));
 
             (from KeyValuePair<string, Type> function in this.unaryFunctions
                 from ConstructorInfo constructor in function.Value.GetTypeInfo()
@@ -253,10 +262,9 @@ namespace IX.Math
         /// <param name="assembly">The assembly to register.</param>
         public void RegisterFunctionsAssembly(Assembly assembly)
         {
-            if (assembly == null)
-            {
-                throw new ArgumentNullException(nameof(assembly));
-            }
+            Contract.RequiresNotNull(
+                in assembly,
+                nameof(assembly));
 
             this.ThrowIfCurrentObjectDisposed();
 
@@ -271,6 +279,25 @@ namespace IX.Math
             this.unaryFunctions?.Clear();
             this.binaryFunctions?.Clear();
             this.ternaryFunctions?.Clear();
+        }
+
+        /// <summary>
+        /// Registers type formatters.
+        /// </summary>
+        /// <param name="formatter">The formatter to register.</param>
+        /// <exception cref="InvalidOperationException">This method was called after having called <see cref="Interpret"/> successfully for the first time.</exception>
+        public void RegisterTypeFormatter(IStringFormatter formatter)
+        {
+            Contract.RequiresNotNull(
+                in formatter,
+                nameof(formatter));
+
+            if (this.interpretationDone != 0)
+            {
+                throw new InvalidOperationException(Resources.TheExpressionParsingServiceHasAlreadyDoneInterpretationAndCannotHaveAnyMoreFormattersRegistered);
+            }
+
+            this.stringFormatters.Add(formatter);
         }
 
         /// <summary>

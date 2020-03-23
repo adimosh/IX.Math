@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.StandardExtensions.Extensions;
@@ -38,7 +39,7 @@ namespace IX.Math.Nodes
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
-                throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
             }
 
             MethodInfo mi = t.GetMethodWithExactParameters(
@@ -48,7 +49,7 @@ namespace IX.Math.Nodes
 #else
                 new Type[0])
 #endif
-                ?? throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                ?? throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
 
             return Expression.Call(mi);
         }

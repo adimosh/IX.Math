@@ -3,8 +3,11 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq.Expressions;
-using IX.StandardExtensions.Extensions;
+using IX.Math.Extensibility;
+using IX.Math.Formatters;
 
 namespace IX.Math.Registration
 {
@@ -13,17 +16,20 @@ namespace IX.Math.Registration
     /// </summary>
     public class ParameterContext : StandardExtensions.IDeepCloneable<ParameterContext>, IEquatable<ParameterContext>
     {
+        private readonly List<IStringFormatter> stringFormatters;
+
         private bool alreadyCompiled;
         private ParameterExpression parameterDefinitionExpression;
         private Expression expression;
         private Expression stringExpression;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParameterContext"/> class.
+        /// Initializes a new instance of the <see cref="ParameterContext" /> class.
         /// </summary>
         /// <param name="name">The name.</param>
-        /// <exception cref="ArgumentNullException">name.</exception>
-        public ParameterContext(string name)
+        /// <param name="stringFormatters">The string formatters.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> is either <c>null</c>, empty or whitespace-only.</exception>
+        public ParameterContext(string name, List<IStringFormatter> stringFormatters)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -31,6 +37,7 @@ namespace IX.Math.Registration
             }
 
             this.Name = name;
+            this.stringFormatters = stringFormatters;
             this.SupportedReturnType = SupportableValueType.All;
         }
 
@@ -100,11 +107,20 @@ namespace IX.Math.Registration
         /// <param name="limit">The limit.</param>
         /// <exception cref="ArgumentException">the limit is invalid.</exception>
         /// <exception cref="ExpressionNotValidLogicallyException">The expression reduces the parameter to no supported type.</exception>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "Unavoidable here.")]
         public void LimitPossibleType(SupportableValueType limit)
         {
             if (limit == SupportableValueType.None)
             {
-                throw new ArgumentException(string.Format(Resources.ParameterTypeNotRecognized, nameof(limit)), nameof(limit));
+                throw new ArgumentException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        Resources.ParameterTypeNotRecognized,
+                        nameof(limit)),
+                    nameof(limit));
             }
 
             var newVal = limit & this.SupportedReturnType;
@@ -117,15 +133,13 @@ namespace IX.Math.Registration
 
             int iVal = (int)newVal;
 
-#pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - nothing to be done here
             if (Enum.IsDefined(
                 typeof(SupportedValueType),
                 iVal))
             {
                 this.DetermineType((SupportedValueType)iVal);
             }
- #pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
-       }
+        }
 
         /// <summary>
         /// Determines the type of the parameter.
@@ -157,7 +171,7 @@ namespace IX.Math.Registration
                     return;
 
                 default:
-                    throw new ArgumentException(string.Format(Resources.ParameterTypeNotRecognized, this.Name), this.Name);
+                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterTypeNotRecognized, this.Name), this.Name);
             }
 
             void ChangeReturnType(SupportedValueType newReturnType)
@@ -171,14 +185,14 @@ namespace IX.Math.Registration
                 {
                     if (this.alreadyCompiled)
                     {
-                        throw new InvalidOperationException(string.Format(Resources.ParameterAlreadyCompiled, this.Name));
+                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterAlreadyCompiled, this.Name));
                     }
 
                     int i1 = (int)newReturnType, i2 = (int)this.SupportedReturnType;
 
                     if ((i1 & i2) == 0)
                     {
-                        throw new ExpressionNotValidLogicallyException(string.Format(Resources.ParameterRequiredOfMismatchedTypes, this.Name));
+                        throw new ExpressionNotValidLogicallyException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterRequiredOfMismatchedTypes, this.Name));
                     }
 
                     this.ReturnType = newReturnType;
@@ -186,7 +200,7 @@ namespace IX.Math.Registration
                 }
                 else
                 {
-                    throw new ExpressionNotValidLogicallyException(string.Format(Resources.ParameterRequiredOfMismatchedTypes, this.Name));
+                    throw new ExpressionNotValidLogicallyException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterRequiredOfMismatchedTypes, this.Name));
                 }
             }
         }
@@ -204,7 +218,7 @@ namespace IX.Math.Registration
                     this.IsFloat = true;
                     break;
                 default:
-                    throw new ExpressionNotValidLogicallyException(string.Format(Resources.ParameterMustBeFloatButAlreadyRequiredToBeInteger, this.Name));
+                    throw new ExpressionNotValidLogicallyException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterMustBeFloatButAlreadyRequiredToBeInteger, this.Name));
             }
         }
 
@@ -221,7 +235,7 @@ namespace IX.Math.Registration
                     this.IsFloat = false;
                     break;
                 default:
-                    throw new ExpressionNotValidLogicallyException(string.Format(Resources.ParameterMustBeIntegerButAlreadyRequiredToBeFloat, this.Name));
+                    throw new ExpressionNotValidLogicallyException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterMustBeIntegerButAlreadyRequiredToBeFloat, this.Name));
             }
         }
 
@@ -240,7 +254,7 @@ namespace IX.Math.Registration
         {
             if (this.alreadyCompiled)
             {
-                return this.expression ?? throw new InvalidOperationException(string.Format(Resources.ParameterAlreadyCompiledButCompilationIsNull, this.Name));
+                return this.expression ?? throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterAlreadyCompiledButCompilationIsNull, this.Name));
             }
 
             Type type;
@@ -284,16 +298,11 @@ namespace IX.Math.Registration
                 this.expression = parameterExpression;
             }
 
-            this.stringExpression =
-                (this.ReturnType == SupportedValueType.String) ?
-                this.expression :
-                Expression.Call(this.expression, typeof(object).GetMethodWithExactParameters(
-                    nameof(this.ToString),
-#if STANDARD2 || NET461
-                    Array.Empty<Type>()));
-#else
-                    new Type[0]));
-#endif
+            this.stringExpression = (this.ReturnType == SupportedValueType.String)
+                ? this.expression
+                : StringFormatter.CreateStringConversionExpression(
+                    this.expression,
+                    this.stringFormatters);
 
             this.alreadyCompiled = true;
             return this.expression;
@@ -307,12 +316,22 @@ namespace IX.Math.Registration
         {
             if (this.alreadyCompiled)
             {
-                return this.stringExpression ?? throw new InvalidOperationException(string.Format(Resources.ParameterAlreadyCompiledButCompilationIsNull, this.Name));
+                return this.stringExpression ??
+                       throw new InvalidOperationException(
+                           string.Format(
+                               CultureInfo.CurrentCulture,
+                               Resources.ParameterAlreadyCompiledButCompilationIsNull,
+                               this.Name));
             }
 
             this.Compile();
 
-            return this.stringExpression ?? throw new InvalidOperationException(string.Format(Resources.ParameterAlreadyCompiledButCompilationIsNull, this.Name));
+            return this.stringExpression ??
+                   throw new InvalidOperationException(
+                       string.Format(
+                           CultureInfo.CurrentCulture,
+                           Resources.ParameterAlreadyCompiledButCompilationIsNull,
+                           this.Name));
         }
 
         /// <summary>
@@ -323,7 +342,7 @@ namespace IX.Math.Registration
         /// <para>Warning! This method does not copy the compilation result.</para>
         /// <para>When called on a compiled expression, the resulting context will not be itself compiled.</para>
         /// </remarks>
-        public ParameterContext DeepClone() => new ParameterContext(this.Name)
+        public ParameterContext DeepClone() => new ParameterContext(this.Name, this.stringFormatters)
         {
             IsFloat = this.IsFloat,
             ReturnType = this.ReturnType,

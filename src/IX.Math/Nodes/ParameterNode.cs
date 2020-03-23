@@ -86,13 +86,13 @@ namespace IX.Math.Nodes
         /// <summary>
         /// Generates the expression that will be compiled into code.
         /// </summary>
-        /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" />.</returns>
+        /// <returns>The generated <see cref="Expression" />.</returns>
         public override Expression GenerateExpression() => this.parametersRegistry.AdvertiseParameter(this.Name).Compile();
 
         /// <summary>
         /// Generates the expression that will be compiled into code as a string expression.
         /// </summary>
-        /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" /> that gives the values as a string.</returns>
+        /// <returns>The generated <see cref="Expression" /> that gives the values as a string.</returns>
         public override Expression GenerateStringExpression() => this.parametersRegistry.AdvertiseParameter(this.Name).CompileString();
 
         /// <summary>

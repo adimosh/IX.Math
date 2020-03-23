@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.StandardExtensions.Extensions;
@@ -117,6 +118,7 @@ namespace IX.Math.Nodes
             {
                 throw new ArgumentException(
                     string.Format(
+                        CultureInfo.CurrentCulture,
                         Resources.FunctionCouldNotBeFound,
                         functionName),
                     nameof(functionName));
@@ -253,6 +255,7 @@ namespace IX.Math.Nodes
             {
                 throw new ArgumentException(
                     string.Format(
+                        CultureInfo.CurrentCulture,
                         Resources.FunctionCouldNotBeFound,
                         methodName),
                     nameof(methodName));
@@ -264,6 +267,7 @@ namespace IX.Math.Nodes
                                 new Type[0]) ??
                             throw new ArgumentException(
                                 string.Format(
+                                    CultureInfo.CurrentCulture,
                                     Resources.FunctionCouldNotBeFound,
                                     methodName),
                                 nameof(methodName));
@@ -273,6 +277,7 @@ namespace IX.Math.Nodes
                                 Array.Empty<Type>()) ??
                             throw new ArgumentException(
                                 string.Format(
+                                    CultureInfo.CurrentCulture,
                                     Resources.FunctionCouldNotBeFound,
                                     methodName),
                                 nameof(methodName));

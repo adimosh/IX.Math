@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Extensibility;
@@ -145,6 +146,7 @@ namespace IX.Math.Nodes.Function.Binary
             {
                 throw new InvalidOperationException(
                     string.Format(
+                        CultureInfo.CurrentCulture,
                         Resources.FunctionCouldNotBeFound,
                         functionName));
             }

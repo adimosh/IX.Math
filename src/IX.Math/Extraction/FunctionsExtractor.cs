@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using IX.Math.ExpressionState;
 using IX.Math.Extensibility;
@@ -12,6 +13,7 @@ using IX.Math.Nodes;
 using IX.Math.Registration;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
+using IX.StandardExtensions.Globalization;
 using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 
@@ -103,7 +105,7 @@ namespace IX.Math.Extraction
             {
                 // Replace sub-expressions
                 ReplaceOneFunction(
-                    $"item{i.ToString().PadLeft(4, '0')}",
+                    $"item{i.ToString(CultureInfo.InvariantCulture).PadLeft(4, '0')}",
                     openParenthesis,
                     closeParenthesis,
                     parameterSeparator,
@@ -176,10 +178,9 @@ namespace IX.Math.Extraction
 
                     while (true)
                     {
-                        op = source.IndexOf(
+                        op = source.InvariantCultureIndexOf(
                             openParanthesisSymbol,
-                            op + opl,
-                            StringComparison.Ordinal);
+                            op + opl);
 
                         if (op == -1)
                         {
@@ -198,7 +199,7 @@ namespace IX.Math.Extraction
                         if (allSymbolsSymbols.Any(
                             (
                                 p,
-                                check) => check.EndsWith(p), functionHeaderCheck))
+                                check) => check.InvariantCultureEndsWith(p), functionHeaderCheck))
                         {
                             continue;
                         }
@@ -207,25 +208,21 @@ namespace IX.Math.Extraction
                             allSymbolsSymbols,
                             StringSplitOptions.None).Last();
 
-                        var oop = source.IndexOf(
+                        var oop = source.InvariantCultureIndexOf(
                             openParanthesisSymbol,
-                            op + opl,
-                            StringComparison.Ordinal);
-                        var cp = source.IndexOf(
+                            op + opl);
+                        var cp = source.InvariantCultureIndexOf(
                             closeParanthesisSymbol,
-                            op + cpl,
-                            StringComparison.Ordinal);
+                            op + cpl);
 
                         while (oop < cp && oop != -1 && cp != -1)
                         {
-                            oop = source.IndexOf(
+                            oop = source.InvariantCultureIndexOf(
                                 openParanthesisSymbol,
-                                oop + opl,
-                                StringComparison.Ordinal);
-                            cp = source.IndexOf(
+                                oop + opl);
+                            cp = source.InvariantCultureIndexOf(
                                 closeParanthesisSymbol,
-                                cp + cpl,
-                                StringComparison.Ordinal);
+                                cp + cpl);
                         }
 
                         if (cp == -1)

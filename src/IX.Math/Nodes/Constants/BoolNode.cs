@@ -2,8 +2,12 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
+using IX.Math.Formatters;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
@@ -14,8 +18,10 @@ namespace IX.Math.Nodes.Constants
     /// <seealso cref="ConstantNodeBase" />
     [DebuggerDisplay("{" + nameof(Value) + "}")]
     [PublicAPI]
-    public sealed class BoolNode : ConstantNodeBase
+    public sealed class BoolNode : ConstantNodeBase, ISpecialRequestNode
     {
+        private Func<Type, object> specialObjectRequestFunction;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BoolNode"/> class.
         /// </summary>
@@ -57,7 +63,13 @@ namespace IX.Math.Nodes.Constants
         /// Generates the expression that will be compiled into code as a string expression.
         /// </summary>
         /// <returns>The string expression.</returns>
-        public override Expression GenerateCachedStringExpression() => Expression.Constant(this.Value ? "true" : "false", typeof(string));
+        public override Expression GenerateCachedStringExpression()
+        {
+            var stringFormatters = this.specialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) as List<IStringFormatter>;
+            return Expression.Constant(
+                StringFormatter.FormatIntoString(this.Value, stringFormatters),
+                typeof(string));
+        }
 
         /// <summary>
         /// Creates a deep clone of the source object.
@@ -65,5 +77,11 @@ namespace IX.Math.Nodes.Constants
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) => new BoolNode(this.Value);
+
+        /// <summary>
+        /// Sets the request special object function.
+        /// </summary>
+        /// <param name="func">The function to set.</param>
+        void ISpecialRequestNode.SetRequestSpecialObjectFunction(Func<Type, object> func) => this.specialObjectRequestFunction = func;
     }
 }

@@ -29,21 +29,16 @@ namespace IX.Math.Generators
         private static Dictionary<string, Type> GenerateTypeAssignableFrom<T>(IEnumerable<Assembly> assemblies)
             where T : FunctionNodeBase
         {
-            // ReSharper disable once PossibleMultipleEnumeration - False positive
             Contract.RequiresNotNullPrivate(
                 in assemblies,
                 nameof(assemblies));
 
             var typeDictionary = new Dictionary<string, Type>();
 
-#pragma warning disable HAA0603 // Delegate allocation from a method group - This is acceptable
-
             // TODO: Do this in parallel
-            // ReSharper disable once PossibleMultipleEnumeration - False positive
             assemblies.GetTypesAssignableFrom<T>().ForEach(
                 AddToTypeDictionary,
                 typeDictionary);
-#pragma warning restore HAA0603 // Delegate allocation from a method group
 
             void AddToTypeDictionary(
                 TypeInfo p,
@@ -56,10 +51,7 @@ namespace IX.Math.Generators
                 }
                 catch
                 {
-                    // We need not do anything special here.
-#pragma warning disable ERP022 // Catching everything considered harmful. - This is acceptable
                     return;
-#pragma warning restore ERP022 // Catching everything considered harmful.
                 }
 
                 if (attr == null)

@@ -3,10 +3,11 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using System.Text;
+using IX.Math.Extensibility;
+using IX.Math.Formatters;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
@@ -17,9 +18,10 @@ namespace IX.Math.Nodes.Constants
     /// <seealso cref="ConstantNodeBase" />
     [DebuggerDisplay("{" + nameof(DisplayValue) + "}")]
     [PublicAPI]
-    public class ByteArrayNode : ConstantNodeBase
+    public class ByteArrayNode : ConstantNodeBase, ISpecialRequestNode
     {
         private string cachedDistilledStringValue;
+        private Func<Type, object> specialObjectRequestFunction;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ByteArrayNode" /> class.
@@ -34,7 +36,7 @@ namespace IX.Math.Nodes.Constants
         ///     Gets the display value.
         /// </summary>
         [NotNull]
-        public string DisplayValue => this.DistillStringValue();
+        public string DisplayValue => this.GetString();
 
         /// <summary>
         ///     Gets the return type of this node.
@@ -45,7 +47,7 @@ namespace IX.Math.Nodes.Constants
         /// <summary>
         ///     Gets the value of the node.
         /// </summary>
-        [SuppressMessage(
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Performance",
             "CA1819:Properties should not return arrays",
             Justification = "We specifically want this here, as this is a binary representation.")]
@@ -70,9 +72,8 @@ namespace IX.Math.Nodes.Constants
         ///     Generates the expression that will be compiled into code as a string expression.
         /// </summary>
         /// <returns>The string expression.</returns>
-        public override Expression GenerateCachedStringExpression() =>
-            Expression.Constant(
-                this.DistillStringValue(),
+        public override Expression GenerateCachedStringExpression() => Expression.Constant(
+                this.GetString(),
                 typeof(string));
 
         /// <summary>
@@ -82,34 +83,24 @@ namespace IX.Math.Nodes.Constants
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) => new ByteArrayNode(this.Value);
 
-        [NotNull]
-        private string DistillStringValue()
+        /// <summary>
+        /// Sets the request special object function.
+        /// </summary>
+        /// <param name="func">The function to set.</param>
+        void ISpecialRequestNode.SetRequestSpecialObjectFunction(Func<Type, object> func) => this.specialObjectRequestFunction = func;
+
+        private string GetString()
         {
-            if (this.cachedDistilledStringValue != null)
+            if (this.cachedDistilledStringValue == null)
             {
-                return this.cachedDistilledStringValue;
+                var stringFormatters = this.specialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) as List<IStringFormatter>;
+
+                this.cachedDistilledStringValue = StringFormatter.FormatIntoString(
+                    this.Value,
+                    stringFormatters);
             }
 
-            var bldr = new StringBuilder();
-
-            bldr.Append("0b");
-
-            if (this.Value.Length == 0)
-            {
-                bldr.Append("0");
-            }
-            else
-            {
-                foreach (var b in this.Value)
-                {
-                    bldr.Append(
-                        Convert.ToString(
-                            b,
-                            2));
-                }
-            }
-
-            return this.cachedDistilledStringValue = bldr.ToString();
+            return this.cachedDistilledStringValue;
         }
     }
 }
