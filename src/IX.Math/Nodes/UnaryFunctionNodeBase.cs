@@ -6,6 +6,7 @@ using System;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Math.Extensibility;
 using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
@@ -51,6 +52,18 @@ namespace IX.Math.Nodes
         ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
         /// </value>
         public override bool IsTolerant => this.Parameter.IsTolerant;
+
+        /// <summary>
+        /// Sets the special object request function for sub objects.
+        /// </summary>
+        /// <param name="func">The function.</param>
+        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
+        {
+            if (this.Parameter is ISpecialRequestNode srnl)
+            {
+                srnl.SetRequestSpecialObjectFunction(func);
+            }
+        }
 
         /// <summary>
         ///     Ensures that the parameter that is received is compatible with the function, optionally allowing the parameter

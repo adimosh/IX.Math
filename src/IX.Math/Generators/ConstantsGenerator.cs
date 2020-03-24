@@ -296,15 +296,15 @@ namespace IX.Math.Generators
                 nameof(keys));
 
             var index = int.Parse(
-                keys.Where(p => p.CurrentCultureStartsWith("Const") && p.Length > 5).LastOrDefault()?.Substring(5) ?? "0", CultureInfo.CurrentCulture);
+                keys.Where(p => p.InvariantCultureStartsWith("Const") && p.Length > 5).LastOrDefault()?.Substring(5) ?? "0", CultureInfo.CurrentCulture);
 
             do
             {
                 index++;
             }
-            while (originalExpression.Contains($"Const{index.ToString(CultureInfo.CurrentCulture)}"));
+            while (originalExpression.InvariantCultureContains($"Const{index.ToString(CultureInfo.InvariantCulture)}"));
 
-            return $"Const{index.ToString(CultureInfo.CurrentCulture)}";
+            return $"Const{index.ToString(CultureInfo.InvariantCulture)}";
         }
     }
 }

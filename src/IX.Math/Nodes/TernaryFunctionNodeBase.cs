@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using IX.Math.Extensibility;
 
 namespace IX.Math.Nodes
 {
@@ -75,6 +76,28 @@ namespace IX.Math.Nodes
         /// </value>
         public override bool IsTolerant =>
             this.FirstParameter.IsTolerant || this.SecondParameter.IsTolerant || this.ThirdParameter.IsTolerant;
+
+        /// <summary>
+        /// Sets the special object request function for sub objects.
+        /// </summary>
+        /// <param name="func">The function.</param>
+        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
+        {
+            if (this.FirstParameter is ISpecialRequestNode srnl)
+            {
+                srnl.SetRequestSpecialObjectFunction(func);
+            }
+
+            if (this.SecondParameter is ISpecialRequestNode srnr)
+            {
+                srnr.SetRequestSpecialObjectFunction(func);
+            }
+
+            if (this.ThirdParameter is ISpecialRequestNode trnr)
+            {
+                trnr.SetRequestSpecialObjectFunction(func);
+            }
+        }
 
         /// <summary>
         /// Ensures the parameters are compatible for this node.

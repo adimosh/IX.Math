@@ -27,6 +27,14 @@ namespace IX.Math.Nodes
         public override bool IsTolerant => false;
 
         /// <summary>
+        /// Sets the special object request function for sub objects.
+        /// </summary>
+        /// <param name="func">The function.</param>
+        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
+        {
+        }
+
+        /// <summary>
         /// Generates a static function call for a function with no parameters.
         /// </summary>
         /// <typeparam name="T">The type to call the function on.</typeparam>
@@ -52,11 +60,7 @@ namespace IX.Math.Nodes
 
             MethodInfo mi = t.GetMethodWithExactParameters(
                 functionName,
-#if !NET452
-                Array.Empty<Type>())
-#else
-                new Type[0])
-#endif
+                Type.EmptyTypes)
                 ?? throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
 
             return Expression.Call(mi);

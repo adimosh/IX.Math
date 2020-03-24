@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Nodes.Operations.Binary
@@ -13,16 +14,16 @@ namespace IX.Math.Nodes.Operations.Binary
     /// A node base for binary operations.
     /// </summary>
     /// <seealso cref="OperationNodeBase" />
-    internal abstract class BinaryOperationNodeBase : OperationNodeBase
+    internal abstract class BinaryOperatorNodeBase : OperationNodeBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BinaryOperationNodeBase"/> class.
+        /// Initializes a new instance of the <see cref="BinaryOperatorNodeBase"/> class.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor", Justification = "We specifically want this to happen.")]
         [SuppressMessage("Usage", "CA2214:Do not call overridable methods in constructors", Justification = "We specifically want this to happen.")]
-        protected private BinaryOperationNodeBase(NodeBase left, NodeBase right)
+        protected private BinaryOperatorNodeBase(NodeBase left, NodeBase right)
         {
             Contract.RequiresNotNull(
                 in left,
@@ -81,6 +82,23 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         protected abstract void EnsureCompatibleOperands(NodeBase left, NodeBase right);
+
+        /// <summary>
+        /// Sets the special object request function for sub objects.
+        /// </summary>
+        /// <param name="func">The function.</param>
+        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
+        {
+            if (this.Left is ISpecialRequestNode srnl)
+            {
+                srnl.SetRequestSpecialObjectFunction(func);
+            }
+
+            if (this.Right is ISpecialRequestNode srnr)
+            {
+                srnr.SetRequestSpecialObjectFunction(func);
+            }
+        }
 
         /// <summary>
         /// Gets the expressions of same type from operands.

@@ -12,8 +12,8 @@ namespace IX.Math.Nodes.Operations.Binary
     /// <summary>
     ///     A base node for comparison operations.
     /// </summary>
-    /// <seealso cref="BinaryOperationNodeBase" />
-    internal abstract class ComparisonOperationNodeBase : BinaryOperationNodeBase
+    /// <seealso cref="BinaryOperatorNodeBase" />
+    internal abstract class ComparisonOperationNodeBase : BinaryOperatorNodeBase
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="ComparisonOperationNodeBase" /> class.

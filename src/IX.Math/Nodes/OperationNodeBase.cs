@@ -120,7 +120,11 @@ namespace IX.Math.Nodes
         /// Sets the request special object function.
         /// </summary>
         /// <param name="func">The function to set.</param>
-        void ISpecialRequestNode.SetRequestSpecialObjectFunction(Func<Type, object> func) => this.SpecialObjectRequestFunction = func;
+        void ISpecialRequestNode.SetRequestSpecialObjectFunction(Func<Type, object> func)
+        {
+            this.SpecialObjectRequestFunction = func;
+            this.SetSpecialObjectRequestFunctionForSubObjects(func);
+        }
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -140,6 +144,12 @@ namespace IX.Math.Nodes
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         protected abstract OperationNodeBase DeepCloneNode(NodeCloningContext context);
+
+        /// <summary>
+        /// Sets the special object request function for sub objects.
+        /// </summary>
+        /// <param name="func">The function.</param>
+        protected abstract void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func);
 
         /// <summary>
         /// Generates the expression that will be compiled into code.

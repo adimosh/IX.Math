@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
+// <copyright file="StringFormatterUnitTests.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using IX.Math;
 using IX.Math.Extensibility;
 using IX.StandardExtensions.TestUtils;
@@ -25,7 +24,7 @@ namespace IX.UnitTests
             // Arrange
             using ExpressionParsingService eps = new ExpressionParsingService();
             eps.RegisterTypeFormatter(new SillyStringFormatter());
-            int comparisonValue = DataGenerator.RandomInteger();
+            int comparisonValue = DataGenerator.RandomNonNegativeInteger();
             string expression = $"\"The number is \" + {comparisonValue}";
             string expectedResult = $"The number is 0x{comparisonValue:x8}";
 

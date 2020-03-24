@@ -37,7 +37,7 @@ namespace IX.Math
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "This is correct, but the analyzer can't tell.")]
-        private LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, NodeBase>> binaryOperators;
+        private LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, BinaryOperatorNodeBase>> binaryOperators;
 
         [DiagCA.SuppressMessage(
             "IDisposableAnalyzers.Correctness",
@@ -47,7 +47,7 @@ namespace IX.Math
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "This is correct, but the analyzer can't tell.")]
-        private LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase>> unaryOperators;
+        private LevelDictionary<string, Func<MathDefinition, NodeBase, UnaryOperatorNodeBase>> unaryOperators;
 
         // Constants
         private Dictionary<string, ConstantNodeBase> constantsTable;
@@ -233,7 +233,7 @@ namespace IX.Math
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "This is correct, but the analyzer can't tell.")]
-        internal LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, NodeBase>> BinaryOperators
+        internal LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, BinaryOperatorNodeBase>> BinaryOperators
         {
             get => this.binaryOperators;
             private set => this.binaryOperators = value;
@@ -317,7 +317,7 @@ namespace IX.Math
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "This is correct, but the analyzer can't tell.")]
-        internal LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase>> UnaryOperators
+        internal LevelDictionary<string, Func<MathDefinition, NodeBase, UnaryOperatorNodeBase>> UnaryOperators
         {
             get => this.unaryOperators;
             private set => this.unaryOperators = value;
@@ -498,7 +498,7 @@ namespace IX.Math
             // ======================================
 
             // Binary operators
-            this.BinaryOperators = new LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, NodeBase>>
+            this.BinaryOperators = new LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, BinaryOperatorNodeBase>>
             {
                 // First tier - Comparison and equation operators
                 {
@@ -658,7 +658,7 @@ namespace IX.Math
             };
 
             // Unary operators
-            this.UnaryOperators = new LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase>>
+            this.UnaryOperators = new LevelDictionary<string, Func<MathDefinition, NodeBase, UnaryOperatorNodeBase>>
             {
                 // First tier - Negation and inversion
                 {

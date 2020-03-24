@@ -4,7 +4,7 @@
 
 namespace IX.Math.Nodes.Operations.Binary
 {
-    internal abstract class LogicalOperationNodeBase : BinaryOperationNodeBase
+    internal abstract class LogicalOperationNodeBase : BinaryOperatorNodeBase
     {
         protected LogicalOperationNodeBase(NodeBase left, NodeBase right)
             : base(left, right)

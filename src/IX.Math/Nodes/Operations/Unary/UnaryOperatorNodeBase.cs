@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using IX.Math.Extensibility;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Unary
@@ -50,5 +51,17 @@ namespace IX.Math.Nodes.Operations.Unary
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         protected override OperationNodeBase DeepCloneNode(NodeCloningContext context) => (OperationNodeBase)this.DeepClone(context);
+
+        /// <summary>
+        /// Sets the special object request function for sub objects.
+        /// </summary>
+        /// <param name="func">The function.</param>
+        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
+        {
+            if (this.Operand is ISpecialRequestNode srnl)
+            {
+                srnl.SetRequestSpecialObjectFunction(func);
+            }
+        }
     }
 }

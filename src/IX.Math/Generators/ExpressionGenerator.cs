@@ -12,6 +12,8 @@ using IX.Math.Extensibility;
 using IX.Math.Extraction;
 using IX.Math.Formatters;
 using IX.Math.Nodes;
+using IX.Math.Nodes.Operations.Binary;
+using IX.Math.Nodes.Operations.Unary;
 using IX.Math.Registration;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Globalization;
@@ -251,8 +253,8 @@ namespace IX.Math.Generators
             }
 
             // Check whether the expression is a function call
-            if (expression.Contains(workingSet.Definition.Parentheses.Item1) &&
-                expression.Contains(workingSet.Definition.Parentheses.Item2))
+            if (expression.InvariantCultureContains(workingSet.Definition.Parentheses.Item1) &&
+                expression.InvariantCultureContains(workingSet.Definition.Parentheses.Item2))
             {
                 return GenerateFunctionCallExpression(
                     expression,
@@ -291,7 +293,7 @@ namespace IX.Math.Generators
 
                     if (!innerWorkingSet.BinaryOperators.TryGetValue(
                         op,
-                        out Func<MathDefinition, NodeBase, NodeBase, NodeBase> t))
+                        out Func<MathDefinition, NodeBase, NodeBase, BinaryOperatorNodeBase> t))
                     {
                         // Binary operator not actually found.
                         return null;
@@ -332,10 +334,12 @@ namespace IX.Math.Generators
                         return null;
                     }
 
-                    return t(
+                    var resultingNode = t(
                         innerWorkingSet.Definition,
                         left,
-                        right).Simplify();
+                        right);
+                    ((ISpecialRequestNode)resultingNode).SetRequestSpecialObjectFunction(innerWorkingSet.OfferReservedType);
+                    return resultingNode.Simplify();
                 }
 
                 if (exp != null)
@@ -369,7 +373,7 @@ namespace IX.Math.Generators
 
                     if (!s.CurrentCultureStartsWith(op) || !innerWorkingSet.UnaryOperators.TryGetValue(
                             op,
-                            out Func<MathDefinition, NodeBase, NodeBase> t))
+                            out Func<MathDefinition, NodeBase, UnaryOperatorNodeBase> t))
                     {
                         // The unary operator is not valid.
                         return null;
@@ -392,9 +396,11 @@ namespace IX.Math.Generators
                         return null;
                     }
 
-                    return t(
+                    var resultingNode = t(
                         innerWorkingSet.Definition,
-                        expr).Simplify();
+                        expr);
+                    ((ISpecialRequestNode)resultingNode).SetRequestSpecialObjectFunction(innerWorkingSet.OfferReservedType);
+                    return resultingNode.Simplify();
                 }
 
                 if (exp != null)
