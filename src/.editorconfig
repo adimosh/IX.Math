@@ -110,6 +110,9 @@ dotnet_style_prefer_conditional_expression_over_return=true:silent
 # Null checks
 dotnet_style_prefer_is_null_check_over_reference_equality_method=true:silent
 
+# Specific rules
+dotnet_diagnostic.IDE0010.severity = none
+dotnet_code_quality.CA1062.null_check_validation_methods = RequiresNotNull|RequiresNotNullOrEmpty|RequiresNotNullOrWhitespace
 # ===============
 # == C# STYLES ==
 # ===============

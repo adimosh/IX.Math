@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.StandardExtensions.Contracts;
+using IX.StandardExtensions.Globalization;
 
 namespace IX.Math.Extraction
 {
@@ -56,19 +57,17 @@ namespace IX.Math.Extraction
 
             while (true)
             {
-                var op = process.IndexOf(
-                    stringIndicator,
-                    StringComparison.Ordinal);
+                var op = process.InvariantCultureIndexOf(
+                    stringIndicator);
 
                 if (op == -1)
                 {
                     break;
                 }
 
-                var cp = process.IndexOf(
+                var cp = process.InvariantCultureIndexOf(
                     stringIndicator,
-                    op + stringIndicator.Length,
-                    StringComparison.Ordinal);
+                    op + stringIndicator.Length);
 
                 escapeRoute:
                 if (cp == -1 || cp + stringIndicator.Length > process.Length)
@@ -76,12 +75,11 @@ namespace IX.Math.Extraction
                     break;
                 }
 
-                if (process.Substring(cp + stringIndicator.Length).StartsWith(stringIndicator))
+                if (process.Substring(cp + stringIndicator.Length).InvariantCultureStartsWith(stringIndicator))
                 {
-                    cp = process.IndexOf(
+                    cp = process.InvariantCultureIndexOf(
                         stringIndicator,
-                        cp + stringIndicator.Length * 2,
-                        StringComparison.Ordinal);
+                        cp + stringIndicator.Length * 2);
                     goto escapeRoute;
                 }
 

@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
-    internal abstract class SimpleMathematicalOperationNodeBase : BinaryOperationNodeBase
+    internal abstract class SimpleMathematicalOperationNodeBase : BinaryOperatorNodeBase
     {
         protected SimpleMathematicalOperationNodeBase(NodeBase left, NodeBase right)
             : base(left, right)

@@ -5,6 +5,7 @@
 using System;
 using System.Linq.Expressions;
 using IX.Math.Registration;
+using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Nodes
 {
@@ -43,6 +44,14 @@ namespace IX.Math.Nodes
         public string Name { get; }
 
         /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant => false;
+
+        /// <summary>
         /// Gets the return type of this node.
         /// </summary>
         /// <value>The node return type.</value>
@@ -75,6 +84,8 @@ namespace IX.Math.Nodes
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context)
         {
+            Contract.RequiresNotNull(in context, nameof(context));
+
             context.ParameterRegistry.CloneFrom(this.parametersRegistry.AdvertiseParameter(this.Name));
 
             return new ParameterNode(this.Name, context.ParameterRegistry);
@@ -83,13 +94,13 @@ namespace IX.Math.Nodes
         /// <summary>
         /// Generates the expression that will be compiled into code.
         /// </summary>
-        /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" />.</returns>
+        /// <returns>The generated <see cref="Expression" />.</returns>
         public override Expression GenerateExpression() => this.parametersRegistry.AdvertiseParameter(this.Name).Compile();
 
         /// <summary>
         /// Generates the expression that will be compiled into code as a string expression.
         /// </summary>
-        /// <returns>The generated <see cref="T:System.Linq.Expressions.Expression" /> that gives the values as a string.</returns>
+        /// <returns>The generated <see cref="Expression" /> that gives the values as a string.</returns>
         public override Expression GenerateStringExpression() => this.parametersRegistry.AdvertiseParameter(this.Name).CompileString();
 
         /// <summary>

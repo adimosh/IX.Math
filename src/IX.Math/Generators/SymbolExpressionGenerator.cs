@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using System.Globalization;
 using IX.Math.ExpressionState;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
@@ -34,7 +35,7 @@ namespace IX.Math.Generators
                 return itemName;
             }
 
-            itemName = $"item{symbolTable.Count.ToString().PadLeft(4, '0')}";
+            itemName = $"item{symbolTable.Count.ToString(CultureInfo.InvariantCulture).PadLeft(4, '0')}";
             ExpressionSymbol symb = isFunction
                 ? ExpressionSymbol.GenerateFunctionCall(
                     itemName,

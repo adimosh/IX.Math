@@ -16,6 +16,13 @@ namespace IX.Math.Nodes
     public abstract class FunctionNodeBase : OperationNodeBase
     {
         /// <summary>
+        /// Prevents a default instance of the <see cref="FunctionNodeBase"/> class from being created.
+        /// </summary>
+        protected private FunctionNodeBase()
+        {
+        }
+
+        /// <summary>
         /// Gets the concrete type of a parameter.
         /// </summary>
         /// <param name="parameter">The parameter.</param>
@@ -36,22 +43,12 @@ namespace IX.Math.Nodes
                     parameterType = typeof(string);
                     break;
                 case SupportedValueType.Numeric:
+                    parameterType = parameter switch
                     {
-                        switch (parameter)
-                        {
-                            case ParameterNode nn:
-                                parameterType = nn.IsFloat == false ? typeof(long) : typeof(double);
-
-                                break;
-                            case NumericNode cn:
-                                parameterType = cn.IsFloat == false ? typeof(long) : typeof(double);
-                                break;
-                            default:
-                                parameterType = typeof(double);
-                                break;
-                        }
-                    }
-
+                        ParameterNode nn => nn.IsFloat == false ? typeof(long) : typeof(double),
+                        NumericNode cn => cn.IsFloat == false ? typeof(long) : typeof(double),
+                        _ => typeof(double)
+                    };
                     break;
 
                 default:
@@ -60,5 +57,19 @@ namespace IX.Math.Nodes
 
             return parameterType;
         }
+
+        /// <summary>
+        ///     Creates a deep clone of the source object.
+        /// </summary>
+        /// <param name="context">The deep cloning context.</param>
+        /// <returns>A deep clone.</returns>
+        public new abstract NodeBase DeepClone(NodeCloningContext context);
+
+        /// <summary>
+        ///     Creates a deep clone of the source object.
+        /// </summary>
+        /// <param name="context">The deep cloning context.</param>
+        /// <returns>A deep clone.</returns>
+        protected override OperationNodeBase DeepCloneNode(NodeCloningContext context) => (OperationNodeBase)this.DeepClone(context);
     }
 }

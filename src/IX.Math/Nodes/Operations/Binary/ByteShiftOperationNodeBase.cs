@@ -4,7 +4,7 @@
 
 namespace IX.Math.Nodes.Operations.Binary
 {
-    internal abstract class ByteShiftOperationNodeBase : BinaryOperationNodeBase
+    internal abstract class ByteShiftOperationNodeBase : BinaryOperatorNodeBase
     {
         protected ByteShiftOperationNodeBase(NodeBase left, NodeBase right)
             : base(left, right)

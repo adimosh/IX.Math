@@ -12,8 +12,8 @@ namespace IX.Math.Nodes.Operations.Binary
     /// <summary>
     ///     A base node for comparison operations.
     /// </summary>
-    /// <seealso cref="BinaryOperationNodeBase" />
-    internal abstract class ComparisonOperationNodeBase : BinaryOperationNodeBase
+    /// <seealso cref="BinaryOperatorNodeBase" />
+    internal abstract class ComparisonOperationNodeBase : BinaryOperatorNodeBase
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="ComparisonOperationNodeBase" /> class.
@@ -36,6 +36,14 @@ namespace IX.Math.Nodes.Operations.Binary
         ///     The node return type.
         /// </value>
         public override SupportedValueType ReturnType => SupportedValueType.Boolean;
+
+        /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant => true;
 
         private static void DetermineChildren(
             NodeBase parameter,

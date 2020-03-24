@@ -4,8 +4,10 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Math.Extensibility;
 using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
@@ -30,6 +32,7 @@ namespace IX.Math.Nodes
         /// is <see langword="null"/> (<see langword="Nothing"/> in Visual Basic).
         /// </exception>
         [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor", Justification = "We specifically want this to happen.")]
+        [SuppressMessage("Usage", "CA2214:Do not call overridable methods in constructors", Justification = "We specifically want this to happen.")]
         protected BinaryFunctionNodeBase(NodeBase firstParameter, NodeBase secondParameter)
         {
             NodeBase firstParameterTemp = firstParameter ?? throw new ArgumentNullException(nameof(firstParameter));
@@ -42,16 +45,41 @@ namespace IX.Math.Nodes
         }
 
         /// <summary>
-        /// Gets or sets the first parameter.
+        /// Gets the first parameter.
         /// </summary>
         /// <value>The first parameter.</value>
-        public NodeBase FirstParameter { get; protected set; }
+        public NodeBase FirstParameter { get; }
 
         /// <summary>
-        /// Gets or sets the second parameter.
+        /// Gets the second parameter.
         /// </summary>
         /// <value>The second parameter.</value>
-        public NodeBase SecondParameter { get; protected set; }
+        public NodeBase SecondParameter { get; }
+
+        /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant => this.FirstParameter.IsTolerant || this.SecondParameter.IsTolerant;
+
+        /// <summary>
+        /// Sets the special object request function for sub objects.
+        /// </summary>
+        /// <param name="func">The function.</param>
+        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
+        {
+            if (this.FirstParameter is ISpecialRequestNode srnl)
+            {
+                srnl.SetRequestSpecialObjectFunction(func);
+            }
+
+            if (this.SecondParameter is ISpecialRequestNode srnr)
+            {
+                srnr.SetRequestSpecialObjectFunction(func);
+            }
+        }
 
         /// <summary>
         /// Ensures that the parameters that are received are compatible with the function, optionally allowing the parameter references to change.
@@ -99,7 +127,7 @@ namespace IX.Math.Nodes
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
-                throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
             }
 
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
@@ -127,7 +155,7 @@ namespace IX.Math.Nodes
                         secondParameterType = typeof(int);
 
                         mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType) ??
-                            throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                            throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
                     }
                 }
             }
@@ -271,7 +299,7 @@ namespace IX.Math.Nodes
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
-                throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
             }
 
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
@@ -302,13 +330,13 @@ namespace IX.Math.Nodes
                             secondParameterType = typeof(int);
 
                             mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType) ??
-                                throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
                         }
                     }
                 }
                 else
                 {
-                    throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
                 }
             }
 

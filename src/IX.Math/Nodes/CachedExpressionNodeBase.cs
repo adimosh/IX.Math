@@ -18,6 +18,13 @@ namespace IX.Math.Nodes
         private Expression generatedStringExpression;
 
         /// <summary>
+        /// Prevents a default instance of the <see cref="CachedExpressionNodeBase"/> class from being created.
+        /// </summary>
+        protected private CachedExpressionNodeBase()
+        {
+        }
+
+        /// <summary>
         ///     Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>The generated <see cref="Expression" />.</returns>
@@ -42,6 +49,14 @@ namespace IX.Math.Nodes
             this.generatedStringExpression ??= this.GenerateCachedStringExpression();
 
         /// <summary>
+        ///     Generates the expression that will be compiled into code as a string expression.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>The generated <see cref="Expression" /> that gives the values as a string.</returns>
+        public override Expression GenerateStringExpression(Tolerance tolerance) =>
+            this.generatedStringExpression ??= this.GenerateCachedStringExpression(tolerance);
+
+        /// <summary>
         ///     Generates an expression that will be cached before being compiled.
         /// </summary>
         /// <returns>The generated <see cref="Expression" /> to be cached.</returns>
@@ -64,5 +79,14 @@ namespace IX.Math.Nodes
         /// <returns>The generated <see cref="Expression" /> to be cached.</returns>
         [NotNull]
         public abstract Expression GenerateCachedStringExpression();
+
+        /// <summary>
+        ///     Generates a string expression that will be cached before being compiled.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>The generated <see cref="Expression" /> to be cached.</returns>
+        [NotNull]
+        public virtual Expression GenerateCachedStringExpression(Tolerance tolerance) =>
+            this.GenerateCachedStringExpression();
     }
 }

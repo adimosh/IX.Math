@@ -3,8 +3,10 @@
 // </copyright>
 
 using System;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Math.Extensibility;
 using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
@@ -22,6 +24,10 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <exception cref="ArgumentNullException">parameter.</exception>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Usage",
+            "CA2214:Do not call overridable methods in constructors",
+            Justification = "This is OK and expected at this point.")]
         protected UnaryFunctionNodeBase([NotNull] NodeBase parameter)
         {
             NodeBase parameterTemp = parameter ?? throw new ArgumentNullException(nameof(parameter));
@@ -38,6 +44,26 @@ namespace IX.Math.Nodes
         /// <value>The parameter.</value>
         [NotNull]
         public NodeBase Parameter { get; private set; }
+
+        /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant => this.Parameter.IsTolerant;
+
+        /// <summary>
+        /// Sets the special object request function for sub objects.
+        /// </summary>
+        /// <param name="func">The function.</param>
+        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
+        {
+            if (this.Parameter is ISpecialRequestNode srnl)
+            {
+                srnl.SetRequestSpecialObjectFunction(func);
+            }
+        }
 
         /// <summary>
         ///     Ensures that the parameter that is received is compatible with the function, optionally allowing the parameter
@@ -113,6 +139,7 @@ namespace IX.Math.Nodes
             {
                 throw new ArgumentException(
                     string.Format(
+                        CultureInfo.CurrentCulture,
                         Resources.FunctionCouldNotBeFound,
                         functionName),
                     nameof(functionName));
@@ -149,6 +176,7 @@ namespace IX.Math.Nodes
                                  parameterType) ??
                              throw new ArgumentException(
                                  string.Format(
+                                     CultureInfo.CurrentCulture,
                                      Resources.FunctionCouldNotBeFound,
                                      functionName),
                                  nameof(functionName));
@@ -202,6 +230,7 @@ namespace IX.Math.Nodes
             {
                 throw new ArgumentException(
                     string.Format(
+                        CultureInfo.CurrentCulture,
                         Resources.FunctionCouldNotBeFound,
                         propertyName),
                     nameof(propertyName));
@@ -210,6 +239,7 @@ namespace IX.Math.Nodes
             PropertyInfo pi = typeof(T).GetRuntimeProperty(propertyName) ??
                               throw new ArgumentException(
                                   string.Format(
+                                      CultureInfo.CurrentCulture,
                                       Resources.FunctionCouldNotBeFound,
                                       propertyName),
                                   nameof(propertyName));
@@ -249,19 +279,33 @@ namespace IX.Math.Nodes
             {
                 throw new ArgumentException(
                     string.Format(
+                        CultureInfo.CurrentCulture,
                         Resources.FunctionCouldNotBeFound,
                         methodName),
                     nameof(methodName));
             }
 
+#if NET452
             MethodInfo mi = typeof(T).GetRuntimeMethod(
                                 methodName,
                                 new Type[0]) ??
                             throw new ArgumentException(
                                 string.Format(
+                                    CultureInfo.CurrentCulture,
                                     Resources.FunctionCouldNotBeFound,
                                     methodName),
                                 nameof(methodName));
+#else
+            MethodInfo mi = typeof(T).GetRuntimeMethod(
+                                methodName,
+                                Array.Empty<Type>()) ??
+                            throw new ArgumentException(
+                                string.Format(
+                                    CultureInfo.CurrentCulture,
+                                    Resources.FunctionCouldNotBeFound,
+                                    methodName),
+                                nameof(methodName));
+#endif
 
             return tolerance == null
                 ? Expression.Call(

@@ -4,11 +4,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using IX.Math.ExpressionState;
 using IX.Math.Generators;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
+using IX.StandardExtensions.Globalization;
 using JetBrains.Annotations;
 
 namespace IX.Math.Computation.InitialExpressionParsers
@@ -165,12 +167,10 @@ namespace IX.Math.Computation.InitialExpressionParsers
 
                     var src = source;
 
-                    var openingParanthesisLocation = src.IndexOf(
-                        openParenthesisL2,
-                        StringComparison.Ordinal);
-                    var closingParanthesisLocation = src.IndexOf(
-                        closeParenthesisL2,
-                        StringComparison.Ordinal);
+                    var openingParanthesisLocation = src.InvariantCultureIndexOf(
+                        openParenthesisL2);
+                    var closingParanthesisLocation = src.InvariantCultureIndexOf(
+                        closeParenthesisL2);
 
                     beginning:
                     if (openingParanthesisLocation != -1)
@@ -206,7 +206,7 @@ namespace IX.Math.Computation.InitialExpressionParsers
                                 if (!allOperatorsInOrderSymbolsL2.Any(
                                     (
                                         p,
-                                        expr4L1) => expr4L1.EndsWith(p), expr4))
+                                        expr4L1) => expr4L1.InvariantCultureEndsWith(p), expr4))
                                 {
                                     // We have a function call
                                     var inx = allOperatorsInOrderSymbolsL2.Max(expr4.LastIndexOf);
@@ -215,13 +215,14 @@ namespace IX.Math.Computation.InitialExpressionParsers
                                         .FirstOrDefault(
                                             (
                                                 p,
-                                                expr5L1) => expr5L1.StartsWith(p), expr5);
+                                                expr5L1) => expr5L1.InvariantCultureStartsWith(p), expr5);
                                     var expr6 = op1 == null ? expr5 : expr5.Substring(op1.Length);
 
+                                    // ReSharper disable once AssignmentIsFullyDiscarded - We're interested only in having the symbol in the table, and nothing more
                                     _ = SymbolExpressionGenerator.GenerateSymbolExpression(
                                         symbolTableL2,
                                         reverseSymbolTableL2,
-                                        $"{expr6}{openParenthesisL2}item{(symbolTableL2.Count - 1).ToString()}{closeParenthesisL2}",
+                                        $"{expr6}{openParenthesisL2}item{(symbolTableL2.Count - 1).ToString(CultureInfo.InvariantCulture)}{closeParenthesisL2}",
                                         false);
 
                                     expr4 = expr6 == expr4
@@ -231,19 +232,17 @@ namespace IX.Math.Computation.InitialExpressionParsers
                                             expr4.Length - expr6.Length);
 
                                     resultingSubExpression = resultingSubExpression.Replace(
-                                        $"item{(symbolTableL2.Count - 1).ToString()}",
-                                        $"item{symbolTableL2.Count.ToString()}");
+                                        $"item{(symbolTableL2.Count - 1).ToString(CultureInfo.InvariantCulture)}",
+                                        $"item{symbolTableL2.Count.ToString(CultureInfo.InvariantCulture)}");
                                 }
 
                                 src = $"{expr4}{resultingSubExpression}";
                             }
 
-                            openingParanthesisLocation = src.IndexOf(
-                                openParenthesisL2,
-                                StringComparison.Ordinal);
-                            closingParanthesisLocation = src.IndexOf(
-                                closeParenthesisL2,
-                                StringComparison.Ordinal);
+                            openingParanthesisLocation = src.InvariantCultureIndexOf(
+                                openParenthesisL2);
+                            closingParanthesisLocation = src.InvariantCultureIndexOf(
+                                closeParenthesisL2);
 
                             goto beginning;
                         }

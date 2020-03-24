@@ -3,10 +3,10 @@
 
   <!-- Build configuration -->
   <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net452;net461;net471;netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net452;net46;net47;net472;netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
-    <TargetFrameworks>netstandard1.3;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -20,13 +20,13 @@
   </PropertyGroup>
 
   <!-- References -->
-  <ItemGroup Condition="'$(TargetFramework)'=='net452' OR '$(TargetFramework)'=='net461' OR '$(TargetFramework)'=='netstandard1.3'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net452' OR '$(TargetFramework)'=='net46'">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.Abstractions.Collections" Version="[0.5.1.1,0.5.2)" />
-    <PackageReference Include="IX.StandardExtensions" Version="[0.5.1.1,0.5.2)" />
+    <PackageReference Include="IX.Abstractions.Collections" Version="[0.5.3,0.6)" />
+    <PackageReference Include="IX.StandardExtensions" Version="[0.5.3,0.6)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">
@@ -35,25 +35,8 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFrameworkIsStandard)'=='true'">
-    <PackageReference Include="System.Collections" Version="[4.3.0,5)" />
-    <PackageReference Include="System.Collections.Concurrent" Version="[4.3.0,5)" />
-    <PackageReference Include="System.Diagnostics.Debug" Version="[4.3.0,5)" />
-    <PackageReference Include="System.Diagnostics.Tools" Version="[4.3.0,5)" />
-    <PackageReference Include="System.Globalization" Version="[4.3.0,5)" />
-    <PackageReference Include="System.Linq" Version="[4.3.0,5)" />
-    <PackageReference Include="System.Linq.Expressions" Version="[4.3.0,5)" />
-    <PackageReference Include="System.Reflection.Extensions" Version="[4.3.0,5)" />
-    <PackageReference Include="System.Resources.ResourceManager" Version="[4.3.0,5)" />
-    <PackageReference Include="System.Runtime" Version="[4.3.1,5)" />
-    <PackageReference Include="System.Runtime.Extensions" Version="[4.3.1,5)" />
-    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="[4.3.0,5)" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="[4.3.1,5)" />
-    <PackageReference Include="System.Threading" Version="[4.3.0,5)" />
-  </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)'!='netstandard2.1'">
-    <PackageReference Include="System.Memory" Version="[4.5.0,5)" />
+    <PackageReference Include="System.Memory" Version="[4.5.3,5)" />
   </ItemGroup>
 
   <ItemGroup>

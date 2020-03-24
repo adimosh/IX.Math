@@ -9,11 +9,13 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
+using IX.Math.Extensibility;
 using IX.Math.Formatters;
 using IX.Math.Nodes;
 using IX.Math.Registration;
 using IX.StandardExtensions;
 using IX.StandardExtensions.ComponentModel;
+using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -25,20 +27,29 @@ namespace IX.Math
     public sealed class ComputedExpression : DisposableBase, IDeepCloneable<ComputedExpression>
     {
         private readonly IParameterRegistry parametersRegistry;
+        private readonly List<IStringFormatter> stringFormatters;
+        private readonly Func<Type, object> specialObjectRequestFunc;
 
-        private readonly string defaultStringFormat;
         private readonly string initialExpression;
         private NodeBase body;
 
-        internal ComputedExpression(string initialExpression, NodeBase body, bool isRecognized, IParameterRegistry parameterRegistry, string defaultStringFormat)
+        internal ComputedExpression(
+            string initialExpression,
+            NodeBase body,
+            bool isRecognized,
+            IParameterRegistry parameterRegistry,
+            List<IStringFormatter> stringFormatters,
+            Func<Type, object> specialObjectRequestFunc)
         {
             this.parametersRegistry = parameterRegistry;
+            this.stringFormatters = stringFormatters;
+            this.specialObjectRequestFunc = specialObjectRequestFunc;
 
             this.initialExpression = initialExpression;
             this.body = body;
             this.RecognizedCorrectly = isRecognized;
             this.IsConstant = body?.IsConstant ?? false;
-            this.defaultStringFormat = string.IsNullOrWhiteSpace(defaultStringFormat) ? defaultStringFormat : null;
+            this.IsTolerant = body?.IsTolerant ?? false;
         }
 
         /// <summary>
@@ -54,15 +65,53 @@ namespace IX.Math
         public bool IsConstant { get; }
 
         /// <summary>
+        /// Gets a value indicating whether this computed expression can have tolerance.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this expression is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsTolerant { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this computed expression is compiled.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this expression is compiled; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsCompiled { get; private set; }
+
+        /// <summary>
         /// Gets a value indicating whether or not the expression has undefined parameters.
         /// </summary>
         /// <value><see langword="true"/> if the expression has undefined parameters, <see langword="false"/> otherwise.</value>
         public bool HasUndefinedParameters => this.parametersRegistry.Dump().Any(p => p.ReturnType == SupportedValueType.Unknown);
 
         /// <summary>
+        /// Gets the names of the parameters this expression requires, if any. This property is obsolete and should not be used anymore.
+        /// </summary>
+        /// <remarks>
+        /// <para>This property is obsolete and will be removed in a future version of the library.</para>
+        /// <para>The method <see cref="GetParameterNames"/> instead.</para>
+        /// </remarks>
+        [Obsolete("Please use the GetParameterNames method instead.")]
+        [SuppressMessage(
+            "Performance",
+            "CA1819:Properties should not return arrays",
+            Justification = "This is obsolete and will be removed soon.")]
+        [SuppressMessage(
+            "Naming",
+            "CA1721:Property names should not match get methods",
+            Justification = "This is obsolete and will be removed soon.")]
+        public string[] ParameterNames => this.GetParameterNames();
+
+        /// <summary>
         /// Gets the names of the parameters this expression requires, if any.
         /// </summary>
-        public string[] ParameterNames => this.parametersRegistry.Dump().Select(p => p.Name).ToArray();
+        /// <returns>An array of required parameter names.</returns>
+        public string[] GetParameterNames() =>
+            this.parametersRegistry.Dump()
+                .Select(p => p.Name)
+                .ToArray();
 
         /// <summary>
         /// Computes the expression and returns a result.
@@ -87,7 +136,7 @@ namespace IX.Math
         [SuppressMessage("Performance", "HAA0301:Closure Allocation Source", Justification = "Unavoidable for now.")]
         public object Compute(Tolerance tolerance, params object[] arguments)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             if (!this.RecognizedCorrectly)
             {
@@ -267,7 +316,7 @@ namespace IX.Math
                                 case SupportedValueType.String:
                                     paramValue = CreateValue(
                                         paraContext,
-                                        this.defaultStringFormat == null ? convertedParam.ToString() : convertedParam.ToString(this.defaultStringFormat));
+                                        StringFormatter.FormatIntoString(convertedParam, this.stringFormatters));
 
                                     break;
 
@@ -307,14 +356,9 @@ namespace IX.Math
                                     break;
 
                                 case SupportedValueType.String:
-#pragma warning disable SA1118 // Parameter should not span multiple lines
                                     paramValue = CreateValue(
                                         paraContext,
-                                        this.defaultStringFormat == null ?
-                                            convertedParam.ToString(CultureInfo.CurrentCulture) :
-                                            convertedParam.ToString(this.defaultStringFormat));
-#pragma warning restore SA1118 // Parameter should not span multiple lines
-
+                                        StringFormatter.FormatIntoString(convertedParam, this.stringFormatters));
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -339,7 +383,9 @@ namespace IX.Math
                                     return null;
 
                                 case SupportedValueType.String:
-                                    paramValue = CreateValue(paraContext, convertedParam.ToString());
+                                    paramValue = CreateValue(
+                                        paraContext,
+                                        StringFormatter.FormatIntoString(convertedParam, this.stringFormatters));
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -436,7 +482,9 @@ namespace IX.Math
                                     break;
 
                                 case SupportedValueType.String:
-                                    paramValue = CreateValue(paraContext, BitConverter.ToString(convertedParam));
+                                    paramValue = CreateValue(
+                                        paraContext,
+                                        StringFormatter.FormatIntoString(convertedParam, this.stringFormatters));
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -476,7 +524,7 @@ namespace IX.Math
                                     break;
 
                                 case SupportedValueType.String:
-                                    paramValue = this.defaultStringFormat == null ? CreateValueFromFunc(paraContext, () => convertedParam().ToString()) : CreateValueFromFunc(paraContext, () => convertedParam().ToString(this.defaultStringFormat));
+                                    paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam(), this.stringFormatters));
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -517,9 +565,7 @@ namespace IX.Math
                                     break;
 
                                 case SupportedValueType.String:
-                                    paramValue = this.defaultStringFormat == null ?
-                                        CreateValueFromFunc(paraContext, () => convertedParam().ToString(CultureInfo.CurrentCulture)) :
-                                        CreateValueFromFunc(paraContext, () => convertedParam().ToString(this.defaultStringFormat));
+                                    paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam(), this.stringFormatters));
 
                                     break;
 
@@ -547,7 +593,7 @@ namespace IX.Math
                                     return null;
 
                                 case SupportedValueType.String:
-                                    paramValue = CreateValueFromFunc(paraContext, () => convertedParam().ToString());
+                                    paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam(), this.stringFormatters));
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -577,14 +623,14 @@ namespace IX.Math
                                             paramValue = CreateValueFromFunc(paraContext, () => ParsingFormatter.ParseNumeric(
                                                 convertedParam(),
                                                 out var numericResult)
-                                                ? Convert.ToDouble(numericResult)
+                                                ? Convert.ToDouble(numericResult, CultureInfo.CurrentCulture)
                                                 : throw new ArgumentInvalidTypeException(paraContext.Name));
                                             break;
                                         case false:
                                             paramValue = CreateValueFromFunc(paraContext, () => ParsingFormatter.ParseNumeric(
                                                 convertedParam(),
                                                 out var numericResult)
-                                                ? Convert.ToInt64(numericResult)
+                                                ? Convert.ToInt64(numericResult, CultureInfo.CurrentCulture)
                                                 : throw new ArgumentInvalidTypeException(paraContext.Name));
                                             break;
                                         default:
@@ -635,7 +681,7 @@ namespace IX.Math
                                     break;
 
                                 case SupportedValueType.String:
-                                    paramValue = CreateValueFromFunc(paraContext, () => BitConverter.ToString(convertedParam()));
+                                    paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam(), this.stringFormatters));
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -739,7 +785,7 @@ namespace IX.Math
         /// </returns>
         public object Compute([CanBeNull] Tolerance tolerance, IDataFinder dataFinder)
         {
-            this.ThrowIfCurrentObjectDisposed();
+            this.RequiresNotDisposed();
 
             if (!this.RecognizedCorrectly)
             {
@@ -747,6 +793,10 @@ namespace IX.Math
             }
 
             var pars = new List<object>();
+
+            Contract.RequiresNotNull(
+                in dataFinder,
+                nameof(dataFinder));
 
             foreach (ParameterContext p in this.parametersRegistry.Dump())
             {
@@ -767,10 +817,10 @@ namespace IX.Math
         /// <returns>A deep clone.</returns>
         public ComputedExpression DeepClone()
         {
-            var registry = new StandardParameterRegistry();
-            var context = new NodeCloningContext { ParameterRegistry = registry };
+            var registry = new StandardParameterRegistry(this.stringFormatters);
+            var context = new NodeCloningContext { ParameterRegistry = registry, SpecialRequestFunction = this.specialObjectRequestFunc};
 
-            return new ComputedExpression(this.initialExpression, this.body.DeepClone(context), this.RecognizedCorrectly, registry, this.defaultStringFormat);
+            return new ComputedExpression(this.initialExpression, this.body.DeepClone(context), this.RecognizedCorrectly, registry, this.stringFormatters, this.specialObjectRequestFunc);
         }
 
         /// <summary>

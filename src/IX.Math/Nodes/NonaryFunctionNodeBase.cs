@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.StandardExtensions.Extensions;
@@ -17,6 +18,22 @@ namespace IX.Math.Nodes
     [PublicAPI]
     public abstract class NonaryFunctionNodeBase : FunctionNodeBase
     {
+        /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant => false;
+
+        /// <summary>
+        /// Sets the special object request function for sub objects.
+        /// </summary>
+        /// <param name="func">The function.</param>
+        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
+        {
+        }
+
         /// <summary>
         /// Generates a static function call for a function with no parameters.
         /// </summary>
@@ -38,17 +55,13 @@ namespace IX.Math.Nodes
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
-                throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
             }
 
             MethodInfo mi = t.GetMethodWithExactParameters(
                 functionName,
-#if STANDARD2
-                Array.Empty<Type>())
-#else
-                new Type[0])
-#endif
-                ?? throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                Type.EmptyTypes)
+                ?? throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
 
             return Expression.Call(mi);
         }

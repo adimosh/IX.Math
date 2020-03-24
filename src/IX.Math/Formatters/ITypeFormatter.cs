@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using JetBrains.Annotations;
 
 namespace IX.Math.Formatters
@@ -10,6 +11,7 @@ namespace IX.Math.Formatters
     /// A service contract for a class that is able to format data types.
     /// </summary>
     [PublicAPI]
+    [Obsolete("This has been moved to the IX.Math.Extensibility namespace, please use the interface IStringFormatter there. This interface is not used anymore.")]
     public interface ITypeFormatter
     {
         /// <summary>

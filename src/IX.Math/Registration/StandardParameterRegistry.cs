@@ -3,33 +3,26 @@
 // </copyright>
 
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using IX.Math.Extensibility;
+using IX.StandardExtensions.Efficiency;
 
 namespace IX.Math.Registration
 {
     internal class StandardParameterRegistry : IParameterRegistry
     {
         private readonly ConcurrentDictionary<string, ParameterContext> parameterContexts;
-#if DEBUG
-        private readonly int id;
-        private static int staticId;
-#endif
+        private readonly List<IStringFormatter> stringFormatters;
 
-        public StandardParameterRegistry()
+        public StandardParameterRegistry(List<IStringFormatter> stringFormatters)
         {
-#if DEBUG
-            this.id = NewId();
-#endif
-
             this.parameterContexts = new ConcurrentDictionary<string, ParameterContext>();
+            this.stringFormatters = stringFormatters;
         }
 
         public bool Populated => this.parameterContexts.Count > 0;
-
-#if DEBUG
-        public static int NewId() => ++staticId;
-#endif
 
         public ParameterContext AdvertiseParameter(string name)
         {
@@ -38,7 +31,7 @@ namespace IX.Math.Registration
                 throw new ArgumentNullException(nameof(name));
             }
 
-            return this.parameterContexts.GetOrAdd(name, (nameL1) => new ParameterContext(nameL1));
+            return this.parameterContexts.GetOrAdd(name, (nameL1, formattersL1) => new ParameterContext(nameL1, formattersL1), this.stringFormatters);
         }
 
         public ParameterContext CloneFrom(ParameterContext previousContext)
@@ -55,19 +48,15 @@ namespace IX.Math.Registration
                 {
                     return existingValue;
                 }
-                else
-                {
-                    throw new InvalidOperationException(string.Format(Resources.ParameterAlreadyAdvertised, name));
-                }
-            }
-            else
-            {
-                ParameterContext newContext = previousContext.DeepClone();
 
-                this.parameterContexts.TryAdd(name, newContext);
-
-                return newContext;
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterAlreadyAdvertised, name));
             }
+
+            ParameterContext newContext = previousContext.DeepClone();
+
+            this.parameterContexts.TryAdd(name, newContext);
+
+            return newContext;
         }
 
         public ParameterContext[] Dump() => this.parameterContexts.ToArray().Select(p => p.Value).OrderBy(p => p.Order).ToArray();

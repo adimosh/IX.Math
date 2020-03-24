@@ -3,9 +3,13 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Math.Extensibility;
+using IX.Math.Formatters;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Extensions;
 
@@ -14,9 +18,9 @@ namespace IX.Math.Nodes.Operations.Binary
     /// <summary>
     ///     A node representing an addition operation.
     /// </summary>
-    /// <seealso cref="BinaryOperationNodeBase" />
+    /// <seealso cref="BinaryOperatorNodeBase" />
     [DebuggerDisplay("{" + nameof(Left) + "} + {" + nameof(Right) + "}")]
-    internal sealed class AddNode : BinaryOperationNodeBase
+    internal sealed class AddNode : BinaryOperatorNodeBase
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="AddNode" /> class.
@@ -126,27 +130,82 @@ namespace IX.Math.Nodes.Operations.Binary
                 return this;
             }
 
-            return this.Left switch
+            switch (this.Left)
             {
-                NumericNode nn1Left when this.Right is NumericNode nn1Right => NumericNode.Add(
-                    nn1Left,
-                    nn1Right),
-                StringNode sn1Left when this.Right is StringNode sn1Right => new StringNode(
-                    sn1Left.Value + sn1Right.Value),
-                NumericNode nn2Left when this.Right is StringNode sn2Right => new StringNode(
-                    $"{nn2Left.Value}{sn2Right.Value}"),
-                StringNode sn3Left when this.Right is NumericNode nn3Right => new StringNode(
-                    $"{sn3Left.Value}{nn3Right.Value}"),
-                BoolNode bn4Left when this.Right is StringNode sn4Right => new StringNode(
-                    $"{bn4Left.Value.ToString()}{sn4Right.Value}"),
-                StringNode sn5Left when this.Right is BoolNode bn5Right => new StringNode(
-                    $"{sn5Left.Value}{bn5Right.Value.ToString()}"),
-                ByteArrayNode ban5Left when this.Right is ByteArrayNode ban5Right => new ByteArrayNode(
-                    Stitch(
-                        ban5Left.Value,
-                        ban5Right.Value)),
-                _ => this
-            };
+                case NumericNode nn1Left when this.Right is NumericNode nn1Right:
+                    return NumericNode.Add(
+                        nn1Left,
+                        nn1Right);
+                case StringNode sn1Left when this.Right is StringNode sn1Right:
+                    return new StringNode(sn1Left.Value + sn1Right.Value);
+                case NumericNode nn2Left when this.Right is StringNode sn2Right:
+                {
+                    string stringValue;
+                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                    {
+                        stringValue = nn2Left.Value.ToString();
+                    }
+                    else
+                    {
+                        stringValue = StringFormatter.FormatIntoString(nn2Left.Value, formatters);
+                    }
+
+                    return new StringNode($"{stringValue}{sn2Right.Value}");
+                }
+
+                case StringNode sn3Left when this.Right is NumericNode nn3Right:
+                {
+                    string stringValue;
+                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                    {
+                        stringValue = nn3Right.Value.ToString();
+                    }
+                    else
+                    {
+                        stringValue = StringFormatter.FormatIntoString(nn3Right.Value, formatters);
+                    }
+
+                    return new StringNode($"{sn3Left.Value}{stringValue}");
+                }
+
+                case BoolNode bn4Left when this.Right is StringNode sn4Right:
+                {
+                    string stringValue;
+                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                    {
+                        stringValue = bn4Left.Value.ToString(CultureInfo.CurrentCulture);
+                    }
+                    else
+                    {
+                        stringValue = StringFormatter.FormatIntoString(bn4Left.Value, formatters);
+                    }
+
+                    return new StringNode($"{stringValue}{sn4Right.Value}");
+                }
+
+                case StringNode sn5Left when this.Right is BoolNode bn5Right:
+                {
+                    string stringValue;
+                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                    {
+                        stringValue = bn5Right.Value.ToString(CultureInfo.CurrentCulture);
+                    }
+                    else
+                    {
+                        stringValue = StringFormatter.FormatIntoString(bn5Right.Value, formatters);
+                    }
+
+                    return new StringNode($"{sn5Left.Value}{stringValue}");
+                }
+
+                case ByteArrayNode ban5Left when this.Right is ByteArrayNode ban5Right:
+                    return new ByteArrayNode(
+                        Stitch(
+                            ban5Left.Value,
+                            ban5Right.Value));
+                default:
+                    return this;
+            }
         }
 
         /// <summary>
@@ -154,8 +213,7 @@ namespace IX.Math.Nodes.Operations.Binary
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) =>
-            new AddNode(
+        public override NodeBase DeepClone(NodeCloningContext context) => new AddNode(
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
 

@@ -3,6 +3,8 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
+using IX.Math.Extensibility;
 
 namespace IX.Math.Nodes
 {
@@ -24,32 +26,78 @@ namespace IX.Math.Nodes
         /// or
         /// <paramref name="thirdParameter" />
         /// is <see langword="null"/> (<see langword="Nothing"/> in Visual Basic).</exception>
-        protected TernaryFunctionNodeBase(NodeBase firstParameter, NodeBase secondParameter, NodeBase thirdParameter)
+        [SuppressMessage(
+            "Usage",
+            "CA2214:Do not call overridable methods in constructors",
+            Justification = "We specifically want this to happen.")]
+        [SuppressMessage(
+            "ReSharper",
+            "VirtualMemberCallInConstructor",
+            Justification = "We specifically want this to happen.")]
+        protected TernaryFunctionNodeBase(
+            NodeBase firstParameter,
+            NodeBase secondParameter,
+            NodeBase thirdParameter)
         {
-            this.FirstParameter = firstParameter ?? throw new ArgumentNullException(nameof(firstParameter));
-            this.SecondParameter = secondParameter ?? throw new ArgumentNullException(nameof(secondParameter));
-            this.ThirdParameter = thirdParameter ?? throw new ArgumentNullException(nameof(thirdParameter));
+            NodeBase firstParameterTemp = firstParameter ?? throw new ArgumentNullException(nameof(firstParameter));
+            NodeBase secondParameterTemp = secondParameter ?? throw new ArgumentNullException(nameof(secondParameter));
+            NodeBase thirdParameterTemp = thirdParameter ?? throw new ArgumentNullException(nameof(thirdParameter));
 
             this.EnsureCompatibleParameters(firstParameter, secondParameter, thirdParameter);
+
+            this.FirstParameter = firstParameterTemp.Simplify();
+            this.SecondParameter = secondParameterTemp.Simplify();
+            this.ThirdParameter = thirdParameterTemp.Simplify();
         }
 
         /// <summary>
-        /// Gets or sets the first parameter.
+        /// Gets the first parameter.
         /// </summary>
         /// <value>The first parameter.</value>
-        public NodeBase FirstParameter { get; protected set; }
+        public NodeBase FirstParameter { get; }
 
         /// <summary>
-        /// Gets or sets the second parameter.
+        /// Gets the second parameter.
         /// </summary>
         /// <value>The second parameter.</value>
-        public NodeBase SecondParameter { get; protected set; }
+        public NodeBase SecondParameter { get; }
 
         /// <summary>
-        /// Gets or sets the third parameter.
+        /// Gets the third parameter.
         /// </summary>
         /// <value>The third parameter.</value>
-        public NodeBase ThirdParameter { get; protected set; }
+        public NodeBase ThirdParameter { get; }
+
+        /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant =>
+            this.FirstParameter.IsTolerant || this.SecondParameter.IsTolerant || this.ThirdParameter.IsTolerant;
+
+        /// <summary>
+        /// Sets the special object request function for sub objects.
+        /// </summary>
+        /// <param name="func">The function.</param>
+        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
+        {
+            if (this.FirstParameter is ISpecialRequestNode srnl)
+            {
+                srnl.SetRequestSpecialObjectFunction(func);
+            }
+
+            if (this.SecondParameter is ISpecialRequestNode srnr)
+            {
+                srnr.SetRequestSpecialObjectFunction(func);
+            }
+
+            if (this.ThirdParameter is ISpecialRequestNode trnr)
+            {
+                trnr.SetRequestSpecialObjectFunction(func);
+            }
+        }
 
         /// <summary>
         /// Ensures the parameters are compatible for this node.

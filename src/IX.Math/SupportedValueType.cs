@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -10,6 +11,10 @@ namespace IX.Math
     ///     An enumeration of supported value types.
     /// </summary>
     [PublicAPI]
+    [SuppressMessage(
+        "Naming",
+        "CA1720:Identifier contains type name",
+        Justification = "This is OK, we're actually referring to string.")]
     public enum SupportedValueType
     {
         /// <summary>
@@ -33,7 +38,7 @@ namespace IX.Math
         String = 4,
 
         /// <summary>
-        ///     Byte array (pass as <see cref="T:byte[]" />).
+        ///     Byte array (pass as array of <see cref="byte" />).
         /// </summary>
         ByteArray = 8,
     }

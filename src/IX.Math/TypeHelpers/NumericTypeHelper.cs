@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace IX.Math.TypeHelpers
 {
@@ -65,7 +66,7 @@ namespace IX.Math.TypeHelpers
                         return d;
                     }
 
-                    return Convert.ToInt64(value);
+                    return Convert.ToInt64(value, CultureInfo.CurrentCulture);
                 }
 
                 default:
