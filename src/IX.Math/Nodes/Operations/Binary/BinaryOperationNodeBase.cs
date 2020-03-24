@@ -44,6 +44,14 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant => this.Left.IsTolerant || this.Right.IsTolerant;
+
+        /// <summary>
         /// Gets the left operand.
         /// </summary>
         /// <value>

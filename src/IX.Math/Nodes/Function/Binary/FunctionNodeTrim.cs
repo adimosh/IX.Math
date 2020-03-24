@@ -126,7 +126,7 @@ namespace IX.Math.Nodes.Function.Binary
         {
             MethodInfo mia = typeof(string).GetMethodWithExactParameters(
                 nameof(string.ToCharArray),
-                new Type[0]);
+                Type.EmptyTypes);
 
             if (mia == null)
             {

@@ -41,6 +41,7 @@ namespace IX.Math
             this.body = body;
             this.RecognizedCorrectly = isRecognized;
             this.IsConstant = body?.IsConstant ?? false;
+            this.IsTolerant = body?.IsTolerant ?? false;
         }
 
         /// <summary>
@@ -54,6 +55,22 @@ namespace IX.Math
         /// </summary>
         /// <value><see langword="true"/> if the expression is constant, <see langword="false"/> otherwise.</value>
         public bool IsConstant { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this computed expression can have tolerance.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this expression is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsTolerant { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this computed expression is compiled.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this expression is compiled; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsCompiled { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether or not the expression has undefined parameters.

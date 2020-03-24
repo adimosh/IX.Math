@@ -14,7 +14,15 @@ namespace IX.Math.Nodes.Operations.Unary
             this.Operand = operand ?? throw new ArgumentNullException(nameof(operand));
         }
 
+        /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant => this.Operand.IsTolerant;
+
         [NotNull]
-        public NodeBase Operand { get; private set; }
+        protected NodeBase Operand { get; }
     }
 }

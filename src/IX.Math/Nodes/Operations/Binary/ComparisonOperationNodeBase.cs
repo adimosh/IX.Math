@@ -37,6 +37,14 @@ namespace IX.Math.Nodes.Operations.Binary
         /// </value>
         public override SupportedValueType ReturnType => SupportedValueType.Boolean;
 
+        /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant => true;
+
         private static void DetermineChildren(
             NodeBase parameter,
             NodeBase other)

@@ -45,6 +45,14 @@ namespace IX.Math.Nodes
         public NodeBase Parameter { get; private set; }
 
         /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant => this.Parameter.IsTolerant;
+
+        /// <summary>
         ///     Ensures that the parameter that is received is compatible with the function, optionally allowing the parameter
         ///     reference to change.
         /// </summary>
@@ -155,6 +163,7 @@ namespace IX.Math.Nodes
                                  parameterType) ??
                              throw new ArgumentException(
                                  string.Format(
+                                     CultureInfo.CurrentCulture,
                                      Resources.FunctionCouldNotBeFound,
                                      functionName),
                                  nameof(functionName));
@@ -208,6 +217,7 @@ namespace IX.Math.Nodes
             {
                 throw new ArgumentException(
                     string.Format(
+                        CultureInfo.CurrentCulture,
                         Resources.FunctionCouldNotBeFound,
                         propertyName),
                     nameof(propertyName));
@@ -216,6 +226,7 @@ namespace IX.Math.Nodes
             PropertyInfo pi = typeof(T).GetRuntimeProperty(propertyName) ??
                               throw new ArgumentException(
                                   string.Format(
+                                      CultureInfo.CurrentCulture,
                                       Resources.FunctionCouldNotBeFound,
                                       propertyName),
                                   nameof(propertyName));

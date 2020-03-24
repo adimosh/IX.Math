@@ -19,6 +19,14 @@ namespace IX.Math.Nodes
     public abstract class NonaryFunctionNodeBase : FunctionNodeBase
     {
         /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant => false;
+
+        /// <summary>
         /// Generates a static function call for a function with no parameters.
         /// </summary>
         /// <typeparam name="T">The type to call the function on.</typeparam>

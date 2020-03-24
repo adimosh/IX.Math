@@ -44,6 +44,14 @@ namespace IX.Math.Nodes
         public string Name { get; }
 
         /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant => false;
+
+        /// <summary>
         /// Gets the return type of this node.
         /// </summary>
         /// <value>The node return type.</value>

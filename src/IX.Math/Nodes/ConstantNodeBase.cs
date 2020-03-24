@@ -3,7 +3,6 @@
 // </copyright>
 
 using JetBrains.Annotations;
-using NotImplementedException = System.NotImplementedException;
 
 namespace IX.Math.Nodes
 {
@@ -17,7 +16,7 @@ namespace IX.Math.Nodes
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstantNodeBase"/> class.
         /// </summary>
-        private protected ConstantNodeBase()
+        protected private ConstantNodeBase()
         {
         }
 
@@ -26,6 +25,14 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <value><see langword="true"/> if the node is a constant, <see langword="false"/> otherwise.</value>
         public sealed override bool IsConstant => true;
+
+        /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
+        /// </value>
+        public override bool IsTolerant => false;
 
         /// <summary>
         /// Distills the value into a usable constant.
