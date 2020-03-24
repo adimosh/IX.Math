@@ -16,6 +16,13 @@ namespace IX.Math.Nodes
     public abstract class NodeBase : IContextAwareDeepCloneable<NodeCloningContext, NodeBase>
     {
         /// <summary>
+        /// Prevents a default instance of the <see cref="NodeBase"/> class from being created.
+        /// </summary>
+        protected private NodeBase()
+        {
+        }
+
+        /// <summary>
         ///     Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>

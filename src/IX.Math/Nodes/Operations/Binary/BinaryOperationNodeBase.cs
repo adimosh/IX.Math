@@ -18,17 +18,11 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryOperationNodeBase"/> class.
         /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
-        /// <exception cref="ArgumentNullException">
-        /// left
-        /// or
-        /// right
-        /// is <c>null</c> (<c>Nothing</c> in Visual Basic).
-        /// </exception>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
         [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor", Justification = "We specifically want this to happen.")]
         [SuppressMessage("Usage", "CA2214:Do not call overridable methods in constructors", Justification = "We specifically want this to happen.")]
-        protected BinaryOperationNodeBase(NodeBase left, NodeBase right)
+        protected private BinaryOperationNodeBase(NodeBase left, NodeBase right)
         {
             Contract.RequiresNotNull(
                 in left,
@@ -66,6 +60,20 @@ namespace IX.Math.Nodes.Operations.Binary
         /// The right operand.
         /// </value>
         protected NodeBase Right { get; }
+
+        /// <summary>
+        ///     Creates a deep clone of the source object.
+        /// </summary>
+        /// <param name="context">The deep cloning context.</param>
+        /// <returns>A deep clone.</returns>
+        public new abstract NodeBase DeepClone(NodeCloningContext context);
+
+        /// <summary>
+        ///     Creates a deep clone of the source object.
+        /// </summary>
+        /// <param name="context">The deep cloning context.</param>
+        /// <returns>A deep clone.</returns>
+        protected override OperationNodeBase DeepCloneNode(NodeCloningContext context) => (OperationNodeBase)this.DeepClone(context);
 
         /// <summary>
         /// Ensures that the operands are compatible.
@@ -110,7 +118,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (this.Left.ReturnType == SupportedValueType.String || this.Right.ReturnType == SupportedValueType.String)
             {
-                return new Tuple<Expression, Expression>(this.Left.GenerateStringExpression(), this.Right.GenerateStringExpression());
+                return new Tuple<Expression, Expression>(this.Left.GenerateStringExpression(tolerance), this.Right.GenerateStringExpression(tolerance));
             }
 
             Expression le = this.Left.GenerateExpression(tolerance);

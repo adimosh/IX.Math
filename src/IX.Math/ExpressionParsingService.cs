@@ -109,7 +109,8 @@ namespace IX.Math
                     new StringNode(expression),
                     true,
                     new StandardParameterRegistry(this.stringFormatters),
-                    this.stringFormatters);
+                    this.stringFormatters,
+                    null);
             }
 
             bool ConstantPassThroughExtractorPredicate(Type cpteKey)
@@ -157,13 +158,15 @@ namespace IX.Math
                         null,
                         false,
                         null,
-                        this.stringFormatters)
+                        this.stringFormatters,
+                        null)
                     : new ComputedExpression(
                         expression,
                         node,
                         true,
                         parameterRegistry,
-                        this.stringFormatters);
+                        this.stringFormatters,
+                        workingSet.OfferReservedType);
 
                 Interlocked.MemoryBarrier();
             }

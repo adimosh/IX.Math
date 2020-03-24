@@ -21,6 +21,13 @@ namespace IX.Math.Nodes
         private Func<Type, object> specialObjectRequestFunction;
 
         /// <summary>
+        /// Prevents a default instance of the <see cref="OperationNodeBase"/> class from being created.
+        /// </summary>
+        protected private OperationNodeBase()
+        {
+        }
+
+        /// <summary>
         /// Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true"/> if the node is a constant, <see langword="false"/> otherwise.</value>
@@ -108,6 +115,25 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <param name="func">The function to set.</param>
         void ISpecialRequestNode.SetRequestSpecialObjectFunction(Func<Type, object> func) => this.specialObjectRequestFunction = func;
+
+        /// <summary>
+        ///     Creates a deep clone of the source object.
+        /// </summary>
+        /// <param name="context">The deep cloning context.</param>
+        /// <returns>A deep clone.</returns>
+        public sealed override NodeBase DeepClone(NodeCloningContext context)
+        {
+            var node = this.DeepCloneNode(context);
+            node.specialObjectRequestFunction = context.SpecialRequestFunction;
+            return node;
+        }
+
+        /// <summary>
+        ///     Creates a deep clone of the source object.
+        /// </summary>
+        /// <param name="context">The deep cloning context.</param>
+        /// <returns>A deep clone.</returns>
+        protected abstract OperationNodeBase DeepCloneNode(NodeCloningContext context);
 
         /// <summary>
         /// Generates the expression that will be compiled into code.

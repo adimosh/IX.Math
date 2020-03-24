@@ -28,14 +28,22 @@ namespace IX.Math
     {
         private readonly IParameterRegistry parametersRegistry;
         private readonly List<IStringFormatter> stringFormatters;
+        private readonly Func<Type, object> specialObjectRequestFunc;
 
         private readonly string initialExpression;
         private NodeBase body;
 
-        internal ComputedExpression(string initialExpression, NodeBase body, bool isRecognized, IParameterRegistry parameterRegistry, List<IStringFormatter> stringFormatters)
+        internal ComputedExpression(
+            string initialExpression,
+            NodeBase body,
+            bool isRecognized,
+            IParameterRegistry parameterRegistry,
+            List<IStringFormatter> stringFormatters,
+            Func<Type, object> specialObjectRequestFunc)
         {
             this.parametersRegistry = parameterRegistry;
             this.stringFormatters = stringFormatters;
+            this.specialObjectRequestFunc = specialObjectRequestFunc;
 
             this.initialExpression = initialExpression;
             this.body = body;
@@ -810,9 +818,9 @@ namespace IX.Math
         public ComputedExpression DeepClone()
         {
             var registry = new StandardParameterRegistry(this.stringFormatters);
-            var context = new NodeCloningContext { ParameterRegistry = registry };
+            var context = new NodeCloningContext { ParameterRegistry = registry, SpecialRequestFunction = this.specialObjectRequestFunc};
 
-            return new ComputedExpression(this.initialExpression, this.body.DeepClone(context), this.RecognizedCorrectly, registry, this.stringFormatters);
+            return new ComputedExpression(this.initialExpression, this.body.DeepClone(context), this.RecognizedCorrectly, registry, this.stringFormatters, this.specialObjectRequestFunc);
         }
 
         /// <summary>

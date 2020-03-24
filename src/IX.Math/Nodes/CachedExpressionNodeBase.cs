@@ -18,6 +18,13 @@ namespace IX.Math.Nodes
         private Expression generatedStringExpression;
 
         /// <summary>
+        /// Prevents a default instance of the <see cref="CachedExpressionNodeBase"/> class from being created.
+        /// </summary>
+        protected private CachedExpressionNodeBase()
+        {
+        }
+
+        /// <summary>
         ///     Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>The generated <see cref="Expression" />.</returns>
