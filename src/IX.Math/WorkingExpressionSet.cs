@@ -590,14 +590,9 @@ namespace IX.Math
                     definition.AddSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) =>
-                    {
-                        var value = new AddNode(
-                            leftOperand,
-                            rightOperand);
-                        ((ISpecialRequestNode)value).SetRequestSpecialObjectFunction(this.OfferReservedType);
-                        return value;
-                    },
+                        rightOperand) => new AddNode(
+                        leftOperand,
+                        rightOperand),
                     30
                 },
                 {

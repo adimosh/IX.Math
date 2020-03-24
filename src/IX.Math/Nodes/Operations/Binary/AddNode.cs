@@ -20,10 +20,8 @@ namespace IX.Math.Nodes.Operations.Binary
     /// </summary>
     /// <seealso cref="BinaryOperationNodeBase" />
     [DebuggerDisplay("{" + nameof(Left) + "} + {" + nameof(Right) + "}")]
-    internal sealed class AddNode : BinaryOperationNodeBase, ISpecialRequestNode
+    internal sealed class AddNode : BinaryOperationNodeBase
     {
-        private Func<Type, object> specialObjectRequestFunction;
-
         /// <summary>
         ///     Initializes a new instance of the <see cref="AddNode" /> class.
         /// </summary>
@@ -143,7 +141,7 @@ namespace IX.Math.Nodes.Operations.Binary
                 case NumericNode nn2Left when this.Right is StringNode sn2Right:
                 {
                     string stringValue;
-                    if (!(this.specialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
                     {
                         stringValue = nn2Left.Value.ToString();
                     }
@@ -158,7 +156,7 @@ namespace IX.Math.Nodes.Operations.Binary
                 case StringNode sn3Left when this.Right is NumericNode nn3Right:
                 {
                     string stringValue;
-                    if (!(this.specialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
                     {
                         stringValue = nn3Right.Value.ToString();
                     }
@@ -173,7 +171,7 @@ namespace IX.Math.Nodes.Operations.Binary
                 case BoolNode bn4Left when this.Right is StringNode sn4Right:
                 {
                     string stringValue;
-                    if (!(this.specialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
                     {
                         stringValue = bn4Left.Value.ToString(CultureInfo.CurrentCulture);
                     }
@@ -188,7 +186,7 @@ namespace IX.Math.Nodes.Operations.Binary
                 case StringNode sn5Left when this.Right is BoolNode bn5Right:
                 {
                     string stringValue;
-                    if (!(this.specialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
                     {
                         stringValue = bn5Right.Value.ToString(CultureInfo.CurrentCulture);
                     }
@@ -217,10 +215,7 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) => new AddNode(
                 this.Left.DeepClone(context),
-                this.Right.DeepClone(context))
-        {
-            specialObjectRequestFunction = context.SpecialRequestFunction
-        };
+                this.Right.DeepClone(context));
 
         /// <summary>
         ///     Strongly determines the node's type, if possible.
@@ -267,12 +262,6 @@ namespace IX.Math.Nodes.Operations.Binary
                 this.Left,
                 this.Right);
         }
-
-        /// <summary>
-        /// Sets the request special object function.
-        /// </summary>
-        /// <param name="func">The function to set.</param>
-        void ISpecialRequestNode.SetRequestSpecialObjectFunction(Func<Type, object> func) => this.specialObjectRequestFunction = func;
 
         /// <summary>
         ///     Ensures that the operands are compatible.

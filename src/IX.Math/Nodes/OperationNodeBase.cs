@@ -18,8 +18,6 @@ namespace IX.Math.Nodes
     [PublicAPI]
     public abstract class OperationNodeBase : CachedExpressionNodeBase, ISpecialRequestNode
     {
-        private Func<Type, object> specialObjectRequestFunction;
-
         /// <summary>
         /// Prevents a default instance of the <see cref="OperationNodeBase"/> class from being created.
         /// </summary>
@@ -32,6 +30,14 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <value><see langword="true"/> if the node is a constant, <see langword="false"/> otherwise.</value>
         public override bool IsConstant => false;
+
+        /// <summary>
+        /// Gets the special object request function.
+        /// </summary>
+        /// <value>
+        /// The special object request function.
+        /// </value>
+        protected Func<Type, object> SpecialObjectRequestFunction { get; private set; }
 
         /// <summary>
         /// Generates an expression that will be cached before being compiled.
@@ -82,7 +88,7 @@ namespace IX.Math.Nodes
                 return expression;
             }
 
-            var stringFormatters = this.specialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) as List<IStringFormatter>;
+            var stringFormatters = this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) as List<IStringFormatter>;
 
             return StringFormatter.CreateStringConversionExpression(
                 expression,
@@ -103,7 +109,7 @@ namespace IX.Math.Nodes
                 return expression;
             }
 
-            var stringFormatters = this.specialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) as List<IStringFormatter>;
+            var stringFormatters = this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) as List<IStringFormatter>;
 
             return StringFormatter.CreateStringConversionExpression(
                 expression,
@@ -114,7 +120,7 @@ namespace IX.Math.Nodes
         /// Sets the request special object function.
         /// </summary>
         /// <param name="func">The function to set.</param>
-        void ISpecialRequestNode.SetRequestSpecialObjectFunction(Func<Type, object> func) => this.specialObjectRequestFunction = func;
+        void ISpecialRequestNode.SetRequestSpecialObjectFunction(Func<Type, object> func) => this.SpecialObjectRequestFunction = func;
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -124,7 +130,7 @@ namespace IX.Math.Nodes
         public sealed override NodeBase DeepClone(NodeCloningContext context)
         {
             var node = this.DeepCloneNode(context);
-            node.specialObjectRequestFunction = context.SpecialRequestFunction;
+            node.SpecialObjectRequestFunction = context.SpecialRequestFunction;
             return node;
         }
 
