@@ -8,6 +8,10 @@ using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Unary
 {
+    /// <summary>
+    /// A base node for unary operators.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.OperationNodeBase" />
     internal abstract class UnaryOperatorNodeBase : OperationNodeBase
     {
         /// <summary>
