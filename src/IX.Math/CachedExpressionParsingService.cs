@@ -3,9 +3,7 @@
 // </copyright>
 
 using System;
-using System.Reflection;
 using System.Threading;
-using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Efficiency;
 using JetBrains.Annotations;
 using DiagCA = System.Diagnostics.CodeAnalysis;
@@ -13,7 +11,8 @@ using DiagCA = System.Diagnostics.CodeAnalysis;
 namespace IX.Math
 {
     /// <summary>
-    ///     A service that is able to parse strings containing mathematical expressions and solve them in a cached way.
+    ///     A service that is able to parse strings containing mathematical expressions and solve them in a cached way. This
+    ///     class cannot be inherited.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -21,27 +20,18 @@ namespace IX.Math
     ///         no use.
     ///     </para>
     /// </remarks>
+    /// <seealso cref="ExpressionParsingServiceBase" />
     [PublicAPI]
-    public class CachedExpressionParsingService : DisposableBase, IExpressionParsingService
+    public sealed class CachedExpressionParsingService : ExpressionParsingServiceBase
     {
         private ConcurrentDictionary<string, ComputedExpression> cachedComputedExpressions;
-
-        [DiagCA.SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP002:Dispose member.",
-            Justification = "It is properly disposed, but the analyzer can't tell this properly.")]
-        [DiagCA.SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP006:Implement IDisposable.",
-            Justification = "It is properly implemented, but the analyzer can't tell this properly.")]
-        private ExpressionParsingService eps;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="CachedExpressionParsingService" /> class.
         /// </summary>
         public CachedExpressionParsingService()
+            : base(MathDefinition.Default)
         {
-            this.eps = new ExpressionParsingService();
             this.cachedComputedExpressions = new ConcurrentDictionary<string, ComputedExpression>();
         }
 
@@ -50,9 +40,8 @@ namespace IX.Math
         /// </summary>
         /// <param name="definition">The math definition to use.</param>
         public CachedExpressionParsingService([NotNull] MathDefinition definition)
+            : base(definition)
         {
-            this.eps = new ExpressionParsingService(definition);
-
             this.cachedComputedExpressions = new ConcurrentDictionary<string, ComputedExpression>();
         }
 
@@ -78,7 +67,7 @@ namespace IX.Math
         ///         reinterpretation, but will execute without having to force undefined parameters into specific types.
         ///     </para>
         /// </remarks>
-        public ComputedExpression Interpret(
+        public override ComputedExpression Interpret(
             string expression,
             CancellationToken cancellationToken = default)
         {
@@ -86,10 +75,10 @@ namespace IX.Math
                 expression,
                 (
                     ex,
-                    st) => st.Item1.eps.Interpret(
+                    st) => st.Item1.Interpret(
                     ex,
                     st.Item2),
-                new Tuple<CachedExpressionParsingService, CancellationToken>(
+                new Tuple<ExpressionParsingServiceBase, CancellationToken>(
                     this,
                     cancellationToken));
 
@@ -102,24 +91,11 @@ namespace IX.Math
         }
 
         /// <summary>
-        ///     Registers an assembly to extract compatible functions from.
-        /// </summary>
-        /// <param name="assembly">The assembly to register.</param>
-        public void RegisterFunctionsAssembly(Assembly assembly) => this.eps.RegisterFunctionsAssembly(assembly);
-
-        /// <summary>
-        ///     Returns the prototypes of all registered functions.
-        /// </summary>
-        /// <returns>All function names, with all possible combinations of input and output data.</returns>
-        public string[] GetRegisteredFunctions() => this.eps.GetRegisteredFunctions();
-
-        /// <summary>
         ///     Disposes in the managed context.
         /// </summary>
         protected override void DisposeManagedContext()
         {
             this.cachedComputedExpressions.Clear();
-            this.eps.Dispose();
 
             base.DisposeManagedContext();
         }
@@ -127,7 +103,7 @@ namespace IX.Math
         /// <summary>
         ///     Disposes in the general (managed and unmanaged) context.
         /// </summary>
-        [DiagCA.SuppressMessage(
+        [DiagCA.SuppressMessageAttribute(
             "IDisposableAnalyzers.Correctness",
             "IDISP003:Dispose previous before re-assigning.",
             Justification = "It is disposed.")]
@@ -138,10 +114,6 @@ namespace IX.Math
             Interlocked.Exchange(
                 ref this.cachedComputedExpressions,
                 null);
-            Interlocked.Exchange(
-                    ref this.eps,
-                    null)
-                ?.Dispose();
         }
     }
 }
