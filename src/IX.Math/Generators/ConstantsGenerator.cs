@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using IX.Math.Extensibility;
 using IX.Math.Formatters;
 using IX.Math.Nodes;
@@ -23,14 +24,16 @@ namespace IX.Math.Generators
     public static class ConstantsGenerator
     {
         /// <summary>
-        ///     Generates a string constant.
+        /// Generates a string constant.
         /// </summary>
         /// <param name="constantsTable">The constants table.</param>
         /// <param name="reverseConstantsTable">The reverse constants table.</param>
         /// <param name="originalExpression">The original expression.</param>
         /// <param name="stringIndicator">The string indicator.</param>
         /// <param name="content">The content.</param>
-        /// <returns>The name of the new constant.</returns>
+        /// <returns>
+        /// The name of the new constant.
+        /// </returns>
         public static string GenerateStringConstant(
             [NotNull] IDictionary<string, ConstantNodeBase> constantsTable,
             [NotNull] IDictionary<string, string> reverseConstantsTable,
@@ -61,6 +64,8 @@ namespace IX.Math.Generators
                 return key;
             }
 
+            var stringIndicatorLength = stringIndicator.Length;
+
             var name = GenerateName(
                 constantsTable.Keys,
                 originalExpression);
@@ -68,8 +73,8 @@ namespace IX.Math.Generators
                 name,
                 new StringNode(
                     content.Substring(
-                        stringIndicator.Length,
-                        content.Length - stringIndicator.Length)));
+                        stringIndicatorLength,
+                        content.Length - stringIndicatorLength * 2)));
             reverseConstantsTable.Add(
                 content,
                 name);

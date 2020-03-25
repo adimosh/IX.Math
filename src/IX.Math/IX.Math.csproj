@@ -13,6 +13,10 @@
     <FailObsoleteTargetFrameworks>true</FailObsoleteTargetFrameworks>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)'!='netstandard2.1' AND '$(TargetFramework)'!='net452'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <!-- Package metadata -->
   <PropertyGroup>
     <Title>IX Mathematics</Title>
@@ -91,6 +95,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Obsolete\" />
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Threading;
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -31,5 +32,17 @@ namespace IX.Math
             : base(definition)
         {
         }
+
+        /// <summary>
+        ///     Interprets the mathematical expression and returns a container that can be invoked for solving using specific
+        ///     mathematical types.
+        /// </summary>
+        /// <param name="expression">The expression to interpret.</param>
+        /// <param name="cancellationToken">The cancellation token for this operation.</param>
+        /// <returns>A <see cref="ComputedExpression" /> that represents the interpreted expression.</returns>
+        public override ComputedExpression Interpret(
+            string expression,
+            CancellationToken cancellationToken = default) =>
+            this.InterpretInternal(expression, cancellationToken);
     }
 }

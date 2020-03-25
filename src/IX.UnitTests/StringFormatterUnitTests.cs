@@ -122,6 +122,28 @@ namespace IX.UnitTests
             Assert.Equal(expectedResult, Assert.IsType<long>(result));
         }
 
+        /// <summary>
+        /// Tests the string formatter according to the <see cref="FactAttribute"/> of this method.
+        /// </summary>
+        [Fact(DisplayName = "String formatter test with complex expression and escape")]
+        public void Test6()
+        {
+            // Arrange
+            using ExpressionParsingService eps = new ExpressionParsingService();
+            eps.RegisterTypeFormatter(new SillyStringFormatter());
+            int comparisonValue1 = DataGenerator.RandomNonNegativeInteger();
+            int comparisonValue2 = DataGenerator.RandomNonNegativeInteger();
+            string expression = $"\"The \\\"alabalaportocala\\\" number is \" + ({comparisonValue1} + {comparisonValue2})";
+            string expectedResult = $"The \\\"alabalaportocala\\\" number is 0x{comparisonValue1 + comparisonValue2:x8}";
+
+            // Act
+            using var computedExpression = eps.Interpret(expression);
+            var result = computedExpression.Compute();
+
+            // Assert
+            Assert.Equal(expectedResult, Assert.IsType<string>(result));
+        }
+
         private class SillyStringFormatter : IStringFormatter
         {
             public (bool Success, string ParsedData) ParseIntoString<T>(T data) => data switch

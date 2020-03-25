@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Threading;
 using IX.StandardExtensions.Efficiency;
 using JetBrains.Annotations;
@@ -75,12 +74,10 @@ namespace IX.Math
                 expression,
                 (
                     ex,
-                    st) => st.Item1.Interpret(
+                    st) => st.Reference.InterpretInternal(
                     ex,
-                    st.Item2),
-                new Tuple<ExpressionParsingServiceBase, CancellationToken>(
-                    this,
-                    cancellationToken));
+                    st.CancellationToken),
+                (Reference: this, CancellationToken: cancellationToken));
 
             if (!expr.RecognizedCorrectly || expr.IsConstant)
             {

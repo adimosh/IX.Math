@@ -71,6 +71,17 @@ namespace IX.Math
         /// </summary>
         /// <param name="expression">The expression to interpret.</param>
         /// <param name="cancellationToken">The cancellation token for this operation.</param>
+        /// <returns>A <see cref="ComputedExpression" /> that represents the interpreted expression.</returns>
+        public abstract ComputedExpression Interpret(
+            string expression,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        ///     Interprets the mathematical expression and returns a container that can be invoked for solving using specific
+        ///     mathematical types.
+        /// </summary>
+        /// <param name="expression">The expression to interpret.</param>
+        /// <param name="cancellationToken">The cancellation token for this operation.</param>
         /// <returns>
         ///     A <see cref="ComputedExpression" /> that represents a compilable form of the original expression, if the
         ///     expression itself makes sense.
@@ -84,7 +95,7 @@ namespace IX.Math
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "We're OK with this.")]
-        public virtual ComputedExpression Interpret(
+        protected ComputedExpression InterpretInternal(
             string expression,
             CancellationToken cancellationToken = default)
         {
