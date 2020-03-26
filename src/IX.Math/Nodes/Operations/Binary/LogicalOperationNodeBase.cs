@@ -4,15 +4,40 @@
 
 namespace IX.Math.Nodes.Operations.Binary
 {
+    /// <summary>
+    ///     A node base for logical operations.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.Operations.Binary.BinaryOperatorNodeBase" />
     internal abstract class LogicalOperationNodeBase : BinaryOperatorNodeBase
     {
-        protected LogicalOperationNodeBase(NodeBase left, NodeBase right)
-            : base(left, right)
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="LogicalOperationNodeBase" /> class.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        protected private LogicalOperationNodeBase(
+            NodeBase left,
+            NodeBase right)
+            : base(
+                left,
+                right)
         {
         }
 
+        /// <summary>
+        ///     Gets the return type of this node.
+        /// </summary>
+        /// <value>
+        ///     The node return type.
+        /// </value>
         public override SupportedValueType ReturnType => this.Left.ReturnType;
 
+        /// <summary>
+        ///     Determines the children.
+        /// </summary>
+        /// <param name="parameter">The parameter.</param>
+        /// <param name="other">The other.</param>
+        /// <exception cref="ExpressionNotValidLogicallyException">Undeterminable children.</exception>
         private static void DetermineChildren(
             NodeBase parameter,
             NodeBase other)
@@ -33,7 +58,7 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         /// <summary>
-        /// Strongly determines the node's type, if possible.
+        ///     Strongly determines the node's type, if possible.
         /// </summary>
         /// <param name="type">The type to determine to.</param>
         public override void DetermineStrongly(SupportedValueType type)
@@ -43,7 +68,9 @@ namespace IX.Math.Nodes.Operations.Binary
                 this.Left.DetermineStrongly(type);
                 this.Right.DetermineStrongly(type);
 
-                this.EnsureCompatibleOperands(this.Left, this.Right);
+                this.EnsureCompatibleOperands(
+                    this.Left,
+                    this.Right);
             }
             else
             {
@@ -52,7 +79,8 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         /// <summary>
-        /// Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible type left.
+        ///     Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible
+        ///     type left.
         /// </summary>
         /// <param name="type">The type or types to determine to.</param>
         public override void DetermineWeakly(SupportableValueType type)
@@ -65,18 +93,30 @@ namespace IX.Math.Nodes.Operations.Binary
             this.Left.DetermineWeakly(type);
             this.Right.DetermineWeakly(type);
 
-            this.EnsureCompatibleOperands(this.Left, this.Right);
+            this.EnsureCompatibleOperands(
+                this.Left,
+                this.Right);
         }
 
-        protected override void EnsureCompatibleOperands(NodeBase left, NodeBase right)
+        protected override void EnsureCompatibleOperands(
+            NodeBase left,
+            NodeBase right)
         {
             left.DetermineWeakly(SupportableValueType.Boolean | SupportableValueType.Numeric);
             right.DetermineWeakly(SupportableValueType.Boolean | SupportableValueType.Numeric);
 
-            DetermineChildren(left, right);
-            DetermineChildren(right, left);
-            DetermineChildren(left, right);
-            DetermineChildren(right, left);
+            DetermineChildren(
+                left,
+                right);
+            DetermineChildren(
+                right,
+                left);
+            DetermineChildren(
+                left,
+                right);
+            DetermineChildren(
+                right,
+                left);
         }
     }
 }

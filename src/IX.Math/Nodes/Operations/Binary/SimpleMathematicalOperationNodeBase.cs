@@ -6,13 +6,28 @@ using System.Linq.Expressions;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
+    /// <summary>
+    /// A node base for simple mathematical operations.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.Operations.Binary.BinaryOperatorNodeBase" />
     internal abstract class SimpleMathematicalOperationNodeBase : BinaryOperatorNodeBase
     {
-        protected SimpleMathematicalOperationNodeBase(NodeBase left, NodeBase right)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleMathematicalOperationNodeBase"/> class.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        protected private SimpleMathematicalOperationNodeBase(NodeBase left, NodeBase right)
             : base(left, right)
         {
         }
 
+        /// <summary>
+        /// Gets the return type of this node.
+        /// </summary>
+        /// <value>
+        /// The node return type.
+        /// </value>
         public override SupportedValueType ReturnType => SupportedValueType.Numeric;
 
         /// <summary>

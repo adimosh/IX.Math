@@ -50,6 +50,7 @@ namespace IX.Math
             this.SubtractSymbol = definition.SubtractSymbol;
             this.XorSymbol = definition.XorSymbol;
             this.AutoConvertStringFormatSpecifier = definition.AutoConvertStringFormatSpecifier;
+            this.EscapeCharacter = definition.EscapeCharacter;
             this.OperatorPrecedenceStyle = definition.OperatorPrecedenceStyle;
         }
 
@@ -86,7 +87,8 @@ namespace IX.Math
             LessThanSymbol = "<",
             RightShiftSymbol = ">>",
             LeftShiftSymbol = "<<",
-            OperatorPrecedenceStyle = OperatorPrecedenceStyle.Mathematical
+            OperatorPrecedenceStyle = OperatorPrecedenceStyle.Mathematical,
+            EscapeCharacter = "\\",
         };
 
         /// <summary>
@@ -246,6 +248,15 @@ namespace IX.Math
         public string AutoConvertStringFormatSpecifier { get; set; }
 
         /// <summary>
+        /// Gets or sets the escape character.
+        /// </summary>
+        /// <value>
+        /// The escape character.
+        /// </value>
+        [DataMember]
+        public string EscapeCharacter { get; set; }
+
+        /// <summary>
         /// Gets or sets the operator precedence style. Default is mathematical.
         /// </summary>
         /// <value>The operator precedence style.</value>
@@ -291,6 +302,7 @@ namespace IX.Math
                 SubtractSymbol = this.SubtractSymbol,
                 XorSymbol = this.XorSymbol,
                 AutoConvertStringFormatSpecifier = this.AutoConvertStringFormatSpecifier,
+                EscapeCharacter = this.EscapeCharacter,
                 OperatorPrecedenceStyle = this.OperatorPrecedenceStyle
             };
     }

@@ -4,13 +4,28 @@
 
 namespace IX.Math.Nodes.Operations.Binary
 {
+    /// <summary>
+    /// A node base for byte shift operations.
+    /// </summary>
+    /// <seealso cref="IX.Math.Nodes.Operations.Binary.BinaryOperatorNodeBase" />
     internal abstract class ByteShiftOperationNodeBase : BinaryOperatorNodeBase
     {
-        protected ByteShiftOperationNodeBase(NodeBase left, NodeBase right)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ByteShiftOperationNodeBase"/> class.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        protected private ByteShiftOperationNodeBase(NodeBase left, NodeBase right)
             : base(left, right)
         {
         }
 
+        /// <summary>
+        /// Gets the return type of this node.
+        /// </summary>
+        /// <value>
+        /// The node return type.
+        /// </value>
         public override SupportedValueType ReturnType => this.Left.ReturnType;
 
         /// <summary>

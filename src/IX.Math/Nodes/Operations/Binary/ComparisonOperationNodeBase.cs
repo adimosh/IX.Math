@@ -20,7 +20,7 @@ namespace IX.Math.Nodes.Operations.Binary
         /// </summary>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
-        protected ComparisonOperationNodeBase(
+        protected private ComparisonOperationNodeBase(
             NodeBase left,
             NodeBase right)
             : base(

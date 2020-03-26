@@ -4,10 +4,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.StandardExtensions.Contracts;
-using IX.StandardExtensions.Globalization;
 
 namespace IX.Math.Extraction
 {
@@ -32,7 +32,16 @@ namespace IX.Math.Extraction
         ///     <paramref name="reverseConstantsTable" />
         ///     is <see langword="null" /> (<see langword="Nothing" /> in Visual Basic).
         /// </exception>
-        public string ExtractAllConstants(
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Usage",
+            "PC001:API not supported on all platforms",
+            Justification = "This is an analyzer bug, TODO: see https://github.com/dotnet/platform-compat/issues/123")]
+#if NETSTANDARD2_1 || NET452
+        public
+#else
+        public unsafe
+#endif
+        string ExtractAllConstants(
             string originalExpression,
             IDictionary<string, ConstantNodeBase> constantsTable,
             IDictionary<string, string> reverseConstantsTable,
@@ -51,51 +60,126 @@ namespace IX.Math.Extraction
                 in mathDefinition,
                 nameof(mathDefinition));
 
-            var stringIndicator = mathDefinition.StringIndicator;
+            var stringIndicagtorString = mathDefinition.StringIndicator;
+            var stringIndicator = mathDefinition.StringIndicator.AsSpan();
+            var stringIndicatorLength = stringIndicator.Length;
+            var escapeCharacter = mathDefinition.EscapeCharacter.AsSpan();
+            var escapeCharacterLength = escapeCharacter.Length;
 
-            var process = originalExpression;
+            var process = originalExpression.AsSpan();
+            StringBuilder sb = null;
 
             while (true)
             {
-                var op = process.InvariantCultureIndexOf(
-                    stringIndicator);
-
-                if (op == -1)
-                {
-                    break;
-                }
-
-                var cp = process.InvariantCultureIndexOf(
+                var openingPosition = process.IndexOf(
                     stringIndicator,
-                    op + stringIndicator.Length);
+                    StringComparison.CurrentCulture);
 
-                escapeRoute:
-                if (cp == -1 || cp + stringIndicator.Length > process.Length)
+                if (openingPosition == -1)
                 {
+                    // No string opening
                     break;
                 }
 
-                if (process.Substring(cp + stringIndicator.Length).InvariantCultureStartsWith(stringIndicator))
+                var header = process.Slice(
+                    0,
+                    openingPosition);
+
+                var rest = process.Slice(openingPosition + stringIndicatorLength);
+
+                int closingPosition;
+                ReadOnlySpan<char> body;
+
+                do
                 {
-                    cp = process.InvariantCultureIndexOf(
-                        stringIndicator,
-                        cp + stringIndicator.Length * 2);
-                    goto escapeRoute;
+                    closingPosition = rest.IndexOf(stringIndicator, StringComparison.CurrentCulture);
+
+                    if (closingPosition != -1)
+                    {
+                        body = rest.Slice(
+                            0,
+                            closingPosition);
+
+                        int occurrences = 0;
+
+                        while (body.EndsWith(escapeCharacter))
+                        {
+                            occurrences++;
+                            body = body.Slice(
+                                0,
+                                body.Length - escapeCharacterLength);
+                        }
+
+                        rest = rest.Slice(closingPosition + stringIndicatorLength);
+
+                        if (occurrences % 2 == 0)
+                        {
+                            break;
+                        }
+                    }
                 }
+                while (closingPosition != -1);
+
+                if (closingPosition == -1)
+                {
+                    // No string closing
+                    break;
+                }
+
+                // We have a proper string
+                body = process.Slice(
+                        openingPosition,
+                        process.Length - header.Length - rest.Length);
 
                 var itemName = ConstantsGenerator.GenerateStringConstant(
                     constantsTable,
                     reverseConstantsTable,
-                    process,
-                    stringIndicator,
-                    process.Substring(
-                        op,
-                        cp - op));
+                    originalExpression,
+                    stringIndicagtorString,
+                    body.ToString());
 
-                process = $"{process.Substring(0, op)}{itemName}{process.Substring(cp + stringIndicator.Length)}";
+                if (sb == null)
+                {
+                    sb = new StringBuilder(originalExpression.Length);
+                }
+
+#if NETSTANDARD2_1
+                sb.Append(header);
+#else
+#if NET452
+                sb.Append(header.ToString());
+#else
+                fixed (char* headerPointer = &header.GetPinnableReference())
+                {
+                    sb.Append(headerPointer, header.Length);
+                }
+#endif
+#endif
+
+                sb.Append(itemName);
+
+                process = rest;
             }
 
-            return process;
+            if (sb == null)
+            {
+                return originalExpression;
+            }
+
+#if NETSTANDARD2_1
+            sb.Append(process);
+#else
+#if NET452
+            sb.Append(process.ToString());
+#else
+            fixed (char* processPointer = &process.GetPinnableReference())
+            {
+                sb.Append(processPointer, process.Length);
+            }
+#endif
+#endif
+
+            return sb.ToString();
         }
     }
 }
