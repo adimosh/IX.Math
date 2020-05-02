@@ -5,6 +5,7 @@
 using System;
 using System.Reflection;
 using System.Threading;
+using IX.Math.Extensibility;
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -24,6 +25,16 @@ namespace IX.Math
         /// <returns>A <see cref="ComputedExpression"/> that represents the interpreted expression.</returns>
         [NotNull]
         ComputedExpression Interpret([NotNull] string expression, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        ///     Registers type formatters.
+        /// </summary>
+        /// <param name="formatter">The formatter to register.</param>
+        /// <exception cref="InvalidOperationException">
+        ///     This method was called after having called <see cref="Interpret" />
+        ///     successfully for the first time.
+        /// </exception>
+        void RegisterTypeFormatter([NotNull] IStringFormatter formatter);
 
         /// <summary>
         /// Registers an assembly to extract compatible functions from.

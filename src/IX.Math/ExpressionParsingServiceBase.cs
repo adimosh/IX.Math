@@ -307,7 +307,7 @@ namespace IX.Math
         ///     This method was called after having called <see cref="Interpret" />
         ///     successfully for the first time.
         /// </exception>
-        public void RegisterTypeFormatter([NotNull] IStringFormatter formatter)
+        public void RegisterTypeFormatter(IStringFormatter formatter)
         {
             Contract.RequiresNotNull(
                 in formatter,
