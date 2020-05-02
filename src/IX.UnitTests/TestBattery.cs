@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using IX.DataGeneration;
 using IX.Math;
+using IX.UnitTests.Helpers;
 using IX.UnitTests.IX.Math;
 using Moq;
 using Xunit;
@@ -31,61 +32,38 @@ namespace IX.UnitTests
             this.comparer = new ReturnValueEqualityComparer();
         }
 
-        private static object GenerateFuncOutOfParameterValue(object tempParameter)
+        private static object GenerateFuncOutOfParameterValue(object tempParameter) => tempParameter switch
         {
-            switch (tempParameter)
-            {
-                case byte convertedValue:
-                    return new Func<byte>(() => convertedValue);
-                case sbyte convertedValue:
-                    return new Func<sbyte>(() => convertedValue);
-                case short convertedValue:
-                    return new Func<short>(() => convertedValue);
-                case ushort convertedValue:
-                    return new Func<ushort>(() => convertedValue);
-                case int convertedValue:
-                    return new Func<int>(() => convertedValue);
-                case uint convertedValue:
-                    return new Func<uint>(() => convertedValue);
-                case long convertedValue:
-                    return new Func<long>(() => convertedValue);
-                case ulong convertedValue:
-                    return new Func<ulong>(() => convertedValue);
-                case float convertedValue:
-                    return new Func<float>(() => convertedValue);
-                case double convertedValue:
-                    return new Func<double>(() => convertedValue);
-                case byte[] convertedValue:
-                    return new Func<byte[]>(() => convertedValue);
-                case string convertedValue:
-                    return new Func<string>(() => convertedValue);
-                case bool convertedValue:
-                    return new Func<bool>(() => convertedValue);
-                default:
-                    throw new InvalidOperationException();
-            }
-        }
+            byte convertedValue => new Func<byte>(() => convertedValue),
+            sbyte convertedValue => new Func<sbyte>(() => convertedValue),
+            short convertedValue => new Func<short>(() => convertedValue),
+            ushort convertedValue => new Func<ushort>(() => convertedValue),
+            int convertedValue => new Func<int>(() => convertedValue),
+            uint convertedValue => new Func<uint>(() => convertedValue),
+            long convertedValue => new Func<long>(() => convertedValue),
+            ulong convertedValue => new Func<ulong>(() => convertedValue),
+            float convertedValue => new Func<float>(() => convertedValue),
+            double convertedValue => new Func<double>(() => convertedValue),
+            byte[] convertedValue => new Func<byte[]>(() => convertedValue),
+            string convertedValue => new Func<string>(() => convertedValue),
+            bool convertedValue => new Func<bool>(() => convertedValue),
+            _ => throw new InvalidOperationException(),
+        };
 
-        private static Type FixNumericType(in object source)
+        private static Type FixNumericType(in object source) => source switch
         {
-            switch (source)
-            {
-                case byte _:
-                case sbyte _:
-                case int _:
-                case uint _:
-                case short _:
-                case ushort _:
-                case long _:
-                case ulong _:
-                case float _:
-                case double _:
-                    return typeof(double);
-
-                default:
-                    return source.GetType();
-            }
-        }
+            byte _ => typeof(double),
+            sbyte _ => typeof(double),
+            int _ => typeof(double),
+            uint _ => typeof(double),
+            short _ => typeof(double),
+            ushort _ => typeof(double),
+            long _ => typeof(double),
+            ulong _ => typeof(double),
+            float _ => typeof(double),
+            double _ => typeof(double),
+            _ => source.GetType()
+        };
 
         /// <summary>
         ///     Tests the computed expression with parameters.
@@ -201,7 +179,7 @@ namespace IX.UnitTests
         {
             try
             {
-                ComputedExpression del = this.fixture.Service.Interpret(expression);
+                ComputedExpression del = this.fixture.CachedService.Interpret(expression);
 
                 object result = del.Compute(parameters?.OrderBy(q => expression.IndexOf(q.Key, StringComparison.Ordinal)).Select(p => p.Value).ToArray() ?? new object[0]);
 
@@ -232,7 +210,7 @@ namespace IX.UnitTests
             {
                 var finder = new Mock<IDataFinder>(MockBehavior.Loose);
 
-                ComputedExpression del = this.fixture.Service.Interpret(expression);
+                ComputedExpression del = this.fixture.CachedService.Interpret(expression);
 
                 if (parameters != null)
                 {
@@ -327,7 +305,7 @@ namespace IX.UnitTests
             {
                 var finder = new Mock<IDataFinder>(MockBehavior.Loose);
 
-                ComputedExpression del = this.fixture.Service.Interpret(expression);
+                ComputedExpression del = this.fixture.CachedService.Interpret(expression);
 
                 if (parameters != null)
                 {
@@ -377,7 +355,7 @@ namespace IX.UnitTests
                 {
                     var finder = new Mock<IDataFinder>(MockBehavior.Loose);
 
-                    ComputedExpression del = this.fixture.Service.Interpret(expression);
+                    ComputedExpression del = this.fixture.CachedService.Interpret(expression);
 
                     if (parameters != null)
                     {
