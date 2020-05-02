@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using IX.Math;
 using IX.StandardExtensions.TestUtils;
+using IX.UnitTests.Helpers;
 using Moq;
 using Xunit;
 
@@ -143,7 +144,7 @@ namespace IX.UnitTests.IX.Math
             Dictionary<string, object> parameters,
             object expectedResult)
         {
-            ComputedExpression del = this.fixture.Service.Interpret(expression);
+            ComputedExpression del = this.fixture.CachedService.Interpret(expression);
             if (del == null)
             {
                 throw new InvalidOperationException("No computed expression was generated!");
@@ -174,7 +175,7 @@ namespace IX.UnitTests.IX.Math
         {
             var finder = new Mock<IDataFinder>(MockBehavior.Loose);
 
-            ComputedExpression del = this.fixture.Service.Interpret(expression);
+            ComputedExpression del = this.fixture.CachedService.Interpret(expression);
             if (del == null)
             {
                 throw new InvalidOperationException("No computed expression was generated!");
@@ -258,7 +259,7 @@ namespace IX.UnitTests.IX.Math
         {
             var finder = new Mock<IDataFinder>(MockBehavior.Loose);
 
-            ComputedExpression del = this.fixture.Service.Interpret(expression);
+            ComputedExpression del = this.fixture.CachedService.Interpret(expression);
             if (del == null)
             {
                 throw new InvalidOperationException("No computed expression was generated!");
@@ -307,7 +308,7 @@ namespace IX.UnitTests.IX.Math
             {
                 var finder = new Mock<IDataFinder>(MockBehavior.Loose);
 
-                ComputedExpression del = this.fixture.Service.Interpret(expression);
+                ComputedExpression del = this.fixture.CachedService.Interpret(expression);
 
                 if (parameters != null)
                 {
