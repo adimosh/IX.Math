@@ -40,12 +40,12 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'!='netstandard2.1'">
-    <PackageReference Include="System.Memory" Version="[4.5.3,5)" />
+    <PackageReference Include="System.Memory" Version="4.5.4" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AsyncUsageAnalyzers" Version="1.0.0-alpha003" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0" PrivateAssets="all" />
   </ItemGroup>
 
 
@@ -91,7 +91,7 @@
 
   <!-- Project system and dependencies -->
   <ItemGroup>
-    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.1">
+    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

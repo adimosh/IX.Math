@@ -21,16 +21,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\CodeGenerator\Test\TestData.BasicOperatorsWithRandomNumbers.cs" Link="TestData.BasicOperatorsWithRandomNumbers.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeCoverage" Version="16.5.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="Microsoft.CodeCoverage" Version="16.6.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     <PackageReference Include="xunit.runner.console" Version="2.4.1" />
-    <PackageReference Include="Moq" Version="4.13.1" />
+    <PackageReference Include="Moq" Version="4.14.1" />
   </ItemGroup>
 
   <!--Suppressions -->
@@ -44,6 +40,28 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IX.Math\IX.Math.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="TestData.BasicOperatorsWithRandomNumbers.tt">
+      <LastGenOutput>TestData.BasicOperatorsWithRandomNumbers.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="TestInitializationData.tt">
+      <Generator></Generator>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="TestData.BasicOperatorsWithRandomNumbers.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>TestData.BasicOperatorsWithRandomNumbers.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

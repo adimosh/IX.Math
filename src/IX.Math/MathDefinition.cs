@@ -6,6 +6,7 @@ using System;
 using System.Runtime.Serialization;
 using IX.Abstractions.Logging;
 using IX.StandardExtensions;
+using IX.StandardExtensions.Contracts;
 
 namespace IX.Math
 {
@@ -28,6 +29,8 @@ namespace IX.Math
         /// <param name="definition">The definition to use.</param>
         public MathDefinition(MathDefinition definition)
         {
+            Contract.RequiresNotNull(in definition, nameof(definition));
+
             this.Parentheses = new Tuple<string, string>(definition.Parentheses.Item1, definition.Parentheses.Item2);
             this.SpecialSymbolIndicators = new Tuple<string, string>(definition.SpecialSymbolIndicators.Item1, definition.SpecialSymbolIndicators.Item2);
             this.StringIndicator = definition.StringIndicator;
