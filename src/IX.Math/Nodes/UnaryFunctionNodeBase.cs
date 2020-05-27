@@ -17,7 +17,7 @@ namespace IX.Math.Nodes
     /// </summary>
     /// <seealso cref="FunctionNodeBase" />
     [PublicAPI]
-    public abstract class UnaryFunctionNodeBase : FunctionNodeBase
+    public abstract partial class UnaryFunctionNodeBase : FunctionNodeBase
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="UnaryFunctionNodeBase" /> class.
@@ -84,7 +84,7 @@ namespace IX.Math.Nodes
             this.GenerateStaticUnaryFunctionCall(
                 typeof(T),
                 functionName,
-                null);
+                in ComparisonTolerance.Empty);
 
         /// <summary>
         ///     Generates a static unary function call.
@@ -97,11 +97,11 @@ namespace IX.Math.Nodes
         [NotNull]
         protected Expression GenerateStaticUnaryFunctionCall<T>(
             [NotNull] string functionName,
-            Tolerance tolerance) =>
+            in ComparisonTolerance tolerance) =>
             this.GenerateStaticUnaryFunctionCall(
                 typeof(T),
                 functionName,
-                tolerance);
+                in tolerance);
 
         /// <summary>
         ///     Generates a static unary function call.
@@ -117,7 +117,7 @@ namespace IX.Math.Nodes
             this.GenerateStaticUnaryFunctionCall(
                 t,
                 functionName,
-                null);
+                in ComparisonTolerance.Empty);
 
         /// <summary>
         ///     Generates a static unary function call.
@@ -133,7 +133,7 @@ namespace IX.Math.Nodes
         protected Expression GenerateStaticUnaryFunctionCall(
             [NotNull] Type t,
             [NotNull] string functionName,
-            [CanBeNull] Tolerance tolerance)
+            in ComparisonTolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
@@ -184,9 +184,9 @@ namespace IX.Math.Nodes
                 }
             }
 
-            Expression e = tolerance == null
+            Expression e = tolerance.IsEmpty
                 ? this.Parameter.GenerateExpression()
-                : this.Parameter.GenerateExpression(tolerance);
+                : this.Parameter.GenerateExpression(in tolerance);
 
             if (e.Type != parameterType)
             {
@@ -211,7 +211,7 @@ namespace IX.Math.Nodes
         protected Expression GenerateParameterPropertyCall<T>([NotNull] string propertyName) =>
             this.GenerateParameterPropertyCall<T>(
                 propertyName,
-                null);
+                in ComparisonTolerance.Empty);
 
         /// <summary>
         ///     Generates a property call on the parameter.
@@ -224,7 +224,7 @@ namespace IX.Math.Nodes
         [NotNull]
         protected Expression GenerateParameterPropertyCall<T>(
             [NotNull] string propertyName,
-            [CanBeNull] Tolerance tolerance)
+            in ComparisonTolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
             {
@@ -245,7 +245,7 @@ namespace IX.Math.Nodes
                                   nameof(propertyName));
 
             return Expression.Property(
-                tolerance == null ? this.Parameter.GenerateExpression() : this.Parameter.GenerateExpression(tolerance),
+                tolerance.IsEmpty ? this.Parameter.GenerateExpression() : this.Parameter.GenerateExpression(in tolerance),
                 pi);
         }
 
@@ -260,7 +260,7 @@ namespace IX.Math.Nodes
         protected Expression GenerateParameterMethodCall<T>([NotNull] string methodName) =>
             this.GenerateParameterMethodCall<T>(
                 methodName,
-                null);
+                in ComparisonTolerance.Empty);
 
         /// <summary>
         ///     Generates a property call on the parameter.
@@ -273,7 +273,7 @@ namespace IX.Math.Nodes
         [NotNull]
         protected Expression GenerateParameterMethodCall<T>(
             [NotNull] string methodName,
-            [CanBeNull] Tolerance tolerance)
+            in ComparisonTolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(methodName))
             {
@@ -307,12 +307,12 @@ namespace IX.Math.Nodes
                                 nameof(methodName));
 #endif
 
-            return tolerance == null
+            return tolerance.IsEmpty
                 ? Expression.Call(
                     this.Parameter.GenerateExpression(),
                     mi)
                 : Expression.Call(
-                    this.Parameter.GenerateExpression(tolerance),
+                    this.Parameter.GenerateExpression(in tolerance),
                     mi);
         }
     }

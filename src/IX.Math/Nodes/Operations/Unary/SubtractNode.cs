@@ -3,9 +3,10 @@
 // </copyright>
 
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
+using JetBrains.Annotations;
+using DiagCA = System.Diagnostics.CodeAnalysis;
 
 namespace IX.Math.Nodes.Operations.Unary
 {
@@ -21,14 +22,14 @@ namespace IX.Math.Nodes.Operations.Unary
         /// </summary>
         /// <param name="operand">The operand.</param>
         /// <exception cref="ExpressionNotValidLogicallyException">The expression is not logically valid.</exception>
-        public SubtractNode([JetBrains.Annotations.NotNull] NodeBase operand)
+        public SubtractNode([NotNull] NodeBase operand)
             : base(operand.Simplify())
         {
             operand.DetermineStrongly(SupportedValueType.Numeric);
 
             if (operand.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -63,7 +64,7 @@ namespace IX.Math.Nodes.Operations.Unary
         {
             if (type != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -76,7 +77,7 @@ namespace IX.Math.Nodes.Operations.Unary
         {
             if ((type & SupportableValueType.Numeric) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -94,7 +95,7 @@ namespace IX.Math.Nodes.Operations.Unary
         /// <returns>
         ///     The expression.
         /// </returns>
-        [SuppressMessage(
+        [DiagCA.SuppressMessage(
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "We want this to happen.")]
@@ -110,15 +111,15 @@ namespace IX.Math.Nodes.Operations.Unary
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        [SuppressMessage(
+        [DiagCA.SuppressMessage(
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "We want this to happen.")]
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance) =>
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance) =>
             Expression.Subtract(
                 Expression.Constant(
                     0L,
                     typeof(long)),
-                this.Operand.GenerateExpression(tolerance));
+                this.Operand.GenerateExpression(in tolerance));
     }
 }

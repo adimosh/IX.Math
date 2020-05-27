@@ -1,4 +1,4 @@
-// <copyright file="XorNode.cs" company="Adrian Mos">
+// <copyright file="OrNode.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -6,21 +6,21 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 
-namespace IX.Math.Nodes.Operations.Binary
+namespace IX.Math.Nodes.Operations.Binary.Logical
 {
     /// <summary>
-    ///     A node for exclusive or operations.
+    ///     A node representing the or logical operation.
     /// </summary>
     /// <seealso cref="LogicalOperationNodeBase" />
-    [DebuggerDisplay("{Left} ~ {Right}")]
-    internal sealed class XorNode : LogicalOperationNodeBase
+    [DebuggerDisplay("{" + nameof(Left) + "} | {" + nameof(Right) + "}")]
+    internal sealed class OrNode : LogicalOperationNodeBase
     {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="XorNode" /> class.
+        ///     Initializes a new instance of the <see cref="OrNode" /> class.
         /// </summary>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
-        public XorNode(
+        public OrNode(
             NodeBase left,
             NodeBase right)
             : base(
@@ -39,8 +39,8 @@ namespace IX.Math.Nodes.Operations.Binary
             this.Left switch
             {
                 NumericNode nnLeft when this.Right is NumericNode nnRight => new NumericNode(
-                    nnLeft.ExtractInteger() ^ nnRight.ExtractInteger()),
-                BoolNode bnLeft when this.Right is BoolNode bnRight => new BoolNode(bnLeft.Value ^ bnRight.Value),
+                    nnLeft.ExtractInteger() | nnRight.ExtractInteger()),
+                BoolNode bnLeft when this.Right is BoolNode bnRight => new BoolNode(bnLeft.Value | bnRight.Value),
                 _ => this
             };
 
@@ -50,7 +50,7 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
-            new XorNode(
+            new OrNode(
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
 
@@ -61,7 +61,7 @@ namespace IX.Math.Nodes.Operations.Binary
         ///     The expression.
         /// </returns>
         protected override Expression GenerateExpressionInternal() =>
-            Expression.ExclusiveOr(
+            Expression.Or(
                 this.Left.GenerateExpression(),
                 this.Right.GenerateExpression());
 
@@ -70,9 +70,9 @@ namespace IX.Math.Nodes.Operations.Binary
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance) =>
-            Expression.ExclusiveOr(
-                this.Left.GenerateExpression(tolerance),
-                this.Right.GenerateExpression(tolerance));
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance) =>
+            Expression.Or(
+                this.Left.GenerateExpression(in tolerance),
+                this.Right.GenerateExpression(in tolerance));
     }
 }

@@ -47,9 +47,10 @@ namespace IX.Math.Nodes.Function.Binary
         /// <returns>
         ///     A deep clone.
         /// </returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeTrimBody(
-            this.FirstParameter.DeepClone(context),
-            this.SecondParameter.DeepClone(context));
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new FunctionNodeTrimBody(
+                this.FirstParameter.DeepClone(context),
+                this.SecondParameter.DeepClone(context));
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
@@ -73,7 +74,7 @@ namespace IX.Math.Nodes.Function.Binary
         {
             if (type != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -86,7 +87,7 @@ namespace IX.Math.Nodes.Function.Binary
         {
             if ((type & SupportableValueType.String) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -107,25 +108,25 @@ namespace IX.Math.Nodes.Function.Binary
             if (firstParameter.ReturnType != SupportedValueType.String ||
                 secondParameter.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
         /// <summary>
-        /// Generates the expression that will be compiled into code.
+        ///     Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>
-        /// The expression.
+        ///     The expression.
         /// </returns>
-        protected override Expression GenerateExpressionInternal()
-            => this.GenerateExpressionInternal(null);
+        protected override Expression GenerateExpressionInternal() =>
+            this.GenerateExpressionInternal(in ComparisonTolerance.Empty);
 
         /// <summary>
-        /// Generates the expression with tolerance that will be compiled into code.
+        ///     Generates the expression with tolerance that will be compiled into code.
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance)
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance)
         {
             MethodInfo mi = typeof(string).GetMethodWithExactParameters(
                 nameof(string.Replace),
@@ -142,15 +143,15 @@ namespace IX.Math.Nodes.Function.Binary
             }
 
             Expression e1, e2;
-            if (tolerance == null)
+            if (tolerance.IsEmpty)
             {
                 e1 = this.FirstParameter.GenerateExpression();
                 e2 = this.SecondParameter.GenerateExpression();
             }
             else
             {
-                e1 = this.FirstParameter.GenerateExpression(tolerance);
-                e2 = this.SecondParameter.GenerateExpression(tolerance);
+                e1 = this.FirstParameter.GenerateExpression(in tolerance);
+                e2 = this.SecondParameter.GenerateExpression(in tolerance);
             }
 
             if (e1.Type != typeof(string))

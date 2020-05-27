@@ -35,7 +35,7 @@ namespace IX.Math.Nodes.Function.Unary
         {
             if (type != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -48,7 +48,7 @@ namespace IX.Math.Nodes.Function.Unary
         {
             if ((type & SupportableValueType.Numeric) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -64,7 +64,7 @@ namespace IX.Math.Nodes.Function.Unary
 
             if (parameter.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
     }

@@ -65,18 +65,20 @@ namespace IX.Math.Nodes.Function.Binary
         /// <returns>
         /// The expression.
         /// </returns>
-        protected override Expression GenerateExpressionInternal() => this.GenerateStaticBinaryFunctionCall(
-            typeof(GlobalSystem.Math),
-            nameof(GlobalSystem.Math.Pow));
+        protected override Expression GenerateExpressionInternal() =>
+            this.GenerateStaticBinaryFunctionCall(
+                typeof(GlobalSystem.Math),
+                nameof(GlobalSystem.Math.Pow));
 
         /// <summary>
         /// Generates the expression with tolerance that will be compiled into code.
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance) => this.GenerateStaticBinaryFunctionCall(
-            typeof(GlobalSystem.Math),
-            nameof(GlobalSystem.Math.Pow),
-            tolerance);
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance) =>
+            this.GenerateStaticBinaryFunctionCall(
+                typeof(GlobalSystem.Math),
+                nameof(GlobalSystem.Math.Pow),
+                in tolerance);
     }
 }

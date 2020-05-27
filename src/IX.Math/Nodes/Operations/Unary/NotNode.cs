@@ -56,7 +56,7 @@ namespace IX.Math.Nodes.Operations.Unary
                 return;
             }
 
-            throw new ExpressionNotValidLogicallyException();
+            throw new Exceptions.ExpressionNotValidLogicallyException();
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace IX.Math.Nodes.Operations.Unary
         {
             if (type != SupportedValueType.Boolean && type != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
 
             this.Operand.DetermineStrongly(type);
@@ -106,7 +106,7 @@ namespace IX.Math.Nodes.Operations.Unary
         {
             if ((type & SupportableValueType.Boolean) == 0 && (type & SupportableValueType.Numeric) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
 
             this.Operand.DetermineWeakly(type);
@@ -127,7 +127,7 @@ namespace IX.Math.Nodes.Operations.Unary
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance) =>
-            Expression.Not(this.Operand.GenerateExpression(tolerance));
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance) =>
+            Expression.Not(this.Operand.GenerateExpression(in tolerance));
     }
 }

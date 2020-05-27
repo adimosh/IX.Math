@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Runtime.Serialization;
 
 namespace IX.Math
@@ -10,6 +11,7 @@ namespace IX.Math
     /// A data contract for a numeric tolerance.
     /// </summary>
     [DataContract]
+    [Obsolete("Please use the ComparisonTolerance value type (implicitly convertible).")]
     public class Tolerance
     {
         /// <summary>
@@ -56,5 +58,33 @@ namespace IX.Math
         /// </value>
         [DataMember]
         public double? ProportionalTolerance { get; set; }
+
+        /// <summary>
+        /// Performs an implicit conversion from <see cref="Tolerance"/> to <see cref="ComparisonTolerance"/>.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>
+        /// The result of the conversion.
+        /// </returns>
+        public static implicit operator ComparisonTolerance(Tolerance tolerance) =>
+            tolerance == null
+                ? new ComparisonTolerance(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null)
+                : new ComparisonTolerance(
+                    tolerance.ToleranceRangeLowerBound,
+                    tolerance.ToleranceRangeUpperBound,
+                    tolerance.IntegerToleranceRangeLowerBound,
+                    tolerance.IntegerToleranceRangeLowerBound,
+                    tolerance.ProportionalTolerance);
+
+        /// <summary>
+        /// Converts to <see cref="ComparisonTolerance"/>.
+        /// </summary>
+        /// <returns>An equivalent <see cref="ComparisonTolerance"/>.</returns>
+        public ComparisonTolerance ToComparisonTolerance() => this;
     }
 }

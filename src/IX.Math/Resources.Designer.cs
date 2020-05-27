@@ -79,6 +79,15 @@ namespace IX.Math {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An exception in the internal engine has caused the current operation to be aborted. Please report the circumstances of this error, along with the input data, to the development team..
+        /// </summary>
+        internal static string MathematicsEngineException {
+            get {
+                return ResourceManager.GetString("MathematicsEngineException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The expression is either not logically sound, internally valid or its invocation was done with incorrect data..
         /// </summary>
         internal static string NotValidInternally {

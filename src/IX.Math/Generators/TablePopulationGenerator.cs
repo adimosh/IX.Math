@@ -45,35 +45,35 @@ namespace IX.Math.Generators
             [NotNull] string[] allSymbols)
         {
             // Validate parameters
-            Contract.RequiresNotNullOrWhitespacePrivate(
+            Requires.NotNullOrWhiteSpace(
                 processedExpression,
                 nameof(processedExpression));
-            Contract.RequiresNotNullPrivate(
-                in constantsTable,
+            Requires.NotNull(
+                constantsTable,
                 nameof(constantsTable));
-            Contract.RequiresNotNullPrivate(
-                in reverseConstantsTable,
+            Requires.NotNull(
+                reverseConstantsTable,
                 nameof(reverseConstantsTable));
-            Contract.RequiresNotNullPrivate(
-                in symbolTable,
+            Requires.NotNull(
+                symbolTable,
                 nameof(symbolTable));
-            Contract.RequiresNotNullPrivate(
-                in reverseSymbolTable,
+            Requires.NotNull(
+                reverseSymbolTable,
                 nameof(reverseSymbolTable));
-            Contract.RequiresNotNullPrivate(
-                in parameterRegistry,
+            Requires.NotNull(
+                parameterRegistry,
                 nameof(parameterRegistry));
-            Contract.RequiresNotNullPrivate(
-                in interpreters,
+            Requires.NotNull(
+                interpreters,
                 nameof(interpreters));
-            Contract.RequiresNotNullOrWhitespacePrivate(
+            Requires.NotNullOrWhiteSpace(
                 originalExpression,
                 nameof(originalExpression));
-            Contract.RequiresNotNullOrWhitespacePrivate(
+            Requires.NotNullOrWhiteSpace(
                 openParenthesis,
                 nameof(openParenthesis));
-            Contract.RequiresNotNullPrivate(
-                in allSymbols,
+            Requires.NotNull(
+                allSymbols,
                 nameof(allSymbols));
 
             // Split expression by all symbols

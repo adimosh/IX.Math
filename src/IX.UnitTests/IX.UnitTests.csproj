@@ -29,11 +29,6 @@
     <PackageReference Include="Moq" Version="4.14.1" />
   </ItemGroup>
 
-  <!--Suppressions -->
-  <ItemGroup>
-    <Compile Include="..\Common\HeapAllocationAnalyzerSuppressions.cs" Link="HeapAllocationAnalyzerSuppressions.cs" />
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="IX.StandardExtensions.TestUtils" Version="0.5.3" />
   </ItemGroup>
@@ -50,6 +45,13 @@
     <None Update="TestInitializationData.tt">
       <Generator></Generator>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

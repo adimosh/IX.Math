@@ -156,4 +156,7 @@
   <data name="TheExpressionParsingServiceHasAlreadyDoneInterpretationAndCannotHaveAnyMoreFormattersRegistered" xml:space="preserve">
     <value>The expression parsing service has already done interpretation, and cannot have any more formatters registered.</value>
   </data>
+  <data name="MathematicsEngineException" xml:space="preserve">
+    <value>An exception in the internal engine has caused the current operation to be aborted. Please report the circumstances of this error, along with the input data, to the development team.</value>
+  </data>
 </root>

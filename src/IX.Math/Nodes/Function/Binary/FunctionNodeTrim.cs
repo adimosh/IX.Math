@@ -70,7 +70,7 @@ namespace IX.Math.Nodes.Function.Binary
         {
             if (type != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -83,7 +83,7 @@ namespace IX.Math.Nodes.Function.Binary
         {
             if ((type & SupportableValueType.String) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -93,7 +93,7 @@ namespace IX.Math.Nodes.Function.Binary
         /// </summary>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
-        /// <exception cref="ExpressionNotValidLogicallyException">The expression is not valid, as its parameters are not strings.</exception>
+        /// <exception cref="Exceptions.ExpressionNotValidLogicallyException">The expression is not valid, as its parameters are not strings.</exception>
         protected override void EnsureCompatibleParameters(
             NodeBase firstParameter,
             NodeBase secondParameter)
@@ -104,7 +104,7 @@ namespace IX.Math.Nodes.Function.Binary
             if (firstParameter.ReturnType != SupportedValueType.String ||
                 secondParameter.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -115,14 +115,14 @@ namespace IX.Math.Nodes.Function.Binary
         /// The expression.
         /// </returns>
         protected override Expression GenerateExpressionInternal()
-            => this.GenerateExpressionInternal(null);
+            => this.GenerateExpressionInternal(in ComparisonTolerance.Empty);
 
         /// <summary>
         /// Generates the expression with tolerance that will be compiled into code.
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance)
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance)
         {
             MethodInfo mia = typeof(string).GetMethodWithExactParameters(
                 nameof(string.ToCharArray),
@@ -151,15 +151,15 @@ namespace IX.Math.Nodes.Function.Binary
             }
 
             Expression e1, e2;
-            if (tolerance == null)
+            if (tolerance.IsEmpty)
             {
                 e1 = this.FirstParameter.GenerateExpression();
                 e2 = this.SecondParameter.GenerateExpression();
             }
             else
             {
-                e1 = this.FirstParameter.GenerateExpression(tolerance);
-                e2 = this.SecondParameter.GenerateExpression(tolerance);
+                e1 = this.FirstParameter.GenerateExpression(in tolerance);
+                e2 = this.SecondParameter.GenerateExpression(in tolerance);
             }
 
             if (e1.Type != typeof(string))

@@ -70,7 +70,7 @@ namespace IX.Math.Nodes.Function.Unary
         {
             if (type != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -83,7 +83,7 @@ namespace IX.Math.Nodes.Function.Unary
         {
             if ((type & SupportableValueType.String) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -92,14 +92,14 @@ namespace IX.Math.Nodes.Function.Unary
         ///     reference to change.
         /// </summary>
         /// <param name="parameter">The parameter.</param>
-        /// <exception cref="ExpressionNotValidLogicallyException">Expression is nor logically valid.</exception>
+        /// <exception cref="Exceptions.ExpressionNotValidLogicallyException">Expression is nor logically valid.</exception>
         protected override void EnsureCompatibleParameter(NodeBase parameter)
         {
             parameter.DetermineStrongly(SupportedValueType.String);
 
             if (parameter.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -117,9 +117,9 @@ namespace IX.Math.Nodes.Function.Unary
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance) =>
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance) =>
             this.GenerateParameterMethodCall<string>(
                 nameof(string.Trim),
-                tolerance);
+                in tolerance);
     }
 }

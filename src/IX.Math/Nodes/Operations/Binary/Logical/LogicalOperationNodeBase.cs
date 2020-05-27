@@ -2,7 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-namespace IX.Math.Nodes.Operations.Binary
+namespace IX.Math.Nodes.Operations.Binary.Logical
 {
     /// <summary>
     ///     A node base for logical operations.
@@ -53,7 +53,7 @@ namespace IX.Math.Nodes.Operations.Binary
                 case SupportedValueType.Unknown:
                     break;
                 default:
-                    throw new ExpressionNotValidLogicallyException();
+                    throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -74,7 +74,7 @@ namespace IX.Math.Nodes.Operations.Binary
             }
             else
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -87,7 +87,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if ((type & SupportableValueType.Numeric) == 0 && (type & SupportableValueType.Boolean) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
 
             this.Left.DetermineWeakly(type);

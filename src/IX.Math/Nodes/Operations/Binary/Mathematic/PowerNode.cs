@@ -1,4 +1,4 @@
-// <copyright file="DivideNode.cs" company="Adrian Mos">
+// <copyright file="PowerNode.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -6,21 +6,21 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 
-namespace IX.Math.Nodes.Operations.Binary
+namespace IX.Math.Nodes.Operations.Binary.Mathematic
 {
     /// <summary>
-    ///     A node representing a division operation.
+    ///     A node for a power operation.
     /// </summary>
     /// <seealso cref="SimpleMathematicalOperationNodeBase" />
-    [DebuggerDisplay("{" + nameof(Left) + "} / {" + nameof(Right) + "}")]
-    internal sealed class DivideNode : SimpleMathematicalOperationNodeBase
+    [DebuggerDisplay("{" + nameof(Left) + "} ^ {" + nameof(Right) + "}")]
+    internal sealed class PowerNode : SimpleMathematicalOperationNodeBase
     {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="DivideNode" /> class.
+        ///     Initializes a new instance of the <see cref="PowerNode" /> class.
         /// </summary>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
-        public DivideNode(
+        public PowerNode(
             NodeBase left,
             NodeBase right)
             : base(
@@ -39,7 +39,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (this.Left is NumericNode nnLeft && this.Right is NumericNode nnRight)
             {
-                return NumericNode.Divide(
+                return NumericNode.Power(
                     nnLeft,
                     nnRight);
             }
@@ -53,7 +53,7 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
-            new DivideNode(
+            new PowerNode(
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
 
@@ -64,7 +64,10 @@ namespace IX.Math.Nodes.Operations.Binary
         ///     The expression.
         /// </returns>
         protected override Expression GenerateExpressionInternal() =>
-            Expression.Divide(
+            Expression.Call(
+                typeof(global::System.Math),
+                nameof(global::System.Math.Pow),
+                null,
                 Expression.Convert(
                     this.Left.GenerateExpression(),
                     typeof(double)),
@@ -77,13 +80,16 @@ namespace IX.Math.Nodes.Operations.Binary
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance) =>
-            Expression.Divide(
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance) =>
+            Expression.Call(
+                typeof(global::System.Math),
+                nameof(global::System.Math.Pow),
+                null,
                 Expression.Convert(
-                    this.Left.GenerateExpression(tolerance),
+                    this.Left.GenerateExpression(in tolerance),
                     typeof(double)),
                 Expression.Convert(
-                    this.Right.GenerateExpression(tolerance),
+                    this.Right.GenerateExpression(in tolerance),
                     typeof(double)));
     }
 }

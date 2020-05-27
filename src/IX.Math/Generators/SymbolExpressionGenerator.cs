@@ -18,14 +18,14 @@ namespace IX.Math.Generators
             [NotNull] string expression,
             bool isFunction)
         {
-            Contract.RequiresNotNullPrivate(
-                in symbolTable,
+            Requires.NotNull(
+                symbolTable,
                 nameof(symbolTable));
-            Contract.RequiresNotNullPrivate(
-                in reverseSymbolTable,
+            Requires.NotNull(
+                reverseSymbolTable,
                 nameof(reverseSymbolTable));
-            Contract.RequiresNotNullPrivate(
-                in expression,
+            Requires.NotNull(
+                expression,
                 nameof(expression));
 
             if (reverseSymbolTable.TryGetValue(

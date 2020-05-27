@@ -55,7 +55,7 @@ namespace IX.Math.Nodes
         {
             if (type != this.ReturnType)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -67,7 +67,7 @@ namespace IX.Math.Nodes
         {
             if ((type & (SupportableValueType)(int)this.ReturnType) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
     }

@@ -75,7 +75,7 @@ namespace IX.Math.Nodes.Function.Binary
         {
             if (type != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -88,7 +88,7 @@ namespace IX.Math.Nodes.Function.Binary
         {
             if ((type & SupportableValueType.String) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -109,7 +109,7 @@ namespace IX.Math.Nodes.Function.Binary
             if (firstParameter.ReturnType != SupportedValueType.String ||
                 secondParameter.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
 
             if (secondParameter is ParameterNode pn)
@@ -125,14 +125,14 @@ namespace IX.Math.Nodes.Function.Binary
         /// The expression.
         /// </returns>
         protected override Expression GenerateExpressionInternal()
-            => this.GenerateExpressionInternal(null);
+            => this.GenerateExpressionInternal(in ComparisonTolerance.Empty);
 
         /// <summary>
         /// Generates the expression with tolerance that will be compiled into code.
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance)
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance)
         {
             Type firstParameterType = typeof(string);
             Type secondParameterType = typeof(int);
@@ -152,7 +152,7 @@ namespace IX.Math.Nodes.Function.Binary
             }
 
             Expression e1, e2;
-            if (tolerance == null)
+            if (tolerance.IsEmpty)
             {
                 e1 = this.FirstParameter.GenerateExpression();
                 e2 = this.SecondParameter.GenerateExpression();

@@ -43,17 +43,17 @@ namespace IX.Math.Extraction
             IDictionary<string, string> reverseConstantsTable,
             MathDefinition mathDefinition)
         {
-            Contract.RequiresNotNullOrWhitespacePrivate(
+            Requires.NotNullOrWhiteSpace(
                 originalExpression,
                 nameof(originalExpression));
-            Contract.RequiresNotNullPrivate(
-                in constantsTable,
+            Requires.NotNull(
+                constantsTable,
                 nameof(constantsTable));
-            Contract.RequiresNotNullPrivate(
-                in reverseConstantsTable,
+            Requires.NotNull(
+                reverseConstantsTable,
                 nameof(reverseConstantsTable));
-            Contract.RequiresNotNullPrivate(
-                in mathDefinition,
+            Requires.NotNull(
+                mathDefinition,
                 nameof(mathDefinition));
 
             var process = originalExpression;

@@ -65,7 +65,7 @@ namespace IX.Math.Nodes.Function.Unary
         {
             if (type != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -78,7 +78,7 @@ namespace IX.Math.Nodes.Function.Unary
         {
             if ((type & SupportableValueType.Numeric) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -95,7 +95,7 @@ namespace IX.Math.Nodes.Function.Unary
             if (parameter.ReturnType != SupportedValueType.String &&
                 parameter.ReturnType != SupportedValueType.ByteArray)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -117,15 +117,15 @@ namespace IX.Math.Nodes.Function.Unary
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance) =>
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance) =>
             Expression.Convert(
                 this.Parameter.ReturnType == SupportedValueType.ByteArray
                     ? this.GenerateParameterPropertyCall<byte[]>(
                         nameof(Array.Length),
-                        tolerance)
+                        in tolerance)
                     : this.GenerateParameterPropertyCall<string>(
                         nameof(string.Length),
-                        tolerance),
+                        in tolerance),
                 typeof(long));
     }
 }

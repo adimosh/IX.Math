@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Math.Exceptions;
 using IX.Math.Extensibility;
 using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
@@ -18,7 +19,7 @@ namespace IX.Math.Nodes
     /// </summary>
     /// <seealso cref="FunctionNodeBase" />
     [PublicAPI]
-    public abstract class BinaryFunctionNodeBase : FunctionNodeBase
+    public abstract partial class BinaryFunctionNodeBase : FunctionNodeBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryFunctionNodeBase"/> class.
@@ -94,7 +95,11 @@ namespace IX.Math.Nodes
         /// <typeparam name="T">The type to call on.</typeparam>
         /// <param name="functionName">Name of the function.</param>
         /// <returns>An expression representing the call.</returns>
-        protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName) => this.GenerateStaticBinaryFunctionCall(typeof(T), functionName, null);
+        protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName) =>
+            this.GenerateStaticBinaryFunctionCall(
+                typeof(T),
+                functionName,
+                in ComparisonTolerance.Empty);
 
         /// <summary>
         /// Generates a static binary function call expression.
@@ -103,7 +108,13 @@ namespace IX.Math.Nodes
         /// <param name="functionName">Name of the function.</param>
         /// <param name="tolerance">The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
         /// <returns>An expression representing the call.</returns>
-        protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName, Tolerance tolerance) => this.GenerateStaticBinaryFunctionCall(typeof(T), functionName, tolerance);
+        protected Expression GenerateStaticBinaryFunctionCall<T>(
+            string functionName,
+            in ComparisonTolerance tolerance) =>
+            this.GenerateStaticBinaryFunctionCall(
+                typeof(T),
+                functionName,
+                in tolerance);
 
         /// <summary>
         /// Generates a static binary function call expression.
@@ -113,7 +124,7 @@ namespace IX.Math.Nodes
         /// <returns>Expression.</returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
         protected Expression GenerateStaticBinaryFunctionCall(Type t, string functionName)
-            => this.GenerateStaticBinaryFunctionCall(t, functionName, null);
+            => this.GenerateStaticBinaryFunctionCall(t, functionName, in ComparisonTolerance.Empty);
 
         /// <summary>
         /// Generates a static binary function call expression.
@@ -123,7 +134,7 @@ namespace IX.Math.Nodes
         /// <param name="tolerance">The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
         /// <returns>Expression.</returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
-        protected Expression GenerateStaticBinaryFunctionCall(Type t, string functionName, Tolerance tolerance)
+        protected Expression GenerateStaticBinaryFunctionCall(Type t, string functionName, in ComparisonTolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
@@ -161,15 +172,15 @@ namespace IX.Math.Nodes
             }
 
             Expression e1, e2;
-            if (tolerance == null)
+            if (tolerance.IsEmpty)
             {
                 e1 = this.FirstParameter.GenerateExpression();
                 e2 = this.SecondParameter.GenerateExpression();
             }
             else
             {
-                e1 = this.FirstParameter.GenerateExpression(tolerance);
-                e2 = this.SecondParameter.GenerateExpression(tolerance);
+                e1 = this.FirstParameter.GenerateExpression(in tolerance);
+                e2 = this.SecondParameter.GenerateExpression(in tolerance);
             }
 
             if (e1.Type != firstParameterType)
@@ -197,7 +208,7 @@ namespace IX.Math.Nodes
         /// </returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
         protected Expression GenerateStaticBinaryFunctionCall<TParam1, TParam2>(Type t, string functionName)
-            => this.GenerateStaticBinaryFunctionCall<TParam1, TParam2>(t, functionName, null);
+            => this.GenerateStaticBinaryFunctionCall<TParam1, TParam2>(t, functionName, in ComparisonTolerance.Empty);
 
         /// <summary>
         /// Generates a static binary function call with explicit parameter types.
@@ -211,28 +222,32 @@ namespace IX.Math.Nodes
         /// The generated binary method call expression.
         /// </returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
-        protected Expression GenerateStaticBinaryFunctionCall<TParam1, TParam2>(Type t, string functionName, Tolerance tolerance)
+        protected Expression GenerateStaticBinaryFunctionCall<TParam1, TParam2>(Type t, string functionName, in ComparisonTolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
-                throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
             }
 
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
             Type secondParameterType = ParameterTypeFromParameter(this.SecondParameter);
 
-            MethodInfo mi = t.GetMethodWithExactParameters(functionName, typeof(TParam1), typeof(TParam2));
+            MethodInfo mi = t.GetMethodWithExactParameters(
+                                functionName,
+                                typeof(TParam1),
+                                typeof(TParam2)) ??
+                            throw new MathematicsEngineException();
 
             Expression e1, e2;
-            if (tolerance == null)
+            if (tolerance.IsEmpty)
             {
                 e1 = this.FirstParameter.GenerateExpression();
                 e2 = this.SecondParameter.GenerateExpression();
             }
             else
             {
-                e1 = this.FirstParameter.GenerateExpression(tolerance);
-                e2 = this.SecondParameter.GenerateExpression(tolerance);
+                e1 = this.FirstParameter.GenerateExpression(in tolerance);
+                e2 = this.SecondParameter.GenerateExpression(in tolerance);
             }
 
             if (e1.Type != firstParameterType)
@@ -268,7 +283,7 @@ namespace IX.Math.Nodes
             this.GenerateBinaryFunctionCallFirstParameterInstance(
                 typeof(T),
                 functionName,
-                null);
+                in ComparisonTolerance.Empty);
 
         /// <summary>
         /// Generates a static binary function call expression.
@@ -283,7 +298,7 @@ namespace IX.Math.Nodes
             this.GenerateBinaryFunctionCallFirstParameterInstance(
                 t,
                 functionName,
-                null);
+                in ComparisonTolerance.Empty);
 
         /// <summary>
         /// Generates a static binary function call expression.
@@ -295,17 +310,28 @@ namespace IX.Math.Nodes
         /// Expression.
         /// </returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
-        protected Expression GenerateBinaryFunctionCallFirstParameterInstance(Type t, string functionName, Tolerance tolerance)
+        protected Expression GenerateBinaryFunctionCallFirstParameterInstance(
+            Type t,
+            string functionName,
+            in ComparisonTolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                throw new ArgumentException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        Resources.FunctionCouldNotBeFound,
+                        functionName),
+                    nameof(functionName));
             }
 
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
             Type secondParameterType = ParameterTypeFromParameter(this.SecondParameter);
 
-            MethodInfo mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
+            MethodInfo mi = t.GetMethodWithExactParameters(
+                functionName,
+                firstParameterType,
+                secondParameterType);
 
             if (mi == null)
             {
@@ -315,54 +341,80 @@ namespace IX.Math.Nodes
                     firstParameterType = typeof(double);
                     secondParameterType = typeof(double);
 
-                    mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
+                    mi = t.GetMethodWithExactParameters(
+                        functionName,
+                        firstParameterType,
+                        secondParameterType);
 
                     if (mi == null)
                     {
                         firstParameterType = typeof(long);
                         secondParameterType = typeof(long);
 
-                        mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
+                        mi = t.GetMethodWithExactParameters(
+                            functionName,
+                            firstParameterType,
+                            secondParameterType);
 
                         if (mi == null)
                         {
                             firstParameterType = typeof(int);
                             secondParameterType = typeof(int);
 
-                            mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType) ??
-                                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                            mi = t.GetMethodWithExactParameters(
+                                     functionName,
+                                     firstParameterType,
+                                     secondParameterType) ??
+                                 throw new ArgumentException(
+                                     string.Format(
+                                         CultureInfo.CurrentCulture,
+                                         Resources.FunctionCouldNotBeFound,
+                                         functionName),
+                                     nameof(functionName));
                         }
                     }
                 }
                 else
                 {
-                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                    throw new ArgumentException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.FunctionCouldNotBeFound,
+                            functionName),
+                        nameof(functionName));
                 }
             }
 
             Expression e1, e2;
-            if (tolerance == null)
+            if (tolerance.IsEmpty)
             {
                 e1 = this.FirstParameter.GenerateExpression();
                 e2 = this.SecondParameter.GenerateExpression();
             }
             else
             {
-                e1 = this.FirstParameter.GenerateExpression(tolerance);
-                e2 = this.SecondParameter.GenerateExpression(tolerance);
+                e1 = this.FirstParameter.GenerateExpression(in tolerance);
+                e2 = this.SecondParameter.GenerateExpression(in tolerance);
             }
 
             if (e1.Type != firstParameterType)
             {
-                e1 = Expression.Convert(e1, firstParameterType);
+                e1 = Expression.Convert(
+                    e1,
+                    firstParameterType);
             }
 
             if (e2.Type != secondParameterType)
             {
-                e2 = Expression.Convert(e2, secondParameterType);
+                e2 = Expression.Convert(
+                    e2,
+                    secondParameterType);
             }
 
-            return Expression.Call(e1, mi, e2);
+            return Expression.Call(
+                e1,
+                mi,
+                e2);
         }
     }
 }

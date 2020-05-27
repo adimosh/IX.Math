@@ -52,38 +52,38 @@ namespace IX.Math.Extraction
             [NotNull] string[] allSymbols)
         {
             // Validate parameters
-            Contract.RequiresNotNullOrWhitespacePrivate(
+            Requires.NotNullOrWhiteSpace(
                 openParenthesis,
                 nameof(openParenthesis));
-            Contract.RequiresNotNullOrWhitespacePrivate(
+            Requires.NotNullOrWhiteSpace(
                 closeParenthesis,
                 nameof(closeParenthesis));
-            Contract.RequiresNotNullOrWhitespacePrivate(
+            Requires.NotNullOrWhiteSpace(
                 parameterSeparator,
                 nameof(parameterSeparator));
-            Contract.RequiresNotNullPrivate(
-                in constantsTable,
+            Requires.NotNull(
+                constantsTable,
                 nameof(constantsTable));
-            Contract.RequiresNotNullPrivate(
-                in reverseConstantsTable,
+            Requires.NotNull(
+                reverseConstantsTable,
                 nameof(reverseConstantsTable));
-            Contract.RequiresNotNullPrivate(
-                in symbolTable,
+            Requires.NotNull(
+                symbolTable,
                 nameof(symbolTable));
-            Contract.RequiresNotNullPrivate(
-                in reverseSymbolTable,
+            Requires.NotNull(
+                reverseSymbolTable,
                 nameof(reverseSymbolTable));
-            Contract.RequiresNotNullPrivate(
-                in interpreters,
+            Requires.NotNull(
+                interpreters,
                 nameof(interpreters));
-            Contract.RequiresNotNullPrivate(
-                in parametersTable,
+            Requires.NotNull(
+                parametersTable,
                 nameof(parametersTable));
-            Contract.RequiresNotNullOrWhitespacePrivate(
+            Requires.NotNullOrWhiteSpace(
                 expression,
                 nameof(expression));
-            Contract.RequiresNotNullPrivate(
-                in allSymbols,
+            Requires.NotNull(
+                allSymbols,
                 nameof(allSymbols));
 
             // Replace the main expression

@@ -1,4 +1,4 @@
-// <copyright file="OrNode.cs" company="Adrian Mos">
+// <copyright file="DivideNode.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -6,21 +6,21 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 
-namespace IX.Math.Nodes.Operations.Binary
+namespace IX.Math.Nodes.Operations.Binary.Mathematic
 {
     /// <summary>
-    ///     A node representing the or logical operation.
+    ///     A node representing a division operation.
     /// </summary>
-    /// <seealso cref="LogicalOperationNodeBase" />
-    [DebuggerDisplay("{" + nameof(Left) + "} | {" + nameof(Right) + "}")]
-    internal sealed class OrNode : LogicalOperationNodeBase
+    /// <seealso cref="SimpleMathematicalOperationNodeBase" />
+    [DebuggerDisplay("{" + nameof(Left) + "} / {" + nameof(Right) + "}")]
+    internal sealed class DivideNode : SimpleMathematicalOperationNodeBase
     {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="OrNode" /> class.
+        ///     Initializes a new instance of the <see cref="DivideNode" /> class.
         /// </summary>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
-        public OrNode(
+        public DivideNode(
             NodeBase left,
             NodeBase right)
             : base(
@@ -35,14 +35,17 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <returns>
         ///     A simplified node, or this instance.
         /// </returns>
-        public override NodeBase Simplify() =>
-            this.Left switch
+        public override NodeBase Simplify()
+        {
+            if (this.Left is NumericNode nnLeft && this.Right is NumericNode nnRight)
             {
-                NumericNode nnLeft when this.Right is NumericNode nnRight => new NumericNode(
-                    nnLeft.ExtractInteger() | nnRight.ExtractInteger()),
-                BoolNode bnLeft when this.Right is BoolNode bnRight => new BoolNode(bnLeft.Value | bnRight.Value),
-                _ => this
-            };
+                return NumericNode.Divide(
+                    nnLeft,
+                    nnRight);
+            }
+
+            return this;
+        }
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -50,7 +53,7 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
-            new OrNode(
+            new DivideNode(
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
 
@@ -61,18 +64,26 @@ namespace IX.Math.Nodes.Operations.Binary
         ///     The expression.
         /// </returns>
         protected override Expression GenerateExpressionInternal() =>
-            Expression.Or(
-                this.Left.GenerateExpression(),
-                this.Right.GenerateExpression());
+            Expression.Divide(
+                Expression.Convert(
+                    this.Left.GenerateExpression(),
+                    typeof(double)),
+                Expression.Convert(
+                    this.Right.GenerateExpression(),
+                    typeof(double)));
 
         /// <summary>
         ///     Generates the expression with tolerance that will be compiled into code.
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance) =>
-            Expression.Or(
-                this.Left.GenerateExpression(tolerance),
-                this.Right.GenerateExpression(tolerance));
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance) =>
+            Expression.Divide(
+                Expression.Convert(
+                    this.Left.GenerateExpression(in tolerance),
+                    typeof(double)),
+                Expression.Convert(
+                    this.Right.GenerateExpression(in tolerance),
+                    typeof(double)));
     }
 }

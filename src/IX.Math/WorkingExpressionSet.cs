@@ -12,13 +12,17 @@ using IX.Math.Extensibility;
 using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Operations.Binary;
+using IX.Math.Nodes.Operations.Binary.Bitwise;
+using IX.Math.Nodes.Operations.Binary.Comparison;
+using IX.Math.Nodes.Operations.Binary.Logical;
+using IX.Math.Nodes.Operations.Binary.Mathematic;
 using IX.Math.Nodes.Operations.Unary;
 using IX.Math.Registration;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Extensions;
 using IX.System.Collections.Generic;
 using DiagCA = System.Diagnostics.CodeAnalysis;
-using SubtractNode = IX.Math.Nodes.Operations.Binary.SubtractNode;
+using SubtractNode = IX.Math.Nodes.Operations.Binary.Mathematic.SubtractNode;
 
 namespace IX.Math
 {
@@ -505,45 +509,54 @@ namespace IX.Math
                     definition.GreaterThanOrEqualSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) => new GreaterThanOrEqualNode(
+                        rightOperand) => new ComparisonOperatorNode(
                         leftOperand,
-                        rightOperand),
+                        rightOperand,
+                        true,
+                        false),
                     10
                 },
                 {
                     definition.LessThanOrEqualSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) => new LessThanOrEqualNode(
+                        rightOperand) => new ComparisonOperatorNode(
                         leftOperand,
-                        rightOperand),
+                        rightOperand,
+                        true,
+                        true),
                     10
                 },
                 {
                     definition.GreaterThanSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) => new GreaterThanNode(
+                        rightOperand) => new ComparisonOperatorNode(
                         leftOperand,
-                        rightOperand),
+                        rightOperand,
+                        false,
+                        false),
                     10
                 },
                 {
                     definition.LessThanSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) => new LessThanNode(
+                        rightOperand) => new ComparisonOperatorNode(
                         leftOperand,
-                        rightOperand),
+                        rightOperand,
+                        false,
+                        true),
                     10
                 },
                 {
                     definition.NotEqualsSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) => new NotEqualsNode(
+                        rightOperand) => new EqualsNode(
                         leftOperand,
-                        rightOperand),
+                        rightOperand,
+                        true),
                     10
                 },
                 {
@@ -552,7 +565,8 @@ namespace IX.Math
                         leftOperand,
                         rightOperand) => new EqualsNode(
                         leftOperand,
-                        rightOperand),
+                        rightOperand,
+                        false),
                     10
                 },
 

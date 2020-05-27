@@ -3,22 +3,20 @@
 // </copyright>
 
 using System;
-#if !STANDARD
 using System.Runtime.Serialization;
-#endif
 using JetBrains.Annotations;
 
+// ReSharper disable once CheckNamespace
 namespace IX.Math
 {
     /// <summary>
     /// Thrown when a function call is not internally logical or consistent.
     /// </summary>
     /// <seealso cref="Exception" />
-#if !STANDARD
     [Serializable]
-#endif
     [PublicAPI]
-    public class FunctionCallNotValidLogicallyException : Exception
+    [Obsolete("Use the base exception.")]
+    public class FunctionCallNotValidLogicallyException : Exceptions.FunctionCallNotValidLogicallyException
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionCallNotValidLogicallyException"/> class.
@@ -56,7 +54,6 @@ namespace IX.Math
         {
         }
 
-#if !STANDARD
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionCallNotValidLogicallyException"/> class.
         /// </summary>
@@ -66,6 +63,5 @@ namespace IX.Math
             : base(info, context)
         {
         }
-#endif
     }
 }

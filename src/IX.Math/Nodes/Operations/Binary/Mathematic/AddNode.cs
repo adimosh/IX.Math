@@ -5,15 +5,15 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Math.Exceptions;
 using IX.Math.Extensibility;
 using IX.Math.Formatters;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Extensions;
 
-namespace IX.Math.Nodes.Operations.Binary
+namespace IX.Math.Nodes.Operations.Binary.Mathematic
 {
     /// <summary>
     ///     A node representing an addition operation.
@@ -139,64 +139,76 @@ namespace IX.Math.Nodes.Operations.Binary
                 case StringNode sn1Left when this.Right is StringNode sn1Right:
                     return new StringNode(sn1Left.Value + sn1Right.Value);
                 case NumericNode nn2Left when this.Right is StringNode sn2Right:
-                {
-                    string stringValue;
-                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
                     {
-                        stringValue = nn2Left.Value.ToString();
-                    }
-                    else
-                    {
-                        stringValue = StringFormatter.FormatIntoString(nn2Left.Value, formatters);
-                    }
+                        if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                        {
+                            formatters = null;
+                        }
 
-                    return new StringNode($"{stringValue}{sn2Right.Value}");
-                }
+                        var stringValue = StringFormatter.FormatIntoString(nn2Left.Value, formatters);
+
+                        return new StringNode($"{stringValue}{sn2Right.Value}");
+                    }
 
                 case StringNode sn3Left when this.Right is NumericNode nn3Right:
-                {
-                    string stringValue;
-                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
                     {
-                        stringValue = nn3Right.Value.ToString();
-                    }
-                    else
-                    {
-                        stringValue = StringFormatter.FormatIntoString(nn3Right.Value, formatters);
-                    }
+                        if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                        {
+                            formatters = null;
+                        }
 
-                    return new StringNode($"{sn3Left.Value}{stringValue}");
-                }
+                        var stringValue = StringFormatter.FormatIntoString(nn3Right.Value, formatters);
+
+                        return new StringNode($"{sn3Left.Value}{stringValue}");
+                    }
 
                 case BoolNode bn4Left when this.Right is StringNode sn4Right:
-                {
-                    string stringValue;
-                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
                     {
-                        stringValue = bn4Left.Value.ToString(CultureInfo.CurrentCulture);
-                    }
-                    else
-                    {
-                        stringValue = StringFormatter.FormatIntoString(bn4Left.Value, formatters);
-                    }
+                        if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                        {
+                            formatters = null;
+                        }
 
-                    return new StringNode($"{stringValue}{sn4Right.Value}");
-                }
+                        var stringValue = StringFormatter.FormatIntoString(bn4Left.Value, formatters);
+
+                        return new StringNode($"{stringValue}{sn4Right.Value}");
+                    }
 
                 case StringNode sn5Left when this.Right is BoolNode bn5Right:
-                {
-                    string stringValue;
-                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
                     {
-                        stringValue = bn5Right.Value.ToString(CultureInfo.CurrentCulture);
-                    }
-                    else
-                    {
-                        stringValue = StringFormatter.FormatIntoString(bn5Right.Value, formatters);
+                        if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                        {
+                            formatters = null;
+                        }
+
+                        var stringValue = StringFormatter.FormatIntoString(bn5Right.Value, formatters);
+
+                        return new StringNode($"{sn5Left.Value}{stringValue}");
                     }
 
-                    return new StringNode($"{sn5Left.Value}{stringValue}");
-                }
+                case ByteArrayNode ba4Left when this.Right is StringNode sn4Right:
+                    {
+                        if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                        {
+                            formatters = null;
+                        }
+
+                        var stringValue = StringFormatter.FormatIntoString(ba4Left.Value, formatters);
+
+                        return new StringNode($"{stringValue}{sn4Right.Value}");
+                    }
+
+                case StringNode sn5Left when this.Right is ByteArrayNode ba5Right:
+                    {
+                        if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                        {
+                            formatters = null;
+                        }
+
+                        var stringValue = StringFormatter.FormatIntoString(ba5Right.Value, formatters);
+
+                        return new StringNode($"{sn5Left.Value}{stringValue}");
+                    }
 
                 case ByteArrayNode ban5Left when this.Right is ByteArrayNode ban5Right:
                     return new ByteArrayNode(
@@ -226,7 +238,7 @@ namespace IX.Math.Nodes.Operations.Binary
             switch (type)
             {
                 case SupportedValueType.Boolean:
-                    throw new ExpressionNotValidLogicallyException();
+                    throw new Exceptions.ExpressionNotValidLogicallyException();
                 case SupportedValueType.ByteArray:
                     this.Left.DetermineStrongly(SupportedValueType.ByteArray);
                     this.Right.DetermineStrongly(SupportedValueType.ByteArray);
@@ -292,7 +304,7 @@ namespace IX.Math.Nodes.Operations.Binary
                         right.ReturnType != SupportedValueType.String &&
                         right.ReturnType != SupportedValueType.Unknown)
                     {
-                        throw new ExpressionNotValidLogicallyException();
+                        throw new Exceptions.ExpressionNotValidLogicallyException();
                     }
 
                     break;
@@ -300,7 +312,7 @@ namespace IX.Math.Nodes.Operations.Binary
                 case SupportedValueType.Boolean:
                     if (right.ReturnType != SupportedValueType.String)
                     {
-                        throw new ExpressionNotValidLogicallyException();
+                        throw new Exceptions.ExpressionNotValidLogicallyException();
                     }
 
                     break;
@@ -310,7 +322,7 @@ namespace IX.Math.Nodes.Operations.Binary
                         right.ReturnType != SupportedValueType.String &&
                         right.ReturnType != SupportedValueType.Unknown)
                     {
-                        throw new ExpressionNotValidLogicallyException();
+                        throw new Exceptions.ExpressionNotValidLogicallyException();
                     }
 
                     break;
@@ -327,7 +339,7 @@ namespace IX.Math.Nodes.Operations.Binary
                         left.ReturnType != SupportedValueType.String &&
                         left.ReturnType != SupportedValueType.Unknown)
                     {
-                        throw new ExpressionNotValidLogicallyException();
+                        throw new Exceptions.ExpressionNotValidLogicallyException();
                     }
 
                     break;
@@ -335,7 +347,7 @@ namespace IX.Math.Nodes.Operations.Binary
                 case SupportedValueType.Boolean:
                     if (left.ReturnType != SupportedValueType.String)
                     {
-                        throw new ExpressionNotValidLogicallyException();
+                        throw new Exceptions.ExpressionNotValidLogicallyException();
                     }
 
                     break;
@@ -345,7 +357,7 @@ namespace IX.Math.Nodes.Operations.Binary
                         left.ReturnType != SupportedValueType.String &&
                         left.ReturnType != SupportedValueType.Unknown)
                     {
-                        throw new ExpressionNotValidLogicallyException();
+                        throw new Exceptions.ExpressionNotValidLogicallyException();
                     }
 
                     break;
@@ -372,20 +384,22 @@ namespace IX.Math.Nodes.Operations.Binary
                     MethodInfo mi1 = typeof(string).GetMethodWithExactParameters(
                         nameof(string.Concat),
                         typeof(string),
-                        typeof(string));
+                        typeof(string)) ?? throw new MathematicsEngineException();
                     return Expression.Call(
                         mi1,
                         leftExpression,
                         rightExpression);
+
                 case SupportedValueType.ByteArray:
                     MethodInfo mi2 = typeof(AddNode).GetMethodWithExactParameters(
                         nameof(Stitch),
                         typeof(byte[]),
-                        typeof(byte[]));
+                        typeof(byte[])) ?? throw new MathematicsEngineException();
                     return Expression.Call(
                         mi2,
                         leftExpression,
                         rightExpression);
+
                 default:
                     return Expression.Add(
                         leftExpression,
@@ -398,10 +412,10 @@ namespace IX.Math.Nodes.Operations.Binary
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance)
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance)
         {
             (Expression leftExpression, Expression rightExpression) =
-                this.GetExpressionsOfSameTypeFromOperands(tolerance);
+                this.GetExpressionsOfSameTypeFromOperands(in tolerance);
 
             switch (this.ReturnType)
             {
@@ -410,6 +424,12 @@ namespace IX.Math.Nodes.Operations.Binary
                         nameof(string.Concat),
                         typeof(string),
                         typeof(string));
+
+                    if (mi1 == null)
+                    {
+                        throw new MathematicsEngineException();
+                    }
+
                     return Expression.Call(
                         mi1,
                         leftExpression,
@@ -419,6 +439,12 @@ namespace IX.Math.Nodes.Operations.Binary
                         nameof(Stitch),
                         typeof(byte[]),
                         typeof(byte[]));
+
+                    if (mi2 == null)
+                    {
+                        throw new MathematicsEngineException();
+                    }
+
                     return Expression.Call(
                         mi2,
                         leftExpression,

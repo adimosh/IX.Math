@@ -40,7 +40,7 @@ namespace IX.Math.Nodes.Function.Binary
         {
             if (type != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -53,7 +53,7 @@ namespace IX.Math.Nodes.Function.Binary
         {
             if ((type & SupportableValueType.Numeric) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -63,7 +63,7 @@ namespace IX.Math.Nodes.Function.Binary
         /// </summary>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
-        /// <exception cref="ExpressionNotValidLogicallyException">
+        /// <exception cref="Exceptions.ExpressionNotValidLogicallyException">
         ///     The expression is not valid logically.
         /// </exception>
         protected sealed override void EnsureCompatibleParameters(
@@ -75,12 +75,12 @@ namespace IX.Math.Nodes.Function.Binary
 
             if (firstParameter.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
 
             if (secondParameter.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
     }

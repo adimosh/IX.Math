@@ -34,8 +34,8 @@ namespace IX.Math.Generators
             Justification = "We want this to happen.")]
         internal static ComputationBody CreateBody([NotNull] WorkingExpressionSet workingSet)
         {
-            Contract.RequiresNotNullPrivate(
-                in workingSet,
+            Requires.NotNull(
+                workingSet,
                 nameof(workingSet));
 
             if (workingSet.CancellationToken.IsCancellationRequested)
@@ -184,11 +184,11 @@ namespace IX.Math.Generators
             [NotNull] string expression,
             [NotNull] WorkingExpressionSet workingSet)
         {
-            Contract.RequiresNotNullOrWhitespacePrivate(
+            Requires.NotNullOrWhiteSpace(
                 expression,
                 nameof(expression));
-            Contract.RequiresNotNullPrivate(
-                in workingSet,
+            Requires.NotNull(
+                workingSet,
                 nameof(workingSet));
 
             if (workingSet.CancellationToken.IsCancellationRequested)

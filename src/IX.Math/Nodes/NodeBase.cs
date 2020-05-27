@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Linq.Expressions;
 using IX.StandardExtensions;
 using JetBrains.Annotations;
@@ -64,7 +65,22 @@ namespace IX.Math.Nodes
         ///     The generated <see cref="Expression" />.
         /// </returns>
         [NotNull]
-        public virtual Expression GenerateExpression(Tolerance tolerance) => this.GenerateExpression();
+        [Obsolete("This method is obsolete, please use the one accepting a ComparisonTolerance parameter.")]
+        public Expression GenerateExpression(Tolerance tolerance)
+        {
+            ComparisonTolerance ct = tolerance;
+            return this.GenerateExpression(in ct);
+        }
+
+        /// <summary>
+        ///     Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>
+        ///     The generated <see cref="Expression" />.
+        /// </returns>
+        [NotNull]
+        public virtual Expression GenerateExpression(in ComparisonTolerance tolerance) => this.GenerateExpression();
 
         /// <summary>
         ///     Generates the expression that will be compiled into code as a string expression.
@@ -79,7 +95,20 @@ namespace IX.Math.Nodes
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The generated <see cref="Expression" /> that gives the values as a string.</returns>
         [NotNull]
-        public virtual Expression GenerateStringExpression(Tolerance tolerance) => this.GenerateStringExpression();
+        [Obsolete("This method is obsolete, please use the one accepting a ComparisonTolerance parameter.")]
+        public Expression GenerateStringExpression(Tolerance tolerance)
+        {
+            ComparisonTolerance ct = tolerance;
+            return this.GenerateStringExpression(in ct);
+        }
+
+        /// <summary>
+        ///     Generates the expression that will be compiled into code as a string expression.
+        /// </summary>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <returns>The generated <see cref="Expression" /> that gives the values as a string.</returns>
+        [NotNull]
+        public virtual Expression GenerateStringExpression(in ComparisonTolerance tolerance) => this.GenerateStringExpression();
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.

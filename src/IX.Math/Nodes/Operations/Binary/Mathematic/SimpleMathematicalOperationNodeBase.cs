@@ -4,7 +4,7 @@
 
 using System.Linq.Expressions;
 
-namespace IX.Math.Nodes.Operations.Binary
+namespace IX.Math.Nodes.Operations.Binary.Mathematic
 {
     /// <summary>
     /// A node base for simple mathematical operations.
@@ -38,7 +38,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (type != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -50,7 +50,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if ((type & SupportableValueType.Numeric) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -61,7 +61,7 @@ namespace IX.Math.Nodes.Operations.Binary
 
             if (left.ReturnType != SupportedValueType.Numeric || right.ReturnType != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 

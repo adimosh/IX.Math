@@ -1,4 +1,4 @@
-// <copyright file="SubtractNode.cs" company="Adrian Mos">
+// <copyright file="MultiplyNode.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -6,21 +6,21 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Nodes.Constants;
 
-namespace IX.Math.Nodes.Operations.Binary
+namespace IX.Math.Nodes.Operations.Binary.Mathematic
 {
     /// <summary>
-    ///     A node for a subtraction operation.
+    ///     A node representing a multiplication operation.
     /// </summary>
     /// <seealso cref="SimpleMathematicalOperationNodeBase" />
-    [DebuggerDisplay("{" + nameof(Left) + "} - {" + nameof(Right) + "}")]
-    internal sealed class SubtractNode : SimpleMathematicalOperationNodeBase
+    [DebuggerDisplay("{" + nameof(Left) + "} * {" + nameof(Right) + "}")]
+    internal sealed class MultiplyNode : SimpleMathematicalOperationNodeBase
     {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="SubtractNode" /> class.
+        ///     Initializes a new instance of the <see cref="MultiplyNode" /> class.
         /// </summary>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
-        public SubtractNode(
+        public MultiplyNode(
             NodeBase left,
             NodeBase right)
             : base(
@@ -39,7 +39,7 @@ namespace IX.Math.Nodes.Operations.Binary
         {
             if (this.Left is NumericNode nnLeft && this.Right is NumericNode nnRight)
             {
-                return NumericNode.Subtract(
+                return NumericNode.Multiply(
                     nnLeft,
                     nnRight);
             }
@@ -53,7 +53,7 @@ namespace IX.Math.Nodes.Operations.Binary
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
-            new SubtractNode(
+            new MultiplyNode(
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
 
@@ -72,7 +72,7 @@ namespace IX.Math.Nodes.Operations.Binary
                 ref left,
                 ref right);
 
-            return Expression.Subtract(
+            return Expression.Multiply(
                 left,
                 right);
         }
@@ -82,20 +82,18 @@ namespace IX.Math.Nodes.Operations.Binary
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance)
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance)
         {
-            {
-                var left = this.Left.GenerateExpression(tolerance);
-                var right = this.Right.GenerateExpression(tolerance);
+            var left = this.Left.GenerateExpression(in tolerance);
+            var right = this.Right.GenerateExpression(in tolerance);
 
-                this.EnsureCompatibleNumericExpressions(
-                    ref left,
-                    ref right);
+            this.EnsureCompatibleNumericExpressions(
+                ref left,
+                ref right);
 
-                return Expression.Subtract(
-                    left,
-                    right);
-            }
+            return Expression.Multiply(
+                left,
+                right);
         }
     }
 }

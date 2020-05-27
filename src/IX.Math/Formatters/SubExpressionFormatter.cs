@@ -10,8 +10,8 @@ namespace IX.Math.Formatters
     {
         internal static string Cleanup(string expression)
         {
-            Contract.RequiresNotNullPrivate(
-                in expression,
+            Requires.NotNull(
+                expression,
                 nameof(expression));
 
             return expression.Trim().Replace(

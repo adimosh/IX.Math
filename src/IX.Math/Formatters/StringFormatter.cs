@@ -84,8 +84,8 @@ namespace IX.Math.Formatters
                     Expression expression,
                     List<IStringFormatter> stringFormatters)
         {
-            Contract.RequiresNotNull(
-                in expression,
+            Requires.NotNull(
+                expression,
                 nameof(expression));
 
             if (expression.Type == typeof(string))
@@ -207,7 +207,7 @@ namespace IX.Math.Formatters
                     expression);
             }
 
-            throw new ExpressionNotValidLogicallyException();
+            throw new Exceptions.ExpressionNotValidLogicallyException();
         }
     }
 }

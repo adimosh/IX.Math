@@ -2,11 +2,13 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
 using System.Threading;
 using IX.StandardExtensions.Efficiency;
 using JetBrains.Annotations;
 using DiagCA = System.Diagnostics.CodeAnalysis;
 
+// ReSharper disable once CheckNamespace
 namespace IX.Math
 {
     /// <summary>
@@ -21,6 +23,7 @@ namespace IX.Math
     /// </remarks>
     /// <seealso cref="ExpressionParsingServiceBase" />
     [PublicAPI]
+    [Obsolete("This class should not longer be used, and MathematicPortfolio should be used instead.")]
     public sealed class CachedExpressionParsingService : ExpressionParsingServiceBase
     {
         private ConcurrentDictionary<string, ComputedExpression> cachedComputedExpressions;
@@ -100,7 +103,7 @@ namespace IX.Math
         /// <summary>
         ///     Disposes in the general (managed and unmanaged) context.
         /// </summary>
-        [DiagCA.SuppressMessageAttribute(
+        [DiagCA.SuppressMessage(
             "IDisposableAnalyzers.Correctness",
             "IDISP003:Dispose previous before re-assigning.",
             Justification = "It is disposed.")]

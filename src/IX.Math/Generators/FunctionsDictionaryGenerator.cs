@@ -29,8 +29,8 @@ namespace IX.Math.Generators
         private static Dictionary<string, Type> GenerateTypeAssignableFrom<T>(IEnumerable<Assembly> assemblies)
             where T : FunctionNodeBase
         {
-            Contract.RequiresNotNullPrivate(
-                in assemblies,
+            Requires.NotNull(
+                assemblies,
                 nameof(assemblies));
 
             var typeDictionary = new Dictionary<string, Type>();

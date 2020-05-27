@@ -33,11 +33,11 @@ namespace IX.Math.Nodes.Operations.Binary
             NodeBase left,
             NodeBase right)
         {
-            Contract.RequiresNotNull(
-                in left,
+            Requires.NotNull(
+                left,
                 nameof(left));
-            Contract.RequiresNotNull(
-                in right,
+            Requires.NotNull(
+                right,
                 nameof(right));
 
             this.EnsureCompatibleOperands(
@@ -152,16 +152,16 @@ namespace IX.Math.Nodes.Operations.Binary
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The left and right operand expressions.</returns>
-        protected (Expression Left, Expression Right) GetExpressionsOfSameTypeFromOperands(Tolerance tolerance)
+        protected (Expression Left, Expression Right) GetExpressionsOfSameTypeFromOperands(in ComparisonTolerance tolerance)
         {
             if (this.Left.ReturnType == SupportedValueType.String || this.Right.ReturnType == SupportedValueType.String)
             {
-                return (this.Left.GenerateStringExpression(tolerance),
-                    this.Right.GenerateStringExpression(tolerance));
+                return (this.Left.GenerateStringExpression(in tolerance),
+                    this.Right.GenerateStringExpression(in tolerance));
             }
 
-            Expression le = this.Left.GenerateExpression(tolerance);
-            Expression re = this.Right.GenerateExpression(tolerance);
+            Expression le = this.Left.GenerateExpression(in tolerance);
+            Expression re = this.Right.GenerateExpression(in tolerance);
 
             if (le.Type == typeof(double) && re.Type == typeof(long))
             {

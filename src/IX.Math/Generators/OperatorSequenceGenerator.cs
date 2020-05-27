@@ -16,11 +16,11 @@ namespace IX.Math.Generators
             [NotNull] string expression,
             [NotNull] KeyValuePair<int, string[]>[] operators)
         {
-            Contract.RequiresNotNullPrivate(
-                in expression,
+            Requires.NotNull(
+                expression,
                 nameof(expression));
-            Contract.RequiresNotNullPrivate(
-                in operators,
+            Requires.NotNull(
+                operators,
                 nameof(operators));
 
             var indexes = new List<Tuple<int, int, string>>();

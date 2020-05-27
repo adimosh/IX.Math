@@ -94,7 +94,7 @@ namespace IX.Math.Nodes.Function.Ternary
         {
             if (type != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -107,7 +107,7 @@ namespace IX.Math.Nodes.Function.Ternary
         {
             if ((type & SupportableValueType.String) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -130,7 +130,7 @@ namespace IX.Math.Nodes.Function.Ternary
                 second.ReturnType != SupportedValueType.String ||
                 third.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -140,14 +140,14 @@ namespace IX.Math.Nodes.Function.Ternary
         /// <returns>
         ///     The expression.
         /// </returns>
-        protected override Expression GenerateExpressionInternal() => this.GenerateExpressionInternal(null);
+        protected override Expression GenerateExpressionInternal() => this.GenerateExpressionInternal(in ComparisonTolerance.Empty);
 
         /// <summary>
         ///     Generates the expression with tolerance that will be compiled into code.
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance)
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance)
         {
             MethodInfo mi = typeof(string).GetMethodWithExactParameters(
                 nameof(string.Replace),
@@ -164,7 +164,7 @@ namespace IX.Math.Nodes.Function.Ternary
             }
 
             Expression e1, e2, e3;
-            if (tolerance == null)
+            if (tolerance.IsEmpty)
             {
                 e1 = this.FirstParameter.GenerateStringExpression();
                 e2 = this.SecondParameter.GenerateStringExpression();
@@ -172,9 +172,9 @@ namespace IX.Math.Nodes.Function.Ternary
             }
             else
             {
-                e1 = this.FirstParameter.GenerateStringExpression(tolerance);
-                e2 = this.SecondParameter.GenerateStringExpression(tolerance);
-                e3 = this.ThirdParameter.GenerateStringExpression(tolerance);
+                e1 = this.FirstParameter.GenerateStringExpression(in tolerance);
+                e2 = this.SecondParameter.GenerateStringExpression(in tolerance);
+                e3 = this.ThirdParameter.GenerateStringExpression(in tolerance);
             }
 
             return Expression.Call(

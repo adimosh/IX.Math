@@ -34,9 +34,10 @@ namespace IX.Math.Nodes.Function.Binary
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeRound(
-            this.FirstParameter.DeepClone(context),
-            this.SecondParameter.DeepClone(context));
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new FunctionNodeRound(
+                this.FirstParameter.DeepClone(context),
+                this.SecondParameter.DeepClone(context));
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
@@ -65,14 +66,14 @@ namespace IX.Math.Nodes.Function.Binary
                 nameof(GlobalSystem.Math.Round));
 
         /// <summary>
-        /// Generates the expression with tolerance that will be compiled into code.
+        ///     Generates the expression with tolerance that will be compiled into code.
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance) =>
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance) =>
             this.GenerateStaticBinaryFunctionCall<double, int>(
                 typeof(GlobalSystem.Math),
                 nameof(GlobalSystem.Math.Round),
-                tolerance);
+                in tolerance);
     }
 }

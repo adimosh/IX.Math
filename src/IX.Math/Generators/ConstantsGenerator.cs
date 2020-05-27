@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using IX.Math.Extensibility;
 using IX.Math.Formatters;
 using IX.Math.Nodes;
@@ -41,19 +40,19 @@ namespace IX.Math.Generators
             [NotNull] string stringIndicator,
             [NotNull] string content)
         {
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 originalExpression,
                 nameof(originalExpression));
-            Contract.RequiresNotNull(
-                in constantsTable,
+            Requires.NotNull(
+                constantsTable,
                 nameof(constantsTable));
-            Contract.RequiresNotNull(
-                in reverseConstantsTable,
+            Requires.NotNull(
+                reverseConstantsTable,
                 nameof(reverseConstantsTable));
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 stringIndicator,
                 nameof(stringIndicator));
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 content,
                 nameof(content));
 
@@ -95,16 +94,16 @@ namespace IX.Math.Generators
             [NotNull] string originalExpression,
             [NotNull] string content)
         {
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 originalExpression,
                 nameof(originalExpression));
-            Contract.RequiresNotNull(
-                in constantsTable,
+            Requires.NotNull(
+                constantsTable,
                 nameof(constantsTable));
-            Contract.RequiresNotNull(
-                in reverseConstantsTable,
+            Requires.NotNull(
+                reverseConstantsTable,
                 nameof(reverseConstantsTable));
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 content,
                 nameof(content));
 
@@ -149,14 +148,14 @@ namespace IX.Math.Generators
             double value,
             params string[] alternateNames)
         {
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 name,
                 nameof(name));
-            Contract.RequiresNotNull(
-                in constantsTable,
+            Requires.NotNull(
+                constantsTable,
                 nameof(constantsTable));
-            Contract.RequiresNotNull(
-                in reverseConstantsTable,
+            Requires.NotNull(
+                reverseConstantsTable,
                 nameof(reverseConstantsTable));
 
             if (reverseConstantsTable.TryGetValue(
@@ -206,17 +205,17 @@ namespace IX.Math.Generators
             [CanBeNull] string content)
         {
             // Contract validation
-            Contract.RequiresNotNullOrWhitespacePrivate(
+            Requires.NotNullOrWhiteSpace(
                 originalExpression,
                 nameof(originalExpression));
-            Contract.RequiresNotNullPrivate(
-                in constantsTable,
+            Requires.NotNull(
+                constantsTable,
                 nameof(constantsTable));
-            Contract.RequiresNotNullPrivate(
-                in reverseConstantsTable,
+            Requires.NotNull(
+                reverseConstantsTable,
                 nameof(reverseConstantsTable));
-            Contract.RequiresNotNullPrivate(
-                in interpreters,
+            Requires.NotNull(
+                interpreters,
                 nameof(interpreters));
 
             // No content
@@ -296,8 +295,8 @@ namespace IX.Math.Generators
             [NotNull] IEnumerable<string> keys,
             string originalExpression)
         {
-            Contract.RequiresNotNullPrivate(
-                in keys,
+            Requires.NotNull(
+                keys,
                 nameof(keys));
 
             var index = int.Parse(

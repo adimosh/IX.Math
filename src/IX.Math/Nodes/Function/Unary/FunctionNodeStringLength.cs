@@ -71,7 +71,7 @@ namespace IX.Math.Nodes.Function.Unary
         {
             if (type != SupportedValueType.Numeric)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -84,7 +84,7 @@ namespace IX.Math.Nodes.Function.Unary
         {
             if ((type & SupportableValueType.Numeric) == 0)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -93,14 +93,14 @@ namespace IX.Math.Nodes.Function.Unary
         ///     reference to change.
         /// </summary>
         /// <param name="parameter">The parameter.</param>
-        /// <exception cref="ExpressionNotValidLogicallyException">The expression is not logically valid.</exception>
+        /// <exception cref="Exceptions.ExpressionNotValidLogicallyException">The expression is not logically valid.</exception>
         protected override void EnsureCompatibleParameter(NodeBase parameter)
         {
             parameter.DetermineStrongly(SupportedValueType.String);
 
             if (parameter.ReturnType != SupportedValueType.String)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
         }
 
@@ -120,11 +120,11 @@ namespace IX.Math.Nodes.Function.Unary
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance) =>
+        protected override Expression GenerateExpressionInternal(in ComparisonTolerance tolerance) =>
             Expression.Convert(
                 this.GenerateParameterPropertyCall<string>(
                     nameof(string.Length),
-                    tolerance),
+                    in tolerance),
                 typeof(long));
     }
 }

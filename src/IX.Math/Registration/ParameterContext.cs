@@ -126,7 +126,7 @@ namespace IX.Math.Registration
             var newVal = limit & this.SupportedReturnType;
             if (newVal == SupportableValueType.None)
             {
-                throw new ExpressionNotValidLogicallyException();
+                throw new Exceptions.ExpressionNotValidLogicallyException();
             }
 
             this.SupportedReturnType = newVal;
@@ -171,7 +171,12 @@ namespace IX.Math.Registration
                     return;
 
                 default:
-                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterTypeNotRecognized, this.Name), this.Name);
+                    throw new ArgumentException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.ParameterTypeNotRecognized,
+                            this.Name),
+                        this.Name);
             }
 
             void ChangeReturnType(SupportedValueType newReturnType)
@@ -185,14 +190,22 @@ namespace IX.Math.Registration
                 {
                     if (this.alreadyCompiled)
                     {
-                        throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterAlreadyCompiled, this.Name));
+                        throw new InvalidOperationException(
+                            string.Format(
+                                CultureInfo.CurrentCulture,
+                                Resources.ParameterAlreadyCompiled,
+                                this.Name));
                     }
 
                     int i1 = (int)newReturnType, i2 = (int)this.SupportedReturnType;
 
                     if ((i1 & i2) == 0)
                     {
-                        throw new ExpressionNotValidLogicallyException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterRequiredOfMismatchedTypes, this.Name));
+                        throw new Exceptions.ExpressionNotValidLogicallyException(
+                            string.Format(
+                                CultureInfo.CurrentCulture,
+                                Resources.ParameterRequiredOfMismatchedTypes,
+                                this.Name));
                     }
 
                     this.ReturnType = newReturnType;
@@ -200,7 +213,11 @@ namespace IX.Math.Registration
                 }
                 else
                 {
-                    throw new ExpressionNotValidLogicallyException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterRequiredOfMismatchedTypes, this.Name));
+                    throw new Exceptions.ExpressionNotValidLogicallyException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.ParameterRequiredOfMismatchedTypes,
+                            this.Name));
                 }
             }
         }
@@ -218,7 +235,11 @@ namespace IX.Math.Registration
                     this.IsFloat = true;
                     break;
                 default:
-                    throw new ExpressionNotValidLogicallyException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterMustBeFloatButAlreadyRequiredToBeInteger, this.Name));
+                    throw new Exceptions.ExpressionNotValidLogicallyException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.ParameterMustBeFloatButAlreadyRequiredToBeInteger,
+                            this.Name));
             }
         }
 
@@ -235,7 +256,11 @@ namespace IX.Math.Registration
                     this.IsFloat = false;
                     break;
                 default:
-                    throw new ExpressionNotValidLogicallyException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterMustBeIntegerButAlreadyRequiredToBeFloat, this.Name));
+                    throw new Exceptions.ExpressionNotValidLogicallyException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.ParameterMustBeIntegerButAlreadyRequiredToBeFloat,
+                            this.Name));
             }
         }
 
@@ -254,7 +279,12 @@ namespace IX.Math.Registration
         {
             if (this.alreadyCompiled)
             {
-                return this.expression ?? throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Resources.ParameterAlreadyCompiledButCompilationIsNull, this.Name));
+                return this.expression ??
+                throw new InvalidOperationException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        Resources.ParameterAlreadyCompiledButCompilationIsNull,
+                        this.Name));
             }
 
             Type type;
@@ -282,7 +312,7 @@ namespace IX.Math.Registration
 
                     break;
                 default:
-                    throw new ExpressionNotValidLogicallyException();
+                    throw new Exceptions.ExpressionNotValidLogicallyException();
             }
 
             ParameterExpression parameterExpression = Expression.Parameter(type, this.Name);
