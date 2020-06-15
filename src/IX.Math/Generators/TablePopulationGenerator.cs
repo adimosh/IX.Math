@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using IX.Math.ExpressionState;
 using IX.Math.Extensibility;
 using IX.Math.Nodes;
+using IX.Math.Nodes.Constants;
 using IX.Math.Registration;
 using IX.StandardExtensions.Contracts;
 using IX.System.Collections.Generic;

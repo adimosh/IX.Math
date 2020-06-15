@@ -11,18 +11,19 @@ using IX.Math.ExpressionState;
 using IX.Math.Extensibility;
 using IX.Math.Generators;
 using IX.Math.Nodes;
-using IX.Math.Nodes.Operations.Binary;
-using IX.Math.Nodes.Operations.Binary.Bitwise;
-using IX.Math.Nodes.Operations.Binary.Comparison;
-using IX.Math.Nodes.Operations.Binary.Logical;
-using IX.Math.Nodes.Operations.Binary.Mathematic;
-using IX.Math.Nodes.Operations.Unary;
-using IX.Math.Registration;
+using IX.Math.Nodes.Constants;
+using IX.Math.Nodes.Operators.Binary;
+using IX.Math.Nodes.Operators.Binary.Bitwise;
+using IX.Math.Nodes.Operators.Binary.Comparison;
+using IX.Math.Nodes.Operators.Binary.Logical;
+using IX.Math.Nodes.Operators.Binary.Mathematic;
+using IX.Math.Nodes.Operators.Unary;
+using IX.Math.Nodes.Parameters;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Extensions;
 using IX.System.Collections.Generic;
 using DiagCA = System.Diagnostics.CodeAnalysis;
-using SubtractNode = IX.Math.Nodes.Operations.Binary.Mathematic.SubtractNode;
+using SubtractNode = IX.Math.Nodes.Operators.Binary.Mathematic.SubtractNode;
 
 namespace IX.Math
 {
@@ -41,7 +42,7 @@ namespace IX.Math
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "This is correct, but the analyzer can't tell.")]
-        private LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, BinaryOperatorNodeBase>> binaryOperators;
+        private LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase>> binaryOperators;
 
         [DiagCA.SuppressMessage(
             "IDisposableAnalyzers.Correctness",
@@ -51,7 +52,7 @@ namespace IX.Math
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "This is correct, but the analyzer can't tell.")]
-        private LevelDictionary<string, Func<MathDefinition, NodeBase, UnaryOperatorNodeBase>> unaryOperators;
+        private LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase>> unaryOperators;
 
         // Constants
         private Dictionary<string, ConstantNodeBase> constantsTable;
@@ -75,7 +76,7 @@ namespace IX.Math
             List<IStringFormatter> stringFormatters,
             CancellationToken cancellationToken)
         {
-            this.ParameterRegistry = new StandardParameterRegistry(stringFormatters);
+            this.ParameterRegistry = new Dictionary<string, ExternalParameterNode>();
             this.ConstantsTable = new Dictionary<string, ConstantNodeBase>();
             this.ReverseConstantsTable = new Dictionary<string, string>();
             this.SymbolTable = new Dictionary<string, ExpressionSymbol>();
@@ -173,7 +174,7 @@ namespace IX.Math
         /// <value>
         ///     The parameter registry.
         /// </value>
-        internal IParameterRegistry ParameterRegistry { get; }
+        internal IDictionary<string, ExternalParameterNode> ParameterRegistry { get; }
 
         /// <summary>
         ///     Gets the nonary functions.
@@ -237,7 +238,7 @@ namespace IX.Math
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "This is correct, but the analyzer can't tell.")]
-        internal LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, BinaryOperatorNodeBase>> BinaryOperators
+        internal LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase>> BinaryOperators
         {
             get => this.binaryOperators;
             private set => this.binaryOperators = value;
@@ -321,7 +322,7 @@ namespace IX.Math
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "This is correct, but the analyzer can't tell.")]
-        internal LevelDictionary<string, Func<MathDefinition, NodeBase, UnaryOperatorNodeBase>> UnaryOperators
+        internal LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase>> UnaryOperators
         {
             get => this.unaryOperators;
             private set => this.unaryOperators = value;
@@ -502,61 +503,57 @@ namespace IX.Math
             // ======================================
 
             // Binary operators
-            this.BinaryOperators = new LevelDictionary<string, Func<MathDefinition, NodeBase, NodeBase, BinaryOperatorNodeBase>>
+            this.BinaryOperators = new LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase>>
             {
                 // First tier - Comparison and equation operators
                 {
                     definition.GreaterThanOrEqualSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) => new ComparisonOperatorNode(
+                        rightOperand) => new GreaterThanOrEqualOperatorNode(
+                        definitionL1,
                         leftOperand,
-                        rightOperand,
-                        true,
-                        false),
+                        rightOperand),
                     10
                 },
                 {
                     definition.LessThanOrEqualSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) => new ComparisonOperatorNode(
+                        rightOperand) => new LessThanOrEqualOperatorNode(
+                        definitionL1,
                         leftOperand,
-                        rightOperand,
-                        true,
-                        true),
+                        rightOperand),
                     10
                 },
                 {
                     definition.GreaterThanSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) => new ComparisonOperatorNode(
+                        rightOperand) => new GreaterThanOperatorNode(
+                        definitionL1,
                         leftOperand,
-                        rightOperand,
-                        false,
-                        false),
+                        rightOperand),
                     10
                 },
                 {
                     definition.LessThanSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) => new ComparisonOperatorNode(
+                        rightOperand) => new LessThanOperatorNode(
+                        definitionL1,
                         leftOperand,
-                        rightOperand,
-                        false,
-                        true),
+                        rightOperand),
                     10
                 },
                 {
                     definition.NotEqualsSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) => new EqualsNode(
+                        rightOperand) => new NotEqualsNode(
+                        definitionL1,
                         leftOperand,
-                        rightOperand,
-                        true),
+                        rightOperand),
                     10
                 },
                 {
@@ -564,9 +561,9 @@ namespace IX.Math
                         definitionL1,
                         leftOperand,
                         rightOperand) => new EqualsNode(
+                        definitionL1,
                         leftOperand,
-                        rightOperand,
-                        false),
+                        rightOperand),
                     10
                 },
 
@@ -576,6 +573,7 @@ namespace IX.Math
                         definitionL1,
                         leftOperand,
                         rightOperand) => new OrNode(
+                        definitionL1,
                         leftOperand,
                         rightOperand),
                     20
@@ -585,6 +583,7 @@ namespace IX.Math
                         definitionL1,
                         leftOperand,
                         rightOperand) => new XorNode(
+                        definitionL1,
                         leftOperand,
                         rightOperand),
                     definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 21 : 20
@@ -594,6 +593,7 @@ namespace IX.Math
                         definitionL1,
                         leftOperand,
                         rightOperand) => new AndNode(
+                        definitionL1,
                         leftOperand,
                         rightOperand),
                     definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 22 : 20
@@ -605,6 +605,7 @@ namespace IX.Math
                         definitionL1,
                         leftOperand,
                         rightOperand) => new AddNode(
+                        definitionL1,
                         leftOperand,
                         rightOperand),
                     30
@@ -614,6 +615,7 @@ namespace IX.Math
                         definitionL1,
                         leftOperand,
                         rightOperand) => new SubtractNode(
+                        definitionL1,
                         leftOperand,
                         rightOperand),
                     30
@@ -625,6 +627,7 @@ namespace IX.Math
                         definitionL1,
                         leftOperand,
                         rightOperand) => new DivideNode(
+                        definitionL1,
                         leftOperand,
                         rightOperand),
                     40
@@ -634,6 +637,7 @@ namespace IX.Math
                         definitionL1,
                         leftOperand,
                         rightOperand) => new MultiplyNode(
+                        definitionL1,
                         leftOperand,
                         rightOperand),
                     40
@@ -645,6 +649,7 @@ namespace IX.Math
                         definitionL1,
                         leftOperand,
                         rightOperand) => new PowerNode(
+                        definitionL1,
                         leftOperand,
                         rightOperand),
                     50
@@ -656,6 +661,7 @@ namespace IX.Math
                         definitionL1,
                         leftOperand,
                         rightOperand) => new LeftShiftNode(
+                        definitionL1,
                         leftOperand,
                         rightOperand),
                     60
@@ -665,6 +671,7 @@ namespace IX.Math
                         definitionL1,
                         leftOperand,
                         rightOperand) => new RightShiftNode(
+                        definitionL1,
                         leftOperand,
                         rightOperand),
                     60
@@ -672,19 +679,23 @@ namespace IX.Math
             };
 
             // Unary operators
-            this.UnaryOperators = new LevelDictionary<string, Func<MathDefinition, NodeBase, UnaryOperatorNodeBase>>
+            this.UnaryOperators = new LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase>>
             {
                 // First tier - Negation and inversion
                 {
                     definition.SubtractSymbol, (
                         definitionL1,
-                        operand) => new Nodes.Operations.Unary.SubtractNode(operand),
+                        operand) => new Nodes.Operators.Unary.SubtractNode(
+                        definitionL1,
+                        operand),
                     1
                 },
                 {
                     definition.NotSymbol, (
                         definitionL1,
-                        operand) => new NotNode(operand),
+                        operand) => new NotNode(
+                        definitionL1,
+                        operand),
                     1
                 }
             };

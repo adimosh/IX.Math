@@ -2,8 +2,9 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Collections.Generic;
 using IX.Math.Nodes;
-using IX.Math.Registration;
+using IX.Math.Nodes.Parameters;
 using JetBrains.Annotations;
 
 namespace IX.Math.Computation
@@ -18,11 +19,11 @@ namespace IX.Math.Computation
         internal readonly NodeBase BodyNode;
 
         [CanBeNull]
-        internal readonly IParameterRegistry ParameterRegistry;
+        internal readonly IDictionary<string, ExternalParameterNode> ParameterRegistry;
 
         internal ComputationBody(
             NodeBase bodyNode,
-            IParameterRegistry parameterRegistry)
+            IDictionary<string, ExternalParameterNode> parameterRegistry)
         {
             this.BodyNode = bodyNode;
             this.ParameterRegistry = parameterRegistry;
@@ -30,7 +31,7 @@ namespace IX.Math.Computation
 
         internal void Deconstruct(
             out NodeBase bodyNode,
-            out IParameterRegistry parameterRegistry)
+            out IDictionary<string, ExternalParameterNode> parameterRegistry)
         {
             bodyNode = this.BodyNode;
             parameterRegistry = this.ParameterRegistry;

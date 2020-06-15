@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using IX.Math.Extensibility;
 using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
+using JetBrains.Annotations;
 using DiagCA = System.Diagnostics.CodeAnalysis;
 
 namespace IX.Math.Formatters
@@ -80,6 +81,7 @@ namespace IX.Math.Formatters
                     "ReSharper",
                     "InvertIf",
                     Justification = "We don't care about inverting ifs here.")]
+        [NotNull]
         public static Expression CreateStringConversionExpression(
                     Expression expression,
                     List<IStringFormatter> stringFormatters)

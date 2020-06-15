@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using IX.Math.Nodes;
+using IX.Math.Nodes.Constants;
 using JetBrains.Annotations;
 
 namespace IX.Math.Extensibility

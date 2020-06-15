@@ -3,17 +3,25 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using IX.Math.Computation;
 using IX.Math.Computation.InitialExpressionParsers;
+using IX.Math.Exceptions;
 using IX.Math.ExpressionState;
 using IX.Math.Extensibility;
 using IX.Math.Extraction;
 using IX.Math.Formatters;
 using IX.Math.Nodes;
-using IX.Math.Nodes.Operations.Binary;
-using IX.Math.Nodes.Operations.Unary;
+using IX.Math.Nodes.Constants;
+using IX.Math.Nodes.Functions.Binary;
+using IX.Math.Nodes.Functions.Nonary;
+using IX.Math.Nodes.Functions.Ternary;
+using IX.Math.Nodes.Functions.Unary;
+using IX.Math.Nodes.Operators.Binary;
+using IX.Math.Nodes.Operators.Unary;
+using IX.Math.Nodes.Parameters;
 using IX.Math.Registration;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Globalization;
@@ -220,7 +228,8 @@ namespace IX.Math.Generators
             // Check whether expression is an external parameter
             if (workingSet.ParameterRegistry.Exists(expression))
             {
-                return new ParameterNode(
+                return new ExternalParameterNode(
+
                     expression,
                     workingSet.ParameterRegistry);
             }
@@ -293,7 +302,7 @@ namespace IX.Math.Generators
 
                     if (!innerWorkingSet.BinaryOperators.TryGetValue(
                         op,
-                        out Func<MathDefinition, NodeBase, NodeBase, BinaryOperatorNodeBase> t))
+                        out Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase> t))
                     {
                         // Binary operator not actually found.
                         return null;
@@ -334,12 +343,10 @@ namespace IX.Math.Generators
                         return null;
                     }
 
-                    var resultingNode = t(
-                        innerWorkingSet.Definition,
+                    return t(
+                        innerWorkingSet.StringFormatters,
                         left,
-                        right);
-                    ((ISpecialRequestNode)resultingNode).SetRequestSpecialObjectFunction(innerWorkingSet.OfferReservedType);
-                    return resultingNode.Simplify();
+                        right).Simplify();
                 }
 
                 if (exp != null)
@@ -373,7 +380,7 @@ namespace IX.Math.Generators
 
                     if (!s.CurrentCultureStartsWith(op) || !innerWorkingSet.UnaryOperators.TryGetValue(
                             op,
-                            out Func<MathDefinition, NodeBase, UnaryOperatorNodeBase> t))
+                            out Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase> t))
                     {
                         // The unary operator is not valid.
                         return null;
@@ -396,11 +403,9 @@ namespace IX.Math.Generators
                         return null;
                     }
 
-                    var resultingNode = t(
-                        innerWorkingSet.Definition,
-                        expr);
-                    ((ISpecialRequestNode)resultingNode).SetRequestSpecialObjectFunction(innerWorkingSet.OfferReservedType);
-                    return resultingNode.Simplify();
+                    return t(
+                        innerWorkingSet.StringFormatters,
+                        expr).Simplify();
                 }
 
                 if (exp != null)
@@ -428,8 +433,10 @@ namespace IX.Math.Generators
                 {
                     if (match.Success)
                     {
-                        var functionName = match.Groups["functionName"].Value;
-                        var expressionValue = match.Groups["expression"].Value;
+                        var functionName = match.Groups["functionName"]
+                            .Value;
+                        var expressionValue = match.Groups["expression"]
+                            .Value;
 
                         string[] parameterExpressions;
 
@@ -443,10 +450,14 @@ namespace IX.Math.Generators
                         }
                         else
                         {
-                            parameterExpressions = match.Groups["expression"].Value
-                                .Split(
-                                    new[] { innerWorkingSet.Definition.ParameterSeparator },
-                                    StringSplitOptions.None).Select(p => string.IsNullOrWhiteSpace(p) ? null : p)
+                            parameterExpressions = match.Groups["expression"]
+                                .Value.Split(
+                                    new[]
+                                    {
+                                        innerWorkingSet.Definition.ParameterSeparator
+                                    },
+                                    StringSplitOptions.None)
+                                .Select(p => string.IsNullOrWhiteSpace(p) ? null : p)
                                 .ToArray();
                         }
 
@@ -456,7 +467,9 @@ namespace IX.Math.Generators
                             case 0:
                                 returnValue = innerWorkingSet.NonaryFunctions.TryGetValue(
                                     functionName,
-                                    out Type t) ? ((NonaryFunctionNodeBase)Activator.CreateInstance(t)).Simplify() : null;
+                                    out Type t)
+                                    ? ((NonaryFunctionNodeBase)Activator.CreateInstance(t)).Simplify()
+                                    : null;
                                 break;
 
                             case 1:
@@ -486,7 +499,8 @@ namespace IX.Math.Generators
                                         t2,
                                         GenerateExpression(
                                             parameterExpressions[0],
-                                            innerWorkingSet), GenerateExpression(
+                                            innerWorkingSet),
+                                        GenerateExpression(
                                             parameterExpressions[1],
                                             innerWorkingSet))).Simplify();
                                 }
@@ -506,9 +520,11 @@ namespace IX.Math.Generators
                                         t3,
                                         GenerateExpression(
                                             parameterExpressions[0],
-                                            innerWorkingSet), GenerateExpression(
+                                            innerWorkingSet),
+                                        GenerateExpression(
                                             parameterExpressions[1],
-                                            innerWorkingSet), GenerateExpression(
+                                            innerWorkingSet),
+                                        GenerateExpression(
                                             parameterExpressions[2],
                                             innerWorkingSet))).Simplify();
                                 }
@@ -524,13 +540,16 @@ namespace IX.Math.Generators
                                 break;
                         }
 
-                        if (returnValue is ISpecialRequestNode srn)
-                        {
-                            srn.SetRequestSpecialObjectFunction(innerWorkingSet.OfferReservedType);
-                        }
-
                         return returnValue;
                     }
+                }
+                catch (ExpressionNotValidLogicallyException)
+                {
+                    return null;
+                }
+                catch (MathematicsEngineException)
+                {
+                    throw;
                 }
                 catch (Exception)
                 {

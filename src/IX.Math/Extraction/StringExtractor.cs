@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using IX.Math.Generators;
 using IX.Math.Nodes;
+using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Extraction

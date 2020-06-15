@@ -22,7 +22,11 @@ namespace IX.Math
     [PublicAPI]
     public class MathematicPortfolio : DisposableBase
     {
-        private readonly ExpressionParsingService ceps;
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP006:Implement IDisposable.",
+            Justification = "It is correctly implemented, but the analyzer can't tell.")]
+        private readonly ExpressionParsingService parsingService;
 
         private readonly ConcurrentDictionary<ExpressionTypedKey, CompiledExpressionResult> compiledDelegate =
             new ConcurrentDictionary<ExpressionTypedKey, CompiledExpressionResult>();
@@ -87,15 +91,15 @@ namespace IX.Math
             IStringFormatter stringFormatter,
             params Assembly[] functionAssemblies)
         {
-            this.ceps = mathDefinition == null
+            this.parsingService = mathDefinition == null
                 ? new ExpressionParsingService()
                 : new ExpressionParsingService(mathDefinition);
 
-            functionAssemblies.ForEach(this.ceps.RegisterFunctionsAssembly);
+            functionAssemblies.ForEach(this.parsingService.RegisterFunctionsAssembly);
 
             if (stringFormatter != null)
             {
-                this.ceps.RegisterTypeFormatter(stringFormatter);
+                this.parsingService.RegisterTypeFormatter(stringFormatter);
             }
         }
 
@@ -103,17 +107,24 @@ namespace IX.Math
         /// Loads the expressions into context.
         /// </summary>
         /// <param name="expressions">The expressions to load.</param>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0603:Delegate allocation from a method group",
+            Justification = "We're using PLINQ, this is unavoidable.")]
         public void LoadIntoContext(IEnumerable<string> expressions)
         {
             Requires.NotNull(
                 expressions,
                 nameof(expressions));
 
-            expressions.ParallelForEach(p =>
+            expressions.ParallelForEach(ContextLoadingAction);
+
+            #region Local functions
+            void ContextLoadingAction(string p)
             {
                 var computedExpression = this.computedExpressions.GetOrAdd(
                     p,
-                    (key) => this.ceps.Interpret(key));
+                    ValueFactory);
 
                 if (!computedExpression.RecognizedCorrectly)
                 {
@@ -121,13 +132,27 @@ namespace IX.Math
                     return;
                 }
 
-                if (!computedExpression.IsConstant)
+                using var clonedComputedExpression = computedExpression.DeepClone();
+                var (success, isConstant, @delegate, constantValue) = clonedComputedExpression.CompileDelegate(in ComparisonTolerance.Empty);
+                if (success)
                 {
-                    return;
+                    if (isConstant)
+                    {
+                        this.compiledDelegate[new ExpressionTypedKey(p)] = new CompiledExpressionResult(constantValue);
+                    }
+                    else
+                    {
+                        this.compiledDelegate[new ExpressionTypedKey(p)] = new CompiledExpressionResult(@delegate);
+                    }
+                }
+                else
+                {
+                    this.compiledDelegate[new ExpressionTypedKey(p)] = CompiledExpressionResult.UncomputableResult;
                 }
 
-                this.compiledDelegate[new ExpressionTypedKey(p)] = new CompiledExpressionResult(computedExpression.Compute());
-            });
+                ComputedExpression ValueFactory(string key) => this.parsingService.Interpret(key);
+            }
+            #endregion
         }
 
         /// <summary>
@@ -178,18 +203,20 @@ namespace IX.Math
 
             CompiledExpressionResult ValueFactory(ExpressionTypedKey key)
             {
-                var compiledExpression = this.computedExpressions.GetOrAdd(
+                var computedExpression = this.computedExpressions.GetOrAdd(
                     key.Expression,
                     this.InnerValueFactory);
 
-                if (!compiledExpression.RecognizedCorrectly)
+                if (!computedExpression.RecognizedCorrectly)
                 {
                     return CompiledExpressionResult.UncomputableResult;
                 }
 
-                var tolerance = key.Tolerance;
-                var (success, isConstant, @delegate, constantValue) = compiledExpression.CompileDelegate(
-                    in tolerance,
+                var localTolerance = key.Tolerance;
+
+                using var clonedComputedExpression = computedExpression.DeepClone();
+                var (success, isConstant, @delegate, constantValue) = clonedComputedExpression.CompileDelegate(
+                    in localTolerance,
                     etk.ParameterTypes);
 
                 return success
@@ -198,6 +225,13 @@ namespace IX.Math
             }
         }
 
-        private ComputedExpression InnerValueFactory(string key) => this.ceps.Interpret(key);
+        /// <summary>Disposes in the managed context.</summary>
+        protected override void DisposeManagedContext()
+        {
+            this.parsingService.Dispose();
+            base.DisposeManagedContext();
+        }
+
+        private ComputedExpression InnerValueFactory(string key) => this.parsingService.Interpret(key);
     }
 }

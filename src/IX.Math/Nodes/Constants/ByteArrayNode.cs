@@ -5,102 +5,113 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq.Expressions;
 using IX.Math.Extensibility;
-using IX.Math.Formatters;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
 {
     /// <summary>
-    ///     A binary value node. This class cannot be inherited.
+    /// A binary value node. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="ConstantNodeBase" />
-    [DebuggerDisplay("{" + nameof(DisplayValue) + "}")]
+    [DebuggerDisplay("{" + nameof(Value) + "}")]
     [PublicAPI]
-    public class ByteArrayNode : ConstantNodeBase, ISpecialRequestNode
+    public sealed class ByteArrayNode : ConstantNodeBase<byte[]>
     {
-        private string cachedDistilledStringValue;
-        private Func<Type, object> specialObjectRequestFunction;
+        private readonly long? possibleInteger;
+
+        private readonly double? possibleNumeric;
+
+        private readonly SupportableValueType supportableType;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="ByteArrayNode" /> class.
+        /// Initializes a new instance of the <see cref="ByteArrayNode" /> class.
         /// </summary>
-        /// <param name="value">The value of the constant.</param>
-        public ByteArrayNode([NotNull] byte[] value)
+        /// <param name="stringFormatters">The string formatters.</param>
+        /// <param name="value">The node's boolean value.</param>
+        internal ByteArrayNode(List<IStringFormatter> stringFormatters, byte[] value)
+            : base(stringFormatters, value)
         {
-            this.Value = value ?? throw new ArgumentNullException(nameof(value));
+            this.supportableType = SupportableValueType.ByteArray | SupportableValueType.String;
+
+            if (value.Length <= 4)
+            {
+                // Integer-compatible
+                this.possibleInteger = BitConverter.ToInt64(
+                    value,
+                    0);
+                this.supportableType |= SupportableValueType.Integer;
+            }
+
+            if (value.Length <= 8)
+            {
+                // Numeric-compatible
+                this.possibleNumeric = BitConverter.ToDouble(
+                    value,
+                    0);
+                this.supportableType |= SupportableValueType.Numeric;
+            }
         }
-
-        /// <summary>
-        ///     Gets the display value.
-        /// </summary>
-        [NotNull]
-        public string DisplayValue => this.GetString();
-
-        /// <summary>
-        ///     Gets the return type of this node.
-        /// </summary>
-        /// <value>Always <see cref="SupportedValueType.ByteArray" />.</value>
-        public override SupportedValueType ReturnType => SupportedValueType.ByteArray;
-
-        /// <summary>
-        ///     Gets the value of the node.
-        /// </summary>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Performance",
-            "CA1819:Properties should not return arrays",
-            Justification = "We specifically want this here, as this is a binary representation.")]
-        public byte[] Value { get; }
-
-        /// <summary>
-        ///     Distills the value into a usable constant.
-        /// </summary>
-        /// <returns>A usable constant.</returns>
-        public override object DistillValue() => this.Value;
-
-        /// <summary>
-        ///     Generates the expression that will be compiled into code.
-        /// </summary>
-        /// <returns>A <see cref="ConstantExpression" /> with a boolean value.</returns>
-        public override Expression GenerateCachedExpression() =>
-            Expression.Constant(
-                this.Value,
-                typeof(byte[]));
-
-        /// <summary>
-        ///     Generates the expression that will be compiled into code as a string expression.
-        /// </summary>
-        /// <returns>The string expression.</returns>
-        public override Expression GenerateCachedStringExpression() => Expression.Constant(
-                this.GetString(),
-                typeof(string));
 
         /// <summary>
         ///     Creates a deep clone of the source object.
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new ByteArrayNode(this.Value);
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new ByteArrayNode(
+                this.StringFormatters,
+                this.Value);
 
         /// <summary>
-        /// Sets the request special object function.
+        /// Tries to get a byte array value out of this constant node.
         /// </summary>
-        /// <param name="func">The function to set.</param>
-        void ISpecialRequestNode.SetRequestSpecialObjectFunction(Func<Type, object> func) => this.specialObjectRequestFunction = func;
-
-        private string GetString()
+        /// <param name="value">The value.</param>
+        /// <returns><c>true</c> if the constant can safely be converted to a byte array, <c>false</c> otherwise.</returns>
+        public override bool TryGetByteArray(out byte[] value)
         {
-            if (this.cachedDistilledStringValue == null)
-            {
-                var stringFormatters = this.specialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) as List<IStringFormatter>;
+            value = this.Value;
+            return true;
+        }
 
-                this.cachedDistilledStringValue = StringFormatter.FormatIntoString(
-                    this.Value,
-                    stringFormatters);
+        /// <summary>
+        /// Tries to get an integer value out of this constant node.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns><c>true</c> if the constant can safely be converted to an integer, <c>false</c> otherwise.</returns>
+        public override bool TryGetInteger(out long value)
+        {
+            if (this.possibleInteger.HasValue)
+            {
+                value = this.possibleInteger.Value;
+                return true;
             }
 
-            return this.cachedDistilledStringValue;
+            value = default;
+            return false;
         }
+
+        /// <summary>
+        /// Tries to get a numeric value out of this constant node.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns><c>true</c> if the constant can safely be converted to a numeric value, <c>false</c> otherwise.</returns>
+        public override bool TryGetNumeric(out double value)
+        {
+            if (this.possibleNumeric.HasValue)
+            {
+                value = this.possibleNumeric.Value;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the supported types.
+        /// </summary>
+        /// <returns>The types supported by this constant.</returns>
+        protected override SupportableValueType GetSupportedTypes() => this.supportableType;
     }
 }

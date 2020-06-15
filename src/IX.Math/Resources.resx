@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="FunctionCallNotValid" xml:space="preserve">
-    <value>The requested function cannot be called with the specified operands, either because their number doesn't match the required number of operands, or because they have mismatched types.</value>
-  </data>
   <data name="FunctionCouldNotBeFound" xml:space="preserve">
     <value>The function "{0}" cannot be found.</value>
   </data>

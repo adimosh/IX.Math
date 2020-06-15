@@ -13,7 +13,7 @@ namespace IX.Math.Exceptions
     /// </summary>
     [Serializable]
     [PublicAPI]
-    public class ExpressionNotValidLogicallyException : BaseMathematicalException
+    public class ExpressionNotValidLogicallyException : Exception
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionNotValidLogicallyException"/> class.

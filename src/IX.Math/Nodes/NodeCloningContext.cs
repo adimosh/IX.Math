@@ -2,8 +2,8 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
-using IX.Math.Registration;
+using System.Collections.Generic;
+using IX.Math.Nodes.Parameters;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes
@@ -12,20 +12,12 @@ namespace IX.Math.Nodes
     /// A context for cloning nodes.
     /// </summary>
     [PublicAPI]
-    public class NodeCloningContext
+    public readonly struct NodeCloningContext
     {
         /// <summary>
-        /// Gets or sets the parameter registry.
+        /// Gets the parameter registry.
         /// </summary>
         /// <value>The parameter registry.</value>
-        public IParameterRegistry ParameterRegistry { get; set; }
-
-        /// <summary>
-        /// Gets or sets the special request function.
-        /// </summary>
-        /// <value>
-        /// The special request function.
-        /// </value>
-        public Func<Type, object> SpecialRequestFunction { get; set; }
+        public IDictionary<string, ExternalParameterNode> ParameterRegistry { get; }
     }
 }

@@ -77,122 +77,6 @@ namespace IX.Math
             CancellationToken cancellationToken = default);
 
         /// <summary>
-        ///     Interprets the mathematical expression and returns a container that can be invoked for solving using specific
-        ///     mathematical types.
-        /// </summary>
-        /// <param name="expression">The expression to interpret.</param>
-        /// <param name="cancellationToken">The cancellation token for this operation.</param>
-        /// <returns>
-        ///     A <see cref="ComputedExpression" /> that represents a compilable form of the original expression, if the
-        ///     expression itself makes sense.
-        /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="expression" /> is either null, empty or whitespace-only.</exception>
-        [DiagCA.SuppressMessage(
-            "Performance",
-            "HAA0401:Possible allocation of reference type enumerator",
-            Justification = "Unavoidable here.")]
-        [DiagCA.SuppressMessage(
-            "Performance",
-            "HAA0603:Delegate allocation from a method group",
-            Justification = "We're OK with this.")]
-        protected ComputedExpression InterpretInternal(
-            string expression,
-            CancellationToken cancellationToken = default)
-        {
-            Requires.NotNullOrWhiteSpace(
-                expression,
-                nameof(expression));
-
-            this.ThrowIfCurrentObjectDisposed();
-
-            if (this.constantPassThroughExtractors == null)
-            {
-                this.InitializePassThroughExtractorsDictionary();
-            }
-
-            if (this.constantPassThroughExtractors.KeysByLevel.SelectMany(p => p.Value)
-                .Any(
-                    ConstantPassThroughExtractorPredicate,
-                    expression,
-                    this))
-            {
-                return new ComputedExpression(
-                    expression,
-                    new StringNode(expression),
-                    true,
-                    new StandardParameterRegistry(this.stringFormatters),
-                    this.stringFormatters,
-                    null);
-            }
-
-            static bool ConstantPassThroughExtractorPredicate(
-                Type cpteKey,
-                string innerExpression,
-                ExpressionParsingServiceBase innerThis)
-            {
-                return innerThis.constantPassThroughExtractors[cpteKey]
-                    .Evaluate(innerExpression);
-            }
-
-            if (this.nonaryFunctions == null ||
-                this.unaryFunctions == null ||
-                this.binaryFunctions == null ||
-                this.ternaryFunctions == null)
-            {
-                this.InitializeFunctionsDictionary();
-            }
-
-            if (this.constantExtractors == null)
-            {
-                this.InitializeExtractorsDictionary();
-            }
-
-            if (this.constantInterpreters == null)
-            {
-                this.InitializeInterpretersDictionary();
-            }
-
-            ComputedExpression result;
-            using (var workingSet = new WorkingExpressionSet(
-                expression,
-                this.workingDefinition.DeepClone(),
-                this.nonaryFunctions,
-                this.unaryFunctions,
-                this.binaryFunctions,
-                this.ternaryFunctions,
-                this.constantExtractors,
-                this.constantInterpreters,
-                this.stringFormatters,
-                cancellationToken))
-            {
-                (NodeBase node, IParameterRegistry parameterRegistry) = ExpressionGenerator.CreateBody(workingSet);
-
-                result = !workingSet.Success
-                    ? new ComputedExpression(
-                        expression,
-                        null,
-                        false,
-                        null,
-                        this.stringFormatters,
-                        null)
-                    : new ComputedExpression(
-                        expression,
-                        node,
-                        true,
-                        parameterRegistry,
-                        this.stringFormatters,
-                        workingSet.OfferReservedType);
-
-                Interlocked.MemoryBarrier();
-            }
-
-            Interlocked.Exchange(
-                ref this.interpretationDone,
-                1);
-            return result;
-        }
-
-        /// <summary>
         ///     Returns the prototypes of all registered functions.
         /// </summary>
         /// <returns>All function names, with all possible combinations of input and output data.</returns>
@@ -321,6 +205,122 @@ namespace IX.Math
             }
 
             this.stringFormatters.Add(formatter);
+        }
+
+        /// <summary>
+        ///     Interprets the mathematical expression and returns a container that can be invoked for solving using specific
+        ///     mathematical types.
+        /// </summary>
+        /// <param name="expression">The expression to interpret.</param>
+        /// <param name="cancellationToken">The cancellation token for this operation.</param>
+        /// <returns>
+        ///     A <see cref="ComputedExpression" /> that represents a compilable form of the original expression, if the
+        ///     expression itself makes sense.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="expression" /> is either null, empty or whitespace-only.</exception>
+        [DiagCA.SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "Unavoidable here.")]
+        [DiagCA.SuppressMessage(
+            "Performance",
+            "HAA0603:Delegate allocation from a method group",
+            Justification = "We're OK with this.")]
+        protected ComputedExpression InterpretInternal(
+            string expression,
+            CancellationToken cancellationToken = default)
+        {
+            Requires.NotNullOrWhiteSpace(
+                expression,
+                nameof(expression));
+
+            this.ThrowIfCurrentObjectDisposed();
+
+            if (this.constantPassThroughExtractors == null)
+            {
+                this.InitializePassThroughExtractorsDictionary();
+            }
+
+            if (this.constantPassThroughExtractors.KeysByLevel.SelectMany(p => p.Value)
+                .Any(
+                    ConstantPassThroughExtractorPredicate,
+                    expression,
+                    this))
+            {
+                return new ComputedExpression(
+                    expression,
+                    new StringNode(expression),
+                    true,
+                    new StandardParameterRegistry(this.stringFormatters),
+                    this.stringFormatters,
+                    null);
+            }
+
+            static bool ConstantPassThroughExtractorPredicate(
+                Type cpteKey,
+                string innerExpression,
+                ExpressionParsingServiceBase innerThis)
+            {
+                return innerThis.constantPassThroughExtractors[cpteKey]
+                    .Evaluate(innerExpression);
+            }
+
+            if (this.nonaryFunctions == null ||
+                this.unaryFunctions == null ||
+                this.binaryFunctions == null ||
+                this.ternaryFunctions == null)
+            {
+                this.InitializeFunctionsDictionary();
+            }
+
+            if (this.constantExtractors == null)
+            {
+                this.InitializeExtractorsDictionary();
+            }
+
+            if (this.constantInterpreters == null)
+            {
+                this.InitializeInterpretersDictionary();
+            }
+
+            ComputedExpression result;
+            using (var workingSet = new WorkingExpressionSet(
+                expression,
+                this.workingDefinition.DeepClone(),
+                this.nonaryFunctions,
+                this.unaryFunctions,
+                this.binaryFunctions,
+                this.ternaryFunctions,
+                this.constantExtractors,
+                this.constantInterpreters,
+                this.stringFormatters,
+                cancellationToken))
+            {
+                (NodeBase node, IParameterRegistry parameterRegistry) = ExpressionGenerator.CreateBody(workingSet);
+
+                result = !workingSet.Success
+                    ? new ComputedExpression(
+                        expression,
+                        null,
+                        false,
+                        null,
+                        this.stringFormatters,
+                        null)
+                    : new ComputedExpression(
+                        expression,
+                        node,
+                        true,
+                        parameterRegistry,
+                        this.stringFormatters,
+                        workingSet.OfferReservedType);
+
+                Interlocked.MemoryBarrier();
+            }
+
+            Interlocked.Exchange(
+                ref this.interpretationDone,
+                1);
+            return result;
         }
 
         /// <summary>
