@@ -3,11 +3,8 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using IX.Math.Generators;
-using IX.Math.Nodes;
-using IX.Math.Nodes.Constants;
+using IX.Math.Extensibility;
 using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Extraction
@@ -15,83 +12,52 @@ namespace IX.Math.Extraction
     /// <summary>
     ///     An extractor for scientific notation of numbers. This class cannot be inherited.
     /// </summary>
-    /// <seealso cref="Extensibility.IConstantsExtractor" />
-    internal sealed class ScientificFormatNumberExtractor : Extensibility.IConstantsExtractor
+    /// <seealso cref="IConstantsExtractor" />
+    internal sealed class ScientificFormatNumberExtractor : IConstantsExtractor
     {
         private readonly Regex exponentialNotationRegex = new Regex(@"[0-9.,]+(?:e\+|E\+|e\-|E\-|e|E)[0-9]+");
 
         /// <summary>
-        ///     Extracts the scientific notations constants and replaces them with expression placeholders.
+        ///     Extracts a constants, returning its value and placement.
         /// </summary>
         /// <param name="originalExpression">The original expression.</param>
-        /// <param name="constantsTable">The constants table.</param>
-        /// <param name="reverseConstantsTable">The reverse constants table.</param>
         /// <param name="mathDefinition">The math definition.</param>
-        /// <returns>The expression, after replacement.</returns>
-        /// <exception cref="ArgumentNullException">
-        ///     <paramref name="constantsTable" />
-        ///     or
-        ///     <paramref name="mathDefinition" />
-        ///     or
-        ///     <paramref name="originalExpression" />
-        ///     or
-        ///     <paramref name="reverseConstantsTable" />
-        ///     is <see langword="null" /> (<see langword="Nothing" /> in Visual Basic).
-        /// </exception>
-        public string ExtractAllConstants(
-            string originalExpression,
-            IDictionary<string, ConstantNodeBase> constantsTable,
-            IDictionary<string, string> reverseConstantsTable,
+        /// <returns>
+        ///     A tuple containing a switch indicating success or failure, the extracted value, if any, and the position at which
+        ///     it is, as well as its length.
+        /// </returns>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "We're fine with this boxing, as the value will be used in a constant and be boxed anyway.")]
+        public (bool Success, object Value, int Position, int Length) ExtractConstant(
+            in ReadOnlySpan<char> originalExpression,
             MathDefinition mathDefinition)
         {
-            Requires.NotNullOrWhiteSpace(
-                originalExpression,
-                nameof(originalExpression));
-            Requires.NotNull(
-                constantsTable,
-                nameof(constantsTable));
-            Requires.NotNull(
-                reverseConstantsTable,
-                nameof(reverseConstantsTable));
             Requires.NotNull(
                 mathDefinition,
                 nameof(mathDefinition));
 
-            var process = originalExpression;
-            var location = 0;
+            Match match = this.exponentialNotationRegex.Match(
+                originalExpression.ToString());
 
-            while (process.Length > location)
+            if (!match.Success)
             {
-                Match match = this.exponentialNotationRegex.Match(
-                    process,
-                    location);
-
-                if (!match.Success)
-                {
-                    break;
-                }
-
-                var itemName = ConstantsGenerator.GenerateNumericConstant(
-                    constantsTable,
-                    reverseConstantsTable,
-                    process,
-                    match.Value);
-
-                if (!string.IsNullOrWhiteSpace(itemName))
-                {
-                    process = this.exponentialNotationRegex.Replace(
-                        process,
-                        itemName,
-                        1,
-                        location);
-                }
-                else
-                {
-                    location = match.Index + match.Length;
-                }
+                return (false, default, -1, default);
             }
 
-            return process;
+            int position = match.Index;
+            int length = match.Length;
+            string content = match.Value;
+
+            if (!double.TryParse(
+                content,
+                out var val))
+            {
+                return (false, default, position, default);
+            }
+
+            return (true, val, position, length);
         }
     }
 }

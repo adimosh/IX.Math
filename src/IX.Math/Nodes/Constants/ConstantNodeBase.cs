@@ -55,6 +55,14 @@ namespace IX.Math.Nodes.Constants
         public string ValueAsString { get; protected set; }
 
         /// <summary>
+        /// Gets the value as object.
+        /// </summary>
+        /// <value>
+        /// The value as object.
+        /// </value>
+        public abstract object ValueAsObject { get; }
+
+        /// <summary>
         /// Simplifies this node, if possible, reflexively returns otherwise.
         /// </summary>
         /// <returns>A reflexive return.</returns>

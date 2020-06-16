@@ -6,7 +6,11 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using IX.Math.Extensibility;
-using IX.Math.Nodes;
+using IX.Math.Nodes.Functions;
+using IX.Math.Nodes.Functions.Binary;
+using IX.Math.Nodes.Functions.Nonary;
+using IX.Math.Nodes.Functions.Ternary;
+using IX.Math.Nodes.Functions.Unary;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
 

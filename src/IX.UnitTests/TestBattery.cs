@@ -4,12 +4,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using IX.Math;
-using IX.StandardExtensions.TestUtils;
-using IX.UnitTests.Helpers;
-using IX.UnitTests.IX.Math;
-using Moq;
+using IX.UnitTests.ContextStructure;
 using Xunit;
 
 namespace IX.UnitTests
@@ -17,38 +13,9 @@ namespace IX.UnitTests
     /// <summary>
     ///     Tests computed expressions.
     /// </summary>
-    public class TestBattery : IClassFixture<CachedExpressionProviderFixture>
+    public class TestBattery
     {
-        private readonly CachedExpressionProviderFixture fixture;
-        private readonly ReturnValueEqualityComparer comparer;
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="TestBattery" /> class.
-        /// </summary>
-        /// <param name="fixture">The fixture.</param>
-        public TestBattery(CachedExpressionProviderFixture fixture)
-        {
-            this.fixture = fixture;
-            this.comparer = new ReturnValueEqualityComparer();
-        }
-
-        private static object GenerateFuncOutOfParameterValue(object tempParameter) => tempParameter switch
-        {
-            byte convertedValue => new Func<byte>(() => convertedValue),
-            sbyte convertedValue => new Func<sbyte>(() => convertedValue),
-            short convertedValue => new Func<short>(() => convertedValue),
-            ushort convertedValue => new Func<ushort>(() => convertedValue),
-            int convertedValue => new Func<int>(() => convertedValue),
-            uint convertedValue => new Func<uint>(() => convertedValue),
-            long convertedValue => new Func<long>(() => convertedValue),
-            ulong convertedValue => new Func<ulong>(() => convertedValue),
-            float convertedValue => new Func<float>(() => convertedValue),
-            double convertedValue => new Func<double>(() => convertedValue),
-            byte[] convertedValue => new Func<byte[]>(() => convertedValue),
-            string convertedValue => new Func<string>(() => convertedValue),
-            bool convertedValue => new Func<bool>(() => convertedValue),
-            _ => throw new InvalidOperationException(),
-        };
+        private static readonly ReturnValueEqualityComparer Comparer = new ReturnValueEqualityComparer();
 
         private static Type FixNumericType(in object source) => source switch
         {
@@ -66,348 +33,112 @@ namespace IX.UnitTests
         };
 
         /// <summary>
-        ///     Tests the computed expression with parameters.
+        /// Runs a test in the battery once for a set of data.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameters">The parameters.</param>
         /// <param name="expectedResult">The expected result.</param>
-        /// <exception cref="InvalidOperationException">
-        ///     No computed expression was generated.
-        /// </exception>
-        [Theory(DisplayName = "EPS")]
-        [MemberData(nameof(TestData.GenerateDataObjects), MemberType = typeof(TestData))]
-        public void ComputedExpressionWithParameters(
-            string expression,
-            Dictionary<string, object> parameters,
-            object expectedResult)
+        /// <param name="creator">The creator.</param>
+        /// <param name="disposer">The disposer.</param>
+        /// <param name="solver">The solver.</param>
+        [Theory(DisplayName = "Single test battery")]
+        [MemberData(nameof(TestContextStructure.GenerateTestData), MemberType = typeof(TestContextStructure))]
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+                    "IDisposableAnalyzers.Correctness",
+                    "IDISP001:Dispose created.",
+                    Justification = "It's being disposed, but the analyzer cannot tell.")]
+        public void SingleTest(
+                    string expression,
+                    Dictionary<string, object> parameters,
+                    object expectedResult,
+                    Func<MathematicPortfolio> creator,
+                    Action<MathematicPortfolio> disposer,
+                    Func<MathematicPortfolio, string, Dictionary<string, object>, object> solver)
         {
+            MathematicPortfolio portfolio = null;
+            object result = null;
             try
             {
-                object result;
+                portfolio = creator?.Invoke();
 
-                using (var service = new ExpressionParsingService())
-                {
-                    using (ComputedExpression del = service.Interpret(expression))
-                    {
-                        result = del.Compute(
-                            parameters?.OrderBy(
-                                q => expression.IndexOf(
-                                    q.Key,
-                                    StringComparison.Ordinal)).Select(p => p.Value).ToArray() ??
-                            new object[0]);
-                    }
-                }
-
-                this.AssertResults(
-                    in expectedResult,
-                    in result);
+                result = solver?.Invoke(
+                    portfolio,
+                    expression,
+                    parameters);
             }
             catch (DivideByZeroException)
             {
+                // We don't do anything - this is entirely possible in random data, and is acceptable
             }
+            finally
+            {
+                disposer?.Invoke(portfolio);
+            }
+
+            this.AssertResults(
+                in expectedResult,
+                in result);
         }
 
         /// <summary>
-        ///     Tests a computed expression with finder.
+        /// Runs a test in the battery multiple times for a set of data.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <param name="parameters">The parameters.</param>
         /// <param name="expectedResult">The expected result.</param>
-        /// <exception cref="InvalidOperationException">
-        ///     No computed expression was generated.
-        /// </exception>
-        [Theory(DisplayName = "EPSF")]
-        [MemberData(nameof(TestData.GenerateDataObjects), MemberType = typeof(TestData))]
-        public void ComputedExpressionWithFinder(
-            string expression,
-            Dictionary<string, object> parameters,
-            object expectedResult)
+        /// <param name="creator">The creator.</param>
+        /// <param name="disposer">The disposer.</param>
+        /// <param name="solver">The solver.</param>
+        [Theory(DisplayName = "Multiple test battery")]
+        [MemberData(nameof(TestContextStructure.GenerateTestData), MemberType = typeof(TestContextStructure))]
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+                    "IDisposableAnalyzers.Correctness",
+                    "IDISP001:Dispose created.",
+                    Justification = "It's being disposed, but the analyzer cannot tell.")]
+        public void MultipleTest(
+                    string expression,
+                    Dictionary<string, object> parameters,
+                    object expectedResult,
+                    Func<MathematicPortfolio> creator,
+                    Action<MathematicPortfolio> disposer,
+                    Func<MathematicPortfolio, string, Dictionary<string, object>, object> solver)
         {
+            MathematicPortfolio portfolio = null;
+            object result = null;
             try
             {
-                object result;
+                portfolio = creator?.Invoke();
 
-                using (var service = new ExpressionParsingService())
+                for (int i = 0; i < 5; i++)
                 {
-                    var finder = new Mock<IDataFinder>(MockBehavior.Loose);
+                    var tempResult = solver?.Invoke(
+                        portfolio,
+                        expression,
+                        parameters);
 
-                    using (ComputedExpression del = service.Interpret(expression))
+                    if (result == null)
                     {
-                        if (parameters != null)
-                        {
-#if NETCOREAPP3_1
-                            foreach ((var key, object val) in parameters)
-                            {
-                                object value = val;
-#else
-                            foreach (var kvp in parameters)
-                            {
-                                var key = kvp.Key;
-                                object value = kvp.Value;
-#endif
-                                finder.Setup(
-                                    p => p.TryGetData(
-                                        key,
-                                        out value)).Returns(true);
-                            }
-                        }
-
-                        result = del.Compute(finder.Object);
+                        result = tempResult;
+                    }
+                    else
+                    {
+                        Assert.Equal(result, tempResult);
                     }
                 }
-
-                this.AssertResults(
-                    in expectedResult,
-                    in result);
             }
             catch (DivideByZeroException)
             {
+                // We don't do anything - this is entirely possible in random data, and is acceptable
             }
+            finally
+            {
+                disposer?.Invoke(portfolio);
+            }
+
+            this.AssertResults(
+                in expectedResult,
+                in result);
         }
-
-#pragma warning disable IDISP001 // Dispose created. - We specifically do not want these to be disposed
-
-        /// <summary>
-        ///     Tests the cached computed expression with parameters.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameters">The parameters.</param>
-        /// <param name="expectedResult">The expected result.</param>
-        /// <exception cref="InvalidOperationException">
-        ///     No computed expression was generated.
-        /// </exception>
-        [Theory(DisplayName = "CEPS")]
-        [MemberData(nameof(TestData.GenerateDataObjects), MemberType = typeof(TestData))]
-        public void CachedComputedExpressionWithParameters(
-            string expression,
-            Dictionary<string, object> parameters,
-            object expectedResult)
-        {
-            try
-            {
-                ComputedExpression del = this.fixture.CachedService.Interpret(expression);
-
-                object result = del.Compute(parameters?.OrderBy(q => expression.IndexOf(q.Key, StringComparison.Ordinal)).Select(p => p.Value).ToArray() ?? new object[0]);
-
-                this.AssertResults(in expectedResult, in result);
-            }
-            catch (DivideByZeroException)
-            {
-            }
-        }
-
-        /// <summary>
-        ///     Tests a cached computed expression with finder.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameters">The parameters.</param>
-        /// <param name="expectedResult">The expected result.</param>
-        /// <exception cref="InvalidOperationException">
-        ///     No computed expression was generated.
-        /// </exception>
-        [Theory(DisplayName = "CEPSF")]
-        [MemberData(nameof(TestData.GenerateDataObjects), MemberType = typeof(TestData))]
-        public void CachedComputedExpressionWithFinder(
-            string expression,
-            Dictionary<string, object> parameters,
-            object expectedResult)
-        {
-            try
-            {
-                var finder = new Mock<IDataFinder>(MockBehavior.Loose);
-
-                ComputedExpression del = this.fixture.CachedService.Interpret(expression);
-
-                if (parameters != null)
-                {
-#if NETCOREAPP3_1
-                    foreach ((var key, object val) in parameters)
-                    {
-                        object value = val;
-#else
-                    foreach (var kvp in parameters)
-                    {
-                        var key = kvp.Key;
-                        object value = kvp.Value;
-#endif
-                        finder.Setup(
-                            p => p.TryGetData(
-                                key,
-                                out value)).Returns(true);
-                    }
-                }
-
-                object result = del.Compute(finder.Object);
-
-                this.AssertResults(in expectedResult, in result);
-            }
-            catch (DivideByZeroException)
-            {
-            }
-        }
-
-        /// <summary>
-        ///     Tests a computed expression with finder.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameters">The parameters.</param>
-        /// <param name="expectedResult">The expected result.</param>
-        /// <exception cref="InvalidOperationException">
-        ///     No computed expression was generated.
-        /// </exception>
-        [Theory(DisplayName = "EPSFF")]
-        [MemberData(nameof(TestData.GenerateDataObjects), MemberType = typeof(TestData))]
-        public void ComputedExpressionWithFunctionFinder(
-            string expression,
-            Dictionary<string, object> parameters,
-            object expectedResult)
-        {
-            try
-            {
-                object result;
-
-                using (var service = new ExpressionParsingService())
-                {
-                    var finder = new Mock<IDataFinder>(MockBehavior.Loose);
-
-                    using (ComputedExpression del = service.Interpret(expression))
-                    {
-                        if (parameters != null)
-                        {
-#if NETCOREAPP3_1
-                            foreach ((var key, object val) in parameters)
-                            {
-#else
-                            foreach (var kvp in parameters)
-                            {
-                                var key = kvp.Key;
-                                object val = kvp.Value;
-#endif
-                                object value = GenerateFuncOutOfParameterValue(val);
-                                finder.Setup(
-                                    p => p.TryGetData(
-                                        key,
-                                        out value)).Returns(true);
-                            }
-                        }
-
-                        result = del.Compute(finder.Object);
-                    }
-                }
-
-                this.AssertResults(in expectedResult, in result);
-            }
-            catch (DivideByZeroException)
-            {
-            }
-        }
-
-        /// <summary>
-        ///     Tests a cached computed expression with finder.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameters">The parameters.</param>
-        /// <param name="expectedResult">The expected result.</param>
-        /// <exception cref="InvalidOperationException">
-        ///     No computed expression was generated!.
-        /// </exception>
-        [Theory(DisplayName = "CEPSFF")]
-        [MemberData(nameof(TestData.GenerateDataObjects), MemberType = typeof(TestData))]
-        public void CachedComputedExpressionWithFunctionFinder(
-            string expression,
-            Dictionary<string, object> parameters,
-            object expectedResult)
-        {
-            try
-            {
-                var finder = new Mock<IDataFinder>(MockBehavior.Loose);
-
-                ComputedExpression del = this.fixture.CachedService.Interpret(expression);
-
-                if (parameters != null)
-                {
-#if NETCOREAPP3_1
-                    foreach ((var key, object val) in parameters)
-                    {
-#else
-                    foreach (var kvp in parameters)
-                    {
-                        var key = kvp.Key;
-                        object val = kvp.Value;
-#endif
-                        object value = GenerateFuncOutOfParameterValue(val);
-                        finder.Setup(
-                            p => p.TryGetData(
-                                key,
-                                out value)).Returns(true);
-                    }
-                }
-
-                object result = del.Compute(finder.Object);
-
-                this.AssertResults(in expectedResult, in result);
-            }
-            catch (DivideByZeroException)
-            {
-            }
-        }
-
-        /// <summary>
-        ///     Tests a cached computed expression with finder returning functions repeatedly.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="parameters">The parameters.</param>
-        /// <param name="expectedResult">The expected result.</param>
-        /// <exception cref="InvalidOperationException">
-        ///     No computed expression was generated.
-        /// </exception>
-        [Theory(DisplayName = "CEPSFFR")]
-        [MemberData(nameof(TestData.GenerateDataObjects), MemberType = typeof(TestData))]
-        public void CachedComputedExpressionWithFunctionFinderRepeated(
-            string expression,
-            Dictionary<string, object> parameters,
-            object expectedResult)
-        {
-            try
-            {
-                var indexLimit = DataGenerator.RandomInteger(
-                    3,
-                    5);
-                for (var index = 0; index < indexLimit; index++)
-                {
-                    var finder = new Mock<IDataFinder>(MockBehavior.Loose);
-
-                    ComputedExpression del = this.fixture.CachedService.Interpret(expression);
-
-                    if (parameters != null)
-                    {
-#if NETCOREAPP3_1
-                        foreach ((var key, object val) in parameters)
-                        {
-#else
-                        foreach (var kvp in parameters)
-                        {
-                            var key = kvp.Key;
-                            object val = kvp.Value;
-#endif
-                            object value = GenerateFuncOutOfParameterValue(val);
-                            finder.Setup(
-                                p => p.TryGetData(
-                                    key,
-                                    out value)).Returns(true);
-                        }
-                    }
-
-                    object result = del.Compute(finder.Object);
-
-                    this.AssertResults(in expectedResult, in result);
-                }
-            }
-            catch (DivideByZeroException)
-            {
-            }
-        }
-#pragma warning restore IDISP001 // Dispose created.
 
         private void AssertResults(
             in object expectedResult,
@@ -423,7 +154,7 @@ namespace IX.UnitTests
             Assert.Equal(
                 expectedResult,
                 result,
-                this.comparer);
+                Comparer);
         }
     }
 }

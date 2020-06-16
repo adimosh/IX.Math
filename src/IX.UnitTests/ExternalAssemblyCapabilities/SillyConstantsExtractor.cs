@@ -1,18 +1,24 @@
-// <copyright file="IConstantsExtractor.cs" company="Adrian Mos">
+// <copyright file="SillyConstantsExtractor.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System;
+using System.Text.RegularExpressions;
+using IX.Math;
+using IX.Math.Extensibility;
 using JetBrains.Annotations;
 
-namespace IX.Math.Extensibility
+namespace IX.UnitTests.ExternalAssemblyCapabilities
 {
     /// <summary>
-    ///     A service contract for extractors of constant values from the expression.
+    /// A constants extractor used for testing purposes.
     /// </summary>
-    [PublicAPI]
-    public interface IConstantsExtractor
+    /// <seealso cref="IConstantsExtractor" />
+    [UsedImplicitly]
+    public class SillyConstantsExtractor : IConstantsExtractor
     {
+        private readonly Regex exponentialNotationRegex = new Regex(@"silly");
+
         /// <summary>
         ///     Extracts a constants, returning its value and placement.
         /// </summary>
@@ -26,8 +32,18 @@ namespace IX.Math.Extensibility
         ///     Please note that the Position argument should be returned if a possible match is found, even if it does not
         ///     compute properly.
         /// </remarks>
-        (bool Success, object Value, int Position, int Length) ExtractConstant(
+        public (bool Success, object Value, int Position, int Length) ExtractConstant(
             in ReadOnlySpan<char> originalExpression,
-            MathDefinition mathDefinition);
+            MathDefinition mathDefinition)
+        {
+            var match = this.exponentialNotationRegex.Match(originalExpression.ToString());
+
+            if (!match.Success)
+            {
+                return (false, default, -1, default);
+            }
+
+            return (true, "stupid", match.Index, match.Length);
+        }
     }
 }

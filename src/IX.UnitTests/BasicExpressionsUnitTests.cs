@@ -8,7 +8,7 @@ using IX.Math;
 using IX.StandardExtensions.TestUtils;
 using Xunit;
 
-namespace IX.UnitTests.IX.Math
+namespace IX.UnitTests
 {
     /// <summary>
     ///     Tests for basic expressions.
@@ -25,7 +25,7 @@ namespace IX.UnitTests.IX.Math
 
 #pragma warning disable SA1123 // Do not place regions within elements
 
-#region STAGE 1: Positive integers
+            #region STAGE 1: Positive integers
 
             // +
             {
@@ -173,9 +173,9 @@ namespace IX.UnitTests.IX.Math
                     });
             }
 
-#endregion
+            #endregion
 
-#region STAGE 1: Negative integers
+            #region STAGE 1: Negative integers
 
             // +
             {
@@ -339,7 +339,7 @@ namespace IX.UnitTests.IX.Math
                     });
             }
 
-#endregion
+            #endregion
 
 #pragma warning restore SA1123 // Do not place regions within elements
 
@@ -362,47 +362,23 @@ namespace IX.UnitTests.IX.Math
             object[] parameters,
             object expectedResult)
         {
-            using (var service = new ExpressionParsingService())
+            using (var service = new MathematicPortfolio())
             {
-                ComputedExpression del;
+                object result;
                 try
                 {
-                    del = service.Interpret(expression);
+                    result = service.Solve(expression, parameters);
                 }
                 catch (Exception ex)
                 {
                     throw new InvalidOperationException(
-                        "The generation process should not have thrown an exception, but it did.",
+                        "The method should not have thrown an exception, but it did.",
                         ex);
                 }
 
-                try
-                {
-                    if (del == null)
-                    {
-                        throw new InvalidOperationException("No computed expression was generated!");
-                    }
-
-                    object result;
-                    try
-                    {
-                        result = del.Compute(parameters);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new InvalidOperationException(
-                            "The method should not have thrown an exception, but it did.",
-                            ex);
-                    }
-
-                    Assert.Equal(
-                        expectedResult,
-                        result);
-                }
-                finally
-                {
-                    del?.Dispose();
-                }
+                Assert.Equal(
+                    expectedResult,
+                    result);
             }
         }
     }

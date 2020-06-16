@@ -3,184 +3,73 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using IX.Math.Generators;
-using IX.Math.Nodes;
-using IX.Math.Nodes.Constants;
-using IX.StandardExtensions.Contracts;
+using System.Text.RegularExpressions;
+using System.Threading;
+using IX.Math.Extensibility;
 
 namespace IX.Math.Extraction
 {
     /// <summary>
     ///     An extractor for strings. This class cannot be inherited.
     /// </summary>
-    internal sealed class StringExtractor : Extensibility.IConstantsExtractor
+    internal sealed class StringExtractor : IConstantsExtractor
     {
+        private string stringIndicator;
+        private string escapeCharacter;
+
+        private Regex quotationMarksRegex;
+
         /// <summary>
-        ///     Extracts the string constants and replaces them with expression placeholders.
+        ///     Extracts a constants, returning its value and placement.
         /// </summary>
         /// <param name="originalExpression">The original expression.</param>
-        /// <param name="constantsTable">The constants table.</param>
-        /// <param name="reverseConstantsTable">The reverse constants table.</param>
         /// <param name="mathDefinition">The math definition.</param>
-        /// <returns>The expression, after replacement.</returns>
-        /// <exception cref="ArgumentNullException">
-        ///     <paramref name="originalExpression" />
-        ///     or
-        ///     <paramref name="constantsTable" />
-        ///     or
-        ///     <paramref name="reverseConstantsTable" />
-        ///     is <see langword="null" /> (<see langword="Nothing" /> in Visual Basic).
-        /// </exception>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Usage",
-            "PC001:API not supported on all platforms",
-            Justification = "This is an analyzer bug, TODO: see https://github.com/dotnet/platform-compat/issues/123")]
-#if NETSTANDARD2_1 || NET452
-        public
-#else
-        public unsafe
-#endif
-        string ExtractAllConstants(
-            string originalExpression,
-            IDictionary<string, ConstantNodeBase> constantsTable,
-            IDictionary<string, string> reverseConstantsTable,
+        /// <returns>
+        ///     A tuple containing a switch indicating success or failure, the extracted value, if any, and the position at which
+        ///     it is, as well as its length.
+        /// </returns>
+        /// <remarks>
+        ///     Please note that the Position argument should be returned if a possible match is found, even if it does not
+        ///     compute properly.
+        /// </remarks>
+        public (bool Success, object Value, int Position, int Length) ExtractConstant(
+            in ReadOnlySpan<char> originalExpression,
             MathDefinition mathDefinition)
         {
-            Requires.NotNullOrWhiteSpace(
-                originalExpression,
-                nameof(originalExpression));
-            Requires.NotNull(
-                constantsTable,
-                nameof(constantsTable));
-            Requires.NotNull(
-                reverseConstantsTable,
-                nameof(reverseConstantsTable));
-            Requires.NotNull(
-                mathDefinition,
-                nameof(mathDefinition));
+            var input = originalExpression.ToString();
 
-            var stringIndicagtorString = mathDefinition.StringIndicator;
-            var stringIndicator = mathDefinition.StringIndicator.AsSpan();
-            var stringIndicatorLength = stringIndicator.Length;
-            var escapeCharacter = mathDefinition.EscapeCharacter.AsSpan();
-            var escapeCharacterLength = escapeCharacter.Length;
-
-            var process = originalExpression.AsSpan();
-            StringBuilder sb = null;
-
-            while (true)
+            if (this.quotationMarksRegex == null ||
+                this.stringIndicator != mathDefinition.StringIndicator ||
+                this.escapeCharacter != mathDefinition.EscapeCharacter)
             {
-                var openingPosition = process.IndexOf(
-                    stringIndicator,
-                    StringComparison.CurrentCulture);
+                var si = this.stringIndicator = mathDefinition.StringIndicator;
+                var ec = this.escapeCharacter = mathDefinition.EscapeCharacter;
 
-                if (openingPosition == -1)
+                if (ec == "\\")
                 {
-                    // No string opening
-                    break;
+                    ec = "\\\\";
                 }
 
-                var header = process.Slice(
-                    0,
-                    openingPosition);
-
-                var rest = process.Slice(openingPosition + stringIndicatorLength);
-
-                int closingPosition;
-                ReadOnlySpan<char> body;
-
-                do
-                {
-                    closingPosition = rest.IndexOf(stringIndicator, StringComparison.CurrentCulture);
-
-                    if (closingPosition != -1)
-                    {
-                        body = rest.Slice(
-                            0,
-                            closingPosition);
-
-                        int occurrences = 0;
-
-                        while (body.EndsWith(escapeCharacter))
-                        {
-                            occurrences++;
-                            body = body.Slice(
-                                0,
-                                body.Length - escapeCharacterLength);
-                        }
-
-                        rest = rest.Slice(closingPosition + stringIndicatorLength);
-
-                        if (occurrences % 2 == 0)
-                        {
-                            break;
-                        }
-                    }
-                }
-                while (closingPosition != -1);
-
-                if (closingPosition == -1)
-                {
-                    // No string closing
-                    break;
-                }
-
-                // We have a proper string
-                body = process.Slice(
-                        openingPosition,
-                        process.Length - header.Length - rest.Length);
-
-                var itemName = ConstantsGenerator.GenerateStringConstant(
-                    constantsTable,
-                    reverseConstantsTable,
-                    originalExpression,
-                    stringIndicagtorString,
-                    body.ToString());
-
-                if (sb == null)
-                {
-                    sb = new StringBuilder(originalExpression.Length);
-                }
-
-#if NETSTANDARD2_1
-                sb.Append(header);
-#else
-#if NET452
-                sb.Append(header.ToString());
-#else
-                fixed (char* headerPointer = &header.GetPinnableReference())
-                {
-                    sb.Append(headerPointer, header.Length);
-                }
-#endif
-#endif
-
-                sb.Append(itemName);
-
-                process = rest;
+                Interlocked.Exchange(
+                    ref this.quotationMarksRegex,
+                    new Regex(
+                        $@"(?<!{ec})(?:{ec}{{2}})*(?<constant>{si}(?<content>(?:(?<!{ec})(?:{ec}{{2}})*{ec}{si}|[^{si}])+(?<!{ec})(?:{ec}{{2}})*){si})"));
             }
 
-            if (sb == null)
+            var match = this.quotationMarksRegex.Match(input);
+
+            if (match.Success)
             {
-                return originalExpression;
+                return (false, default, -1, default);
             }
 
-#if NETSTANDARD2_1
-            sb.Append(process);
-#else
-#if NET452
-            sb.Append(process.ToString());
-#else
-            fixed (char* processPointer = &process.GetPinnableReference())
-            {
-                sb.Append(processPointer, process.Length);
-            }
-#endif
-#endif
+            var grp = match.Groups["constant"];
+            int index = grp.Index;
+            int length = grp.Length;
+            string content = match.Groups["content"]
+                .Value;
 
-            return sb.ToString();
+            return (true, content, index, length);
         }
     }
 }

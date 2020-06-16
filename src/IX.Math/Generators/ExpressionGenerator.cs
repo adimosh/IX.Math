@@ -21,8 +21,6 @@ using IX.Math.Nodes.Functions.Ternary;
 using IX.Math.Nodes.Functions.Unary;
 using IX.Math.Nodes.Operators.Binary;
 using IX.Math.Nodes.Operators.Unary;
-using IX.Math.Nodes.Parameters;
-using IX.Math.Registration;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Globalization;
 using JetBrains.Annotations;
@@ -51,20 +49,14 @@ namespace IX.Math.Generators
                 return ComputationBody.Empty;
             }
 
-            foreach (Type extractorType in workingSet.Extractors.KeysByLevel.OrderBy(p => p.Key)
-                .SelectMany(p => p.Value).ToArray())
-            {
-                workingSet.Expression = workingSet.Extractors[extractorType].ExtractAllConstants(
-                    workingSet.Expression,
-                    workingSet.ConstantsTable,
-                    workingSet.ReverseConstantsTable,
-                    workingSet.Definition);
-
-                if (workingSet.CancellationToken.IsCancellationRequested)
-                {
-                    return ComputationBody.Empty;
-                }
-            }
+            workingSet.Expression = ConstantsGenerator.ExtractConstants(
+                workingSet.ConstantsTable,
+                workingSet.ReverseConstantsTable,
+                workingSet.Expression,
+                workingSet.Extractors,
+                workingSet.Definition,
+                workingSet.StringFormatters,
+                workingSet.CancellationToken);
 
             workingSet.Expression = SubExpressionFormatter.Cleanup(workingSet.Expression);
 
@@ -97,7 +89,8 @@ namespace IX.Math.Generators
                 workingSet.Interpreters,
                 workingSet.ParameterRegistry,
                 workingSet.SymbolTable[string.Empty].Expression,
-                workingSet.AllSymbols);
+                workingSet.AllSymbols,
+                workingSet.StringFormatters);
 
             if (workingSet.CancellationToken.IsCancellationRequested)
             {
@@ -137,11 +130,12 @@ namespace IX.Math.Generators
                     workingSet.Interpreters,
                     workingSet.Expression,
                     workingSet.Definition.Parentheses.Item1,
-                    workingSet.AllSymbols);
+                    workingSet.AllSymbols,
+                    workingSet.StringFormatters);
             }
 
             // For each parameter from the table we've just populated, see where it's first used, and fill in that index as the order
-            foreach (ParameterContext paramForOrdering in workingSet.ParameterRegistry.Dump())
+            foreach (var paramForOrdering in workingSet.ParameterRegistry.Values)
             {
                 paramForOrdering.Order = Array.IndexOf(
                     splitExpression,
@@ -171,7 +165,7 @@ namespace IX.Math.Generators
                 return ComputationBody.Empty;
             }
 
-            if (body is ConstantNodeBase && workingSet.ParameterRegistry.Populated)
+            if (body is ConstantNodeBase)
             {
                 return ComputationBody.Empty;
             }
@@ -226,12 +220,9 @@ namespace IX.Math.Generators
             }
 
             // Check whether expression is an external parameter
-            if (workingSet.ParameterRegistry.Exists(expression))
+            if (workingSet.ParameterRegistry.TryGetValue(expression, out var parameter))
             {
-                return new ExternalParameterNode(
-
-                    expression,
-                    workingSet.ParameterRegistry);
+                return parameter;
             }
 
             // Check whether the expression already exists in the symbols table

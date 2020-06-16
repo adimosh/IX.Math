@@ -329,27 +329,6 @@ namespace IX.Math
         }
 
         /// <summary>
-        /// Offers a reserved object type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns>An instance of a reserved type, if one exists.</returns>
-        /// <exception cref="NotSupportedException">The type requested is not supported.</exception>
-        internal object OfferReservedType(Type type)
-        {
-            if (type == typeof(WorkingExpressionSet))
-            {
-                return this;
-            }
-
-            if (type == typeof(IStringFormatter))
-            {
-                return this.StringFormatters;
-            }
-
-            throw new NotSupportedException();
-        }
-
-        /// <summary>
         ///     Initializes this instance. This method shuld be called after initialization and extraction of major constants.
         /// </summary>
         [DiagCA.SuppressMessage(
@@ -717,7 +696,8 @@ namespace IX.Math
                 this.ConstantsTable,
                 this.ReverseConstantsTable,
                 "e",
-                global::System.Math.E);
+                global::System.Math.E,
+                this.StringFormatters);
 
             // Archimedes-Ludolph constant (pi)
             ConstantsGenerator.GenerateNamedNumericSymbol(
@@ -725,6 +705,7 @@ namespace IX.Math
                 this.ReverseConstantsTable,
                 "π",
                 global::System.Math.PI,
+                this.StringFormatters,
                 $"{definition.SpecialSymbolIndicators.Item1}pi{definition.SpecialSymbolIndicators.Item2}");
 
             // Golden ratio
@@ -733,6 +714,7 @@ namespace IX.Math
                 this.ReverseConstantsTable,
                 "φ",
                 1.6180339887498948,
+                this.StringFormatters,
                 $"{definition.SpecialSymbolIndicators.Item1}phi{definition.SpecialSymbolIndicators.Item2}");
 
             // Bernstein constant
@@ -741,6 +723,7 @@ namespace IX.Math
                 this.ReverseConstantsTable,
                 "β",
                 0.2801694990238691,
+                this.StringFormatters,
                 $"{definition.SpecialSymbolIndicators.Item1}beta{definition.SpecialSymbolIndicators.Item2}");
 
             // Euler-Mascheroni constant
@@ -749,6 +732,7 @@ namespace IX.Math
                 this.ReverseConstantsTable,
                 "γ",
                 0.5772156649015328,
+                this.StringFormatters,
                 $"{definition.SpecialSymbolIndicators.Item1}gamma{definition.SpecialSymbolIndicators.Item2}");
 
             // Gauss-Kuzmin-Wirsing constant
@@ -757,6 +741,7 @@ namespace IX.Math
                 this.ReverseConstantsTable,
                 "λ",
                 0.3036630028987326,
+                this.StringFormatters,
                 $"{definition.SpecialSymbolIndicators.Item1}lambda{definition.SpecialSymbolIndicators.Item2}");
         }
 

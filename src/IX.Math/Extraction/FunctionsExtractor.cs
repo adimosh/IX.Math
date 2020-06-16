@@ -9,9 +9,8 @@ using System.Linq;
 using IX.Math.ExpressionState;
 using IX.Math.Extensibility;
 using IX.Math.Generators;
-using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
-using IX.Math.Registration;
+using IX.Math.Nodes.Parameters;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Globalization;
@@ -26,7 +25,7 @@ namespace IX.Math.Extraction
     internal static class FunctionsExtractor
     {
         /// <summary>
-        ///     Replaces functions calls with expression placeholders.
+        /// Replaces functions calls with expression placeholders.
         /// </summary>
         /// <param name="openParenthesis">The symbol of an open parenthesis.</param>
         /// <param name="closeParenthesis">The symbol of a closed parenthesis.</param>
@@ -39,6 +38,7 @@ namespace IX.Math.Extraction
         /// <param name="parametersTable">The parameters table.</param>
         /// <param name="expression">The expression before processing.</param>
         /// <param name="allSymbols">All symbols.</param>
+        /// <param name="stringFormatters">The string formatters.</param>
         internal static void ReplaceFunctions(
             [NotNull] string openParenthesis,
             [NotNull] string closeParenthesis,
@@ -48,9 +48,10 @@ namespace IX.Math.Extraction
             [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
             [NotNull] Dictionary<string, string> reverseSymbolTable,
             [NotNull] LevelDictionary<Type, IConstantInterpreter> interpreters,
-            [NotNull] IParameterRegistry parametersTable,
+            [NotNull] IDictionary<string, ExternalParameterNode> parametersTable,
             [NotNull] string expression,
-            [NotNull] string[] allSymbols)
+            [NotNull] string[] allSymbols,
+            [NotNull] List<IStringFormatter> stringFormatters)
         {
             // Validate parameters
             Requires.NotNullOrWhiteSpace(
@@ -86,6 +87,9 @@ namespace IX.Math.Extraction
             Requires.NotNull(
                 allSymbols,
                 nameof(allSymbols));
+            Requires.NotNull(
+                allSymbols,
+                nameof(allSymbols));
 
             // Replace the main expression
             ReplaceOneFunction(
@@ -100,7 +104,8 @@ namespace IX.Math.Extraction
                 interpreters,
                 parametersTable,
                 expression,
-                allSymbols);
+                allSymbols,
+                stringFormatters);
 
             for (var i = 1; i < symbolTable.Count; i++)
             {
@@ -117,7 +122,8 @@ namespace IX.Math.Extraction
                     interpreters,
                     parametersTable,
                     expression,
-                    allSymbols);
+                    allSymbols,
+                    stringFormatters);
             }
 
             static void ReplaceOneFunction(
@@ -130,9 +136,10 @@ namespace IX.Math.Extraction
                 Dictionary<string, ExpressionSymbol> outerSymbolTableReference,
                 Dictionary<string, string> outerReverseSymbolTableRefeerence,
                 LevelDictionary<Type, IConstantInterpreter> interpreters,
-                IParameterRegistry outerParametersTableReference,
+                IDictionary<string, ExternalParameterNode> outerParametersTableReference,
                 string outerExpressionSymbol,
-                string[] outerAllSymbolsSymbols)
+                string[] outerAllSymbolsSymbols,
+                List<IStringFormatter> outerStringFormatters)
             {
                 ExpressionSymbol symbol = outerSymbolTableReference[key];
                 if (symbol.IsFunctionCall)
@@ -156,7 +163,8 @@ namespace IX.Math.Extraction
                         interpreters,
                         outerParametersTableReference,
                         outerExpressionSymbol,
-                        outerAllSymbolsSymbols);
+                        outerAllSymbolsSymbols,
+                        outerStringFormatters);
                 }
 
                 static string ReplaceFunctions(
@@ -169,9 +177,10 @@ namespace IX.Math.Extraction
                     Dictionary<string, ExpressionSymbol> symbolTableReference,
                     Dictionary<string, string> reverseSymbolTableReference,
                     LevelDictionary<Type, IConstantInterpreter> interpretersReference,
-                    IParameterRegistry parametersTableReference,
+                    IDictionary<string, ExternalParameterNode> parametersTableReference,
                     string expressionSymbol,
-                    string[] allSymbolsSymbols)
+                    string[] allSymbolsSymbols,
+                    List<IStringFormatter> innerStringFormatters)
                 {
                     var op = -1;
                     var opl = openParanthesisSymbol.Length;
@@ -252,7 +261,8 @@ namespace IX.Math.Extraction
                                 interpretersReference,
                                 parametersTableReference,
                                 expressionSymbol,
-                                allSymbolsSymbols);
+                                allSymbolsSymbols,
+                                innerStringFormatters);
                         }
 
                         var argPlaceholders = new List<string>();
@@ -270,7 +280,8 @@ namespace IX.Math.Extraction
                                 interpretersReference,
                                 expressionSymbol,
                                 openParanthesisSymbol,
-                                allSymbolsSymbols);
+                                allSymbolsSymbols,
+                                innerStringFormatters);
 
                             // We check whether or not this is actually a constant
                             argPlaceholders.Add(
@@ -279,7 +290,8 @@ namespace IX.Math.Extraction
                                     reverseConstantsTableReference,
                                     interpretersReference,
                                     expressionSymbol,
-                                    s) ?? (!parametersTableReference.Exists(s)
+                                    s,
+                                    innerStringFormatters) ?? (!parametersTableReference.ContainsKey(s)
                                     ? SymbolExpressionGenerator.GenerateSymbolExpression(
                                         symbolTableReference,
                                         reverseSymbolTableReference,

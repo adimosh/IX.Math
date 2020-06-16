@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using IX.Math.Extensibility;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
@@ -26,11 +25,11 @@ namespace IX.Math.Nodes.Operators.Unary
         ///     operand
         ///     is <c>null</c> (<c>Nothing</c> in Visual Basic).
         /// </exception>
-        [SuppressMessage(
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
             "ReSharper",
             "VirtualMemberCallInConstructor",
             Justification = "We specifically want this to happen.")]
-        [SuppressMessage(
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Usage",
             "CA2214:Do not call overridable methods in constructors",
             Justification = "We want this here.")]

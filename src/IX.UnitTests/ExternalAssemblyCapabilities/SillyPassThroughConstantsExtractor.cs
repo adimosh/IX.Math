@@ -6,7 +6,7 @@ using IX.Math.Extensibility;
 using IX.StandardExtensions.Globalization;
 using JetBrains.Annotations;
 
-namespace IX.UnitTests.IX.Math.ExternalAssemblyCapabilities
+namespace IX.UnitTests.ExternalAssemblyCapabilities
 {
     /// <summary>
     /// Test pass-through extractor baby.

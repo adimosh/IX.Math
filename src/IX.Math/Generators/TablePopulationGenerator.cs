@@ -6,9 +6,8 @@ using System;
 using System.Collections.Generic;
 using IX.Math.ExpressionState;
 using IX.Math.Extensibility;
-using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
-using IX.Math.Registration;
+using IX.Math.Nodes.Parameters;
 using IX.StandardExtensions.Contracts;
 using IX.System.Collections.Generic;
 using JetBrains.Annotations;
@@ -33,17 +32,19 @@ namespace IX.Math.Generators
         /// <param name="originalExpression">The expression before processing.</param>
         /// <param name="openParenthesis">The symbol of an open parenthesis.</param>
         /// <param name="allSymbols">All symbols on which to split, in order.</param>
+        /// <param name="stringFormatters">The string formatters.</param>
         internal static void PopulateTables(
             [NotNull] string processedExpression,
             [NotNull] Dictionary<string, ConstantNodeBase> constantsTable,
             [NotNull] Dictionary<string, string> reverseConstantsTable,
             [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
             [NotNull] Dictionary<string, string> reverseSymbolTable,
-            [NotNull] IParameterRegistry parameterRegistry,
+            [NotNull] IDictionary<string, ExternalParameterNode> parameterRegistry,
             [NotNull] LevelDictionary<Type, IConstantInterpreter> interpreters,
             [NotNull] string originalExpression,
             [NotNull] string openParenthesis,
-            [NotNull] string[] allSymbols)
+            [NotNull] string[] allSymbols,
+            [NotNull] List<IStringFormatter> stringFormatters)
         {
             // Validate parameters
             Requires.NotNullOrWhiteSpace(
@@ -76,6 +77,9 @@ namespace IX.Math.Generators
             Requires.NotNull(
                 allSymbols,
                 nameof(allSymbols));
+            Requires.NotNull(
+                stringFormatters,
+                nameof(stringFormatters));
 
             // Split expression by all symbols
             string[] expressions = processedExpression.Split(
@@ -96,7 +100,7 @@ namespace IX.Math.Generators
                     continue;
                 }
 
-                if (parameterRegistry.Exists(exp))
+                if (parameterRegistry.ContainsKey(exp))
                 {
                     // We have a parameter
                     continue;
@@ -126,14 +130,15 @@ namespace IX.Math.Generators
                         reverseConstantsTable,
                         interpreters,
                         originalExpression,
-                        exp) != null)
+                        exp,
+                        stringFormatters) != null)
                 {
                     continue;
                 }
 
                 // It's not a constant, nor something ever encountered before
                 // Therefore it should be a parameter
-                parameterRegistry.AdvertiseParameter(exp);
+                parameterRegistry.Add(exp, new ExternalParameterNode(exp, stringFormatters));
             }
         }
     }

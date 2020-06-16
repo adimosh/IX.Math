@@ -5,20 +5,18 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using IX.Math.Exceptions;
 using IX.Math.Extensibility;
-using IX.Math.Formatters;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
-using IX.Math.Registration;
 using IX.StandardExtensions;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Contracts;
+using IX.StandardExtensions.Efficiency;
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -27,7 +25,7 @@ namespace IX.Math
     /// A representation of a computed expression, resulting from a string expression.
     /// </summary>
     [PublicAPI]
-    public sealed partial class ComputedExpression : DisposableBase, IDeepCloneable<ComputedExpression>
+    public sealed class ComputedExpression : DisposableBase, IDeepCloneable<ComputedExpression>
     {
 #if NET452
         private static readonly ReadOnlyCollection<Type> EmptyTypeCollection = new ReadOnlyCollection<Type>(new Type[0]);
@@ -128,18 +126,25 @@ namespace IX.Math
 
             if (this.IsConstant)
             {
-                return (true, true, default, ((ConstantNodeBase)this.body).DistillValue());
+                return (true, true, default, ((ConstantNodeBase)this.body).ValueAsObject);
             }
 
-            Expression localBody = tolerance.IsEmpty ? this.body.GenerateExpression() : this.body.GenerateExpression(in tolerance);
+            for (int i = 0; i < parameterContexts.Length; i++)
+            {
+                parameterContexts[i].DetermineParameterType(parameterTypes[i]);
+            }
+
+            this.body.Verify();
+
+            Expression localBody = this.body.GenerateExpression(this.body.CalculateLeastCostlyStrategy(), in tolerance);
 
             Delegate del;
             try
             {
                 del = Expression.Lambda(
                         localBody,
-                        this.parametersRegistry.Dump()
-                            .Select(p => p.ParameterExpression))
+                        this.parametersRegistry.Values
+                            .Select(p => p.ParameterDefinitionExpression))
                     .Compile();
             }
             catch (MathematicsEngineException)
@@ -161,10 +166,15 @@ namespace IX.Math
         /// <returns>A deep clone.</returns>
         public ComputedExpression DeepClone()
         {
-            var registry = new StandardParameterRegistry(this.stringFormatters);
-            var context = new NodeCloningContext { ParameterRegistry = registry, SpecialRequestFunction = this.specialObjectRequestFunc };
+            var registry = new ConcurrentDictionary<string, ExternalParameterNode>();
+            var context = new NodeCloningContext(registry);
 
-            return new ComputedExpression(this.initialExpression, this.body.DeepClone(context), this.RecognizedCorrectly, registry, this.stringFormatters, this.specialObjectRequestFunc);
+            return new ComputedExpression(
+                this.initialExpression,
+                this.body.DeepClone(context),
+                this.RecognizedCorrectly,
+                registry,
+                this.stringFormatters);
         }
 
         /// <summary>
@@ -175,466 +185,6 @@ namespace IX.Math
             base.DisposeGeneralContext();
 
             Interlocked.Exchange(ref this.body, null);
-        }
-
-        private object[] FormatArgumentsAccordingToParameters(
-            object[] parameterValues,
-            ParameterContext[] parameters)
-        {
-            if (parameterValues.Length != parameters.Length)
-            {
-                return null;
-            }
-
-            var finalValues = new object[parameterValues.Length];
-
-            var i = 0;
-
-            object paramValue = null;
-
-            while (i < finalValues.Length)
-            {
-                ParameterContext paraContext = parameters[i];
-
-                // If there was no continuation, initialize parameter with value.
-                paramValue ??= parameterValues[i];
-
-                // Type filtration
-                switch (paramValue)
-                {
-                    case long convertedParam:
-                        switch (paraContext.ReturnType)
-                        {
-                            case SupportedValueType.Boolean:
-                                paramValue = CreateValue(paraContext, convertedParam != 0);
-                                break;
-
-                            case SupportedValueType.ByteArray:
-                                paramValue = CreateValue(paraContext, BitConverter.GetBytes(convertedParam));
-                                break;
-
-                            case SupportedValueType.Numeric:
-                                switch (paraContext.IsFloat)
-                                {
-                                    case true:
-                                        paramValue = CreateValue(paraContext, Convert.ToDouble(convertedParam));
-                                        break;
-                                    case false:
-                                        paramValue = CreateValue(paraContext, convertedParam);
-                                        break;
-                                    default:
-                                        paraContext.DetermineInteger();
-                                        continue;
-                                }
-
-                                break;
-
-                            case SupportedValueType.String:
-                                paramValue = CreateValue(
-                                    paraContext,
-                                    StringFormatter.FormatIntoString(convertedParam, this.stringFormatters));
-
-                                break;
-
-                            case SupportedValueType.Unknown:
-                                paraContext.DetermineType(SupportedValueType.Numeric);
-                                continue;
-                        }
-
-                        break;
-
-                    case double convertedParam:
-                        switch (paraContext.ReturnType)
-                        {
-                            case SupportedValueType.Boolean:
-                                // ReSharper disable once CompareOfFloatsByEqualityOperator - no better idea for now
-                                paramValue = CreateValue(paraContext, convertedParam != 0D);
-                                break;
-
-                            case SupportedValueType.ByteArray:
-                                paramValue = CreateValue(paraContext, BitConverter.GetBytes(convertedParam));
-                                break;
-
-                            case SupportedValueType.Numeric:
-                                switch (paraContext.IsFloat)
-                                {
-                                    case true:
-                                        paramValue = CreateValue(paraContext, convertedParam);
-                                        break;
-                                    case false:
-                                        paramValue = CreateValue(paraContext, Convert.ToInt64(convertedParam));
-                                        break;
-                                    default:
-                                        paraContext.DetermineFloat();
-                                        continue;
-                                }
-
-                                break;
-
-                            case SupportedValueType.String:
-                                paramValue = CreateValue(
-                                    paraContext,
-                                    StringFormatter.FormatIntoString(convertedParam, this.stringFormatters));
-                                break;
-
-                            case SupportedValueType.Unknown:
-                                paraContext.DetermineType(SupportedValueType.Numeric);
-                                continue;
-                        }
-
-                        break;
-
-                    case bool convertedParam:
-                        switch (paraContext.ReturnType)
-                        {
-                            case SupportedValueType.Boolean:
-                                paramValue = CreateValue(paraContext, convertedParam);
-                                break;
-
-                            case SupportedValueType.ByteArray:
-                                paramValue = CreateValue(paraContext, BitConverter.GetBytes(convertedParam));
-                                break;
-
-                            case SupportedValueType.Numeric:
-                                return null;
-
-                            case SupportedValueType.String:
-                                paramValue = CreateValue(
-                                    paraContext,
-                                    StringFormatter.FormatIntoString(convertedParam, this.stringFormatters));
-                                break;
-
-                            case SupportedValueType.Unknown:
-                                paraContext.DetermineType(SupportedValueType.Boolean);
-                                continue;
-                        }
-
-                        break;
-
-                    case string convertedParam:
-                        switch (paraContext.ReturnType)
-                        {
-                            case SupportedValueType.Boolean:
-                                paramValue = CreateValue(paraContext, bool.Parse(convertedParam));
-                                break;
-
-                            case SupportedValueType.ByteArray:
-                                {
-                                    if (ParsingFormatter.ParseByteArray(convertedParam, out var byteArrayResult))
-                                    {
-                                        paramValue = CreateValue(paraContext, byteArrayResult);
-                                    }
-                                    else
-                                    {
-                                        // Cannot parse byte array.
-                                        return null;
-                                    }
-                                }
-
-                                break;
-
-                            case SupportedValueType.Numeric:
-                                {
-                                    if (ParsingFormatter.ParseNumeric(convertedParam, out var numericResult))
-                                    {
-                                        switch (numericResult)
-                                        {
-                                            case long integerResult:
-                                                paramValue = CreateValue(paraContext, integerResult);
-                                                break;
-                                            case double floatResult:
-                                                paramValue = CreateValue(paraContext, floatResult);
-                                                break;
-                                            default:
-                                                // Numeric type unknown.
-                                                return null;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // Cannot parse numeric type.
-                                        return null;
-                                    }
-                                }
-
-                                break;
-
-                            case SupportedValueType.String:
-                                paramValue = CreateValue(paraContext, convertedParam);
-                                break;
-
-                            case SupportedValueType.Unknown:
-                                paraContext.DetermineType(SupportedValueType.String);
-                                continue;
-                        }
-
-                        break;
-
-                    case byte[] convertedParam:
-                        switch (paraContext.ReturnType)
-                        {
-                            case SupportedValueType.Boolean:
-                                paramValue = CreateValue(paraContext, BitConverter.ToBoolean(convertedParam, 0));
-                                break;
-
-                            case SupportedValueType.ByteArray:
-                                paramValue = CreateValue(paraContext, convertedParam);
-                                break;
-
-                            case SupportedValueType.Numeric:
-                                switch (paraContext.IsFloat)
-                                {
-                                    case true:
-                                        paramValue = CreateValue(paraContext, BitConverter.ToDouble(convertedParam, 0));
-                                        break;
-                                    case false:
-                                        paramValue = CreateValue(paraContext, BitConverter.ToInt64(convertedParam, 0));
-                                        break;
-                                    default:
-                                        paraContext.DetermineFloat();
-                                        continue;
-                                }
-
-                                break;
-
-                            case SupportedValueType.String:
-                                paramValue = CreateValue(
-                                    paraContext,
-                                    StringFormatter.FormatIntoString(convertedParam, this.stringFormatters));
-                                break;
-
-                            case SupportedValueType.Unknown:
-                                paraContext.DetermineType(SupportedValueType.ByteArray);
-                                continue;
-                        }
-
-                        break;
-
-                    case Func<long> convertedParam:
-                        paraContext.DetermineFunc();
-
-                        switch (paraContext.ReturnType)
-                        {
-                            case SupportedValueType.Boolean:
-                                paramValue = CreateValueFromFunc(paraContext, () => convertedParam() == 0);
-                                break;
-
-                            case SupportedValueType.ByteArray:
-                                paramValue = CreateValueFromFunc(paraContext, () => BitConverter.GetBytes(convertedParam()));
-                                break;
-
-                            case SupportedValueType.Numeric:
-                                switch (paraContext.IsFloat)
-                                {
-                                    case true:
-                                        paramValue = CreateValueFromFunc(paraContext, () => Convert.ToDouble(convertedParam()));
-                                        break;
-                                    case false:
-                                        paramValue = CreateValueFromFunc(paraContext, convertedParam);
-                                        break;
-                                    default:
-                                        paraContext.DetermineInteger();
-                                        continue;
-                                }
-
-                                break;
-
-                            case SupportedValueType.String:
-                                paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam(), this.stringFormatters));
-                                break;
-
-                            case SupportedValueType.Unknown:
-                                paraContext.DetermineType(SupportedValueType.Numeric);
-                                continue;
-                        }
-
-                        break;
-
-                    case Func<double> convertedParam:
-                        paraContext.DetermineFunc();
-
-                        switch (paraContext.ReturnType)
-                        {
-                            case SupportedValueType.Boolean:
-                                // ReSharper disable once CompareOfFloatsByEqualityOperator - no better idea for now
-                                paramValue = CreateValueFromFunc(paraContext, () => convertedParam() == 0D);
-                                break;
-
-                            case SupportedValueType.ByteArray:
-                                paramValue = CreateValueFromFunc(paraContext, () => BitConverter.GetBytes(convertedParam()));
-                                break;
-
-                            case SupportedValueType.Numeric:
-                                switch (paraContext.IsFloat)
-                                {
-                                    case true:
-                                        paramValue = CreateValueFromFunc(paraContext, convertedParam);
-                                        break;
-                                    case false:
-                                        paramValue = CreateValueFromFunc(paraContext, () => Convert.ToInt64(convertedParam()));
-                                        break;
-                                    default:
-                                        paraContext.DetermineFloat();
-                                        continue;
-                                }
-
-                                break;
-
-                            case SupportedValueType.String:
-                                paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam(), this.stringFormatters));
-
-                                break;
-
-                            case SupportedValueType.Unknown:
-                                paraContext.DetermineType(SupportedValueType.Numeric);
-                                continue;
-                        }
-
-                        break;
-
-                    case Func<bool> convertedParam:
-                        paraContext.DetermineFunc();
-
-                        switch (paraContext.ReturnType)
-                        {
-                            case SupportedValueType.Boolean:
-                                paramValue = CreateValueFromFunc(paraContext, convertedParam);
-                                break;
-
-                            case SupportedValueType.ByteArray:
-                                paramValue = CreateValueFromFunc(paraContext, () => BitConverter.GetBytes(convertedParam()));
-                                break;
-
-                            case SupportedValueType.Numeric:
-                                return null;
-
-                            case SupportedValueType.String:
-                                paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam(), this.stringFormatters));
-                                break;
-
-                            case SupportedValueType.Unknown:
-                                paraContext.DetermineType(SupportedValueType.Boolean);
-                                continue;
-                        }
-
-                        break;
-
-                    case Func<string> convertedParam:
-                        paraContext.DetermineFunc();
-
-                        switch (paraContext.ReturnType)
-                        {
-                            case SupportedValueType.Boolean:
-                                paramValue = CreateValueFromFunc(paraContext, () => bool.Parse(convertedParam()));
-                                break;
-
-                            case SupportedValueType.ByteArray:
-                                paramValue = CreateValueFromFunc(paraContext, () => ParsingFormatter.ParseByteArray(convertedParam(), out var baResult) ? baResult : null);
-                                break;
-
-                            case SupportedValueType.Numeric:
-                                switch (paraContext.IsFloat)
-                                {
-                                    case true:
-                                        paramValue = CreateValueFromFunc(paraContext, () => ParsingFormatter.ParseNumeric(
-                                            convertedParam(),
-                                            out var numericResult)
-                                            ? Convert.ToDouble(numericResult, CultureInfo.CurrentCulture)
-                                            : throw new ArgumentInvalidTypeException(paraContext.Name));
-                                        break;
-                                    case false:
-                                        paramValue = CreateValueFromFunc(paraContext, () => ParsingFormatter.ParseNumeric(
-                                            convertedParam(),
-                                            out var numericResult)
-                                            ? Convert.ToInt64(numericResult, CultureInfo.CurrentCulture)
-                                            : throw new ArgumentInvalidTypeException(paraContext.Name));
-                                        break;
-                                    default:
-                                        paraContext.DetermineFloat();
-                                        continue;
-                                }
-
-                                break;
-
-                            case SupportedValueType.String:
-                                paramValue = CreateValueFromFunc(paraContext, convertedParam);
-                                break;
-
-                            case SupportedValueType.Unknown:
-                                paraContext.DetermineType(SupportedValueType.String);
-                                continue;
-                        }
-
-                        break;
-
-                    case Func<byte[]> convertedParam:
-                        paraContext.DetermineFunc();
-
-                        switch (paraContext.ReturnType)
-                        {
-                            case SupportedValueType.Boolean:
-                                paramValue = CreateValueFromFunc(paraContext, () => BitConverter.ToBoolean(convertedParam(), 0));
-                                break;
-
-                            case SupportedValueType.ByteArray:
-                                paramValue = CreateValueFromFunc(paraContext, convertedParam);
-                                break;
-
-                            case SupportedValueType.Numeric:
-                                switch (paraContext.IsFloat)
-                                {
-                                    case true:
-                                        paramValue = CreateValueFromFunc(paraContext, () => BitConverter.ToDouble(convertedParam(), 0));
-                                        break;
-                                    case false:
-                                        paramValue = CreateValueFromFunc(paraContext, () => BitConverter.ToInt64(convertedParam(), 0));
-                                        break;
-                                    default:
-                                        paraContext.DetermineFloat();
-                                        continue;
-                                }
-
-                                break;
-
-                            case SupportedValueType.String:
-                                paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam(), this.stringFormatters));
-                                break;
-
-                            case SupportedValueType.Unknown:
-                                paraContext.DetermineType(SupportedValueType.ByteArray);
-                                continue;
-                        }
-
-                        break;
-
-                    default:
-                        // Argument type is not (yet) supported
-                        return null;
-                }
-
-#pragma warning disable HAA0601 // Value type to reference type conversion causing boxing allocation - This is unavoidable now
-#pragma warning disable HAA0303 // Considering moving this out of the generic method - Not really possible
-                object CreateValue<T>(ParameterContext parameterContext, T value) => parameterContext.FuncParameter ? new Func<T>(() => value) : (object)value;
-
-                object CreateValueFromFunc<T>(
-                    ParameterContext parameterContext,
-                    Func<T> value) => parameterContext.FuncParameter ? (object)value : value();
-#pragma warning restore HAA0303 // Considering moving this out of the generic method
-#pragma warning restore HAA0601 // Value type to reference type conversion causing boxing allocation
-
-                if (paramValue == null)
-                {
-                    return null;
-                }
-
-                finalValues[i] = paramValue;
-
-                paramValue = null;
-
-                i++;
-            }
-
-            return finalValues;
         }
     }
 }

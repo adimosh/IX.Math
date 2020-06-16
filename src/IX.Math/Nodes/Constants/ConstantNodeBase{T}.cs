@@ -58,6 +58,14 @@ namespace IX.Math.Nodes.Constants
         public T Value { get; }
 
         /// <summary>
+        /// Gets the value as object.
+        /// </summary>
+        /// <value>
+        /// The value as object.
+        /// </value>
+        public override object ValueAsObject => this.Value;
+
+        /// <summary>
         /// Tries to get a string value out of this constant node.
         /// </summary>
         /// <param name="value">The value.</param>

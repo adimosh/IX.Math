@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace IX.UnitTests
+namespace IX.UnitTests.Data
 {
     /// <summary>
     ///     Test data for IX.Math tests.

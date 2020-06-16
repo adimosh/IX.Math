@@ -46,6 +46,14 @@ namespace IX.Math.Nodes.Parameters
         }
 
         /// <summary>
+        /// Gets or sets the order.
+        /// </summary>
+        /// <value>
+        /// The order.
+        /// </value>
+        public int Order { get; set; }
+
+        /// <summary>
         /// Gets the name.
         /// </summary>
         /// <value>

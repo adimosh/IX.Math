@@ -21,6 +21,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Data\TestData.BasicOperatorsWithRandomNumbers.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>TestData.BasicOperatorsWithRandomNumbers.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.CodeCoverage" Version="16.6.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -38,6 +46,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Data\TestData.BasicOperatorsWithRandomNumbers.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>TestData.BasicOperatorsWithRandomNumbers.cs</LastGenOutput>
+    </None>
     <None Update="TestData.BasicOperatorsWithRandomNumbers.tt">
       <LastGenOutput>TestData.BasicOperatorsWithRandomNumbers.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -56,14 +68,6 @@
 
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="TestData.BasicOperatorsWithRandomNumbers.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>TestData.BasicOperatorsWithRandomNumbers.tt</DependentUpon>
-    </Compile>
   </ItemGroup>
 
 </Project>

@@ -15,6 +15,15 @@ namespace IX.Math.Nodes
     public readonly struct NodeCloningContext
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="NodeCloningContext"/> struct.
+        /// </summary>
+        /// <param name="parameterRegistry">The parameter registry.</param>
+        public NodeCloningContext(IDictionary<string, ExternalParameterNode> parameterRegistry)
+        {
+            this.ParameterRegistry = parameterRegistry;
+        }
+
+        /// <summary>
         /// Gets the parameter registry.
         /// </summary>
         /// <value>The parameter registry.</value>

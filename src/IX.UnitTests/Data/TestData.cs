@@ -5,7 +5,7 @@
 using System.Linq;
 using JetBrains.Annotations;
 
-namespace IX.UnitTests
+namespace IX.UnitTests.Data
 {
     /// <summary>
     ///     Test data for IX.Math tests.
@@ -17,6 +17,9 @@ namespace IX.UnitTests
         ///     Provides templated text data.
         /// </summary>
         /// <returns>Test data.</returns>
-        public static object[][] GenerateDataObjects() => BasicOperatorsWithRandomNumbers().Union(SpecialCases()).ToArray();
+        public static object[][] GenerateDataObjects() =>
+            BasicOperatorsWithRandomNumbers()
+                .Union(SpecialCases())
+                .ToArray();
     }
 }

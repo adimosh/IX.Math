@@ -156,6 +156,115 @@ namespace IX.Math
         }
 
         /// <summary>
+        /// Gets the required parameters of an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>An array with the required parameter names and order.</returns>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0603:Delegate allocation from a method group",
+            Justification = "The methods that we're dealing with use delegate instances, and it is unavoidable.")]
+        public string[] GetRequiredParameters(string expression)
+        {
+            Requires.NotNullOrWhiteSpace(
+                expression,
+                nameof(expression));
+
+            var computedExpression = this.computedExpressions.GetOrAdd(
+                expression,
+                this.InnerValueFactory);
+
+            if (!computedExpression.RecognizedCorrectly)
+            {
+                return null;
+            }
+
+            return computedExpression.GetParameterNames();
+        }
+
+        /// <summary>
+        /// Solves the specified expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="dataFinder">The data finder.</param>
+        /// <returns>A computed object.</returns>
+        public object Solve(
+            string expression,
+            IDataFinder dataFinder) =>
+            this.Solve(
+                expression,
+                in ComparisonTolerance.Empty,
+                dataFinder);
+
+        /// <summary>
+        /// Solves the specified expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <param name="dataFinder">The data finder.</param>
+        /// <returns>A computed object.</returns>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0603:Delegate allocation from a method group",
+            Justification = "The methods that we're dealing with use delegate instances, and it is unavoidable.")]
+        public object Solve(
+            string expression,
+            in ComparisonTolerance tolerance,
+            IDataFinder dataFinder)
+        {
+            Requires.NotNullOrWhiteSpace(
+                expression,
+                nameof(expression));
+            Requires.NotNull(
+                dataFinder,
+                nameof(dataFinder));
+
+            var computedExpression = this.computedExpressions.GetOrAdd(
+                expression,
+                this.InnerValueFactory);
+
+            if (!computedExpression.RecognizedCorrectly)
+            {
+                return expression;
+            }
+
+            var names = computedExpression.GetParameterNames();
+
+            object[] parameterValues = new object[names.Length];
+
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (!dataFinder.TryGetData(
+                    names[i],
+                    out var val))
+                {
+                    return expression;
+                }
+
+                parameterValues[i] = val;
+            }
+
+            return this.Solve(
+                expression,
+                in tolerance,
+                parameterValues);
+        }
+
+        /// <summary>
+        /// Solves the specified expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>A computed object.</returns>
+        public object Solve(
+            string expression,
+            params object[] parameters) =>
+            this.Solve(
+                expression,
+                in ComparisonTolerance.Empty,
+                parameters);
+
+        /// <summary>
         /// Solves the specified expression.
         /// </summary>
         /// <param name="expression">The expression.</param>

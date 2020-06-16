@@ -6,7 +6,7 @@ using System;
 using IX.Math;
 using Xunit;
 
-namespace IX.UnitTests.IX.Math
+namespace IX.UnitTests
 {
     /// <summary>
     /// Unit tests for operator precedence styles.
@@ -26,20 +26,12 @@ namespace IX.UnitTests.IX.Math
 
             object result1, result2;
 
-            using (var service = new ExpressionParsingService())
+            using (var service = new MathematicPortfolio())
             {
-                using (ComputedExpression del = service.Interpret(expression))
-                {
-                    if (del == null)
-                    {
-                        throw new InvalidOperationException("No computed expression was generated!");
-                    }
-
-                    result1 = del.Compute();
-                }
+                result1 = service.Solve(expression);
             }
 
-            using (var service = new ExpressionParsingService(new MathDefinition
+            using (var service = new MathematicPortfolio(new MathDefinition
             {
                 Parentheses = new Tuple<string, string>("(", ")"),
                 SpecialSymbolIndicators = new Tuple<string, string>("[", "]"),
@@ -65,15 +57,7 @@ namespace IX.UnitTests.IX.Math
                 OperatorPrecedenceStyle = OperatorPrecedenceStyle.CStyle,
             }))
             {
-                using (ComputedExpression del = service.Interpret(expression))
-                {
-                    if (del == null)
-                    {
-                        throw new InvalidOperationException("No computed expression was generated!");
-                    }
-
-                    result2 = del.Compute();
-                }
+                result2 = service.Solve(expression);
             }
 
             Assert.False((bool)result1);

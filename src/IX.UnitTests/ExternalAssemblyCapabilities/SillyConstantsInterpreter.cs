@@ -3,12 +3,10 @@
 // </copyright>
 
 using IX.Math.Extensibility;
-using IX.Math.Nodes;
-using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Globalization;
 using JetBrains.Annotations;
 
-namespace IX.UnitTests.IX.Math.ExternalAssemblyCapabilities
+namespace IX.UnitTests.ExternalAssemblyCapabilities
 {
     /// <summary>
     ///     A constants interpreter used for testing purposes.
@@ -42,7 +40,7 @@ namespace IX.UnitTests.IX.Math.ExternalAssemblyCapabilities
         ///         standard formatters.
         ///     </para>
         /// </remarks>
-        public (bool Success, ConstantNodeBase Value) EvaluateIsConstant(string expressionPart) =>
-            expressionPart.CurrentCultureEqualsInsensitive("bumblydumb") ? (true, new NumericNode(2L)) : (false, default);
+        public (bool Success, object Value) EvaluateIsConstant(string expressionPart) =>
+            expressionPart.CurrentCultureEqualsInsensitive("bumblydumb") ? (true, 2L) : (false, default);
     }
 }

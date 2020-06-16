@@ -2,8 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using IX.Math.Nodes;
-using IX.Math.Nodes.Constants;
 using JetBrains.Annotations;
 
 namespace IX.Math.Extensibility
@@ -37,6 +35,6 @@ namespace IX.Math.Extensibility
         ///         standard formatters.
         ///     </para>
         /// </remarks>
-        (bool Success, ConstantNodeBase Value) EvaluateIsConstant(string expressionPart);
+        (bool Success, object Value) EvaluateIsConstant(string expressionPart);
     }
 }
