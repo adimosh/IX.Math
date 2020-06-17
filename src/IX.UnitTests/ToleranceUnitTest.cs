@@ -1025,7 +1025,7 @@ namespace IX.UnitTests
         {
             using var service = new MathematicPortfolio();
 
-            object result = service.Solve(expression, in tolerance, parameters?.Values.ToArray() ?? new object[0]);
+            object result = service.Solve(expression, in tolerance, parameters?.Select(p => p.Value).ToArray() ?? new object[0]);
 
             Assert.Equal(
                 expectedResult,

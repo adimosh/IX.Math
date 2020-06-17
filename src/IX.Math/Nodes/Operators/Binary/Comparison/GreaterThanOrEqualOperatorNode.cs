@@ -26,7 +26,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                 left,
                 right,
                 true,
-                true)
+                false)
         {
         }
 
@@ -38,7 +38,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new GreaterThanOrEqualOperatorNode(
                 this.StringFormatters,
-                this.Left,
-                this.Right);
+                this.Left.DeepClone(context),
+                this.Right.DeepClone(context));
     }
 }

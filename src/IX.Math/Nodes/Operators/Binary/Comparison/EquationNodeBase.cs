@@ -153,7 +153,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             }
 
             return this.notEqual
-                ? Expression.Negate(equalExpression)
+                ? Expression.Equal(equalExpression, Expression.Constant(false, typeof(bool)))
                 : equalExpression;
         }
 
