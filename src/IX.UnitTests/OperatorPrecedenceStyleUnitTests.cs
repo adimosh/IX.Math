@@ -40,6 +40,7 @@ namespace IX.UnitTests
                 AddSymbol = "+",
                 AndSymbol = "&",
                 DivideSymbol = "/",
+                ModuloSymbol = "%",
                 NotEqualsSymbol = "!=",
                 EqualsSymbol = "=",
                 MultiplySymbol = "*",
@@ -55,6 +56,7 @@ namespace IX.UnitTests
                 RightShiftSymbol = ">>",
                 LeftShiftSymbol = "<<",
                 OperatorPrecedenceStyle = OperatorPrecedenceStyle.CStyle,
+                EscapeCharacter = "\\"
             }))
             {
                 result2 = service.Solve(expression);

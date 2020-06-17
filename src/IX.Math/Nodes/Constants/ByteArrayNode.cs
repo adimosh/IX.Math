@@ -18,11 +18,11 @@ namespace IX.Math.Nodes.Constants
     [PublicAPI]
     public sealed class ByteArrayNode : ConstantNodeBase<byte[]>
     {
-        private readonly long? possibleInteger;
+        private long? possibleInteger;
 
-        private readonly double? possibleNumeric;
+        private double? possibleNumeric;
 
-        private readonly SupportableValueType supportableType;
+        private SupportableValueType supportableType;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ByteArrayNode" /> class.
@@ -32,25 +32,6 @@ namespace IX.Math.Nodes.Constants
         internal ByteArrayNode(List<IStringFormatter> stringFormatters, byte[] value)
             : base(stringFormatters, value)
         {
-            this.supportableType = SupportableValueType.ByteArray | SupportableValueType.String;
-
-            if (value.Length <= 4)
-            {
-                // Integer-compatible
-                this.possibleInteger = BitConverter.ToInt64(
-                    value,
-                    0);
-                this.supportableType |= SupportableValueType.Integer;
-            }
-
-            if (value.Length <= 8)
-            {
-                // Numeric-compatible
-                this.possibleNumeric = BitConverter.ToDouble(
-                    value,
-                    0);
-                this.supportableType |= SupportableValueType.Numeric;
-            }
         }
 
         /// <summary>
@@ -111,7 +92,33 @@ namespace IX.Math.Nodes.Constants
         /// <summary>
         /// Gets the supported types.
         /// </summary>
-        /// <returns>The types supported by this constant.</returns>
-        protected override SupportableValueType GetSupportedTypes() => this.supportableType;
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The types supported by this constant.
+        /// </returns>
+        protected override SupportableValueType GetSupportedTypes(byte[] value)
+        {
+            this.supportableType = SupportableValueType.ByteArray | SupportableValueType.String;
+
+            if (value.Length <= 4)
+            {
+                // Integer-compatible
+                this.possibleInteger = BitConverter.ToInt64(
+                    value,
+                    0);
+                this.supportableType |= SupportableValueType.Integer;
+            }
+
+            if (value.Length <= 8)
+            {
+                // Numeric-compatible
+                this.possibleNumeric = BitConverter.ToDouble(
+                    value,
+                    0);
+                this.supportableType |= SupportableValueType.Numeric;
+            }
+
+            return this.supportableType;
+        }
     }
 }

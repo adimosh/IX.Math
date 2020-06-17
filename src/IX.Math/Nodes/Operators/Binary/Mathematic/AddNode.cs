@@ -187,7 +187,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             this.CalculatedCosts.Clear();
 
             var typeLeft = left.VerifyPossibleType(completeSupport);
-            var typeRight = left.VerifyPossibleType(completeSupport);
+            var typeRight = right.VerifyPossibleType(completeSupport);
 
             // We might have addition with limited types
             if (typeLeft == SupportableValueType.String || typeRight == SupportableValueType.String)
@@ -354,12 +354,16 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             if ((commonType & SupportableValueType.Integer) != SupportableValueType.None)
             {
                 possibleStringType |= GetSupportableConversions(SupportedValueType.Integer);
+                iCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
+                        right.CalculateStrategyCost(SupportedValueType.Integer);
             }
 
             int nCost = int.MaxValue;
-            if ((commonType & SupportableValueType.Numeric) != SupportableValueType.Numeric)
+            if ((commonType & SupportableValueType.Numeric) != SupportableValueType.None)
             {
-                possibleStringType |= GetSupportableConversions(SupportedValueType.ByteArray);
+                possibleStringType |= GetSupportableConversions(SupportedValueType.Numeric);
+                nCost = left.CalculateStrategyCost(SupportedValueType.Numeric) +
+                        right.CalculateStrategyCost(SupportedValueType.Numeric);
             }
 
             this.PossibleReturnType = possibleStringType;
@@ -389,19 +393,19 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
 
                 if (totalIntegerCost == minCost)
                 {
-                    this.CalculatedCosts[supportedType] = (totalStringCost, SupportedValueType.Integer);
+                    this.CalculatedCosts[supportedType] = (totalIntegerCost, SupportedValueType.Integer);
                 }
                 else if (totalNumericCost == minCost)
                 {
-                    this.CalculatedCosts[supportedType] = (totalStringCost, SupportedValueType.Numeric);
+                    this.CalculatedCosts[supportedType] = (totalNumericCost, SupportedValueType.Numeric);
                 }
                 else if (totalByteArrayCost == minCost)
                 {
                     this.CalculatedCosts[supportedType] = (totalStringCost, SupportedValueType.ByteArray);
                 }
-                else if (totalIntegerCost == minCost)
+                else if (totalStringCost == minCost)
                 {
-                    this.CalculatedCosts[supportedType] = (totalStringCost, SupportedValueType.Integer);
+                    this.CalculatedCosts[supportedType] = (totalByteArrayCost, SupportedValueType.String);
                 }
             }
         }

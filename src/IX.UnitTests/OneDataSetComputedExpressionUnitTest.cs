@@ -25,9 +25,13 @@ namespace IX.UnitTests
         {
             new object[]
             {
-                "min(2,17)",
-                null,
-                2L,
+                "(10&y)+z",
+                new Dictionary<string, object>
+                {
+                    ["y"] = 982,
+                    ["z"] = 952
+                },
+                954L,
             },
         };
 
@@ -67,7 +71,7 @@ namespace IX.UnitTests
         {
             using var service = new MathematicPortfolio();
 
-            object result = service.Solve(expression, parameters?.Values.ToArray() ?? new object[0]);
+            object result = service.Solve(expression, parameters?.Select(p => p.Value).ToArray() ?? new object[0]);
 
             Assert.Equal(
                 expectedResult,

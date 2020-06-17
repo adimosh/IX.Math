@@ -55,7 +55,7 @@ namespace IX.UnitTests
             string expectedResult = $"The number is 0x{comparisonValue:x8}";
 
             // Act
-            var result = eps.Solve(expression);
+            var result = eps.Solve(expression, comparisonValue);
 
             // Assert
             Assert.Equal(expectedResult, Assert.IsType<string>(result));
@@ -97,7 +97,7 @@ namespace IX.UnitTests
             string expectedResult = $"The number is 0x{comparisonValue1 + comparisonValue2:x8}";
 
             // Act
-            var result = eps.Solve(expression);
+            var result = eps.Solve(expression, comparisonValue1, comparisonValue2);
 
             // Assert
             Assert.Equal(expectedResult, Assert.IsType<string>(result));

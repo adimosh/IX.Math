@@ -182,6 +182,7 @@ namespace IX.Math.Generators
             int tempIndex = 0;
             string name = GenerateName(
                 ref tempIndex,
+                constantsTable,
                 originalExpression.AsSpan());
 
             // Add constant data to tables
@@ -253,27 +254,34 @@ namespace IX.Math.Generators
                 stringFormatters,
                 nameof(stringFormatters));
 
+            // We create a copy of our expression first
             var expressionChars = new char[originalExpression.Length * 2];
             var espan = new Span<char>(expressionChars);
             var expressionSpan = originalExpression.AsSpan();
 
             expressionSpan.CopyTo(espan);
 
+            // We get and order our extractors
             var extractors = constantExtractors.KeysByLevel.OrderBy(p => p.Key)
                 .SelectMany(p => p.Value)
                 .ToArray()
                 .Select(p => constantExtractors[p])
                 .ToArray();
 
+            // The constant name index
             int constantIndex = 0;
-            int currentIndex = 0;
+
+            // The span indexes
+            int currentIndex = 0, currentFinalIndex = 0;
             for (int i = 0; i < extractors.Length; i++)
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
+                    // Cancellation time
                     return null;
                 }
 
+                // We call the constant extractor
                 var ce = extractors[i];
                 var (success, value, index, length) = ce.ExtractConstant(
                     expressionSpan.Slice(currentIndex),
@@ -282,7 +290,13 @@ namespace IX.Math.Generators
                 if (index < 0)
                 {
                     // Constant extractor did not find anything
+                    expressionSpan = espan.Slice(
+                            0,
+                            currentFinalIndex + (expressionSpan.Length - currentIndex))
+                        .ToString()
+                        .AsSpan();
                     currentIndex = 0;
+                    currentFinalIndex = 0;
                     continue;
                 }
 
@@ -290,43 +304,49 @@ namespace IX.Math.Generators
                 {
                     // Constant extractor found what it thought might be a constant, but wasn't
                     currentIndex += index + 1;
+                    currentFinalIndex += index + 1;
                     i--;
                     continue;
                 }
 
                 // We have a successfully-extracted constant
-                int actualIndex = currentIndex + index;
+                currentIndex += index;
                 var name = AddExtractedValue(
                     constantsTable,
                     reverseConstantsTable,
                     expressionSpan,
                     expressionSpan.Slice(
-                            actualIndex,
+                            currentIndex,
                             length)
                         .ToString(),
                     value,
                     stringFormatters,
                     ref constantIndex);
 
-                if (length != name.Length)
-                {
-                    espan.Slice(actualIndex + length)
-                        .CopyTo(espan.Slice(actualIndex + name.Length));
-                }
-
+                // Let's set the value in the span
+                currentFinalIndex += index;
                 name.AsSpan()
                     .CopyTo(
                         espan.Slice(
-                            actualIndex,
-                            length));
+                            currentFinalIndex,
+                            name.Length));
 
-                currentIndex = actualIndex + name.Length;
-                expressionSpan = espan.Slice(
-                    0,
-                    expressionSpan.Length - length + name.Length);
+                // Let's increase the indexes
+                currentFinalIndex += name.Length;
+                currentIndex += length;
+
+                // Let's set the rest of the string
+                expressionSpan.Slice(currentIndex).CopyTo(espan.Slice(currentFinalIndex));
+
+                // Returning to the same extractor until there ain't no more matches
+                i--;
+                continue;
             }
 
-            return expressionSpan.ToString();
+            return espan.Slice(
+                    0,
+                    currentFinalIndex + (expressionSpan.Length - currentIndex))
+                .ToString();
         }
 
         private static string AddExtractedValue(
@@ -354,6 +374,7 @@ namespace IX.Math.Generators
             // Get the constant a new name
             string name = GenerateName(
                 ref index,
+                constantsTable,
                 originalExpression);
 
             // Add constant data to tables
@@ -370,6 +391,7 @@ namespace IX.Math.Generators
 
         private static string GenerateName(
             ref int index,
+            IDictionary<string, ConstantNodeBase> constantsTable,
             ReadOnlySpan<char> originalExpression)
         {
             var nameChars = "C000000000".ToCharArray();
@@ -385,7 +407,7 @@ namespace IX.Math.Generators
                     0,
                     1 + nameSpan.Length);
             }
-            while (originalExpression.Contains(cc, StringComparison.OrdinalIgnoreCase));
+            while (originalExpression.Contains(cc, StringComparison.OrdinalIgnoreCase) || constantsTable.Keys.Contains(cc.ToString()));
 
             return cc.ToString();
         }

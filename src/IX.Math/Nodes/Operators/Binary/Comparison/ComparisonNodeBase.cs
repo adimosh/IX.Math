@@ -33,6 +33,12 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         }
 
         /// <summary>
+        ///     Gets a value indicating whether or not this node is actually a constant.
+        /// </summary>
+        /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
+        public override bool IsConstant => false;
+
+        /// <summary>
         ///     Ensures that the operands are compatible, and refines the return type of this expression based on them.
         /// </summary>
         /// <param name="left">The left operand.</param>

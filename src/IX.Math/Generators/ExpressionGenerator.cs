@@ -165,11 +165,6 @@ namespace IX.Math.Generators
                 return ComputationBody.Empty;
             }
 
-            if (body is ConstantNodeBase)
-            {
-                return ComputationBody.Empty;
-            }
-
             workingSet.Success = true;
 
             return new ComputationBody(
@@ -459,7 +454,8 @@ namespace IX.Math.Generators
                                 returnValue = innerWorkingSet.NonaryFunctions.TryGetValue(
                                     functionName,
                                     out Type t)
-                                    ? ((NonaryFunctionNodeBase)Activator.CreateInstance(t)).Simplify()
+                                    ? ((NonaryFunctionNodeBase)Activator.CreateInstance(t,
+                                        innerWorkingSet.StringFormatters)).Simplify()
                                     : null;
                                 break;
 
@@ -470,6 +466,7 @@ namespace IX.Math.Generators
                                 {
                                     returnValue = ((UnaryFunctionNodeBase)Activator.CreateInstance(
                                         t1,
+                                        innerWorkingSet.StringFormatters,
                                         GenerateExpression(
                                             parameterExpressions[0],
                                             innerWorkingSet))).Simplify();
@@ -488,6 +485,7 @@ namespace IX.Math.Generators
                                 {
                                     returnValue = ((BinaryFunctionNodeBase)Activator.CreateInstance(
                                         t2,
+                                        innerWorkingSet.StringFormatters,
                                         GenerateExpression(
                                             parameterExpressions[0],
                                             innerWorkingSet),
@@ -509,6 +507,7 @@ namespace IX.Math.Generators
                                 {
                                     returnValue = ((TernaryFunctionNodeBase)Activator.CreateInstance(
                                         t3,
+                                        innerWorkingSet.StringFormatters,
                                         GenerateExpression(
                                             parameterExpressions[0],
                                             innerWorkingSet),

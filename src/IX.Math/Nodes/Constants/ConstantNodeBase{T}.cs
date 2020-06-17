@@ -39,7 +39,7 @@ namespace IX.Math.Nodes.Constants
                 value,
                 stringFormatters);
 
-            this.PossibleReturnType = this.GetSupportedTypes();
+            this.PossibleReturnType = this.GetSupportedTypes(value);
 
             var possibleReturns = GetSupportedTypeOptions(this.PossibleReturnType);
 
@@ -125,7 +125,10 @@ namespace IX.Math.Nodes.Constants
         /// <summary>
         /// Gets the supported types.
         /// </summary>
-        /// <returns>The types supported by this constant.</returns>
-        protected virtual SupportableValueType GetSupportedTypes() => GetSupportableConversions(typeof(T));
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The types supported by this constant.
+        /// </returns>
+        protected virtual SupportableValueType GetSupportedTypes(T value) => GetSupportableConversions(typeof(T));
     }
 }

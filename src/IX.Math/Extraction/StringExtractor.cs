@@ -58,7 +58,7 @@ namespace IX.Math.Extraction
 
             var match = this.quotationMarksRegex.Match(input);
 
-            if (match.Success)
+            if (!match.Success)
             {
                 return (false, default, -1, default);
             }

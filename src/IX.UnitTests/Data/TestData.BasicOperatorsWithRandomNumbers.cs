@@ -584,7 +584,7 @@ namespace IX.UnitTests.Data
                 new Dictionary<string, object> { ["y"] = operand2 },
                 operand1 * operand2
             });
-
+/*
             operand1 = DataGenerator.RandomNonNegativeInteger(limit);
             operand2 = DataGenerator.RandomNonNegativeInteger(limit);
             operand3 = DataGenerator.RandomNonNegativeInteger(limit);
@@ -6182,7 +6182,7 @@ namespace IX.UnitTests.Data
                 $"(x | y) | z",
                 new Dictionary<string, object> { ["z"] = operand3, ["x"] = operand1, ["y"] = operand2 },
                 (operand1 | operand2) | operand3
-            });
+            });*/
 
             // Return
             return tests;

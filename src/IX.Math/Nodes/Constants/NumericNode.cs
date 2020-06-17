@@ -18,11 +18,11 @@ namespace IX.Math.Nodes.Constants
     [PublicAPI]
     public sealed class NumericNode : ConstantNodeBase<double>
     {
-        private readonly byte[] binaryRepresentation;
+        private byte[] binaryRepresentation;
 
-        private readonly long? possibleInteger;
+        private SupportableValueType supportableTypes;
 
-        private readonly SupportableValueType supportableTypes;
+        private long? possibleInteger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NumericNode" /> class.
@@ -32,21 +32,6 @@ namespace IX.Math.Nodes.Constants
         internal NumericNode(List<IStringFormatter> stringFormatters, double value)
             : base(stringFormatters, value)
         {
-            this.supportableTypes = SupportableValueType.Numeric |
-                                    SupportableValueType.ByteArray |
-                                    SupportableValueType.String;
-
-            if (value <= long.MaxValue && value >= long.MinValue)
-            {
-                var numericAbs = global::System.Math.Abs(value);
-                if (numericAbs - global::System.Math.Floor(numericAbs) < double.Epsilon)
-                {
-                    this.supportableTypes |= SupportableValueType.Integer;
-                    this.possibleInteger = Convert.ToInt64(value);
-                }
-            }
-
-            this.binaryRepresentation = BitConverter.GetBytes(value);
         }
 
         /// <summary>
@@ -101,7 +86,29 @@ namespace IX.Math.Nodes.Constants
         /// <summary>
         /// Gets the supported types.
         /// </summary>
-        /// <returns>The types supported by this constant.</returns>
-        protected override SupportableValueType GetSupportedTypes() => this.supportableTypes;
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The types supported by this constant.
+        /// </returns>
+        protected override SupportableValueType GetSupportedTypes(double value)
+        {
+            this.supportableTypes = SupportableValueType.Numeric |
+                                    SupportableValueType.ByteArray |
+                                    SupportableValueType.String;
+
+            this.binaryRepresentation = BitConverter.GetBytes(value);
+
+            if (value <= long.MaxValue && value >= long.MinValue)
+            {
+                var numericAbs = global::System.Math.Abs(value);
+                if (numericAbs - global::System.Math.Floor(numericAbs) < double.Epsilon)
+                {
+                    this.supportableTypes |= SupportableValueType.Integer;
+                    this.possibleInteger = Convert.ToInt64(value);
+                }
+            }
+
+            return this.supportableTypes;
+        }
     }
 }

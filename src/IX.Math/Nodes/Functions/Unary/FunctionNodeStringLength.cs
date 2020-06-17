@@ -71,7 +71,7 @@ namespace IX.Math.Nodes.Functions.Unary
             _ = parameter.VerifyPossibleType(SupportableValueType.String);
 
             this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer);
-            var cost = parameter.CalculateStrategyCost(SupportedValueType.Integer);
+            var cost = parameter.CalculateStrategyCost(SupportedValueType.String);
 
             foreach (var possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
             {

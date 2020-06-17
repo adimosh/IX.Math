@@ -303,7 +303,7 @@ namespace IX.Math
 
             try
             {
-                return result.CompiledExpression.DynamicInvoke(parameters);
+                return result.CompiledExpression.DynamicInvoke(pars);
             }
             catch
             {

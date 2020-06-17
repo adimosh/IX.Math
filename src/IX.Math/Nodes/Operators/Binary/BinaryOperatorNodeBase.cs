@@ -54,7 +54,7 @@ namespace IX.Math.Nodes.Operators.Binary
         ///     Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
-        public sealed override bool IsConstant => this.Left.IsConstant | this.Right.IsConstant;
+        public override bool IsConstant => this.Left.IsConstant & this.Right.IsConstant;
 
         /// <summary>
         /// Gets a value indicating whether this node supports tolerance.

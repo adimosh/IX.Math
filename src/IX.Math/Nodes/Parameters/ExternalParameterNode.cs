@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
 using IX.Math.Extensibility;
@@ -17,6 +18,7 @@ namespace IX.Math.Nodes.Parameters
     /// </summary>
     /// <seealso cref="IX.Math.Nodes.NodeBase" />
     [PublicAPI]
+    [DebuggerDisplay("param:{" + nameof(Name) + "}")]
     public sealed class ExternalParameterNode : NodeBase
     {
         private ParameterExpression compiledParameterExpression;
@@ -76,6 +78,45 @@ namespace IX.Math.Nodes.Parameters
         /// The type of the parameter.
         /// </value>
         public SupportedValueType ParameterType { get; private set; }
+
+        /// <summary>
+        ///     Gets a value indicating whether or not this node is actually a constant.
+        /// </summary>
+        /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
+        public override bool IsConstant => false;
+
+        /// <summary>
+        ///     Gets a value indicating whether this node supports tolerance.
+        /// </summary>
+        /// <value>
+        ///     <see langword="true" /> if the node is tolerant, <see langword="false" /> otherwise.
+        /// </value>
+        public override bool IsTolerant => false;
+
+        /// <summary>
+        ///     Gets a value indicating whether this node requires preservation of the original expression.
+        /// </summary>
+        /// <value>
+        ///     <see langword="true" /> if the node requires original expression preservation, or <see langword="false" />
+        ///     if it can be polynomially-reduced.
+        /// </value>
+        public override bool RequiresPreservedExpression => this.IsFunction;
+
+        /// <summary>
+        /// Gets the parameter definition expression.
+        /// </summary>
+        /// <value>
+        /// The parameter definition expression.
+        /// </value>
+        public ParameterExpression ParameterDefinitionExpression
+        {
+            get
+            {
+                this.Verify();
+
+                return this.compiledParameterExpression;
+            }
+        }
 
         /// <summary>
         /// Determines the type of the parameter.
@@ -155,45 +196,6 @@ namespace IX.Math.Nodes.Parameters
                 this.CalculatedCosts[possibleType] = (GetStandardConversionStrategyCost(
                     in svt,
                     in possibleType), svt);
-            }
-        }
-
-        /// <summary>
-        ///     Gets a value indicating whether or not this node is actually a constant.
-        /// </summary>
-        /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
-        public override bool IsConstant => false;
-
-        /// <summary>
-        ///     Gets a value indicating whether this node supports tolerance.
-        /// </summary>
-        /// <value>
-        ///     <see langword="true" /> if the node is tolerant, <see langword="false" /> otherwise.
-        /// </value>
-        public override bool IsTolerant => false;
-
-        /// <summary>
-        ///     Gets a value indicating whether this node requires preservation of the original expression.
-        /// </summary>
-        /// <value>
-        ///     <see langword="true" /> if the node requires original expression preservation, or <see langword="false" />
-        ///     if it can be polynomially-reduced.
-        /// </value>
-        public override bool RequiresPreservedExpression => this.IsFunction;
-
-        /// <summary>
-        /// Gets the parameter definition expression.
-        /// </summary>
-        /// <value>
-        /// The parameter definition expression.
-        /// </value>
-        public ParameterExpression ParameterDefinitionExpression
-        {
-            get
-            {
-                this.Verify();
-
-                return this.compiledParameterExpression;
             }
         }
 

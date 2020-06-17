@@ -238,24 +238,24 @@ namespace IX.Math.Nodes
                 SupportedValueType.Integer => toType switch
                 {
                     SupportedValueType.Integer => 0,
-                    SupportedValueType.Numeric => 0,
-                    SupportedValueType.ByteArray => 1,
-                    SupportedValueType.String => 2,
+                    SupportedValueType.Numeric => 1,
+                    SupportedValueType.ByteArray => 2,
+                    SupportedValueType.String => 10,
                     _ => int.MaxValue
                 },
                 SupportedValueType.Numeric => toType switch
                 {
                     SupportedValueType.Numeric => 0,
                     SupportedValueType.ByteArray => 1,
-                    SupportedValueType.String => 2,
+                    SupportedValueType.String => 10,
                     _ => int.MaxValue
                 },
                 SupportedValueType.ByteArray => toType switch
                 {
-                    SupportedValueType.Integer => 1,
-                    SupportedValueType.Numeric => 1,
+                    SupportedValueType.Integer => 2,
+                    SupportedValueType.Numeric => 2,
                     SupportedValueType.ByteArray => 0,
-                    SupportedValueType.String => 2,
+                    SupportedValueType.String => 10,
                     _ => int.MaxValue
                 },
                 SupportedValueType.String => toType switch
@@ -266,8 +266,8 @@ namespace IX.Math.Nodes
                 SupportedValueType.Boolean => toType switch
                 {
                     SupportedValueType.Boolean => 0,
-                    SupportedValueType.ByteArray => 1,
-                    SupportedValueType.String => 2,
+                    SupportedValueType.ByteArray => 2,
+                    SupportedValueType.String => 10,
                     _ => int.MaxValue
                 },
                 _ => int.MaxValue
@@ -475,32 +475,32 @@ namespace IX.Math.Nodes
                 case SupportedValueType.Integer:
                     return this.integerExpression ??
                            this.ConvertToIntegerExpression(
-                               this.GenerateExpression(
+                               this.GenerateExpressionInternal(
                                    in valueType,
                                    in comparisonTolerance));
                 case SupportedValueType.Numeric:
                     return this.numericExpression ??
                            this.ConvertToNumericExpression(
-                               this.GenerateExpression(
+                               this.GenerateExpressionInternal(
                                    in valueType,
                                    in comparisonTolerance));
                 case SupportedValueType.ByteArray:
                     return this.byteArrayExpression ??
                            this.ConvertToByteArrayExpression(
-                               this.GenerateExpression(
+                               this.GenerateExpressionInternal(
                                    in valueType,
                                    in comparisonTolerance));
                 case SupportedValueType.String:
                     return this.stringExpression ??
                            StringFormatter.CreateStringConversionExpression(
-                               this.GenerateExpression(
+                               this.GenerateExpressionInternal(
                                    in valueType,
                                    in comparisonTolerance),
                                this.StringFormatters);
                 case SupportedValueType.Boolean:
                     return this.boolExpression ??
                            this.ConvertToBooleanExpression(
-                               this.GenerateExpression(
+                               this.GenerateExpressionInternal(
                                    in valueType,
                                    in comparisonTolerance));
                 default:
@@ -536,14 +536,6 @@ namespace IX.Math.Nodes
         protected abstract Expression GenerateExpressionInternal(
             in SupportedValueType valueType,
             in ComparisonTolerance comparisonTolerance);
-
-        ///// <summary>
-        ///// Returns the type being restricted.
-        ///// </summary>
-        ///// <param name="valueType">Type of the value.</param>
-        //protected virtual void ReturnTypeBeingRestricted(in SupportableValueType valueType)
-        //{
-        //}
 
         #endregion
 

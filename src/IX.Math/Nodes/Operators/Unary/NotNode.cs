@@ -92,7 +92,7 @@ namespace IX.Math.Nodes.Operators.Unary
                                                  cost, SupportedValueType.Integer);
                 }
             }
-            else if (supportedType == SupportableValueType.Boolean | supportedType == SupportableValueType.Integer)
+            else if (supportedType == (SupportableValueType.Boolean | SupportableValueType.Integer))
             {
                 int boolCost = operand.CalculateStrategyCost(SupportedValueType.Boolean);
                 int intCost = operand.CalculateStrategyCost(SupportedValueType.Boolean);

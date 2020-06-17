@@ -69,7 +69,7 @@ namespace IX.UnitTests.ContextStructure
                 {
                     new Func<MathematicPortfolio, string, Dictionary<string, object>, object>(SolveWithFinder),
                 },
-                new object[]
+/*                new object[]
                 {
                     new Func<MathematicPortfolio, string, Dictionary<string, object>, object>(SolveWithDataFunctions),
                 },
@@ -108,7 +108,7 @@ namespace IX.UnitTests.ContextStructure
                 new object[]
                 {
                     new Func<MathematicPortfolio, string, Dictionary<string, object>, object>(SolveWithFinderFunctionsThenDataFunctions),
-                },
+                },*/
             };
 
         private static object[] Stitch(
@@ -186,7 +186,7 @@ namespace IX.UnitTests.ContextStructure
             return portfolio.Solve(
                 expression,
                 in ComparisonTolerance.Empty,
-                finder);
+                finder.Object);
         }
 
         private static object SolveWithFinderFunctions(
@@ -218,7 +218,7 @@ namespace IX.UnitTests.ContextStructure
             return portfolio.Solve(
                 expression,
                 in ComparisonTolerance.Empty,
-                finder);
+                finder.Object);
         }
 
         private static object SolveWithDataThenFinder(

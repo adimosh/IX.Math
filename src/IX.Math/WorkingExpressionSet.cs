@@ -101,6 +101,7 @@ namespace IX.Math
                 mathDefinition.AddSymbol,
                 mathDefinition.SubtractSymbol,
                 mathDefinition.DivideSymbol,
+                mathDefinition.ModuloSymbol,
                 mathDefinition.MultiplySymbol,
                 mathDefinition.PowerSymbol,
                 mathDefinition.LeftShiftSymbol,
@@ -405,6 +406,11 @@ namespace IX.Math
                     definition.DivideSymbol = s;
                 }
 
+                if (definition.ModuloSymbol == op)
+                {
+                    definition.ModuloSymbol = s;
+                }
+
                 if (definition.NotEqualsSymbol == op)
                 {
                     definition.NotEqualsSymbol = s;
@@ -606,6 +612,16 @@ namespace IX.Math
                         definitionL1,
                         leftOperand,
                         rightOperand) => new DivideNode(
+                        definitionL1,
+                        leftOperand,
+                        rightOperand),
+                    40
+                },
+                {
+                    definition.ModuloSymbol, (
+                        definitionL1,
+                        leftOperand,
+                        rightOperand) => new ModuloNode(
                         definitionL1,
                         leftOperand,
                         rightOperand),
