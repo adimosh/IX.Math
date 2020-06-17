@@ -17,9 +17,9 @@ namespace IX.Math.Nodes.Functions.Unary
     [DebuggerDisplay("floor({" + nameof(Parameter) + "})")]
     [CallableMathematicsFunction("floor")]
     [UsedImplicitly]
-    internal class FunctionNodeFloor : NumericRoundingUnaryFunctionNodeBase
+    internal class FunctionNodeFloor : NumericUnaryFunctionNodeBase
     {
-        private static readonly GlobalSystem.Func<double, double> CachedRepresentedFunction = GlobalSystem.Math.Acos;
+        private static readonly GlobalSystem.Func<double, double> CachedRepresentedFunction = GlobalSystem.Math.Floor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeFloor" /> class.

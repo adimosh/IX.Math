@@ -116,10 +116,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
 
             // String is least preferred
             return (this.Left.GenerateExpression(
-                SupportedValueType.Integer,
+                SupportedValueType.String,
                 in comparisonTolerance), this.Right.GenerateExpression(
-                SupportedValueType.Integer,
-                in comparisonTolerance), SupportedValueType.Integer);
+                SupportedValueType.String,
+                in comparisonTolerance), SupportedValueType.String);
         }
     }
 }

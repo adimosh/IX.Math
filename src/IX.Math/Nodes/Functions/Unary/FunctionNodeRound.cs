@@ -51,7 +51,7 @@ namespace IX.Math.Nodes.Functions.Unary
         ///     A deep clone.
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
-            new FunctionNodeArcCosine(
+            new FunctionNodeRound(
                 this.StringFormatters,
                 this.Parameter.DeepClone(context));
     }

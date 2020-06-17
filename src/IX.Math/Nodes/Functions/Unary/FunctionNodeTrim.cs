@@ -57,7 +57,7 @@ namespace IX.Math.Nodes.Functions.Unary
         ///     A deep clone.
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
-            new FunctionNodeStringLength(
+            new FunctionNodeTrim(
                 this.StringFormatters,
                 this.Parameter.DeepClone(context));
 

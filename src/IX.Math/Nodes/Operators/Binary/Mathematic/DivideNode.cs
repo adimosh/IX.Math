@@ -17,7 +17,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
     /// </summary>
     /// <seealso cref="SimpleMathematicalOperationNodeBase" />
     [DebuggerDisplay("{" + nameof(Left) + "} / {" + nameof(Right) + "}")]
-    internal sealed class DivideNode : SimpleMathematicalOperationNodeBase
+    internal sealed class DivideNode : BinaryOperatorNodeBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="IX.Math.Nodes.Operators.Binary.Mathematic.DivideNode" /> class.
@@ -81,6 +81,35 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 this.StringFormatters,
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
+
+        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(NodeBase left, NodeBase right)
+        {
+            var leftType = left.VerifyPossibleType(SupportableValueType.Numeric);
+            var rightType = right.VerifyPossibleType(SupportableValueType.Numeric);
+
+            int cost;
+            SupportedValueType svt;
+
+            if (leftType == rightType && leftType != SupportableValueType.None)
+            {
+                this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Numeric);
+                cost = left.CalculateStrategyCost(SupportedValueType.Numeric) +
+                       right.CalculateStrategyCost(SupportedValueType.Numeric);
+                svt = SupportedValueType.Numeric;
+            }
+            else
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+
+            foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
+            {
+                this.CalculatedCosts[supportedType] = (GetStandardConversionStrategyCost(
+                                                           in svt,
+                                                           in supportedType) +
+                                                       cost, svt);
+            }
+        }
 
         /// <summary>
         /// Generates the expression that this node represents.

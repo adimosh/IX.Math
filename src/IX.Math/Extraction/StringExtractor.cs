@@ -53,7 +53,7 @@ namespace IX.Math.Extraction
                 Interlocked.Exchange(
                     ref this.quotationMarksRegex,
                     new Regex(
-                        $@"(?<!{ec})(?:{ec}{{2}})*(?<constant>{si}(?<content>(?:(?<!{ec})(?:{ec}{{2}})*{ec}{si}|[^{si}])+(?<!{ec})(?:{ec}{{2}})*){si})"));
+                        $@"(?<!{ec})(?:{ec}{{2}})*(?<constant>{si}(?<content>(?:(?<!{ec})(?:{ec}{{2}})*{ec}{si}|[^{si}])*?(?<!{ec})(?:{ec}{{2}})*){si})"));
             }
 
             var match = this.quotationMarksRegex.Match(input);

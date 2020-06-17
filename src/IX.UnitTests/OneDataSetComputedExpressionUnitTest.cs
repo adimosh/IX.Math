@@ -25,13 +25,13 @@ namespace IX.UnitTests
         {
             new object[]
             {
-                "(10&y)+z",
+                "min(max(x,y),max(y,500)*2-min(995,(x^10)))",
                 new Dictionary<string, object>
                 {
-                    ["y"] = 982,
-                    ["z"] = 952
+                    ["x"] = 5,
+                    ["y"] = 3,
                 },
-                954L,
+                5L,
             },
         };
 

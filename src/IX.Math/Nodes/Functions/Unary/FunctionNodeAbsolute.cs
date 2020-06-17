@@ -196,7 +196,7 @@ namespace IX.Math.Nodes.Functions.Unary
                 SupportedValueType.Numeric => Expression.Call(
                     FuncAbsDouble.Method,
                     this.Parameter.GenerateExpression(
-                        SupportedValueType.Integer,
+                        SupportedValueType.Numeric,
                         in comparisonTolerance)),
                 _ => throw new ExpressionNotValidLogicallyException(),
             };

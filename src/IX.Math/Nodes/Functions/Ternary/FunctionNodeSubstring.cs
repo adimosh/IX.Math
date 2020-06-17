@@ -154,10 +154,10 @@ namespace IX.Math.Nodes.Functions.Ternary
             var e1 = this.FirstParameter.GenerateExpression(SupportedValueType.String, in comparisonTolerance);
             var e2 = Expression.Call(
                 ((Func<long, int>)Convert.ToInt32).Method,
-                this.SecondParameter.GenerateExpression(SupportedValueType.String, in comparisonTolerance));
+                this.SecondParameter.GenerateExpression(SupportedValueType.Integer, in comparisonTolerance));
             var e3 = Expression.Call(
                 ((Func<long, int>)Convert.ToInt32).Method,
-                this.ThirdParameter.GenerateExpression(SupportedValueType.String, in comparisonTolerance));
+                this.ThirdParameter.GenerateExpression(SupportedValueType.Integer, in comparisonTolerance));
 
             return Expression.Call(
                 e1,

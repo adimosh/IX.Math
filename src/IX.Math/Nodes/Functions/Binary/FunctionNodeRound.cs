@@ -79,6 +79,7 @@ namespace IX.Math.Nodes.Functions.Binary
 
             MethodInfo mi = typeof(GlobalSystem.Math).GetMethodWithExactParameters(
                 functionName,
+                typeof(double),
                 typeof(int));
 
             if (mi == null)
@@ -97,8 +98,8 @@ namespace IX.Math.Nodes.Functions.Binary
                 second);
 
             return Expression.Call(
-                first,
                 mi,
+                first,
                 second);
         }
     }

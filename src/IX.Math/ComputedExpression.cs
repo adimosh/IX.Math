@@ -118,7 +118,8 @@ namespace IX.Math
                 return (false, default, default, default);
             }
 
-            var parameterContexts = this.parametersRegistry.Values.ToArray();
+            var parameterContexts = this.parametersRegistry.Values.OrderBy(p => p.Order)
+                .ToArray();
 
             if (parameterTypes.Count != parameterContexts.Length)
             {

@@ -19,7 +19,7 @@ namespace IX.Math.Nodes.Functions.Unary
         "ceil",
         "ceiling")]
     [UsedImplicitly]
-    internal sealed class FunctionNodeCeiling : NumericRoundingUnaryFunctionNodeBase
+    internal sealed class FunctionNodeCeiling : NumericUnaryFunctionNodeBase
     {
         private static readonly GlobalSystem.Func<double, double> CachedRepresentedFunction = GlobalSystem.Math.Ceiling;
 

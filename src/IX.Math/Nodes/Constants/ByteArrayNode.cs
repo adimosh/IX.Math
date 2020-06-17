@@ -100,17 +100,21 @@ namespace IX.Math.Nodes.Constants
         {
             this.supportableType = SupportableValueType.ByteArray | SupportableValueType.String;
 
-            if (value.Length <= 4)
+            if (value.Length <= 8)
             {
+                if (value.Length < 8)
+                {
+                    byte[] bytes = new byte[8];
+                    Array.Copy(value, bytes, value.Length);
+                    value = bytes;
+                }
+
                 // Integer-compatible
                 this.possibleInteger = BitConverter.ToInt64(
                     value,
                     0);
                 this.supportableType |= SupportableValueType.Integer;
-            }
 
-            if (value.Length <= 8)
-            {
                 // Numeric-compatible
                 this.possibleNumeric = BitConverter.ToDouble(
                     value,

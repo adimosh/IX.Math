@@ -564,6 +564,13 @@ namespace IX.Math.Nodes
                 throw new ArgumentInvalidTypeException(nameof(binary));
             }
 
+            if (binary.Length < 8)
+            {
+                byte[] bytes = new byte[8];
+                Array.Copy(binary, bytes, binary.Length);
+                binary = bytes;
+            }
+
             return BitConverter.ToDouble(
                 binary,
                 0);
@@ -571,9 +578,16 @@ namespace IX.Math.Nodes
 
         private static long ConvertToInteger(byte[] binary)
         {
-            if (binary.Length > 4)
+            if (binary.Length > 8)
             {
                 throw new ArgumentInvalidTypeException(nameof(binary));
+            }
+
+            if (binary.Length < 8)
+            {
+                byte[] bytes = new byte[8];
+                Array.Copy(binary, bytes, binary.Length);
+                binary = bytes;
             }
 
             return BitConverter.ToInt64(

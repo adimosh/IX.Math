@@ -656,7 +656,7 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
-                    "(2*max(x,500)-y)/pow(x,2)",
+                    "(2*max(x,500)-y)/(x^2)",
                     new Dictionary<string, object>
                     {
                         ["x"] = 217,
@@ -676,7 +676,7 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
-                    "min(max(x,y),max(y,500)*2-min(995,pow(x,200)))",
+                    "min(max(x,y),max(y,500)*2-min(995,(x^10)))",
                     new Dictionary<string, object>
                     {
                         ["x"] = 5,
