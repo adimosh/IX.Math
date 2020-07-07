@@ -26,6 +26,10 @@ namespace IX.Math.Extensibility
         ///     Please note that the Position argument should be returned if a possible match is found, even if it does not
         ///     compute properly.
         /// </remarks>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "EPS02:Non-readonly struct used as in-parameter",
+            Justification = "Special built-in type, the compiler can handle it.")]
         (bool Success, object Value, int Position, int Length) ExtractConstant(
             in ReadOnlySpan<char> originalExpression,
             MathDefinition mathDefinition);

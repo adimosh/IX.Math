@@ -5,6 +5,7 @@
 using System;
 using System.Runtime.Serialization;
 using IX.Abstractions.Logging;
+using IX.Math.Extensibility;
 using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
 
@@ -276,6 +277,15 @@ namespace IX.Math
         public OperatorPrecedenceStyle OperatorPrecedenceStyle { get; set; }
 
         /// <summary>
+        /// Gets or sets the pass-through state container.
+        /// </summary>
+        /// <value>
+        /// The pass-through state container.
+        /// </value>
+        [DataMember]
+        public PassThroughStateContainerBase PassThroughStateContainer { get; set; }
+
+        /// <summary>
         /// Gets or sets the diagnostics logger.
         /// </summary>
         /// <value>
@@ -316,7 +326,8 @@ namespace IX.Math
                 XorSymbol = this.XorSymbol,
                 AutoConvertStringFormatSpecifier = this.AutoConvertStringFormatSpecifier,
                 EscapeCharacter = this.EscapeCharacter,
-                OperatorPrecedenceStyle = this.OperatorPrecedenceStyle
+                OperatorPrecedenceStyle = this.OperatorPrecedenceStyle,
+                PassThroughStateContainer = this.PassThroughStateContainer.DeepClone()
             };
     }
 }
