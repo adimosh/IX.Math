@@ -9,7 +9,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using IX.Math.ExpressionState;
 using IX.Math.Extensibility;
-using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Operators.Binary;
@@ -25,14 +24,74 @@ using IX.System.Collections.Generic;
 using DiagCA = System.Diagnostics.CodeAnalysis;
 using SubtractNode = IX.Math.Nodes.Operators.Binary.Mathematic.SubtractNode;
 
-namespace IX.Math
+namespace IX.Math.WorkingSet
 {
     [DiagCA.SuppressMessage(
         "IDisposableAnalyzers.Correctness",
         "IDISP008:Don't assign member with injected and created disposables.",
         Justification = "It is OK, but the analyzer can't tell.")]
-    internal class WorkingExpressionSet : DisposableBase
+    internal partial class WorkingExpressionSet : DisposableBase
     {
+        /// <summary>
+        /// A regular expression to determine functions.
+        /// </summary>
+        private readonly Regex functionRegex;
+
+        /// <summary>
+        ///     Gets all operators in order.
+        /// </summary>
+        private readonly string[] allOperatorsInOrder;
+
+        /// <summary>
+        ///     Gets the cancellation token.
+        /// </summary>
+        private readonly CancellationToken cancellationToken;
+
+        /// <summary>
+        ///     Gets the definition.
+        /// </summary>
+        private readonly MathDefinition definition;
+
+        /// <summary>
+        ///     Gets the constant extractors.
+        /// </summary>
+        private readonly LevelDictionary<Type, IConstantsExtractor> Extractors;
+
+        /// <summary>
+        ///     Gets the constant interpreters.
+        /// </summary>
+        private readonly LevelDictionary<Type, IConstantInterpreter> Interpreters;
+
+        /// <summary>
+        ///     Gets the parameter registry.
+        /// </summary>
+        private readonly IDictionary<string, ExternalParameterNode> ParameterRegistry;
+
+        /// <summary>
+        ///     Gets the nonary functions.
+        /// </summary>
+        private readonly Dictionary<string, Type> NonaryFunctions;
+
+        /// <summary>
+        ///     Gets the ternary functions.
+        /// </summary>
+        private readonly Dictionary<string, Type> TernaryFunctions;
+
+        /// <summary>
+        ///     Gets the unary functions.
+        /// </summary>
+        private readonly Dictionary<string, Type> UnaryFunctions;
+
+        /// <summary>
+        ///     Gets the binary functions.
+        /// </summary>
+        private readonly Dictionary<string, Type> BinaryFunctions;
+
+        /// <summary>
+        /// Gets the string formatters.
+        /// </summary>
+        private readonly List<IStringFormatter> StringFormatters;
+
         // Operators
         [DiagCA.SuppressMessage(
             "IDisposableAnalyzers.Correctness",
@@ -79,15 +138,15 @@ namespace IX.Math
             this.ParameterRegistry = new Dictionary<string, ExternalParameterNode>();
             this.ConstantsTable = new Dictionary<string, ConstantNodeBase>();
             this.ReverseConstantsTable = new Dictionary<string, string>();
-            this.SymbolTable = new Dictionary<string, ExpressionSymbol>();
+            this.symbolTable = new Dictionary<string, ExpressionSymbol>();
             this.ReverseSymbolTable = new Dictionary<string, string>();
             this.StringFormatters = stringFormatters;
 
-            this.CancellationToken = cancellationToken;
+            this.cancellationToken = cancellationToken;
             this.Expression = expression;
-            this.Definition = mathDefinition;
+            this.definition = mathDefinition;
 
-            this.AllOperatorsInOrder = new[]
+            this.allOperatorsInOrder = new[]
             {
                 mathDefinition.GreaterThanOrEqualSymbol,
                 mathDefinition.LessThanOrEqualSymbol,
@@ -117,105 +176,9 @@ namespace IX.Math
             this.Extractors = extractors;
             this.Interpreters = interpreters;
 
-            this.FunctionRegex = new Regex(
+            this.functionRegex = new Regex(
                 $@"(?'functionName'.*?){Regex.Escape(mathDefinition.Parentheses.Item1)}(?'expression'.*?){Regex.Escape(mathDefinition.Parentheses.Item2)}");
         }
-
-        /// <summary>
-        ///     Gets all operators in order.
-        /// </summary>
-        /// <value>
-        ///     All operators in order.
-        /// </value>
-        internal string[] AllOperatorsInOrder { get; }
-
-        /// <summary>
-        ///     Gets the cancellation token.
-        /// </summary>
-        /// <value>
-        ///     The cancellation token.
-        /// </value>
-        internal CancellationToken CancellationToken { get; }
-
-        /// <summary>
-        ///     Gets the definition.
-        /// </summary>
-        /// <value>
-        ///     The definition.
-        /// </value>
-        internal MathDefinition Definition { get; }
-
-        /// <summary>
-        ///     Gets the constant extractors.
-        /// </summary>
-        /// <value>
-        ///     The constant extractors.
-        /// </value>
-        internal LevelDictionary<Type, IConstantsExtractor> Extractors { get; }
-
-        /// <summary>
-        ///     Gets the constant interpreters.
-        /// </summary>
-        /// <value>
-        ///     The constant interpreters.
-        /// </value>
-        internal LevelDictionary<Type, IConstantInterpreter> Interpreters { get; }
-
-        /// <summary>
-        ///     Gets the function regex.
-        /// </summary>
-        /// <value>
-        ///     The function regex.
-        /// </value>
-        internal Regex FunctionRegex { get; }
-
-        /// <summary>
-        ///     Gets the parameter registry.
-        /// </summary>
-        /// <value>
-        ///     The parameter registry.
-        /// </value>
-        internal IDictionary<string, ExternalParameterNode> ParameterRegistry { get; }
-
-        /// <summary>
-        ///     Gets the nonary functions.
-        /// </summary>
-        /// <value>
-        ///     The nonary functions.
-        /// </value>
-        internal Dictionary<string, Type> NonaryFunctions { get; }
-
-        /// <summary>
-        ///     Gets the ternary functions.
-        /// </summary>
-        /// <value>
-        ///     The ternary functions.
-        /// </value>
-        internal Dictionary<string, Type> TernaryFunctions { get; }
-
-        /// <summary>
-        ///     Gets the unary functions.
-        /// </summary>
-        /// <value>
-        ///     The unary functions.
-        /// </value>
-        internal Dictionary<string, Type> UnaryFunctions { get; }
-
-        /// <summary>
-        ///     Gets the binary functions.
-        /// </summary>
-        /// <value>
-        ///     The binary functions.
-        /// </value>
-        internal Dictionary<string, Type> BinaryFunctions { get; }
-
-        /// <summary>
-        /// Gets the string formatters.
-        /// </summary>
-        /// <value>
-        /// The string formatters.
-        /// </value>
-        internal List<IStringFormatter> StringFormatters { get; }
 
         /// <summary>
         ///     Gets all symbols.
@@ -223,7 +186,7 @@ namespace IX.Math
         /// <value>
         ///     All symbols.
         /// </value>
-        internal string[] AllSymbols { get; private set; }
+        private string[] AllSymbols;
 
         /// <summary>
         ///     Gets the binary operators.
@@ -295,19 +258,7 @@ namespace IX.Math
         /// <value>
         ///     <c>true</c> if success; otherwise, <c>false</c>.
         /// </value>
-        internal bool Success { get; set; }
-
-        /// <summary>
-        ///     Gets the symbol table.
-        /// </summary>
-        /// <value>
-        ///     The symbol table.
-        /// </value>
-        internal Dictionary<string, ExpressionSymbol> SymbolTable
-        {
-            get => this.symbolTable;
-            private set => this.symbolTable = value;
-        }
+        internal bool Success { get; private set; }
 
         /// <summary>
         ///     Gets the unary operators.
@@ -352,7 +303,7 @@ namespace IX.Math
             "Performance",
             "HAA0302:Display class allocation to capture closure",
             Justification = "We actively want this to keep a reference to this working set.")]
-        internal void Initialize()
+        private void Initialize()
         {
             if (this.initialized)
             {
@@ -362,8 +313,8 @@ namespace IX.Math
             this.initialized = true;
 
             var i = 1;
-            var allOperatorsInOrder = this.AllOperatorsInOrder;
-            var definition = this.Definition;
+            var allOperatorsInOrder = this.allOperatorsInOrder;
+            var definition = this.definition;
 
             foreach (var op in allOperatorsInOrder.OrderByDescending(p => p.Length)
                 .Where(
@@ -708,56 +659,38 @@ namespace IX.Math
             // Special symbols
 
             // Euler-Napier constant (e)
-            ConstantsGenerator.GenerateNamedNumericSymbol(
-                this.ConstantsTable,
-                this.ReverseConstantsTable,
+            this.GenerateNamedNumericSymbol(
                 "e",
-                global::System.Math.E,
-                this.StringFormatters);
+                global::System.Math.E);
 
             // Archimedes-Ludolph constant (pi)
-            ConstantsGenerator.GenerateNamedNumericSymbol(
-                this.ConstantsTable,
-                this.ReverseConstantsTable,
+            this.GenerateNamedNumericSymbol(
                 "π",
                 global::System.Math.PI,
-                this.StringFormatters,
                 $"{definition.SpecialSymbolIndicators.Item1}pi{definition.SpecialSymbolIndicators.Item2}");
 
             // Golden ratio
-            ConstantsGenerator.GenerateNamedNumericSymbol(
-                this.ConstantsTable,
-                this.ReverseConstantsTable,
+            this.GenerateNamedNumericSymbol(
                 "φ",
                 1.6180339887498948,
-                this.StringFormatters,
                 $"{definition.SpecialSymbolIndicators.Item1}phi{definition.SpecialSymbolIndicators.Item2}");
 
             // Bernstein constant
-            ConstantsGenerator.GenerateNamedNumericSymbol(
-                this.ConstantsTable,
-                this.ReverseConstantsTable,
+            this.GenerateNamedNumericSymbol(
                 "β",
                 0.2801694990238691,
-                this.StringFormatters,
                 $"{definition.SpecialSymbolIndicators.Item1}beta{definition.SpecialSymbolIndicators.Item2}");
 
             // Euler-Mascheroni constant
-            ConstantsGenerator.GenerateNamedNumericSymbol(
-                this.ConstantsTable,
-                this.ReverseConstantsTable,
+            this.GenerateNamedNumericSymbol(
                 "γ",
                 0.5772156649015328,
-                this.StringFormatters,
                 $"{definition.SpecialSymbolIndicators.Item1}gamma{definition.SpecialSymbolIndicators.Item2}");
 
             // Gauss-Kuzmin-Wirsing constant
-            ConstantsGenerator.GenerateNamedNumericSymbol(
-                this.ConstantsTable,
-                this.ReverseConstantsTable,
+            this.GenerateNamedNumericSymbol(
                 "λ",
                 0.3036630028987326,
-                this.StringFormatters,
                 $"{definition.SpecialSymbolIndicators.Item1}lambda{definition.SpecialSymbolIndicators.Item2}");
         }
 

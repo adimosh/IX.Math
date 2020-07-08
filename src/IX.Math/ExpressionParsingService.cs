@@ -13,6 +13,7 @@ using IX.Math.Extraction;
 using IX.Math.Generators;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
+using IX.Math.WorkingSet;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
@@ -244,7 +245,7 @@ namespace IX.Math
                 ExpressionParsingService innerThis)
             {
                 return innerThis.constantPassThroughExtractors[cpteKey]
-                    .Evaluate(innerExpression);
+                    .Evaluate(innerExpression, innerThis.workingDefinition);
             }
 
             if (this.nonaryFunctions == null ||
@@ -278,7 +279,7 @@ namespace IX.Math
                 this.stringFormatters,
                 cancellationToken))
             {
-                ComputationBody cb = ExpressionGenerator.CreateBody(workingSet);
+                ComputationBody cb = workingSet.CreateBody();
 
                 result = !workingSet.Success
                     ? new ComputedExpression(

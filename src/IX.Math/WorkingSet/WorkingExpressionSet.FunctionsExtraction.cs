@@ -1,4 +1,4 @@
-// <copyright file="FunctionsExtractor.cs" company="Adrian Mos">
+// <copyright file="WorkingExpressionSet.FunctionsExtraction.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -9,7 +9,6 @@ using System.Linq;
 using IX.Math.ExpressionState;
 using IX.Math.Extensibility;
 using IX.Math.Generators;
-using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
@@ -17,12 +16,9 @@ using IX.StandardExtensions.Globalization;
 using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace IX.Math.Extraction
+namespace IX.Math.WorkingSet
 {
-    /// <summary>
-    ///     A class to handle function extraction.
-    /// </summary>
-    internal static class FunctionsExtractor
+    internal partial class WorkingExpressionSet
     {
         /// <summary>
         /// Replaces functions calls with expression placeholders.
@@ -30,28 +26,22 @@ namespace IX.Math.Extraction
         /// <param name="openParenthesis">The symbol of an open parenthesis.</param>
         /// <param name="closeParenthesis">The symbol of a closed parenthesis.</param>
         /// <param name="parameterSeparator">The symbol of a parameter separator.</param>
-        /// <param name="constantsTable">The constants table.</param>
-        /// <param name="reverseConstantsTable">The reverse-lookup constants table.</param>
-        /// <param name="symbolTable">The symbols table.</param>
-        /// <param name="reverseSymbolTable">The reverse-lookup symbols table.</param>
         /// <param name="interpreters">The constant interpreters.</param>
         /// <param name="parametersTable">The parameters table.</param>
         /// <param name="expression">The expression before processing.</param>
         /// <param name="allSymbols">All symbols.</param>
         /// <param name="stringFormatters">The string formatters.</param>
-        internal static void ReplaceFunctions(
+        /// <param name="mathDefinition">The math definition.</param>
+        private void ReplaceFunctions(
             [NotNull] string openParenthesis,
             [NotNull] string closeParenthesis,
             [NotNull] string parameterSeparator,
-            [NotNull] Dictionary<string, ConstantNodeBase> constantsTable,
-            [NotNull] Dictionary<string, string> reverseConstantsTable,
-            [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
-            [NotNull] Dictionary<string, string> reverseSymbolTable,
             [NotNull] LevelDictionary<Type, IConstantInterpreter> interpreters,
             [NotNull] IDictionary<string, ExternalParameterNode> parametersTable,
             [NotNull] string expression,
             [NotNull] string[] allSymbols,
-            [NotNull] List<IStringFormatter> stringFormatters)
+            [NotNull] List<IStringFormatter> stringFormatters,
+            [NotNull] MathDefinition mathDefinition)
         {
             // Validate parameters
             Requires.NotNullOrWhiteSpace(
@@ -63,18 +53,6 @@ namespace IX.Math.Extraction
             Requires.NotNullOrWhiteSpace(
                 parameterSeparator,
                 nameof(parameterSeparator));
-            Requires.NotNull(
-                constantsTable,
-                nameof(constantsTable));
-            Requires.NotNull(
-                reverseConstantsTable,
-                nameof(reverseConstantsTable));
-            Requires.NotNull(
-                symbolTable,
-                nameof(symbolTable));
-            Requires.NotNull(
-                reverseSymbolTable,
-                nameof(reverseSymbolTable));
             Requires.NotNull(
                 interpreters,
                 nameof(interpreters));
@@ -88,8 +66,8 @@ namespace IX.Math.Extraction
                 allSymbols,
                 nameof(allSymbols));
             Requires.NotNull(
-                allSymbols,
-                nameof(allSymbols));
+                mathDefinition,
+                nameof(mathDefinition));
 
             // Replace the main expression
             ReplaceOneFunction(
@@ -97,17 +75,14 @@ namespace IX.Math.Extraction
                 openParenthesis,
                 closeParenthesis,
                 parameterSeparator,
-                constantsTable,
-                reverseConstantsTable,
-                symbolTable,
-                reverseSymbolTable,
                 interpreters,
                 parametersTable,
                 expression,
                 allSymbols,
-                stringFormatters);
+                stringFormatters,
+                mathDefinition);
 
-            for (var i = 1; i < symbolTable.Count; i++)
+            for (var i = 1; i < this.symbolTable.Count; i++)
             {
                 // Replace sub-expressions
                 ReplaceOneFunction(
@@ -115,33 +90,27 @@ namespace IX.Math.Extraction
                     openParenthesis,
                     closeParenthesis,
                     parameterSeparator,
-                    constantsTable,
-                    reverseConstantsTable,
-                    symbolTable,
-                    reverseSymbolTable,
                     interpreters,
                     parametersTable,
                     expression,
                     allSymbols,
-                    stringFormatters);
+                    stringFormatters,
+                    mathDefinition);
             }
 
-            static void ReplaceOneFunction(
+            void ReplaceOneFunction(
                 string key,
                 string outerOpenParanthesisSymbol,
                 string outerCloseParanthesisSymbol,
                 string outerParameterSeparatorSymbol,
-                Dictionary<string, ConstantNodeBase> outerConstantsTableReference,
-                Dictionary<string, string> outerReverseConstantsTableReference,
-                Dictionary<string, ExpressionSymbol> outerSymbolTableReference,
-                Dictionary<string, string> outerReverseSymbolTableRefeerence,
                 LevelDictionary<Type, IConstantInterpreter> interpreters,
                 IDictionary<string, ExternalParameterNode> outerParametersTableReference,
                 string outerExpressionSymbol,
                 string[] outerAllSymbolsSymbols,
-                List<IStringFormatter> outerStringFormatters)
+                List<IStringFormatter> outerStringFormatters,
+                MathDefinition outerMathDefinition)
             {
-                ExpressionSymbol symbol = outerSymbolTableReference[key];
+                ExpressionSymbol symbol = this.symbolTable[key];
                 if (symbol.IsFunctionCall)
                 {
                     return;
@@ -150,37 +119,31 @@ namespace IX.Math.Extraction
                 var replaced = symbol.Expression;
                 while (replaced != null)
                 {
-                    outerSymbolTableReference[key].Expression = replaced;
+                    this.symbolTable[key].Expression = replaced;
                     replaced = ReplaceFunctions(
                         replaced,
                         outerOpenParanthesisSymbol,
                         outerCloseParanthesisSymbol,
                         outerParameterSeparatorSymbol,
-                        outerConstantsTableReference,
-                        outerReverseConstantsTableReference,
-                        outerSymbolTableReference,
-                        outerReverseSymbolTableRefeerence,
                         interpreters,
                         outerParametersTableReference,
                         outerExpressionSymbol,
                         outerAllSymbolsSymbols,
-                        outerStringFormatters);
+                        outerStringFormatters,
+                        outerMathDefinition);
                 }
 
-                static string ReplaceFunctions(
+                string ReplaceFunctions(
                     string source,
                     string openParanthesisSymbol,
                     string closeParanthesisSymbol,
                     string parameterSeparatorSymbol,
-                    Dictionary<string, ConstantNodeBase> constantsTableReference,
-                    Dictionary<string, string> reverseConstantsTableReference,
-                    Dictionary<string, ExpressionSymbol> symbolTableReference,
-                    Dictionary<string, string> reverseSymbolTableReference,
                     LevelDictionary<Type, IConstantInterpreter> interpretersReference,
                     IDictionary<string, ExternalParameterNode> parametersTableReference,
                     string expressionSymbol,
                     string[] allSymbolsSymbols,
-                    List<IStringFormatter> innerStringFormatters)
+                    List<IStringFormatter> innerStringFormatters,
+                    MathDefinition innerMathDefinition)
                 {
                     var op = -1;
                     var opl = openParanthesisSymbol.Length;
@@ -254,15 +217,12 @@ namespace IX.Math.Extraction
                                 openParanthesisSymbol,
                                 closeParanthesisSymbol,
                                 parameterSeparatorSymbol,
-                                constantsTableReference,
-                                reverseConstantsTableReference,
-                                symbolTableReference,
-                                reverseSymbolTableReference,
                                 interpretersReference,
                                 parametersTableReference,
                                 expressionSymbol,
                                 allSymbolsSymbols,
-                                innerStringFormatters);
+                                innerStringFormatters,
+                                innerMathDefinition);
                         }
 
                         var argPlaceholders = new List<string>();
@@ -270,31 +230,26 @@ namespace IX.Math.Extraction
                             new[] { parameterSeparatorSymbol },
                             StringSplitOptions.RemoveEmptyEntries))
                         {
-                            TablePopulationGenerator.PopulateTables(
+                            this.PopulateTables(
                                 s,
-                                constantsTableReference,
-                                reverseConstantsTableReference,
-                                symbolTableReference,
-                                reverseSymbolTableReference,
                                 parametersTableReference,
                                 interpretersReference,
                                 expressionSymbol,
-                                openParanthesisSymbol,
-                                allSymbolsSymbols,
-                                innerStringFormatters);
+                                openParanthesisSymbol);
 
                             // We check whether or not this is actually a constant
                             argPlaceholders.Add(
                                 ConstantsGenerator.CheckAndAdd(
-                                    constantsTableReference,
-                                    reverseConstantsTableReference,
+                                    this.constantsTable,
+                                    this.reverseConstantsTable,
                                     interpretersReference,
                                     expressionSymbol,
                                     s,
-                                    innerStringFormatters) ?? (!parametersTableReference.ContainsKey(s)
+                                    innerStringFormatters,
+                                    innerMathDefinition) ?? (!parametersTableReference.ContainsKey(s)
                                     ? SymbolExpressionGenerator.GenerateSymbolExpression(
-                                        symbolTableReference,
-                                        reverseSymbolTableReference,
+                                        this.symbolTable,
+                                        this.reverseSymbolTable,
                                         s,
                                         false)
                                     : s));
@@ -305,8 +260,8 @@ namespace IX.Math.Extraction
                         var functionCallToReplace =
                             $"{functionHeader}{openParanthesisSymbol}{originalArguments}{closeParanthesisSymbol}";
                         var functionCallItem = SymbolExpressionGenerator.GenerateSymbolExpression(
-                            symbolTableReference,
-                            reverseSymbolTableReference,
+                            this.symbolTable,
+                            this.reverseSymbolTable,
                             functionCallBody,
                             true);
 

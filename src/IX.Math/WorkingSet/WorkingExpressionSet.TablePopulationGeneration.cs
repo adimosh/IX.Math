@@ -1,67 +1,39 @@
-// <copyright file="TablePopulationGenerator.cs" company="Adrian Mos">
+// <copyright file="WorkingExpressionSet.TablePopulationGeneration.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
 using System;
 using System.Collections.Generic;
-using IX.Math.ExpressionState;
 using IX.Math.Extensibility;
-using IX.Math.Nodes.Constants;
+using IX.Math.Generators;
 using IX.Math.Nodes.Parameters;
 using IX.StandardExtensions.Contracts;
 using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace IX.Math.Generators
+namespace IX.Math.WorkingSet
 {
-    /// <summary>
-    ///     A class to handle table population.
-    /// </summary>
-    internal static class TablePopulationGenerator
+    internal partial class WorkingExpressionSet
     {
         /// <summary>
         /// Populates tables according to the currently-processed expression.
         /// </summary>
         /// <param name="processedExpression">The expression that is being processed.</param>
-        /// <param name="constantsTable">The constants table.</param>
-        /// <param name="reverseConstantsTable">The reverse-lookup constants table.</param>
-        /// <param name="symbolTable">The symbols table.</param>
-        /// <param name="reverseSymbolTable">The reverse-lookup symbols table.</param>
         /// <param name="parameterRegistry">The parameters registry.</param>
         /// <param name="interpreters">The constant interpreters.</param>
         /// <param name="originalExpression">The expression before processing.</param>
         /// <param name="openParenthesis">The symbol of an open parenthesis.</param>
-        /// <param name="allSymbols">All symbols on which to split, in order.</param>
-        /// <param name="stringFormatters">The string formatters.</param>
-        internal static void PopulateTables(
+        private void PopulateTables(
             [NotNull] string processedExpression,
-            [NotNull] Dictionary<string, ConstantNodeBase> constantsTable,
-            [NotNull] Dictionary<string, string> reverseConstantsTable,
-            [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
-            [NotNull] Dictionary<string, string> reverseSymbolTable,
             [NotNull] IDictionary<string, ExternalParameterNode> parameterRegistry,
             [NotNull] LevelDictionary<Type, IConstantInterpreter> interpreters,
             [NotNull] string originalExpression,
-            [NotNull] string openParenthesis,
-            [NotNull] string[] allSymbols,
-            [NotNull] List<IStringFormatter> stringFormatters)
+            [NotNull] string openParenthesis)
         {
             // Validate parameters
             Requires.NotNullOrWhiteSpace(
                 processedExpression,
                 nameof(processedExpression));
-            Requires.NotNull(
-                constantsTable,
-                nameof(constantsTable));
-            Requires.NotNull(
-                reverseConstantsTable,
-                nameof(reverseConstantsTable));
-            Requires.NotNull(
-                symbolTable,
-                nameof(symbolTable));
-            Requires.NotNull(
-                reverseSymbolTable,
-                nameof(reverseSymbolTable));
             Requires.NotNull(
                 parameterRegistry,
                 nameof(parameterRegistry));
@@ -74,27 +46,21 @@ namespace IX.Math.Generators
             Requires.NotNullOrWhiteSpace(
                 openParenthesis,
                 nameof(openParenthesis));
-            Requires.NotNull(
-                allSymbols,
-                nameof(allSymbols));
-            Requires.NotNull(
-                stringFormatters,
-                nameof(stringFormatters));
 
             // Split expression by all symbols
             string[] expressions = processedExpression.Split(
-                allSymbols,
+                this.AllSymbols,
                 StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var exp in expressions)
             {
-                if (constantsTable.ContainsKey(exp))
+                if (this.constantsTable.ContainsKey(exp))
                 {
                     // We have a constant
                     continue;
                 }
 
-                if (reverseConstantsTable.ContainsKey(exp))
+                if (this.reverseConstantsTable.ContainsKey(exp))
                 {
                     // We have a constant that has bee evaluated before
                     continue;
@@ -106,13 +72,13 @@ namespace IX.Math.Generators
                     continue;
                 }
 
-                if (symbolTable.ContainsKey(exp))
+                if (this.symbolTable.ContainsKey(exp))
                 {
                     // We have an already-existing symbol
                     continue;
                 }
 
-                if (reverseSymbolTable.ContainsKey(exp))
+                if (this.reverseSymbolTable.ContainsKey(exp))
                 {
                     // We have a symbol value that has been evaluated before
                     continue;
@@ -126,19 +92,20 @@ namespace IX.Math.Generators
 
                 // Let's check whether it is a constant
                 if (ConstantsGenerator.CheckAndAdd(
-                        constantsTable,
-                        reverseConstantsTable,
+                        this.constantsTable,
+                        this.reverseConstantsTable,
                         interpreters,
                         originalExpression,
                         exp,
-                        stringFormatters) != null)
+                        this.StringFormatters,
+                        this.definition) != null)
                 {
                     continue;
                 }
 
                 // It's not a constant, nor something ever encountered before
                 // Therefore it should be a parameter
-                parameterRegistry.Add(exp, new ExternalParameterNode(exp, stringFormatters));
+                parameterRegistry.Add(exp, new ExternalParameterNode(exp, this.StringFormatters));
             }
         }
     }

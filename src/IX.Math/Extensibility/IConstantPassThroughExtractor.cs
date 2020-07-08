@@ -16,7 +16,10 @@ namespace IX.Math.Extensibility
         ///     Evaluates an expression and decides whether or not it should be a pass-through constant.
         /// </summary>
         /// <param name="expression">The expression to evaluate.</param>
+        /// <param name="mathDefinition">The math definition.</param>
         /// <returns><c>true</c> if the expression is a pass-through constant, <c>false</c> otherwise.</returns>
-        bool Evaluate(string expression);
+        bool Evaluate(
+            string expression,
+            MathDefinition mathDefinition);
     }
 }
