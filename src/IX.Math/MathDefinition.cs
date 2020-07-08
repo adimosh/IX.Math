@@ -57,6 +57,7 @@ namespace IX.Math
             this.AutoConvertStringFormatSpecifier = definition.AutoConvertStringFormatSpecifier;
             this.EscapeCharacter = definition.EscapeCharacter;
             this.OperatorPrecedenceStyle = definition.OperatorPrecedenceStyle;
+            this.PassThroughStateContainer = definition.PassThroughStateContainer;
         }
 
         /// <summary>
@@ -327,7 +328,7 @@ namespace IX.Math
                 AutoConvertStringFormatSpecifier = this.AutoConvertStringFormatSpecifier,
                 EscapeCharacter = this.EscapeCharacter,
                 OperatorPrecedenceStyle = this.OperatorPrecedenceStyle,
-                PassThroughStateContainer = this.PassThroughStateContainer.DeepClone()
+                PassThroughStateContainer = this.PassThroughStateContainer?.DeepClone()
             };
     }
 }
