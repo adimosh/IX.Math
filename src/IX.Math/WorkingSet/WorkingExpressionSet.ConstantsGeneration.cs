@@ -3,17 +3,191 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using IX.Math.Generators;
+using System.Text.RegularExpressions;
+using IX.Math.Exceptions;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Contracts;
+using IX.StandardExtensions.Globalization;
 using JetBrains.Annotations;
 
 namespace IX.Math.WorkingSet
 {
     internal partial class WorkingExpressionSet
     {
+        private const NumberStyles IntegerNumberStyle = NumberStyles.AllowLeadingSign | NumberStyles.AllowThousands |
+                                                        NumberStyles.AllowExponent | NumberStyles.AllowExponent;
+
+        private const NumberStyles FloatNumberStyle = NumberStyles.AllowLeadingSign | NumberStyles.AllowThousands |
+                                                      NumberStyles.AllowExponent | NumberStyles.AllowExponent |
+                                                      NumberStyles.AllowDecimalPoint;
+
+        private const NumberStyles HexNumberStyle = NumberStyles.AllowHexSpecifier;
+
+        private static readonly Regex BitRepresentationRegex = new Regex("^[01]{8}$");
+
+        private static bool ParseNumeric(
+            string expression,
+            out object result)
+        {
+            Requires.NotNull(
+                expression,
+                nameof(expression));
+
+            if (!expression.StartsWith(
+                    "0x",
+                    StringComparison.CurrentCultureIgnoreCase) && !expression.StartsWith(
+                    "&h",
+                    StringComparison.CurrentCultureIgnoreCase))
+            {
+                return ParseSpecific(
+                    expression,
+                    out result);
+            }
+
+            if (expression.Length > 2)
+            {
+                return ParseHexSpecific(
+                    expression.Substring(2),
+                    out result);
+            }
+
+            result = null;
+            return false;
+
+            bool ParseHexSpecific(
+                string hexExpression,
+                out object hexResult)
+            {
+                if (long.TryParse(
+                    hexExpression,
+                    HexNumberStyle,
+                    CultureInfo.CurrentCulture,
+                    out var intVal))
+                {
+                    hexResult = intVal;
+                    return true;
+                }
+
+                hexResult = null;
+                return false;
+            }
+
+            bool ParseSpecific(
+                string specificExpression,
+                out object specificResult)
+            {
+                Requires.NotNull(
+                    specificExpression,
+                    nameof(specificExpression));
+
+                IFormatProvider formatProvider = CultureInfo.CurrentCulture;
+
+                if (long.TryParse(
+                    specificExpression,
+                    IntegerNumberStyle,
+                    formatProvider,
+                    out var intVal))
+                {
+                    specificResult = intVal;
+                    return true;
+                }
+
+                if (double.TryParse(
+                    specificExpression,
+                    FloatNumberStyle,
+                    formatProvider,
+                    out var doubleVal))
+                {
+                    specificResult = doubleVal;
+                    return true;
+                }
+
+                specificResult = null;
+                return false;
+            }
+        }
+
+        private static bool ParseByteArray(
+            string expression,
+            out byte[] result)
+        {
+            Requires.NotNull(
+                expression,
+                nameof(expression));
+
+            if (expression.CurrentCultureStartsWithInsensitive("0b"))
+            {
+                if (expression.Length > 2)
+                {
+                    return ParseByteArray(
+                        expression.Substring(2),
+                        out result);
+                }
+
+                result = null;
+                return false;
+            }
+
+            result = null;
+            return false;
+
+            bool ParseByteArray(
+                string byteArrayExpression,
+                out byte[] byteArrayResult)
+            {
+                Requires.NotNull(
+                    byteArrayExpression,
+                    nameof(byteArrayExpression));
+
+                byteArrayExpression = byteArrayExpression.Replace(
+                    "_",
+                    string.Empty);
+                var stringLength = byteArrayExpression.Length;
+                var byteLength = stringLength / 8;
+                if (byteLength < (double)stringLength / 8)
+                {
+                    byteLength++;
+                }
+
+                stringLength = byteLength * 8;
+                if (byteArrayExpression.Length < stringLength)
+                {
+                    byteArrayExpression = byteArrayExpression.PadLeft(
+                        stringLength,
+                        '0');
+                }
+
+                var bytes = new byte[byteLength];
+
+                for (var i = byteLength - 1; i >= 0; i -= 1)
+                {
+                    var startingIndex = stringLength - (byteLength - i) * 8;
+
+                    var currentByteExpression = byteArrayExpression.Substring(
+                        startingIndex,
+                        8);
+
+                    if (!BitRepresentationRegex.IsMatch(currentByteExpression))
+                    {
+                        byteArrayResult = null;
+                        return false;
+                    }
+
+                    bytes[i] = Convert.ToByte(
+                        currentByteExpression,
+                        2);
+                }
+
+                Array.Reverse(bytes);
+                byteArrayResult = bytes;
+
+                return true;
+            }
+        }
+
         /// <summary>
         /// Generates a named numeric symbol.
         /// </summary>
@@ -63,10 +237,10 @@ namespace IX.Math.WorkingSet
             expressionSpan.CopyTo(espan);
 
             // We get and order our extractors
-            var extractors = this.Extractors.KeysByLevel.OrderBy(p => p.Key)
+            var extractors = this.extractors.KeysByLevel.OrderBy(p => p.Key)
                 .SelectMany(p => p.Value)
                 .ToArray()
-                .Select(p => this.Extractors[p])
+                .Select(p => this.extractors[p])
                 .ToArray();
 
             // The constant name index
@@ -147,6 +321,115 @@ namespace IX.Math.WorkingSet
                 .ToString();
         }
 
+        /// <summary>
+        /// Checks the constant to see if there isn't one already, then tries to guess what type it is, finally adding it to
+        /// the constants table if one suitable type is found.
+        /// </summary>
+        /// <param name="originalExpression">The original expression.</param>
+        /// <param name="content">The content.</param>
+        /// <returns>
+        /// The name of the new constant, or <see langword="null" /> (<see langword="Nothing" /> in Visual Basic) if a
+        /// suitable type is not found.
+        /// </returns>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "We're cool with this.")]
+        private string CheckAndAdd(
+            [NotNull] string originalExpression,
+            [CanBeNull] string content)
+        {
+            // Contract validation
+            Requires.NotNullOrWhiteSpace(
+                originalExpression,
+                nameof(originalExpression));
+
+            // No content
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                return null;
+            }
+
+            // Constant has already been evaluated, let's skip
+            if (this.reverseConstantsTable.TryGetValue(
+                content,
+                out var key))
+            {
+                return key;
+            }
+
+            ConstantNodeBase node = null;
+
+            // Go through each interpreter
+            foreach (var interpreter in this.interpreters.KeysByLevel.SelectMany(p => p.Value))
+            {
+                var (success, result) = this.interpreters[interpreter].EvaluateIsConstant(content, this.definition);
+                if (success)
+                {
+                    node = this.CreateConstant(result);
+                    break;
+                }
+            }
+
+            // Standard formatters
+            if (node == null)
+            {
+                if (ParseNumeric(
+                    content,
+                    out object n))
+                {
+                    if (n is double d)
+                    {
+                        node = new NumericNode(
+                            this.StringFormatters,
+                            d);
+                    }
+                    else if (n is long i)
+                    {
+                        node = new IntegerNode(
+                            this.StringFormatters,
+                            i);
+                    }
+                }
+                else if (ParseByteArray(
+                    content,
+                    out byte[] ba))
+                {
+                    node = new ByteArrayNode(this.StringFormatters, ba);
+                }
+                else if (bool.TryParse(
+                    content,
+                    out var b))
+                {
+                    node = new BoolNode(this.StringFormatters, b);
+                }
+            }
+
+            // Node not recognized
+            if (node == null)
+            {
+                return null;
+            }
+
+            // Get the constant a new name
+            int tempIndex = 0;
+            string name = GenerateName(
+                ref tempIndex,
+                this.constantsTable,
+                originalExpression.AsSpan());
+
+            // Add constant data to tables
+            this.constantsTable.Add(
+                name,
+                node);
+            this.reverseConstantsTable.Add(
+                content,
+                name);
+
+            // Return
+            return name;
+        }
+
         private string AddExtractedValue(
             ReadOnlySpan<char> originalExpression,
             [NotNull] string content,
@@ -162,12 +445,10 @@ namespace IX.Math.WorkingSet
             }
 
             // Create the constant
-            var node = ConstantsGenerator.CreateConstant(
-                value,
-                this.StringFormatters);
+            var node = this.CreateConstant(value);
 
             // Get the constant a new name
-            string name = ConstantsGenerator.GenerateName(
+            string name = GenerateName(
                 ref index,
                 this.constantsTable,
                 originalExpression);
@@ -182,6 +463,56 @@ namespace IX.Math.WorkingSet
 
             // Return
             return name;
+        }
+
+        private ConstantNodeBase CreateConstant(object value)
+        {
+            Requires.NotNull(
+                value,
+                nameof(value));
+
+            return value switch
+            {
+                long l => new IntegerNode(
+                    this.StringFormatters,
+                    l),
+                double d => new NumericNode(
+                    this.StringFormatters,
+                    d),
+                bool b => new BoolNode(
+                    this.StringFormatters,
+                    b),
+                byte[] ba => new ByteArrayNode(
+                    this.StringFormatters,
+                    ba),
+                string s => new StringNode(
+                    this.StringFormatters,
+                    s),
+                _ => throw new MathematicsEngineException()
+            };
+        }
+
+        private static string GenerateName(
+            ref int index,
+            IDictionary<string, ConstantNodeBase> constantsTable,
+            ReadOnlySpan<char> originalExpression)
+        {
+            var nameChars = "C000000000".ToCharArray();
+            Span<char> chr = nameChars;
+            ReadOnlySpan<char> cc;
+
+            do
+            {
+                index++;
+                ReadOnlySpan<char> nameSpan = index.ToString(CultureInfo.InvariantCulture).AsSpan();
+                nameSpan.CopyTo(chr.Slice(1));
+                cc = chr.Slice(
+                    0,
+                    1 + nameSpan.Length);
+            }
+            while (originalExpression.Contains(cc, StringComparison.OrdinalIgnoreCase) || constantsTable.Keys.Contains(cc.ToString()));
+
+            return cc.ToString();
         }
     }
 }

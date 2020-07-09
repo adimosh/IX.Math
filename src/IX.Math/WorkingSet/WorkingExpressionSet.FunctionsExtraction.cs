@@ -7,13 +7,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using IX.Math.ExpressionState;
-using IX.Math.Extensibility;
 using IX.Math.Generators;
-using IX.Math.Nodes.Parameters;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Globalization;
-using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace IX.Math.WorkingSet
@@ -23,92 +20,31 @@ namespace IX.Math.WorkingSet
         /// <summary>
         /// Replaces functions calls with expression placeholders.
         /// </summary>
-        /// <param name="openParenthesis">The symbol of an open parenthesis.</param>
-        /// <param name="closeParenthesis">The symbol of a closed parenthesis.</param>
-        /// <param name="parameterSeparator">The symbol of a parameter separator.</param>
-        /// <param name="interpreters">The constant interpreters.</param>
-        /// <param name="parametersTable">The parameters table.</param>
         /// <param name="expression">The expression before processing.</param>
-        /// <param name="allSymbols">All symbols.</param>
-        /// <param name="stringFormatters">The string formatters.</param>
-        /// <param name="mathDefinition">The math definition.</param>
         private void ReplaceFunctions(
-            [NotNull] string openParenthesis,
-            [NotNull] string closeParenthesis,
-            [NotNull] string parameterSeparator,
-            [NotNull] LevelDictionary<Type, IConstantInterpreter> interpreters,
-            [NotNull] IDictionary<string, ExternalParameterNode> parametersTable,
-            [NotNull] string expression,
-            [NotNull] string[] allSymbols,
-            [NotNull] List<IStringFormatter> stringFormatters,
-            [NotNull] MathDefinition mathDefinition)
+            [NotNull] string expression)
         {
             // Validate parameters
             Requires.NotNullOrWhiteSpace(
-                openParenthesis,
-                nameof(openParenthesis));
-            Requires.NotNullOrWhiteSpace(
-                closeParenthesis,
-                nameof(closeParenthesis));
-            Requires.NotNullOrWhiteSpace(
-                parameterSeparator,
-                nameof(parameterSeparator));
-            Requires.NotNull(
-                interpreters,
-                nameof(interpreters));
-            Requires.NotNull(
-                parametersTable,
-                nameof(parametersTable));
-            Requires.NotNullOrWhiteSpace(
                 expression,
                 nameof(expression));
-            Requires.NotNull(
-                allSymbols,
-                nameof(allSymbols));
-            Requires.NotNull(
-                mathDefinition,
-                nameof(mathDefinition));
 
             // Replace the main expression
             ReplaceOneFunction(
                 string.Empty,
-                openParenthesis,
-                closeParenthesis,
-                parameterSeparator,
-                interpreters,
-                parametersTable,
-                expression,
-                allSymbols,
-                stringFormatters,
-                mathDefinition);
+                expression);
 
             for (var i = 1; i < this.symbolTable.Count; i++)
             {
                 // Replace sub-expressions
                 ReplaceOneFunction(
                     $"item{i.ToString(CultureInfo.InvariantCulture).PadLeft(4, '0')}",
-                    openParenthesis,
-                    closeParenthesis,
-                    parameterSeparator,
-                    interpreters,
-                    parametersTable,
-                    expression,
-                    allSymbols,
-                    stringFormatters,
-                    mathDefinition);
+                    expression);
             }
 
             void ReplaceOneFunction(
                 string key,
-                string outerOpenParanthesisSymbol,
-                string outerCloseParanthesisSymbol,
-                string outerParameterSeparatorSymbol,
-                LevelDictionary<Type, IConstantInterpreter> interpreters,
-                IDictionary<string, ExternalParameterNode> outerParametersTableReference,
-                string outerExpressionSymbol,
-                string[] outerAllSymbolsSymbols,
-                List<IStringFormatter> outerStringFormatters,
-                MathDefinition outerMathDefinition)
+                string outerExpressionSymbol)
             {
                 ExpressionSymbol symbol = this.symbolTable[key];
                 if (symbol.IsFunctionCall)
@@ -122,29 +58,17 @@ namespace IX.Math.WorkingSet
                     this.symbolTable[key].Expression = replaced;
                     replaced = ReplaceFunctions(
                         replaced,
-                        outerOpenParanthesisSymbol,
-                        outerCloseParanthesisSymbol,
-                        outerParameterSeparatorSymbol,
-                        interpreters,
-                        outerParametersTableReference,
-                        outerExpressionSymbol,
-                        outerAllSymbolsSymbols,
-                        outerStringFormatters,
-                        outerMathDefinition);
+                        outerExpressionSymbol);
                 }
 
                 string ReplaceFunctions(
                     string source,
-                    string openParanthesisSymbol,
-                    string closeParanthesisSymbol,
-                    string parameterSeparatorSymbol,
-                    LevelDictionary<Type, IConstantInterpreter> interpretersReference,
-                    IDictionary<string, ExternalParameterNode> parametersTableReference,
-                    string expressionSymbol,
-                    string[] allSymbolsSymbols,
-                    List<IStringFormatter> innerStringFormatters,
-                    MathDefinition innerMathDefinition)
+                    string expressionSymbol)
                 {
+                    string openParanthesisSymbol = this.definition.Parentheses.Item1;
+                    string closeParanthesisSymbol = this.definition.Parentheses.Item2;
+                    string parameterSeparatorSymbol = this.definition.ParameterSeparator;
+
                     var op = -1;
                     var opl = openParanthesisSymbol.Length;
                     var cpl = closeParanthesisSymbol.Length;
@@ -169,7 +93,7 @@ namespace IX.Math.WorkingSet
                             0,
                             op);
 
-                        if (allSymbolsSymbols.Any(
+                        if (this.allSymbols.Any(
                             (
                                 p,
                                 check) => check.InvariantCultureEndsWith(p), functionHeaderCheck))
@@ -178,7 +102,7 @@ namespace IX.Math.WorkingSet
                         }
 
                         var functionHeader = functionHeaderCheck.Split(
-                            allSymbolsSymbols,
+                            this.allSymbols,
                             StringSplitOptions.None).Last();
 
                         var oop = source.InvariantCultureIndexOf(
@@ -214,15 +138,7 @@ namespace IX.Math.WorkingSet
                             arguments = q;
                             q = ReplaceFunctions(
                                 q,
-                                openParanthesisSymbol,
-                                closeParanthesisSymbol,
-                                parameterSeparatorSymbol,
-                                interpretersReference,
-                                parametersTableReference,
-                                expressionSymbol,
-                                allSymbolsSymbols,
-                                innerStringFormatters,
-                                innerMathDefinition);
+                                expressionSymbol);
                         }
 
                         var argPlaceholders = new List<string>();
@@ -232,21 +148,13 @@ namespace IX.Math.WorkingSet
                         {
                             this.PopulateTables(
                                 s,
-                                parametersTableReference,
-                                interpretersReference,
-                                expressionSymbol,
-                                openParanthesisSymbol);
+                                expressionSymbol);
 
                             // We check whether or not this is actually a constant
                             argPlaceholders.Add(
-                                ConstantsGenerator.CheckAndAdd(
-                                    this.constantsTable,
-                                    this.reverseConstantsTable,
-                                    interpretersReference,
+                                this.CheckAndAdd(
                                     expressionSymbol,
-                                    s,
-                                    innerStringFormatters,
-                                    innerMathDefinition) ?? (!parametersTableReference.ContainsKey(s)
+                                    s) ?? (!this.ParameterRegistry.ContainsKey(s)
                                     ? SymbolExpressionGenerator.GenerateSymbolExpression(
                                         this.symbolTable,
                                         this.reverseSymbolTable,

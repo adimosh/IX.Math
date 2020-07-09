@@ -7,11 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using IX.Math.Computation;
-using IX.Math.Computation.InitialExpressionParsers;
 using IX.Math.Exceptions;
 using IX.Math.ExpressionState;
 using IX.Math.Extensibility;
-using IX.Math.Formatters;
 using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
@@ -47,7 +45,10 @@ namespace IX.Math.WorkingSet
 
             this.Expression = this.ExtractConstants();
 
-            this.Expression = SubExpressionFormatter.Cleanup(this.Expression);
+            this.Expression = this.Expression.Trim()
+                .Replace(
+                    " ",
+                    string.Empty);
 
             // Start preparing expression
             this.symbolTable.Add(
@@ -67,16 +68,7 @@ namespace IX.Math.WorkingSet
             }
 
             // Break expression based on function calls
-            this.ReplaceFunctions(
-                this.definition.Parentheses.Item1,
-                this.definition.Parentheses.Item2,
-                this.definition.ParameterSeparator,
-                this.Interpreters,
-                this.ParameterRegistry,
-                this.symbolTable[string.Empty].Expression,
-                this.AllSymbols,
-                this.StringFormatters,
-                this.definition);
+            this.ReplaceFunctions(this.symbolTable[string.Empty].Expression);
 
             if (this.cancellationToken.IsCancellationRequested)
             {
@@ -85,17 +77,11 @@ namespace IX.Math.WorkingSet
 
             // We save a split expression for determining parameter order
             var splitExpression = this.Expression.Split(
-                this.AllSymbols.ToArray(),
+                this.allSymbols.ToArray(),
                 StringSplitOptions.RemoveEmptyEntries);
 
             // Break by parentheses
-            ParenthesesParser.FormatParentheses(
-                this.definition.Parentheses.Item1,
-                this.definition.Parentheses.Item2,
-                this.definition.ParameterSeparator,
-                this.allOperatorsInOrder,
-                this.symbolTable,
-                this.ReverseSymbolTable);
+            this.FormatParentheses();
 
             if (this.cancellationToken.IsCancellationRequested)
             {
@@ -108,10 +94,7 @@ namespace IX.Math.WorkingSet
             {
                 this.PopulateTables(
                     p,
-                    this.ParameterRegistry,
-                    this.Interpreters,
-                    this.Expression,
-                    this.definition.Parentheses.Item1);
+                    this.Expression);
             }
 
             // For each parameter from the table we've just populated, see where it's first used, and fill in that index as the order
@@ -168,18 +151,18 @@ namespace IX.Math.WorkingSet
             }
 
             // Expression might be an already-defined constant
-            if (this.ConstantsTable.TryGetValue(
+            if (this.constantsTable.TryGetValue(
                 expression,
                 out ConstantNodeBase c1))
             {
                 return c1;
             }
 
-            if (this.ReverseConstantsTable.TryGetValue(
+            if (this.reverseConstantsTable.TryGetValue(
                 expression,
                 out var c2))
             {
-                if (this.ConstantsTable.TryGetValue(
+                if (this.constantsTable.TryGetValue(
                     c2,
                     out ConstantNodeBase c3))
                 {
@@ -227,7 +210,7 @@ namespace IX.Math.WorkingSet
             foreach (var (_, operatorPosition, @operator) in OperatorSequenceGenerator
                 .GetOperatorsInOrderInExpression(
                     expression,
-                    this.BinaryOperators.KeysByLevel).OrderBy(p => p.Item1).ThenByDescending(p => p.Item2).ToArray())
+                    this.binaryOperators.KeysByLevel).OrderBy(p => p.Item1).ThenByDescending(p => p.Item2).ToArray())
             {
                 NodeBase exp = ExpressionByBinaryOperator(
                     this,
@@ -253,7 +236,7 @@ namespace IX.Math.WorkingSet
                         return null;
                     }
 
-                    if (!innerWorkingSet.BinaryOperators.TryGetValue(
+                    if (!innerWorkingSet.binaryOperators.TryGetValue(
                         op,
                         out Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase> t))
                     {
@@ -309,7 +292,7 @@ namespace IX.Math.WorkingSet
             foreach (Tuple<int, int, string> operatorPosition in OperatorSequenceGenerator
                 .GetOperatorsInOrderInExpression(
                     expression,
-                    this.UnaryOperators.KeysByLevel).OrderBy(p => p.Item1).ThenByDescending(p => p.Item2).ToArray())
+                    this.unaryOperators.KeysByLevel).OrderBy(p => p.Item1).ThenByDescending(p => p.Item2).ToArray())
             {
                 NodeBase exp = ExpressionByUnaryOperator(
                     expression,
@@ -325,7 +308,7 @@ namespace IX.Math.WorkingSet
                         return null;
                     }
 
-                    if (!s.CurrentCultureStartsWith(op) || !this.UnaryOperators.TryGetValue(
+                    if (!s.CurrentCultureStartsWith(op) || !this.unaryOperators.TryGetValue(
                             op,
                             out Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase> t))
                     {

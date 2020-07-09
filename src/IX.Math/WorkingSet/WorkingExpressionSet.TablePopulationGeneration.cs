@@ -3,12 +3,8 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using IX.Math.Extensibility;
-using IX.Math.Generators;
 using IX.Math.Nodes.Parameters;
 using IX.StandardExtensions.Contracts;
-using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace IX.Math.WorkingSet
@@ -19,37 +15,24 @@ namespace IX.Math.WorkingSet
         /// Populates tables according to the currently-processed expression.
         /// </summary>
         /// <param name="processedExpression">The expression that is being processed.</param>
-        /// <param name="parameterRegistry">The parameters registry.</param>
-        /// <param name="interpreters">The constant interpreters.</param>
         /// <param name="originalExpression">The expression before processing.</param>
-        /// <param name="openParenthesis">The symbol of an open parenthesis.</param>
         private void PopulateTables(
             [NotNull] string processedExpression,
-            [NotNull] IDictionary<string, ExternalParameterNode> parameterRegistry,
-            [NotNull] LevelDictionary<Type, IConstantInterpreter> interpreters,
-            [NotNull] string originalExpression,
-            [NotNull] string openParenthesis)
+            [NotNull] string originalExpression)
         {
             // Validate parameters
             Requires.NotNullOrWhiteSpace(
                 processedExpression,
                 nameof(processedExpression));
-            Requires.NotNull(
-                parameterRegistry,
-                nameof(parameterRegistry));
-            Requires.NotNull(
-                interpreters,
-                nameof(interpreters));
             Requires.NotNullOrWhiteSpace(
                 originalExpression,
                 nameof(originalExpression));
-            Requires.NotNullOrWhiteSpace(
-                openParenthesis,
-                nameof(openParenthesis));
+
+            string openParenthesis = this.definition.Parentheses.Item1;
 
             // Split expression by all symbols
             string[] expressions = processedExpression.Split(
-                this.AllSymbols,
+                this.allSymbols,
                 StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var exp in expressions)
@@ -66,7 +49,7 @@ namespace IX.Math.WorkingSet
                     continue;
                 }
 
-                if (parameterRegistry.ContainsKey(exp))
+                if (this.ParameterRegistry.ContainsKey(exp))
                 {
                     // We have a parameter
                     continue;
@@ -91,21 +74,16 @@ namespace IX.Math.WorkingSet
                 }
 
                 // Let's check whether it is a constant
-                if (ConstantsGenerator.CheckAndAdd(
-                        this.constantsTable,
-                        this.reverseConstantsTable,
-                        interpreters,
+                if (this.CheckAndAdd(
                         originalExpression,
-                        exp,
-                        this.StringFormatters,
-                        this.definition) != null)
+                        exp) != null)
                 {
                     continue;
                 }
 
                 // It's not a constant, nor something ever encountered before
                 // Therefore it should be a parameter
-                parameterRegistry.Add(exp, new ExternalParameterNode(exp, this.StringFormatters));
+                this.ParameterRegistry.Add(exp, new ExternalParameterNode(exp, this.StringFormatters));
             }
         }
     }

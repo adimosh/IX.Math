@@ -55,12 +55,12 @@ namespace IX.Math.WorkingSet
         /// <summary>
         ///     Gets the constant extractors.
         /// </summary>
-        private readonly LevelDictionary<Type, IConstantsExtractor> Extractors;
+        private readonly LevelDictionary<Type, IConstantsExtractor> extractors;
 
         /// <summary>
         ///     Gets the constant interpreters.
         /// </summary>
-        private readonly LevelDictionary<Type, IConstantInterpreter> Interpreters;
+        private readonly LevelDictionary<Type, IConstantInterpreter> interpreters;
 
         /// <summary>
         ///     Gets the parameter registry.
@@ -92,7 +92,9 @@ namespace IX.Math.WorkingSet
         /// </summary>
         private readonly List<IStringFormatter> StringFormatters;
 
-        // Operators
+        /// <summary>
+        ///     The binary operators.
+        /// </summary>
         [DiagCA.SuppressMessage(
             "IDisposableAnalyzers.Correctness",
             "IDISP002:Dispose member.",
@@ -103,6 +105,9 @@ namespace IX.Math.WorkingSet
             Justification = "This is correct, but the analyzer can't tell.")]
         private LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase>> binaryOperators;
 
+        /// <summary>
+        ///     The unary operators.
+        /// </summary>
         [DiagCA.SuppressMessage(
             "IDisposableAnalyzers.Correctness",
             "IDISP002:Dispose member.",
@@ -113,13 +118,23 @@ namespace IX.Math.WorkingSet
             Justification = "This is correct, but the analyzer can't tell.")]
         private LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase>> unaryOperators;
 
-        // Constants
+        /// <summary>
+        ///     The constants table.
+        /// </summary>
         private Dictionary<string, ConstantNodeBase> constantsTable;
+
+        /// <summary>
+        ///     The reverse constants table.
+        /// </summary>
         private Dictionary<string, string> reverseConstantsTable;
 
-        // Symbols
         private Dictionary<string, ExpressionSymbol> symbolTable;
         private Dictionary<string, string> reverseSymbolTable;
+
+        /// <summary>
+        ///     All symbols.
+        /// </summary>
+        private string[] allSymbols;
 
         private bool initialized;
 
@@ -136,8 +151,8 @@ namespace IX.Math.WorkingSet
             CancellationToken cancellationToken)
         {
             this.ParameterRegistry = new Dictionary<string, ExternalParameterNode>();
-            this.ConstantsTable = new Dictionary<string, ConstantNodeBase>();
-            this.ReverseConstantsTable = new Dictionary<string, string>();
+            this.constantsTable = new Dictionary<string, ConstantNodeBase>();
+            this.reverseConstantsTable = new Dictionary<string, string>();
             this.symbolTable = new Dictionary<string, ExpressionSymbol>();
             this.ReverseSymbolTable = new Dictionary<string, string>();
             this.StringFormatters = stringFormatters;
@@ -173,51 +188,11 @@ namespace IX.Math.WorkingSet
             this.BinaryFunctions = binaryFunctions;
             this.TernaryFunctions = ternaryFunctions;
 
-            this.Extractors = extractors;
-            this.Interpreters = interpreters;
+            this.extractors = extractors;
+            this.interpreters = interpreters;
 
             this.functionRegex = new Regex(
                 $@"(?'functionName'.*?){Regex.Escape(mathDefinition.Parentheses.Item1)}(?'expression'.*?){Regex.Escape(mathDefinition.Parentheses.Item2)}");
-        }
-
-        /// <summary>
-        ///     Gets all symbols.
-        /// </summary>
-        /// <value>
-        ///     All symbols.
-        /// </value>
-        private string[] AllSymbols;
-
-        /// <summary>
-        ///     Gets the binary operators.
-        /// </summary>
-        /// <value>
-        ///     The binary operators.
-        /// </value>
-        [DiagCA.SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP002:Dispose member.",
-            Justification = "This is correct, but the analyzer can't tell.")]
-        [DiagCA.SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP006:Implement IDisposable.",
-            Justification = "This is correct, but the analyzer can't tell.")]
-        internal LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase>> BinaryOperators
-        {
-            get => this.binaryOperators;
-            private set => this.binaryOperators = value;
-        }
-
-        /// <summary>
-        ///     Gets the constants table.
-        /// </summary>
-        /// <value>
-        ///     The constants table.
-        /// </value>
-        internal Dictionary<string, ConstantNodeBase> ConstantsTable
-        {
-            get => this.constantsTable;
-            private set => this.constantsTable = value;
         }
 
         /// <summary>
@@ -227,18 +202,6 @@ namespace IX.Math.WorkingSet
         ///     The expression.
         /// </value>
         internal string Expression { get; set; }
-
-        /// <summary>
-        ///     Gets the reverse constants table.
-        /// </summary>
-        /// <value>
-        ///     The reverse constants table.
-        /// </value>
-        internal Dictionary<string, string> ReverseConstantsTable
-        {
-            get => this.reverseConstantsTable;
-            private set => this.reverseConstantsTable = value;
-        }
 
         /// <summary>
         ///     Gets the reverse symbol table.
@@ -259,26 +222,6 @@ namespace IX.Math.WorkingSet
         ///     <c>true</c> if success; otherwise, <c>false</c>.
         /// </value>
         internal bool Success { get; private set; }
-
-        /// <summary>
-        ///     Gets the unary operators.
-        /// </summary>
-        /// <value>
-        ///     The unary operators.
-        /// </value>
-        [DiagCA.SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP002:Dispose member.",
-            Justification = "This is correct, but the analyzer can't tell.")]
-        [DiagCA.SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP006:Implement IDisposable.",
-            Justification = "This is correct, but the analyzer can't tell.")]
-        internal LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase>> UnaryOperators
-        {
-            get => this.unaryOperators;
-            private set => this.unaryOperators = value;
-        }
 
         /// <summary>
         ///     Initializes this instance. This method shuld be called after initialization and extraction of major constants.
@@ -315,6 +258,8 @@ namespace IX.Math.WorkingSet
             var i = 1;
             var allOperatorsInOrder = this.allOperatorsInOrder;
             var definition = this.definition;
+
+            #region Operators initialization
 
             foreach (var op in allOperatorsInOrder.OrderByDescending(p => p.Length)
                 .Where(
@@ -435,11 +380,13 @@ namespace IX.Math.WorkingSet
                 i++;
             }
 
+            #endregion
+
             // Operator string interpretation support
             // ======================================
+            #region Binary operators
 
-            // Binary operators
-            this.BinaryOperators = new LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase>>
+            this.binaryOperators = new LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase>>
             {
                 // First tier - Comparison and equation operators
                 {
@@ -624,8 +571,11 @@ namespace IX.Math.WorkingSet
                 }
             };
 
-            // Unary operators
-            this.UnaryOperators = new LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase>>
+            #endregion
+
+            #region Unary operators
+
+            this.unaryOperators = new LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase>>
             {
                 // First tier - Negation and inversion
                 {
@@ -646,8 +596,10 @@ namespace IX.Math.WorkingSet
                 }
             };
 
+            #endregion
+
             // All symbols
-            this.AllSymbols = allOperatorsInOrder.Union(
+            this.allSymbols = allOperatorsInOrder.Union(
                     new[]
                     {
                         definition.ParameterSeparator,
@@ -656,7 +608,7 @@ namespace IX.Math.WorkingSet
                     })
                 .ToArray();
 
-            // Special symbols
+            #region Special symbols
 
             // Euler-Napier constant (e)
             this.GenerateNamedNumericSymbol(
@@ -692,6 +644,8 @@ namespace IX.Math.WorkingSet
                 "λ",
                 0.3036630028987326,
                 $"{definition.SpecialSymbolIndicators.Item1}lambda{definition.SpecialSymbolIndicators.Item2}");
+
+            #endregion
         }
 
         /// <summary>
