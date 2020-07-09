@@ -34,6 +34,7 @@ namespace IX.Math
 
             this.Parentheses = new Tuple<string, string>(definition.Parentheses.Item1, definition.Parentheses.Item2);
             this.SpecialSymbolIndicators = new Tuple<string, string>(definition.SpecialSymbolIndicators.Item1, definition.SpecialSymbolIndicators.Item2);
+            this.IndexerIndicators = new Tuple<string, string>(definition.IndexerIndicators.Item1, definition.IndexerIndicators.Item2);
             this.StringIndicator = definition.StringIndicator;
             this.ParameterSeparator = definition.ParameterSeparator;
             this.AddSymbol = definition.AddSymbol;
@@ -72,6 +73,9 @@ namespace IX.Math
                 "(",
                 ")"),
             SpecialSymbolIndicators = new Tuple<string, string>(
+                "[",
+                "]"),
+            IndexerIndicators = new Tuple<string, string>(
                 "[",
                 "]"),
             StringIndicator = "\"",
@@ -113,6 +117,14 @@ namespace IX.Math
         /// <remarks>The first item in the tuple represents the opening of the special symbol marker, whereas the second represents its closing.</remarks>
         [DataMember]
         public Tuple<string, string> SpecialSymbolIndicators { get; set; }
+
+        /// <summary>
+        /// Gets or sets what should be interpreted as special symbols.
+        /// </summary>
+        /// <value>The special symbol indicators.</value>
+        /// <remarks>The first item in the tuple represents the opening of the special symbol marker, whereas the second represents its closing.</remarks>
+        [DataMember]
+        public Tuple<string, string> IndexerIndicators { get; set; }
 
         /// <summary>
         /// Gets or sets what should be interpreted as string markers.
@@ -322,6 +334,7 @@ namespace IX.Math
                 PowerSymbol = this.PowerSymbol,
                 RightShiftSymbol = this.RightShiftSymbol,
                 SpecialSymbolIndicators = new Tuple<string, string>(this.SpecialSymbolIndicators.Item1, this.SpecialSymbolIndicators.Item2),
+                IndexerIndicators = new Tuple<string, string>(this.IndexerIndicators.Item1, this.IndexerIndicators.Item2),
                 StringIndicator = this.StringIndicator,
                 SubtractSymbol = this.SubtractSymbol,
                 XorSymbol = this.XorSymbol,

@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using IX.Math.Extensibility;
@@ -111,12 +110,8 @@ namespace IX.Math
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "We're using PLINQ, this is unavoidable.")]
-        public void LoadIntoContext(IEnumerable<string> expressions)
+        public void LoadIntoContext(params string[] expressions)
         {
-            Requires.NotNull(
-                expressions,
-                nameof(expressions));
-
             expressions.ParallelForEach(ContextLoadingAction);
 
             #region Local functions

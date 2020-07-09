@@ -83,7 +83,21 @@ namespace IX.Math.WorkingSet
 
                 // It's not a constant, nor something ever encountered before
                 // Therefore it should be a parameter
-                this.ParameterRegistry.Add(exp, new ExternalParameterNode(exp, this.StringFormatters));
+                var exp2 = exp;
+
+                // We check whether or not we have an indexer in the constant name
+                if (exp2.Contains(this.definition.IndexerIndicators.Item1))
+                {
+                    // We first replace back the constants in the parameter registry
+                    foreach (var constant in this.reverseConstantsTable)
+                    {
+                        exp2 = exp2.Replace(
+                            constant.Value,
+                            constant.Key);
+                    }
+                }
+
+                this.ParameterRegistry.Add(exp2, new ExternalParameterNode(exp2, this.StringFormatters));
             }
         }
     }
