@@ -1352,6 +1352,16 @@ namespace IX.UnitTests.Data
                     },
                     false
                 },
+                new object[]
+                {
+                    "xwithindexer[\"string\"]=ywithindexer[123]",
+                    new Dictionary<string, object>
+                    {
+                        ["xwithindexer[\"string\"]"] = 5,
+                        ["ywithindexer[123]"] = 49,
+                    },
+                    false,
+                },
             };
     }
 }

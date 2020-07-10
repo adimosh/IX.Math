@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
 using IX.Math.Extensibility;
@@ -210,7 +211,15 @@ namespace IX.Math.Nodes.Parameters
                 this.Name,
                 out var result))
             {
-                throw new MathematicsEngineException();
+                // We might have a indexed variable with a discovered indexer
+                var par = context.ParameterRegistry.FirstOrDefault(p => p.Value.Name == this.Name)
+                    .Value;
+                if (par == null)
+                {
+                    throw new MathematicsEngineException();
+                }
+
+                return par;
             }
 
             return result;

@@ -128,7 +128,14 @@ namespace IX.Math.WorkingSet
         /// </summary>
         private Dictionary<string, string> reverseConstantsTable;
 
+        /// <summary>
+        ///     The symbol table.
+        /// </summary>
         private Dictionary<string, ExpressionSymbol> symbolTable;
+
+        /// <summary>
+        ///     The reverse symbol table.
+        /// </summary>
         private Dictionary<string, string> reverseSymbolTable;
 
         /// <summary>
@@ -154,7 +161,7 @@ namespace IX.Math.WorkingSet
             this.constantsTable = new Dictionary<string, ConstantNodeBase>();
             this.reverseConstantsTable = new Dictionary<string, string>();
             this.symbolTable = new Dictionary<string, ExpressionSymbol>();
-            this.ReverseSymbolTable = new Dictionary<string, string>();
+            this.reverseSymbolTable = new Dictionary<string, string>();
             this.StringFormatters = stringFormatters;
 
             this.cancellationToken = cancellationToken;
@@ -202,18 +209,6 @@ namespace IX.Math.WorkingSet
         ///     The expression.
         /// </value>
         internal string Expression { get; set; }
-
-        /// <summary>
-        ///     Gets the reverse symbol table.
-        /// </summary>
-        /// <value>
-        ///     The reverse symbol table.
-        /// </value>
-        internal Dictionary<string, string> ReverseSymbolTable
-        {
-            get => this.reverseSymbolTable;
-            private set => this.reverseSymbolTable = value;
-        }
 
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="WorkingExpressionSet" /> is success.

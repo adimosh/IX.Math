@@ -100,7 +100,7 @@ namespace IX.Math
         public string[] GetParameterNames() =>
             this.parametersRegistry
                 .OrderBy(p => p.Value.Order)
-                .Select(p => p.Key)
+                .Select(p => p.Value.Name)
                 .ToArray();
 
         internal (bool, bool, Delegate, object) CompileDelegate(in ComparisonTolerance tolerance) =>
@@ -171,17 +171,12 @@ namespace IX.Math
         public ComputedExpression DeepClone()
         {
             var registry = new ConcurrentDictionary<string, ExternalParameterNode>();
-            this.parametersRegistry.Select(
-                    p => new ExternalParameterNode(
-                        p.Key,
-                        this.stringFormatters)
+            this.parametersRegistry.ForEach(
+                p =>
+                    _ = registry.TryAdd(p.Key, new ExternalParameterNode(p.Value.Name, this.stringFormatters)
                     {
                         Order = p.Value.Order
-                    })
-                .ForEach(
-                    p => _ = registry.TryAdd(
-                        p.Name,
-                        p));
+                    }));
             var context = new NodeCloningContext(registry);
 
             return new ComputedExpression(

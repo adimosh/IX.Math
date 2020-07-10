@@ -33,8 +33,9 @@ namespace IX.UnitTests
 
             using (var service = new MathematicPortfolio(new MathDefinition
             {
-                Parentheses = new Tuple<string, string>("(", ")"),
-                SpecialSymbolIndicators = new Tuple<string, string>("[", "]"),
+                Parentheses = ("(", ")"),
+                SpecialSymbolIndicators = ("[", "]"),
+                IndexerIndicators = ("[", "]"),
                 StringIndicator = "\"",
                 ParameterSeparator = ",",
                 AddSymbol = "+",

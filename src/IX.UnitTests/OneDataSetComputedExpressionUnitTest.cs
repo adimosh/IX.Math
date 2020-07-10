@@ -25,13 +25,13 @@ namespace IX.UnitTests
         {
             new object[]
             {
-                "min(max(x,y),max(y,500)*2-min(995,(x^10)))",
+                "xwithindexer[\"string\"]=ywithindexer[123]",
                 new Dictionary<string, object>
                 {
-                    ["x"] = 5,
-                    ["y"] = 3,
+                    ["xwithindexer[\"string\"]"] = 5,
+                    ["ywithindexer[123]"] = 49,
                 },
-                5L,
+                false,
             },
         };
 

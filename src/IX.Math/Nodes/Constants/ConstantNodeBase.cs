@@ -63,6 +63,14 @@ namespace IX.Math.Nodes.Constants
         public abstract object ValueAsObject { get; }
 
         /// <summary>
+        /// Gets or sets the original string value.
+        /// </summary>
+        /// <value>
+        /// The original string value.
+        /// </value>
+        public string OriginalStringValue { get; set; }
+
+        /// <summary>
         /// Simplifies this node, if possible, reflexively returns otherwise.
         /// </summary>
         /// <returns>A reflexive return.</returns>

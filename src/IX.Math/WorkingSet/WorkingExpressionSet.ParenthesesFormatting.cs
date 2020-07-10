@@ -71,8 +71,8 @@ namespace IX.Math.WorkingSet
 
                     var src = source;
 
-                    var openParenthesis = this.definition.Parentheses.Item1;
-                    var closeParenthesis = this.definition.Parentheses.Item2;
+                    var openParenthesis = this.definition.Parentheses.Open;
+                    var closeParenthesis = this.definition.Parentheses.Close;
                     var openingParanthesisLocation = src.InvariantCultureIndexOf(
                         openParenthesis);
                     var closingParanthesisLocation = src.InvariantCultureIndexOf(

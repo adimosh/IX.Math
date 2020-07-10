@@ -366,7 +366,7 @@ namespace IX.Math.WorkingSet
                 var (success, result) = this.interpreters[interpreter].EvaluateIsConstant(content, this.definition);
                 if (success)
                 {
-                    node = this.CreateConstant(result);
+                    node = this.CreateConstant(result, content);
                     break;
                 }
             }
@@ -445,7 +445,7 @@ namespace IX.Math.WorkingSet
             }
 
             // Create the constant
-            var node = this.CreateConstant(value);
+            var node = this.CreateConstant(value, content);
 
             // Get the constant a new name
             string name = GenerateName(
@@ -465,7 +465,7 @@ namespace IX.Math.WorkingSet
             return name;
         }
 
-        private ConstantNodeBase CreateConstant(object value)
+        private ConstantNodeBase CreateConstant(object value, string originalStringValue)
         {
             Requires.NotNull(
                 value,
@@ -475,19 +475,34 @@ namespace IX.Math.WorkingSet
             {
                 long l => new IntegerNode(
                     this.StringFormatters,
-                    l),
+                    l)
+                {
+                    OriginalStringValue = originalStringValue
+                },
                 double d => new NumericNode(
                     this.StringFormatters,
-                    d),
+                    d)
+                {
+                    OriginalStringValue = originalStringValue
+                },
                 bool b => new BoolNode(
                     this.StringFormatters,
-                    b),
+                    b)
+                {
+                    OriginalStringValue = originalStringValue
+                },
                 byte[] ba => new ByteArrayNode(
                     this.StringFormatters,
-                    ba),
+                    ba)
+                {
+                    OriginalStringValue = originalStringValue
+                },
                 string s => new StringNode(
                     this.StringFormatters,
-                    s),
+                    s)
+                {
+                    OriginalStringValue = originalStringValue
+                },
                 _ => throw new MathematicsEngineException()
             };
         }

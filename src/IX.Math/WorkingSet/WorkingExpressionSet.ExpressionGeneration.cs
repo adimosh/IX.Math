@@ -98,11 +98,11 @@ namespace IX.Math.WorkingSet
             }
 
             // For each parameter from the table we've just populated, see where it's first used, and fill in that index as the order
-            foreach (var paramForOrdering in this.ParameterRegistry.Values)
+            foreach (var paramForOrdering in this.ParameterRegistry)
             {
-                paramForOrdering.Order = Array.IndexOf(
+                paramForOrdering.Value.Order = Array.IndexOf(
                     splitExpression,
-                    paramForOrdering.Name);
+                    paramForOrdering.Key);
             }
 
             if (this.cancellationToken.IsCancellationRequested)
@@ -184,7 +184,7 @@ namespace IX.Math.WorkingSet
                 return this.GenerateExpression(e1.Expression);
             }
 
-            if (this.ReverseSymbolTable.TryGetValue(
+            if (this.reverseSymbolTable.TryGetValue(
                 expression,
                 out var e2))
             {
@@ -200,8 +200,8 @@ namespace IX.Math.WorkingSet
             }
 
             // Check whether the expression is a function call
-            if (expression.InvariantCultureContains(this.definition.Parentheses.Item1) &&
-                expression.InvariantCultureContains(this.definition.Parentheses.Item2))
+            if (expression.InvariantCultureContains(this.definition.Parentheses.Open) &&
+                expression.InvariantCultureContains(this.definition.Parentheses.Close))
             {
                 return GenerateFunctionCallExpression(expression);
             }
@@ -210,7 +210,10 @@ namespace IX.Math.WorkingSet
             foreach (var (_, operatorPosition, @operator) in OperatorSequenceGenerator
                 .GetOperatorsInOrderInExpression(
                     expression,
-                    this.binaryOperators.KeysByLevel).OrderBy(p => p.Item1).ThenByDescending(p => p.Item2).ToArray())
+                    this.binaryOperators.KeysByLevel)
+                .OrderBy(p => p.Item1)
+                .ThenByDescending(p => p.Item2)
+                .ToArray())
             {
                 NodeBase exp = ExpressionByBinaryOperator(
                     this,
@@ -276,9 +279,10 @@ namespace IX.Math.WorkingSet
                     }
 
                     return t(
-                        innerWorkingSet.StringFormatters,
-                        left,
-                        right).Simplify();
+                            innerWorkingSet.StringFormatters,
+                            left,
+                            right)
+                        .Simplify();
                 }
 
                 if (exp != null)
@@ -292,7 +296,10 @@ namespace IX.Math.WorkingSet
             foreach (Tuple<int, int, string> operatorPosition in OperatorSequenceGenerator
                 .GetOperatorsInOrderInExpression(
                     expression,
-                    this.unaryOperators.KeysByLevel).OrderBy(p => p.Item1).ThenByDescending(p => p.Item2).ToArray())
+                    this.unaryOperators.KeysByLevel)
+                .OrderBy(p => p.Item1)
+                .ThenByDescending(p => p.Item2)
+                .ToArray())
             {
                 NodeBase exp = ExpressionByUnaryOperator(
                     expression,
@@ -308,9 +315,10 @@ namespace IX.Math.WorkingSet
                         return null;
                     }
 
-                    if (!s.CurrentCultureStartsWith(op) || !this.unaryOperators.TryGetValue(
-                            op,
-                            out Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase> t))
+                    if (!s.CurrentCultureStartsWith(op) ||
+                    !this.unaryOperators.TryGetValue(
+                        op,
+                        out Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase> t))
                     {
                         // The unary operator is not valid.
                         return null;
@@ -332,8 +340,9 @@ namespace IX.Math.WorkingSet
                     }
 
                     return t(
-                        this.StringFormatters,
-                        expr).Simplify();
+                            this.StringFormatters,
+                            expr)
+                        .Simplify();
                 }
 
                 if (exp != null)
@@ -395,7 +404,8 @@ namespace IX.Math.WorkingSet
                                 returnValue = this.NonaryFunctions.TryGetValue(
                                     functionName,
                                     out Type t)
-                                    ? ((NonaryFunctionNodeBase)Activator.CreateInstance(t,
+                                    ? ((NonaryFunctionNodeBase)Activator.CreateInstance(
+                                        t,
                                         this.StringFormatters)).Simplify()
                                     : null;
                                 break;

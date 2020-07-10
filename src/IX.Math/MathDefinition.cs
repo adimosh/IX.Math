@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Runtime.Serialization;
 using IX.Abstractions.Logging;
 using IX.Math.Extensibility;
@@ -32,9 +31,9 @@ namespace IX.Math
         {
             Requires.NotNull(definition, nameof(definition));
 
-            this.Parentheses = new Tuple<string, string>(definition.Parentheses.Item1, definition.Parentheses.Item2);
-            this.SpecialSymbolIndicators = new Tuple<string, string>(definition.SpecialSymbolIndicators.Item1, definition.SpecialSymbolIndicators.Item2);
-            this.IndexerIndicators = new Tuple<string, string>(definition.IndexerIndicators.Item1, definition.IndexerIndicators.Item2);
+            this.Parentheses = definition.Parentheses;
+            this.SpecialSymbolIndicators = definition.SpecialSymbolIndicators;
+            this.IndexerIndicators = definition.IndexerIndicators;
             this.StringIndicator = definition.StringIndicator;
             this.ParameterSeparator = definition.ParameterSeparator;
             this.AddSymbol = definition.AddSymbol;
@@ -69,15 +68,9 @@ namespace IX.Math
         /// </value>
         public static MathDefinition Default => new MathDefinition
         {
-            Parentheses = new Tuple<string, string>(
-                "(",
-                ")"),
-            SpecialSymbolIndicators = new Tuple<string, string>(
-                "[",
-                "]"),
-            IndexerIndicators = new Tuple<string, string>(
-                "[",
-                "]"),
+            Parentheses = ("(", ")"),
+            SpecialSymbolIndicators = ("[", "]"),
+            IndexerIndicators = ("[", "]"),
             StringIndicator = "\"",
             ParameterSeparator = ",",
             AddSymbol = "+",
@@ -108,7 +101,7 @@ namespace IX.Math
         /// <value>The parentheses indicators.</value>
         /// <remarks>The first item in the tuple represents the opening parenthesis, whereas the second represents the closing parenthesis.</remarks>
         [DataMember]
-        public Tuple<string, string> Parentheses { get; set; }
+        public (string Open, string Close) Parentheses { get; set; }
 
         /// <summary>
         /// Gets or sets what should be interpreted as special symbols.
@@ -116,7 +109,7 @@ namespace IX.Math
         /// <value>The special symbol indicators.</value>
         /// <remarks>The first item in the tuple represents the opening of the special symbol marker, whereas the second represents its closing.</remarks>
         [DataMember]
-        public Tuple<string, string> SpecialSymbolIndicators { get; set; }
+        public (string Open, string Close) SpecialSymbolIndicators { get; set; }
 
         /// <summary>
         /// Gets or sets what should be interpreted as special symbols.
@@ -124,7 +117,7 @@ namespace IX.Math
         /// <value>The special symbol indicators.</value>
         /// <remarks>The first item in the tuple represents the opening of the special symbol marker, whereas the second represents its closing.</remarks>
         [DataMember]
-        public Tuple<string, string> IndexerIndicators { get; set; }
+        public (string Open, string Close) IndexerIndicators { get; set; }
 
         /// <summary>
         /// Gets or sets what should be interpreted as string markers.
@@ -330,11 +323,11 @@ namespace IX.Math
                 NotSymbol = this.NotSymbol,
                 OrSymbol = this.OrSymbol,
                 ParameterSeparator = this.ParameterSeparator,
-                Parentheses = new Tuple<string, string>(this.Parentheses.Item1, this.Parentheses.Item2),
+                Parentheses = this.Parentheses,
                 PowerSymbol = this.PowerSymbol,
                 RightShiftSymbol = this.RightShiftSymbol,
-                SpecialSymbolIndicators = new Tuple<string, string>(this.SpecialSymbolIndicators.Item1, this.SpecialSymbolIndicators.Item2),
-                IndexerIndicators = new Tuple<string, string>(this.IndexerIndicators.Item1, this.IndexerIndicators.Item2),
+                SpecialSymbolIndicators = this.SpecialSymbolIndicators,
+                IndexerIndicators = this.IndexerIndicators,
                 StringIndicator = this.StringIndicator,
                 SubtractSymbol = this.SubtractSymbol,
                 XorSymbol = this.XorSymbol,

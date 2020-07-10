@@ -65,8 +65,8 @@ namespace IX.Math.WorkingSet
                     string source,
                     string expressionSymbol)
                 {
-                    string openParanthesisSymbol = this.definition.Parentheses.Item1;
-                    string closeParanthesisSymbol = this.definition.Parentheses.Item2;
+                    string openParanthesisSymbol = this.definition.Parentheses.Open;
+                    string closeParanthesisSymbol = this.definition.Parentheses.Close;
                     string parameterSeparatorSymbol = this.definition.ParameterSeparator;
 
                     var op = -1;

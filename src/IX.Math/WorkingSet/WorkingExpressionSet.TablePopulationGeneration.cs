@@ -5,6 +5,7 @@
 using System;
 using IX.Math.Nodes.Parameters;
 using IX.StandardExtensions.Contracts;
+using IX.StandardExtensions.Globalization;
 using JetBrains.Annotations;
 
 namespace IX.Math.WorkingSet
@@ -28,7 +29,7 @@ namespace IX.Math.WorkingSet
                 originalExpression,
                 nameof(originalExpression));
 
-            string openParenthesis = this.definition.Parentheses.Item1;
+            string openParenthesis = this.definition.Parentheses.Open;
 
             // Split expression by all symbols
             string[] expressions = processedExpression.Split(
@@ -86,18 +87,34 @@ namespace IX.Math.WorkingSet
                 var exp2 = exp;
 
                 // We check whether or not we have an indexer in the constant name
-                if (exp2.Contains(this.definition.IndexerIndicators.Item1))
+                if (exp2.CurrentCultureEndsWith(this.definition.IndexerIndicators.Close))
                 {
-                    // We first replace back the constants in the parameter registry
-                    foreach (var constant in this.reverseConstantsTable)
+                    var openIndex = exp2.IndexOf(this.definition.IndexerIndicators.Open);
+
+                    if (openIndex != -1)
                     {
-                        exp2 = exp2.Replace(
-                            constant.Value,
-                            constant.Key);
+                        var constantKey = exp2.Substring(
+                            openIndex + 1,
+                            exp2.Length - openIndex - 2);
+
+                        if (this.constantsTable.TryGetValue(
+                            constantKey,
+                            out var constantValue))
+                        {
+                            // We first replace back the constants in the parameter registry
+                            exp2 =
+                                $"{exp2.Substring(0, openIndex)}{this.definition.IndexerIndicators.Open}{constantValue.OriginalStringValue ?? constantValue.ValueAsString}{this.definition.IndexerIndicators.Close}";
+
+                            if (this.ParameterRegistry.ContainsKey(exp2))
+                            {
+                                // We have a parameter
+                                continue;
+                            }
+                        }
                     }
                 }
 
-                this.ParameterRegistry.Add(exp2, new ExternalParameterNode(exp2, this.StringFormatters));
+                this.ParameterRegistry.Add(exp, new ExternalParameterNode(exp2, this.StringFormatters));
             }
         }
     }
