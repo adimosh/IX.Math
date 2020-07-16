@@ -25,13 +25,13 @@ namespace IX.UnitTests
         {
             new object[]
             {
-                "xwithindexer[\"string\"]=ywithindexer[123]",
+                "leftOperand-rightOperand",
                 new Dictionary<string, object>
                 {
-                    ["xwithindexer[\"string\"]"] = 5,
-                    ["ywithindexer[123]"] = 49,
+                    ["leftOperand"] = 5745786L,
+                    ["rightOperand"] = 1986373029L,
                 },
-                false,
+                -1980627243L,
             },
         };
 

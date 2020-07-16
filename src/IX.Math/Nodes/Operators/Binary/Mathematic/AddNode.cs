@@ -185,227 +185,88 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 SupportableValueType.String;
 
             this.CalculatedCosts.Clear();
+            this.PossibleReturnType = SupportableValueType.None;
 
-            var typeLeft = left.VerifyPossibleType(completeSupport);
-            var typeRight = right.VerifyPossibleType(completeSupport);
+            var commonType = right.VerifyPossibleType(right.VerifyPossibleType(left.VerifyPossibleType(completeSupport)));
 
-            // We might have addition with limited types
-            if (typeLeft == SupportableValueType.String || typeRight == SupportableValueType.String)
-            {
-                // If any of the operands are string-limited, the result can only be a string
-                this.PossibleReturnType = GetSupportableConversions(SupportedValueType.String);
-                foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
-                {
-                    this.CalculatedCosts[supportedType] = (GetStandardConversionStrategyCost(
-                                                               SupportedValueType.String,
-                                                               in supportedType) +
-                                                           left.CalculateStrategyCost(SupportedValueType.String) +
-                                                           right.CalculateStrategyCost(SupportedValueType.String),
-                        SupportedValueType.String);
-                }
+            // Cost calculation
+            int intCost = int.MaxValue, numericCost = int.MaxValue, binaryCost = int.MaxValue, stringCost = int.MaxValue;
 
-                return;
-            }
-
-            // If the return type of any can be string, the return type of the additionh can be string-compatible
-            SupportableValueType possibleStringType;
-            int stringCosts;
-            if (left.CheckSupportedType(SupportableValueType.String) ||
-                 right.CheckSupportedType(SupportableValueType.String))
-            {
-                possibleStringType = GetSupportableConversions(SupportedValueType.String);
-                stringCosts = left.CalculateStrategyCost(SupportedValueType.String) +
-                              right.CalculateStrategyCost(SupportedValueType.String);
-            }
-            else
-            {
-                possibleStringType = SupportableValueType.None;
-                stringCosts = int.MaxValue;
-            }
-
-            if ((typeLeft == SupportableValueType.ByteArray && right.CheckSupportedType(SupportableValueType.ByteArray)) ||
-                (left.CheckSupportedType(SupportableValueType.ByteArray) && typeRight == SupportableValueType.ByteArray))
-            {
-                // If the operands are byte-array limited and compatible, and none of them is string,
-                // the return type can only be a byte array
-                this.PossibleReturnType = GetSupportableConversions(SupportedValueType.ByteArray) | possibleStringType;
-
-                foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
-                {
-                    int totalStringCost = this.GetTotalConversionCosts(
-                        in stringCosts,
-                        SupportedValueType.String,
-                        in supportedType);
-                    int totalOtherCost = this.GetTotalConversionCosts(
-                        left.CalculateStrategyCost(SupportedValueType.ByteArray) +
-                            right.CalculateStrategyCost(SupportedValueType.ByteArray),
-                        SupportedValueType.ByteArray,
-                        in supportedType);
-
-                    if (totalStringCost < totalOtherCost)
-                    {
-                        this.CalculatedCosts[supportedType] = (totalStringCost, SupportedValueType.String);
-                    }
-                    else
-                    {
-                        this.CalculatedCosts[supportedType] = (totalOtherCost, SupportedValueType.ByteArray);
-                    }
-                }
-
-                return;
-            }
-
-            if ((typeLeft == SupportableValueType.Numeric && right.CheckSupportedType(SupportableValueType.Numeric)) ||
-                (left.CheckSupportedType(SupportableValueType.Numeric) && typeRight == SupportableValueType.Numeric))
-            {
-                // If the operands are numeric limited and compatible, the return type can only be a numeric
-                this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Numeric) | possibleStringType;
-
-                foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
-                {
-                    int totalStringCost = this.GetTotalConversionCosts(
-                        in stringCosts,
-                        SupportedValueType.String,
-                        in supportedType);
-                    int totalOtherCost = this.GetTotalConversionCosts(
-                        left.CalculateStrategyCost(SupportedValueType.Numeric) +
-                        right.CalculateStrategyCost(SupportedValueType.Numeric),
-                        SupportedValueType.Numeric,
-                        in supportedType);
-
-                    if (totalStringCost < totalOtherCost)
-                    {
-                        this.CalculatedCosts[supportedType] = (totalStringCost, SupportedValueType.String);
-                    }
-                    else
-                    {
-                        this.CalculatedCosts[supportedType] = (totalOtherCost, SupportedValueType.Numeric);
-                    }
-                }
-
-                return;
-            }
-
-            if ((typeLeft == SupportableValueType.Integer && right.CheckSupportedType(SupportableValueType.Integer)) ||
-                (left.CheckSupportedType(SupportableValueType.Integer) && typeRight == SupportableValueType.Integer))
-            {
-                // If the operands are integer limited and compatible, the return type can only be an integer
-                this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer) | possibleStringType;
-
-                foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
-                {
-                    int totalStringCost = this.GetTotalConversionCosts(
-                        in stringCosts,
-                        SupportedValueType.String,
-                        in supportedType);
-                    int totalOtherCost = this.GetTotalConversionCosts(
-                        left.CalculateStrategyCost(SupportedValueType.Integer) +
-                        right.CalculateStrategyCost(SupportedValueType.Integer),
-                        SupportedValueType.Integer,
-                        in supportedType);
-
-                    if (totalStringCost < totalOtherCost)
-                    {
-                        this.CalculatedCosts[supportedType] = (totalStringCost, SupportedValueType.String);
-                    }
-                    else
-                    {
-                        this.CalculatedCosts[supportedType] = (totalOtherCost, SupportedValueType.Integer);
-                    }
-                }
-
-                return;
-            }
-
-            // We do not have any limited types
-            var commonType = typeLeft & typeRight;
-
-            if (commonType == SupportableValueType.None)
-            {
-                if (possibleStringType != SupportableValueType.None)
-                {
-                    this.PossibleReturnType = possibleStringType;
-
-                    foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
-                    {
-                        int totalStringCost = this.GetTotalConversionCosts(
-                            in stringCosts,
-                            SupportedValueType.String,
-                            in supportedType);
-                        this.CalculatedCosts[supportedType] = (totalStringCost, SupportedValueType.String);
-                    }
-
-                    return;
-                }
-
-                throw new ExpressionNotValidLogicallyException();
-            }
-
-            // Once we have determined the common types, let's check on what we can do with them
-            int baCost = int.MaxValue;
-            if ((commonType & SupportableValueType.ByteArray) != SupportableValueType.None)
-            {
-                possibleStringType |= GetSupportableConversions(SupportedValueType.ByteArray);
-                baCost = left.CalculateStrategyCost(SupportedValueType.ByteArray) +
-                         right.CalculateStrategyCost(SupportedValueType.ByteArray);
-            }
-
-            int iCost = int.MaxValue;
             if ((commonType & SupportableValueType.Integer) != SupportableValueType.None)
             {
-                possibleStringType |= GetSupportableConversions(SupportedValueType.Integer);
-                iCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
-                        right.CalculateStrategyCost(SupportedValueType.Integer);
+                checked
+                {
+                    intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
+                            right.CalculateStrategyCost(SupportedValueType.Integer);
+                }
+
+                this.PossibleReturnType |= GetSupportableConversions(SupportedValueType.Integer);
             }
 
-            int nCost = int.MaxValue;
             if ((commonType & SupportableValueType.Numeric) != SupportableValueType.None)
             {
-                possibleStringType |= GetSupportableConversions(SupportedValueType.Numeric);
-                nCost = left.CalculateStrategyCost(SupportedValueType.Numeric) +
-                        right.CalculateStrategyCost(SupportedValueType.Numeric);
+                checked
+                {
+                    numericCost = left.CalculateStrategyCost(SupportedValueType.Numeric) +
+                            right.CalculateStrategyCost(SupportedValueType.Numeric);
+                }
+
+                this.PossibleReturnType |= GetSupportableConversions(SupportedValueType.Numeric);
             }
 
-            this.PossibleReturnType = possibleStringType;
+            if ((commonType & SupportableValueType.ByteArray) != SupportableValueType.None)
+            {
+                checked
+                {
+                    binaryCost = left.CalculateStrategyCost(SupportedValueType.ByteArray) +
+                            right.CalculateStrategyCost(SupportedValueType.ByteArray);
+                }
 
+                this.PossibleReturnType |= GetSupportableConversions(SupportedValueType.ByteArray);
+            }
+
+            if ((commonType & SupportableValueType.String) != SupportableValueType.None)
+            {
+                checked
+                {
+                    stringCost = left.CalculateStrategyCost(SupportedValueType.String) +
+                            right.CalculateStrategyCost(SupportedValueType.String);
+                }
+
+                this.PossibleReturnType |= GetSupportableConversions(SupportedValueType.String);
+            }
+
+            // Let's populate the cost tables
             foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
-                int totalByteArrayCost = this.GetTotalConversionCosts(
-                    in baCost,
-                    SupportedValueType.ByteArray,
-                    in supportedType);
-                int totalIntegerCost = this.GetTotalConversionCosts(
-                    in iCost,
-                    SupportedValueType.Integer,
-                    in supportedType);
-                int totalNumericCost = this.GetTotalConversionCosts(
-                    in nCost,
-                    SupportedValueType.Numeric,
-                    in supportedType);
-                int totalStringCost = this.GetTotalConversionCosts(
-                    in stringCosts,
-                    SupportedValueType.String,
-                    in supportedType);
+                int totalIntCost = this.GetTotalConversionCosts(in intCost, SupportedValueType.Integer, supportedType);
+                int totalNumericCost = this.GetTotalConversionCosts(in numericCost, SupportedValueType.Numeric, supportedType);
+                int totalBinaryCost = this.GetTotalConversionCosts(in binaryCost, SupportedValueType.ByteArray, supportedType);
+                int totalStringCost = this.GetTotalConversionCosts(in stringCost, SupportedValueType.String, supportedType);
 
-                int minCost = global::System.Math.Min(
-                    global::System.Math.Min(totalByteArrayCost, totalNumericCost),
-                    global::System.Math.Min(totalIntegerCost, totalStringCost));
+                int minimalCost = global::System.Math.Min(
+                    global::System.Math.Min(totalIntCost, totalNumericCost),
+                    global::System.Math.Min(totalBinaryCost, totalStringCost));
 
-                if (totalIntegerCost == minCost)
+                if (minimalCost == totalIntCost)
                 {
-                    this.CalculatedCosts[supportedType] = (totalIntegerCost, SupportedValueType.Integer);
+                    this.CalculatedCosts[supportedType] = (minimalCost, SupportedValueType.Integer);
                 }
-                else if (totalNumericCost == minCost)
+                else if (minimalCost == totalNumericCost)
                 {
-                    this.CalculatedCosts[supportedType] = (totalNumericCost, SupportedValueType.Numeric);
+                    this.CalculatedCosts[supportedType] = (minimalCost, SupportedValueType.Numeric);
                 }
-                else if (totalByteArrayCost == minCost)
+                else if (minimalCost == totalBinaryCost)
                 {
-                    this.CalculatedCosts[supportedType] = (totalStringCost, SupportedValueType.ByteArray);
+                    this.CalculatedCosts[supportedType] = (minimalCost, SupportedValueType.ByteArray);
                 }
-                else if (totalStringCost == minCost)
+                else if (minimalCost == totalStringCost)
                 {
-                    this.CalculatedCosts[supportedType] = (totalByteArrayCost, SupportedValueType.String);
+                    this.CalculatedCosts[supportedType] = (minimalCost, SupportedValueType.String);
+                }
+                else
+                {
+                    throw new ExpressionNotValidLogicallyException();
                 }
             }
         }

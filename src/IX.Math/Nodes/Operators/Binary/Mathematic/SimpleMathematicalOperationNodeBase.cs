@@ -3,6 +3,7 @@
 // </copyright>
 
 using System.Collections.Generic;
+using IX.Math.Exceptions;
 using IX.Math.Extensibility;
 
 namespace IX.Math.Nodes.Operators.Binary.Mathematic
@@ -35,36 +36,66 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             const SupportableValueType logicalMaximumSupport =
                 SupportableValueType.Integer | SupportableValueType.Numeric;
 
-            var leftType = left.VerifyPossibleType(logicalMaximumSupport);
-            var rightType = right.VerifyPossibleType(logicalMaximumSupport);
+            var commonType = left.VerifyPossibleType(right.VerifyPossibleType(left.VerifyPossibleType(logicalMaximumSupport)));
 
-            int cost;
-            SupportedValueType svt;
+            int intCost = int.MaxValue, numericCost = int.MaxValue;
 
-            if (((leftType & SupportableValueType.Integer) == SupportableValueType.Integer) &&
-                ((rightType & SupportableValueType.Integer) == SupportableValueType.Integer))
+            switch (commonType)
             {
-                // Integer only if both support it
-                this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Numeric) |
-                                          GetSupportableConversions(SupportedValueType.Integer);
-                cost = left.CalculateStrategyCost(SupportedValueType.Integer) +
-                       right.CalculateStrategyCost(SupportedValueType.Integer);
-                svt = SupportedValueType.Integer;
-            }
-            else
-            {
-                this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Numeric);
-                cost = left.CalculateStrategyCost(SupportedValueType.Numeric) +
-                       right.CalculateStrategyCost(SupportedValueType.Numeric);
-                svt = SupportedValueType.Numeric;
+                case SupportableValueType.Integer:
+                    this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer);
+                    checked
+                    {
+                        intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
+                           right.CalculateStrategyCost(SupportedValueType.Integer);
+                    }
+
+                    break;
+                case SupportableValueType.Numeric:
+                    this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Numeric);
+                    checked
+                    {
+                        numericCost = left.CalculateStrategyCost(SupportedValueType.Numeric) +
+                           right.CalculateStrategyCost(SupportedValueType.Numeric);
+                    }
+
+                    break;
+                case SupportableValueType.Integer | SupportableValueType.Numeric:
+                    this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer) |
+                                              GetSupportableConversions(SupportedValueType.Numeric);
+                    checked
+                    {
+                        intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
+                           right.CalculateStrategyCost(SupportedValueType.Integer);
+                        numericCost = left.CalculateStrategyCost(SupportedValueType.Numeric) +
+                           right.CalculateStrategyCost(SupportedValueType.Numeric);
+                    }
+
+                    break;
+                default:
+                    throw new ExpressionNotValidLogicallyException();
             }
 
             foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
-                this.CalculatedCosts[supportedType] = (GetStandardConversionStrategyCost(
-                                                           in svt,
-                                                           in supportedType) +
-                                                       cost, svt);
+                int totalIntCost, totalNumericCost;
+
+                checked
+                {
+                    totalIntCost = this.GetTotalConversionCosts(in intCost, SupportedValueType.Integer, in supportedType);
+                    totalNumericCost = this.GetTotalConversionCosts(in numericCost, SupportedValueType.Numeric, in supportedType);
+                }
+
+                if (totalNumericCost < totalIntCost)
+                {
+                    // Numeric if it's more advantageous
+                    this.CalculatedCosts[supportedType] = (totalNumericCost, SupportedValueType.Numeric);
+                }
+                else
+                {
+                    // Integer otherwise
+                    this.CalculatedCosts[supportedType] = (totalIntCost, SupportedValueType.Integer);
+                }
             }
         }
     }

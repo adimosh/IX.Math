@@ -103,12 +103,45 @@ namespace IX.Math
                 .Select(p => p.Value.Name)
                 .ToArray();
 
-        internal (bool, bool, Delegate, object) CompileDelegate(in ComparisonTolerance tolerance) =>
+        /// <summary>
+        /// Creates a deep clone of the source object.
+        /// </summary>
+        /// <returns>A deep clone.</returns>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0603:Delegate allocation from a method group", Justification = "<Pending>")]
+        public ComputedExpression DeepClone()
+        {
+            var registry = new ConcurrentDictionary<string, ExternalParameterNode>();
+            this.parametersRegistry.ForEach(
+                DoParameters,
+                registry);
+
+            void DoParameters(
+                KeyValuePair<string, ExternalParameterNode> p,
+                ConcurrentDictionary<string, ExternalParameterNode> r) =>
+                    _ = r.TryAdd(p.Key, new ExternalParameterNode(p.Value.Name, this.stringFormatters)
+                    {
+                        Order = p.Value.Order
+                    });
+
+            var context = new NodeCloningContext(registry);
+
+            return new ComputedExpression(
+                this.initialExpression,
+                this.body.DeepClone(context),
+                this.RecognizedCorrectly,
+                registry,
+                this.stringFormatters);
+        }
+
+        internal (bool Success, bool IsObject, Delegate Function, object ConstantValue) CompileDelegate(
+            in ComparisonTolerance tolerance) =>
             this.CompileDelegate(
                 in tolerance,
                 EmptyTypeCollection);
 
-        internal (bool, bool, Delegate, object) CompileDelegate(in ComparisonTolerance tolerance, ReadOnlyCollection<Type> parameterTypes)
+        internal (bool Success, bool IsObject, Delegate Function, object ConstantValue) CompileDelegate(
+            in ComparisonTolerance tolerance,
+            ReadOnlyCollection<Type> parameterTypes)
         {
             this.RequiresNotDisposed();
 
@@ -162,29 +195,6 @@ namespace IX.Math
             }
 
             return (true, false, del, default);
-        }
-
-        /// <summary>
-        /// Creates a deep clone of the source object.
-        /// </summary>
-        /// <returns>A deep clone.</returns>
-        public ComputedExpression DeepClone()
-        {
-            var registry = new ConcurrentDictionary<string, ExternalParameterNode>();
-            this.parametersRegistry.ForEach(
-                p =>
-                    _ = registry.TryAdd(p.Key, new ExternalParameterNode(p.Value.Name, this.stringFormatters)
-                    {
-                        Order = p.Value.Order
-                    }));
-            var context = new NodeCloningContext(registry);
-
-            return new ComputedExpression(
-                this.initialExpression,
-                this.body.DeepClone(context),
-                this.RecognizedCorrectly,
-                registry,
-                this.stringFormatters);
         }
 
         /// <summary>
