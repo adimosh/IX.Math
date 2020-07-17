@@ -135,12 +135,11 @@ namespace IX.Math.Nodes
                 SupportedValueType.Numeric => SupportableValueType.Numeric |
                                               SupportableValueType.ByteArray |
                                               SupportableValueType.String,
-                SupportedValueType.ByteArray => SupportableValueType.Integer |
-                                                SupportableValueType.Numeric |
-                                                SupportableValueType.ByteArray |
+                SupportedValueType.ByteArray => SupportableValueType.ByteArray |
                                                 SupportableValueType.String,
+                SupportedValueType.Boolean => SupportableValueType.Boolean |
+                                              SupportableValueType.String,
                 SupportedValueType.String => SupportableValueType.String,
-                SupportedValueType.Boolean => SupportableValueType.Boolean | SupportableValueType.String,
                 _ => SupportableValueType.None
             };
 
