@@ -51,8 +51,6 @@ namespace IX.Math.Nodes
 
         #endregion
 
-        private readonly Dictionary<SupportedValueType, (int Cost, SupportedValueType InternalType)> calculatedCosts;
-
         private Expression integerExpression;
         private Expression numericExpression;
         private Expression byteArrayExpression;
@@ -64,7 +62,7 @@ namespace IX.Math.Nodes
             this.PossibleReturnType = SupportableValueType.All;
             this.StringFormatters = stringFormatters;
 
-            this.calculatedCosts = new Dictionary<SupportedValueType, (int, SupportedValueType)>();
+            this.CalculatedCosts = new Dictionary<SupportedValueType, (int, SupportedValueType)>();
         }
 
         #region Properties
@@ -112,7 +110,7 @@ namespace IX.Math.Nodes
         /// <value>
         /// The calculated costs.
         /// </value>
-        protected Dictionary<SupportedValueType, (int Cost, SupportedValueType InternalType)> CalculatedCosts => this.calculatedCosts;
+        protected Dictionary<SupportedValueType, (int Cost, SupportedValueType InternalType)> CalculatedCosts { get; }
 
         #endregion
 
@@ -150,7 +148,7 @@ namespace IX.Math.Nodes
         /// <returns>The value types supported for conversion.</returns>
         public static SupportableValueType GetSupportableConversions(Type internalValueType)
         {
-            if (internalValueType == typeof(long) || internalValueType == typeof(byte[]))
+            if (internalValueType == typeof(long))
             {
                 return SupportableValueType.Integer |
                        SupportableValueType.Numeric |
@@ -165,14 +163,21 @@ namespace IX.Math.Nodes
                        SupportableValueType.String;
             }
 
-            if (internalValueType == typeof(string))
+            if (internalValueType == typeof(byte[]))
             {
-                return SupportableValueType.String;
+                return SupportableValueType.ByteArray |
+                       SupportableValueType.String;
             }
 
             if (internalValueType == typeof(bool))
             {
-                return SupportableValueType.Boolean | SupportableValueType.String;
+                return SupportableValueType.Boolean |
+                       SupportableValueType.String;
+            }
+
+            if (internalValueType == typeof(string))
+            {
+                return SupportableValueType.String;
             }
 
             return SupportableValueType.None;
@@ -433,7 +438,7 @@ namespace IX.Math.Nodes
         /// <returns>An execution strategy cost.</returns>
         public int CalculateStrategyCost(in SupportedValueType valueType)
         {
-            if (this.calculatedCosts.TryGetValue(valueType, out var tuple))
+            if (this.CalculatedCosts.TryGetValue(valueType, out var tuple))
             {
                 return tuple.Cost;
             }
@@ -446,7 +451,7 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <returns>The preferred type for which the exdcution strategy is least costly.</returns>
         public SupportedValueType CalculateLeastCostlyStrategy() =>
-            this.calculatedCosts.GroupBy(p => p.Value.Cost)
+            this.CalculatedCosts.GroupBy(p => p.Value.Cost)
                 .OrderBy(p => p.Key)
                 .FirstOrDefault()
                 ?.First()
