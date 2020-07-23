@@ -44,21 +44,21 @@ namespace IX.Math.ExpressionState
 
         internal static ExpressionSymbol GenerateSymbol(
             string name,
-            string expression) => new ExpressionSymbol
-        {
-            Name = name,
-            Expression = expression
-        };
+            string expression) =>
+            new ExpressionSymbol
+            {
+                Name = name,
+                Expression = expression
+            };
 
         internal static ExpressionSymbol GenerateFunctionCall(
             string name,
-            string expression)
-        {
-            ExpressionSymbol generatedExpression = GenerateSymbol(
-                name,
-                expression);
-            generatedExpression.IsFunctionCall = true;
-            return generatedExpression;
-        }
+            string expression) =>
+            new ExpressionSymbol
+            {
+                Name = name,
+                Expression = expression,
+                IsFunctionCall = true
+            };
     }
 }

@@ -28,6 +28,8 @@ namespace IX.Math.WorkingSet
 {
     internal partial class WorkingExpressionSet
     {
+        private readonly Regex whitespaceRegex = new Regex("\\s*");
+
         [DiagCA.SuppressMessage(
             "Performance",
             "HAA0401:Possible allocation of reference type enumerator",
@@ -38,54 +40,68 @@ namespace IX.Math.WorkingSet
             Justification = "We want this to happen.")]
         internal ComputationBody CreateBody()
         {
+            // Stage 1. Extract literal constants from the expression
+            // ======================================================
             this.Expression = this.ExtractConstants();
 
-            this.Expression = this.Expression.Trim()
-                .Replace(
-                    " ",
-                    string.Empty);
+            // Stage 2. Prepare expression for processing
+            // ==========================================
 
-            // Start preparing expression
-            this.symbolTable.Add(
-                string.Empty,
-                ExpressionSymbol.GenerateSymbol(
-                    string.Empty,
-                    this.Expression));
+            // Create a symbol for the main expression
 
             // Prepares expression and takes care of operators to ensure that they are all OK and usable
             this.Initialize();
 
-            this.symbolTable[string.Empty].Expression = this.Expression;
+            var symbolValueToCompare = this.whitespaceRegex.Replace(
+                this.Expression,
+                string.Empty);
 
-            // Break expression based on function calls
-            this.ReplaceFunctions(this.symbolTable[string.Empty].Expression);
+            this.symbolTable.Add(
+                string.Empty,
+                ExpressionSymbol.GenerateSymbol(
+                    string.Empty,
+                    symbolValueToCompare));
+
+            // Stage 3. Replace functions to sub-expressions
+            // =============================================
+            this.ReplaceFunctions();
 
             // We save a split expression for determining parameter order
-            var splitExpression = this.Expression.Split(
-                this.allSymbols.ToArray(),
-                StringSplitOptions.RemoveEmptyEntries);
+            var splitExpression = this.symbolTable[string.Empty]
+                .Expression.Split(
+                    this.allSymbols.ToArray(),
+                    StringSplitOptions.RemoveEmptyEntries);
 
-            // Break by parentheses
+            if (splitExpression.Length == 1 &&
+                this.symbolTable.Count == 1 &&
+                this.symbolTable[string.Empty]
+                    .Expression ==
+                symbolValueToCompare)
+            {
+                // We are not dealing with an expression, but with a value, let's try to compute it somehow
+                this.symbolTable[string.Empty]
+                    .Expression = this.Expression;
+            }
+
+            // Stage 4. Extract symbols
+            // ========================
             this.FormatParentheses();
 
             // Populating symbol tables
             foreach (var p in this.symbolTable.Where(p => !p.Value.IsFunctionCall)
                 .Select(p => p.Value.Expression))
             {
-                this.PopulateTables(
-                    p,
-                    this.Expression);
+                this.PopulateTables(p);
             }
 
             // For each parameter from the table we've just populated, see where it's first used, and fill in that index as the order
             foreach (var paramForOrdering in this.parameterRegistry)
             {
-                paramForOrdering.Value.Order = Array.IndexOf(
-                    splitExpression,
-                    paramForOrdering.Key);
+                paramForOrdering.Value.Order = this.Expression.CurrentCultureIndexOf(paramForOrdering.Key);
             }
 
-            // Generate expressions
+            // Stage 5. Compute and return body
+            // ================================
             NodeBase body;
             try
             {
@@ -306,6 +322,8 @@ namespace IX.Math.WorkingSet
 
             return null;
 
+            #region Local functions
+
             NodeBase GenerateFunctionCallExpression(
                 string possibleFunctionCallExpression)
             {
@@ -433,6 +451,8 @@ namespace IX.Math.WorkingSet
 
                 return null;
             }
+
+            #endregion
         }
     }
 }

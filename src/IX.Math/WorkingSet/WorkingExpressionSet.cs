@@ -211,6 +211,43 @@ namespace IX.Math.WorkingSet
         internal bool Success { get; private set; }
 
         /// <summary>
+        /// Disposes in the managed context.
+        /// </summary>
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP003:Dispose previous before re-assigning.",
+            Justification = "It is, but the analyzer can't tell.")]
+        protected override void DisposeManagedContext()
+        {
+            base.DisposeManagedContext();
+
+            Interlocked.Exchange(
+                    ref this.constantsTable,
+                    null)
+                .Clear();
+            Interlocked.Exchange(
+                    ref this.reverseConstantsTable,
+                    null)
+                .Clear();
+            Interlocked.Exchange(
+                    ref this.symbolTable,
+                    null)
+                ?.Clear();
+            Interlocked.Exchange(
+                    ref this.reverseSymbolTable,
+                    null)
+                ?.Clear();
+            Interlocked.Exchange(
+                    ref this.unaryOperators,
+                    null)
+                ?.Dispose();
+            Interlocked.Exchange(
+                    ref this.binaryOperators,
+                    null)
+                ?.Dispose();
+        }
+
+        /// <summary>
         ///     Initializes this instance. This method shuld be called after initialization and extraction of major constants.
         /// </summary>
         [DiagCA.SuppressMessage(
@@ -616,43 +653,6 @@ namespace IX.Math.WorkingSet
                 $"{localDefinition.SpecialSymbolIndicators.Item1}lambda{localDefinition.SpecialSymbolIndicators.Item2}");
 
             #endregion
-        }
-
-        /// <summary>
-        /// Disposes in the managed context.
-        /// </summary>
-        [DiagCA.SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP003:Dispose previous before re-assigning.",
-            Justification = "It is, but the analyzer can't tell.")]
-        protected override void DisposeManagedContext()
-        {
-            base.DisposeManagedContext();
-
-            Interlocked.Exchange(
-                    ref this.constantsTable,
-                    null)
-                .Clear();
-            Interlocked.Exchange(
-                    ref this.reverseConstantsTable,
-                    null)
-                .Clear();
-            Interlocked.Exchange(
-                    ref this.symbolTable,
-                    null)
-                ?.Clear();
-            Interlocked.Exchange(
-                    ref this.reverseSymbolTable,
-                    null)
-                ?.Clear();
-            Interlocked.Exchange(
-                    ref this.unaryOperators,
-                    null)
-                ?.Dispose();
-            Interlocked.Exchange(
-                    ref this.binaryOperators,
-                    null)
-                ?.Dispose();
         }
     }
 }

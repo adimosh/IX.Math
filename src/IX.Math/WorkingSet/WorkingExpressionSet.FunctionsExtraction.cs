@@ -8,10 +8,8 @@ using System.Globalization;
 using System.Linq;
 using IX.Math.ExpressionState;
 using IX.Math.Generators;
-using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Globalization;
-using JetBrains.Annotations;
 
 namespace IX.Math.WorkingSet
 {
@@ -20,31 +18,20 @@ namespace IX.Math.WorkingSet
         /// <summary>
         /// Replaces functions calls with expression placeholders.
         /// </summary>
-        /// <param name="expression">The expression before processing.</param>
-        private void ReplaceFunctions(
-            [NotNull] string expression)
+        private void ReplaceFunctions()
         {
-            // Validate parameters
-            Requires.NotNullOrWhiteSpace(
-                expression,
-                nameof(expression));
-
             // Replace the main expression
             ReplaceOneFunction(
-                string.Empty,
-                expression);
+                string.Empty);
 
             for (var i = 1; i < this.symbolTable.Count; i++)
             {
                 // Replace sub-expressions
                 ReplaceOneFunction(
-                    $"item{i.ToString(CultureInfo.InvariantCulture).PadLeft(4, '0')}",
-                    expression);
+                    $"item{i.ToString(CultureInfo.InvariantCulture).PadLeft(4, '0')}");
             }
 
-            void ReplaceOneFunction(
-                string key,
-                string outerExpressionSymbol)
+            void ReplaceOneFunction(string key)
             {
                 ExpressionSymbol symbol = this.symbolTable[key];
                 if (symbol.IsFunctionCall)
@@ -56,14 +43,10 @@ namespace IX.Math.WorkingSet
                 while (replaced != null)
                 {
                     this.symbolTable[key].Expression = replaced;
-                    replaced = ReplaceFunctions(
-                        replaced,
-                        outerExpressionSymbol);
+                    replaced = ReplaceFunctions(replaced);
                 }
 
-                string ReplaceFunctions(
-                    string source,
-                    string expressionSymbol)
+                string ReplaceFunctions(string source)
                 {
                     string openParanthesisSymbol = this.definition.Parentheses.Open;
                     string closeParanthesisSymbol = this.definition.Parentheses.Close;
@@ -136,9 +119,7 @@ namespace IX.Math.WorkingSet
                         while (q != null)
                         {
                             arguments = q;
-                            q = ReplaceFunctions(
-                                q,
-                                expressionSymbol);
+                            q = ReplaceFunctions(q);
                         }
 
                         var argPlaceholders = new List<string>();
@@ -146,15 +127,12 @@ namespace IX.Math.WorkingSet
                             new[] { parameterSeparatorSymbol },
                             StringSplitOptions.RemoveEmptyEntries))
                         {
-                            this.PopulateTables(
-                                s,
-                                expressionSymbol);
+                            this.PopulateTables(s);
 
                             // We check whether or not this is actually a constant
                             argPlaceholders.Add(
-                                this.CheckAndAdd(
-                                    expressionSymbol,
-                                    s) ?? (!this.parameterRegistry.ContainsKey(s)
+                                this.CheckAndAdd(s) ??
+                                (!this.parameterRegistry.ContainsKey(s)
                                     ? SymbolExpressionGenerator.GenerateSymbolExpression(
                                         this.symbolTable,
                                         this.reverseSymbolTable,

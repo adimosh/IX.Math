@@ -16,18 +16,13 @@ namespace IX.Math.WorkingSet
         /// Populates tables according to the currently-processed expression.
         /// </summary>
         /// <param name="processedExpression">The expression that is being processed.</param>
-        /// <param name="originalExpression">The expression before processing.</param>
         private void PopulateTables(
-            [NotNull] string processedExpression,
-            [NotNull] string originalExpression)
+            [NotNull] string processedExpression)
         {
             // Validate parameters
             Requires.NotNullOrWhiteSpace(
                 processedExpression,
                 nameof(processedExpression));
-            Requires.NotNullOrWhiteSpace(
-                originalExpression,
-                nameof(originalExpression));
 
             string openParenthesis = this.definition.Parentheses.Open;
 
@@ -75,9 +70,7 @@ namespace IX.Math.WorkingSet
                 }
 
                 // Let's check whether it is a constant
-                if (this.CheckAndAdd(
-                        originalExpression,
-                        exp) != null)
+                if (this.CheckAndAdd(exp) != null)
                 {
                     continue;
                 }

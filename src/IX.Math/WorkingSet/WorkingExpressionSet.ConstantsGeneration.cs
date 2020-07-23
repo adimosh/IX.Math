@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -281,7 +280,6 @@ namespace IX.Math.WorkingSet
                 // We have a successfully-extracted constant
                 currentIndex += index;
                 var name = this.AddExtractedValue(
-                    expressionSpan,
                     expressionSpan.Slice(
                             currentIndex,
                             length)
@@ -318,7 +316,6 @@ namespace IX.Math.WorkingSet
         /// Checks the constant to see if there isn't one already, then tries to guess what type it is, finally adding it to
         /// the constants table if one suitable type is found.
         /// </summary>
-        /// <param name="originalExpression">The original expression.</param>
         /// <param name="content">The content.</param>
         /// <returns>
         /// The name of the new constant, or <see langword="null" /> (<see langword="Nothing" /> in Visual Basic) if a
@@ -329,14 +326,8 @@ namespace IX.Math.WorkingSet
             "HAA0401:Possible allocation of reference type enumerator",
             Justification = "We're cool with this.")]
         private string CheckAndAdd(
-            [NotNull] string originalExpression,
             [CanBeNull] string content)
         {
-            // Contract validation
-            Requires.NotNullOrWhiteSpace(
-                originalExpression,
-                nameof(originalExpression));
-
             // No content
             if (string.IsNullOrWhiteSpace(content))
             {
@@ -406,10 +397,7 @@ namespace IX.Math.WorkingSet
 
             // Get the constant a new name
             int tempIndex = 0;
-            string name = GenerateName(
-                ref tempIndex,
-                this.constantsTable,
-                originalExpression.AsSpan());
+            string name = this.GenerateName(ref tempIndex);
 
             // Add constant data to tables
             this.constantsTable.Add(
@@ -424,7 +412,6 @@ namespace IX.Math.WorkingSet
         }
 
         private string AddExtractedValue(
-            ReadOnlySpan<char> originalExpression,
             [NotNull] string content,
             [NotNull] object value,
             ref int index)
@@ -441,10 +428,7 @@ namespace IX.Math.WorkingSet
             var node = this.CreateConstant(value, content);
 
             // Get the constant a new name
-            string name = GenerateName(
-                ref index,
-                this.constantsTable,
-                originalExpression);
+            string name = this.GenerateName(ref index);
 
             // Add constant data to tables
             this.constantsTable.Add(
@@ -500,10 +484,8 @@ namespace IX.Math.WorkingSet
             };
         }
 
-        private static string GenerateName(
-            ref int index,
-            IDictionary<string, ConstantNodeBase> constantsTable,
-            ReadOnlySpan<char> originalExpression)
+        private string GenerateName(
+            ref int index)
         {
             var nameChars = "C000000000".ToCharArray();
             Span<char> chr = nameChars;
@@ -512,13 +494,17 @@ namespace IX.Math.WorkingSet
             do
             {
                 index++;
-                ReadOnlySpan<char> nameSpan = index.ToString(CultureInfo.InvariantCulture).AsSpan();
+                ReadOnlySpan<char> nameSpan = index.ToString(CultureInfo.InvariantCulture)
+                    .AsSpan();
                 nameSpan.CopyTo(chr.Slice(1));
                 cc = chr.Slice(
                     0,
                     1 + nameSpan.Length);
             }
-            while (originalExpression.Contains(cc, StringComparison.OrdinalIgnoreCase) || constantsTable.Keys.Contains(cc.ToString()));
+            while (this.Expression.AsSpan().Contains(
+                       cc,
+                       StringComparison.OrdinalIgnoreCase) ||
+                   this.constantsTable.Keys.Contains(cc.ToString()));
 
             return cc.ToString();
         }
