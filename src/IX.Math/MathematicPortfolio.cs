@@ -2,14 +2,23 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using IX.Math.Computation;
 using IX.Math.Extensibility;
 using IX.Math.Extraction;
+using IX.Math.Generators;
+using IX.Math.Nodes.Constants;
+using IX.Math.Nodes.Parameters;
+using IX.Math.WorkingSet;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Efficiency;
 using IX.StandardExtensions.Extensions;
+using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -19,19 +28,27 @@ namespace IX.Math
     /// </summary>
     /// <seealso cref="IX.StandardExtensions.ComponentModel.DisposableBase" />
     [PublicAPI]
-    public class MathematicPortfolio : DisposableBase
+    public class MathematicPortfolio : DisposableBase, IMathematicPortfolio
     {
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP006:Implement IDisposable.",
-            Justification = "It is correctly implemented, but the analyzer can't tell.")]
-        private readonly ExpressionParsingService parsingService;
-
         private readonly ConcurrentDictionary<ExpressionTypedKey, CompiledExpressionResult> compiledDelegate =
             new ConcurrentDictionary<ExpressionTypedKey, CompiledExpressionResult>();
 
         private readonly ConcurrentDictionary<string, ComputedExpression> computedExpressions =
             new ConcurrentDictionary<string, ComputedExpression>();
+
+        private readonly List<Assembly> assembliesToRegister;
+
+        private readonly MathDefinition workingDefinition;
+
+        private readonly List<IStringFormatter> stringFormatters;
+        private readonly LevelDictionary<Type, IConstantsExtractor> constantExtractors;
+        private readonly LevelDictionary<Type, IConstantInterpreter> constantInterpreters;
+        private readonly LevelDictionary<Type, IConstantPassThroughExtractor> constantPassThroughExtractors;
+
+        private readonly Dictionary<string, Type> nonaryFunctions;
+        private readonly Dictionary<string, Type> unaryFunctions;
+        private readonly Dictionary<string, Type> binaryFunctions;
+        private readonly Dictionary<string, Type> ternaryFunctions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MathematicPortfolio"/> class.
@@ -39,7 +56,7 @@ namespace IX.Math
         /// <param name="functionAssemblies">The function assemblies.</param>
         public MathematicPortfolio(params Assembly[] functionAssemblies)
             : this(
-                null,
+                MathDefinition.Default,
                 null,
                 functionAssemblies)
         {
@@ -54,7 +71,7 @@ namespace IX.Math
             IStringFormatter stringFormatter,
             params Assembly[] functionAssemblies)
             : this(
-                null,
+                MathDefinition.Default,
                 stringFormatter,
                 functionAssemblies)
         {
@@ -90,16 +107,218 @@ namespace IX.Math
             IStringFormatter stringFormatter,
             params Assembly[] functionAssemblies)
         {
-            this.parsingService = mathDefinition == null
-                ? new ExpressionParsingService()
-                : new ExpressionParsingService(mathDefinition);
+            Requires.NotNull(ref this.workingDefinition, mathDefinition, nameof(mathDefinition));
 
-            functionAssemblies.ForEach(this.parsingService.RegisterFunctionsAssembly);
+            // Register function assemblies
+            this.assembliesToRegister = new List<Assembly>(functionAssemblies.Length + 1)
+            {
+                typeof(MathematicPortfolio).Assembly
+            };
+
+            foreach (Assembly assembly in functionAssemblies)
+            {
+                if (assembly == null || this.assembliesToRegister.Contains(assembly))
+                {
+                    return;
+                }
+
+                this.assembliesToRegister.Add(assembly);
+            }
+
+            // Load functions
+            this.nonaryFunctions =
+                FunctionsDictionaryGenerator.GenerateInternalNonaryFunctionsDictionary(this.assembliesToRegister);
+            this.unaryFunctions =
+                FunctionsDictionaryGenerator.GenerateInternalUnaryFunctionsDictionary(this.assembliesToRegister);
+            this.binaryFunctions =
+                FunctionsDictionaryGenerator.GenerateInternalBinaryFunctionsDictionary(this.assembliesToRegister);
+            this.ternaryFunctions =
+                FunctionsDictionaryGenerator.GenerateInternalTernaryFunctionsDictionary(this.assembliesToRegister);
+
+            // String formatter
+            this.stringFormatters = new List<IStringFormatter>();
 
             if (stringFormatter != null)
             {
-                this.parsingService.RegisterTypeFormatter(stringFormatter);
+                this.stringFormatters.Add(stringFormatter);
             }
+
+            // Constant pass-through extractors
+            this.constantPassThroughExtractors = new LevelDictionary<Type, IConstantPassThroughExtractor>();
+
+            var incrementer = 2001;
+            this.assembliesToRegister.GetTypesAssignableFrom<IConstantPassThroughExtractor>()
+                .Where(
+                    p => p.IsClass &&
+                         !p.IsAbstract &&
+                         !p.IsGenericTypeDefinition &&
+                         p.HasPublicParameterlessConstructor())
+                .Select(p => p.AsType())
+                .Where(
+                    (
+                        p,
+                        thisL1) => !thisL1.constantPassThroughExtractors.ContainsKey(p),
+                    this)
+                .ForEach(
+                    (
+                        Type p,
+                        ref int i,
+                        MathematicPortfolio thisL1) =>
+                    {
+                        thisL1.constantPassThroughExtractors.Add(
+                            p,
+                            (IConstantPassThroughExtractor)p.Instantiate(),
+                            p.GetAttributeDataByTypeWithoutVersionBinding<ConstantsPassThroughExtractorAttribute, int>(
+                                out var explicitLevel)
+                                ? explicitLevel
+                                : i++);
+                    },
+                    ref incrementer,
+                    this);
+
+            // Constant extractors
+            this.constantExtractors = new LevelDictionary<Type, IConstantsExtractor>
+            {
+                { typeof(StringExtractor), new StringExtractor(), 1000 },
+                { typeof(ScientificFormatNumberExtractor), new ScientificFormatNumberExtractor(), 2000 }
+            };
+
+            incrementer = 2001;
+            this.assembliesToRegister.GetTypesAssignableFrom<IConstantsExtractor>()
+                .Where(
+                    p => p.IsClass &&
+                         !p.IsAbstract &&
+                         !p.IsGenericTypeDefinition &&
+                         p.HasPublicParameterlessConstructor())
+                .Select(p => p.AsType())
+                .Where(
+                    (
+                        p,
+                        thisL1) => !thisL1.constantExtractors.ContainsKey(p),
+                    this)
+                .ForEach(
+                    (
+                        Type p,
+                        ref int i,
+                        MathematicPortfolio thisL1) =>
+                    {
+                        thisL1.constantExtractors.Add(
+                            p,
+                            (IConstantsExtractor)p.Instantiate(),
+                            p.GetAttributeDataByTypeWithoutVersionBinding<ConstantsExtractorAttribute, int>(
+                                out var explicitLevel)
+                                ? explicitLevel
+                                : Interlocked.Increment(ref i));
+                    },
+                    ref incrementer,
+                    this);
+
+            // Constant interpreters
+            this.constantInterpreters = new LevelDictionary<Type, IConstantInterpreter>();
+
+            incrementer = 2001;
+            this.assembliesToRegister.GetTypesAssignableFrom<IConstantInterpreter>()
+                .Where(
+                    p => p.IsClass &&
+                         !p.IsAbstract &&
+                         !p.IsGenericTypeDefinition &&
+                         p.HasPublicParameterlessConstructor())
+                .Select(p => p.AsType())
+                .Where(
+                    (
+                        p,
+                        thisL1) => !thisL1.constantInterpreters.ContainsKey(p),
+                    this)
+                .ForEach(
+                    (
+                        Type p,
+                        ref int i,
+                        MathematicPortfolio thisL1) =>
+                    {
+                        thisL1.constantInterpreters.Add(
+                            p,
+                            (IConstantInterpreter)p.Instantiate(),
+                            p.GetAttributeDataByTypeWithoutVersionBinding<ConstantsInterpreterAttribute, int>(
+                                out var explicitLevel)
+                                ? explicitLevel
+                                : Interlocked.Increment(ref i));
+                    },
+                    ref incrementer,
+                    this);
+        }
+
+        /// <summary>
+        ///     Returns the prototypes of all registered functions.
+        /// </summary>
+        /// <returns>All function names, with all possible combinations of input and output data.</returns>
+        public string[] GetRegisteredFunctions()
+        {
+            this.ThrowIfCurrentObjectDisposed();
+
+            // Capacity is sum of all, times 3; the "3" number was chosen as a good-enough average of how many overloads are defined, on average
+            var bldr = new List<string>(
+                (this.nonaryFunctions.Count +
+                 this.unaryFunctions.Count +
+                 this.binaryFunctions.Count +
+                 this.ternaryFunctions.Count) *
+                3);
+
+            bldr.AddRange(this.nonaryFunctions.Select(function => $"{function.Key}()"));
+
+            (from KeyValuePair<string, Type> function in this.unaryFunctions
+             from ConstructorInfo constructor in function.Value.GetTypeInfo()
+                 .DeclaredConstructors
+             let parameters = constructor.GetParameters()
+             where parameters.Length == 1
+             let parameterName = parameters[0]
+                 .Name
+             where parameterName != null
+             let functionName = function.Key
+             select (functionName, parameterName)).ForEach(
+                (
+                    parameter,
+                    bldrL1) => bldrL1.Add($"{parameter.functionName}({parameter.parameterName})"),
+                bldr);
+
+            (from KeyValuePair<string, Type> function in this.binaryFunctions
+             from ConstructorInfo constructor in function.Value.GetTypeInfo()
+                 .DeclaredConstructors
+             let parameters = constructor.GetParameters()
+             where parameters.Length == 2
+             let parameterNameLeft = parameters[0]
+                 .Name
+             let parameterNameRight = parameters[1]
+                 .Name
+             where parameterNameLeft != null && parameterNameRight != null
+             let functionName = function.Key
+             select (functionName, parameterNameLeft, parameterNameRight)).ForEach(
+                (
+                    parameter,
+                    bldrL1) => bldrL1.Add(
+                    $"{parameter.functionName}({parameter.parameterNameLeft}, {parameter.parameterNameRight})"),
+                bldr);
+
+            (from KeyValuePair<string, Type> function in this.ternaryFunctions
+             from ConstructorInfo constructor in function.Value.GetTypeInfo()
+                 .DeclaredConstructors
+             let parameters = constructor.GetParameters()
+             where parameters.Length == 3
+             let parameterNameLeft = parameters[0]
+                 .Name
+             let parameterNameMiddle = parameters[1]
+                 .Name
+             let parameterNameRight = parameters[2]
+                 .Name
+             where parameterNameLeft != null && parameterNameMiddle != null && parameterNameRight != null
+             let functionName = function.Key
+             select (functionName, parameterNameLeft, parameterNameMiddle, parameterNameRight)).ForEach(
+                (
+                    parameter,
+                    bldrL1) => bldrL1.Add(
+                    $"{parameter.functionName}({parameter.parameterNameLeft}, {parameter.parameterNameMiddle}, {parameter.parameterNameRight})"),
+                bldr);
+
+            return bldr.ToArray();
         }
 
         /// <summary>
@@ -112,6 +331,8 @@ namespace IX.Math
             Justification = "We're using PLINQ, this is unavoidable.")]
         public void LoadIntoContext(params string[] expressions)
         {
+            this.ThrowIfCurrentObjectDisposed();
+
             expressions.ParallelForEach(ContextLoadingAction);
 
             #region Local functions
@@ -119,7 +340,7 @@ namespace IX.Math
             {
                 var computedExpression = this.computedExpressions.GetOrAdd(
                     p,
-                    ValueFactory);
+                    this.ValueFactory);
 
                 if (!computedExpression.RecognizedCorrectly)
                 {
@@ -144,8 +365,6 @@ namespace IX.Math
                 {
                     this.compiledDelegate[new ExpressionTypedKey(p)] = CompiledExpressionResult.UncomputableResult;
                 }
-
-                ComputedExpression ValueFactory(string key) => this.parsingService.Interpret(key);
             }
             #endregion
         }
@@ -167,14 +386,9 @@ namespace IX.Math
 
             var computedExpression = this.computedExpressions.GetOrAdd(
                 expression,
-                this.InnerValueFactory);
+                this.ValueFactory);
 
-            if (!computedExpression.RecognizedCorrectly)
-            {
-                return null;
-            }
-
-            return computedExpression.GetParameterNames();
+            return !computedExpression.RecognizedCorrectly ? null : computedExpression.GetParameterNames();
         }
 
         /// <summary>
@@ -216,7 +430,7 @@ namespace IX.Math
 
             var computedExpression = this.computedExpressions.GetOrAdd(
                 expression,
-                this.InnerValueFactory);
+                this.ValueFactory);
 
             if (!computedExpression.RecognizedCorrectly)
             {
@@ -309,7 +523,7 @@ namespace IX.Math
             {
                 var computedExpression = this.computedExpressions.GetOrAdd(
                     key.Expression,
-                    this.InnerValueFactory);
+                    this.ValueFactory);
 
                 if (!computedExpression.RecognizedCorrectly)
                 {
@@ -332,10 +546,75 @@ namespace IX.Math
         /// <summary>Disposes in the managed context.</summary>
         protected override void DisposeManagedContext()
         {
-            this.parsingService.Dispose();
+            this.assembliesToRegister.Clear();
+
+            this.stringFormatters.Clear();
+
+            this.nonaryFunctions.Clear();
+            this.unaryFunctions.Clear();
+            this.binaryFunctions.Clear();
+            this.ternaryFunctions.Clear();
+
+            this.constantPassThroughExtractors.Dispose();
+            this.constantExtractors.Dispose();
+            this.constantInterpreters.Dispose();
+
             base.DisposeManagedContext();
         }
 
-        private ComputedExpression InnerValueFactory(string key) => this.parsingService.Interpret(key);
+        private ComputedExpression ValueFactory(string expression)
+        {
+            if (this.constantPassThroughExtractors.KeysByLevel.SelectMany(p => p.Value)
+                .Any(
+                    (
+                        cpteKey,
+                        innerExpression,
+                        innerThis) => innerThis.constantPassThroughExtractors[cpteKey]
+                        .Evaluate(
+                            innerExpression,
+                            innerThis.workingDefinition),
+                    expression,
+                    this))
+            {
+                return new ComputedExpression(
+                    expression,
+                    new StringNode(
+                        this.stringFormatters,
+                        expression),
+                    true,
+                    new Dictionary<string, ExternalParameterNode>(),
+                    this.stringFormatters);
+            }
+
+            using var workingSet = new WorkingExpressionSet(
+                expression,
+                this.workingDefinition.DeepClone(),
+                this.nonaryFunctions,
+                this.unaryFunctions,
+                this.binaryFunctions,
+                this.ternaryFunctions,
+                this.constantExtractors,
+                this.constantInterpreters,
+                this.stringFormatters);
+            ComputationBody cb = workingSet.CreateBody();
+
+            ComputedExpression result = !workingSet.Success
+                ? new ComputedExpression(
+                    expression,
+                    null,
+                    false,
+                    null,
+                    this.stringFormatters)
+                : new ComputedExpression(
+                    expression,
+                    cb.BodyNode,
+                    true,
+                    cb.ParameterRegistry,
+                    this.stringFormatters);
+
+            Interlocked.MemoryBarrier();
+
+            return result;
+        }
     }
 }

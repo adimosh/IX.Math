@@ -38,11 +38,6 @@ namespace IX.Math.WorkingSet
             Justification = "We want this to happen.")]
         internal ComputationBody CreateBody()
         {
-            if (this.cancellationToken.IsCancellationRequested)
-            {
-                return ComputationBody.Empty;
-            }
-
             this.Expression = this.ExtractConstants();
 
             this.Expression = this.Expression.Trim()
@@ -62,18 +57,8 @@ namespace IX.Math.WorkingSet
 
             this.symbolTable[string.Empty].Expression = this.Expression;
 
-            if (this.cancellationToken.IsCancellationRequested)
-            {
-                return ComputationBody.Empty;
-            }
-
             // Break expression based on function calls
             this.ReplaceFunctions(this.symbolTable[string.Empty].Expression);
-
-            if (this.cancellationToken.IsCancellationRequested)
-            {
-                return ComputationBody.Empty;
-            }
 
             // We save a split expression for determining parameter order
             var splitExpression = this.Expression.Split(
@@ -82,11 +67,6 @@ namespace IX.Math.WorkingSet
 
             // Break by parentheses
             this.FormatParentheses();
-
-            if (this.cancellationToken.IsCancellationRequested)
-            {
-                return ComputationBody.Empty;
-            }
 
             // Populating symbol tables
             foreach (var p in this.symbolTable.Where(p => !p.Value.IsFunctionCall)
@@ -105,11 +85,6 @@ namespace IX.Math.WorkingSet
                     paramForOrdering.Key);
             }
 
-            if (this.cancellationToken.IsCancellationRequested)
-            {
-                return ComputationBody.Empty;
-            }
-
             // Generate expressions
             NodeBase body;
             try
@@ -117,11 +92,6 @@ namespace IX.Math.WorkingSet
                 body = this.GenerateExpression(this.symbolTable[string.Empty].Expression);
             }
             catch
-            {
-                body = null;
-            }
-
-            if (body == null || this.cancellationToken.IsCancellationRequested)
             {
                 return ComputationBody.Empty;
             }
@@ -143,12 +113,6 @@ namespace IX.Math.WorkingSet
             Requires.NotNullOrWhiteSpace(
                 expression,
                 nameof(expression));
-
-            if (this.cancellationToken.IsCancellationRequested)
-            {
-                // Cancellation requested, let's exit gracefully
-                return null;
-            }
 
             // Expression might be an already-defined constant
             if (this.constantsTable.TryGetValue(
@@ -233,12 +197,6 @@ namespace IX.Math.WorkingSet
                         return null;
                     }
 
-                    if (innerWorkingSet.cancellationToken.IsCancellationRequested)
-                    {
-                        // Cancellation requested, let's exit gracefully
-                        return null;
-                    }
-
                     if (!innerWorkingSet.binaryOperators.TryGetValue(
                         op,
                         out Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase> t))
@@ -309,12 +267,6 @@ namespace IX.Math.WorkingSet
                     string s,
                     string op)
                 {
-                    if (this.cancellationToken.IsCancellationRequested)
-                    {
-                        // Cancellation requested, let's stop
-                        return null;
-                    }
-
                     if (!s.CurrentCultureStartsWith(op) ||
                     !this.unaryOperators.TryGetValue(
                         op,
@@ -357,12 +309,6 @@ namespace IX.Math.WorkingSet
             NodeBase GenerateFunctionCallExpression(
                 string possibleFunctionCallExpression)
             {
-                if (this.cancellationToken.IsCancellationRequested)
-                {
-                    // Cancellation requested, let's exit gracefully
-                    return null;
-                }
-
                 Match match = this.functionRegex.Match(possibleFunctionCallExpression);
 
                 try

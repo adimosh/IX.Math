@@ -43,11 +43,6 @@ namespace IX.Math.WorkingSet
         private readonly string[] allOperatorsInOrder;
 
         /// <summary>
-        ///     Gets the cancellation token.
-        /// </summary>
-        private readonly CancellationToken cancellationToken;
-
-        /// <summary>
         ///     Gets the definition.
         /// </summary>
         private readonly MathDefinition definition;
@@ -154,8 +149,7 @@ namespace IX.Math.WorkingSet
             Dictionary<string, Type> ternaryFunctions,
             LevelDictionary<Type, IConstantsExtractor> extractors,
             LevelDictionary<Type, IConstantInterpreter> interpreters,
-            List<IStringFormatter> stringFormatters,
-            CancellationToken cancellationToken)
+            List<IStringFormatter> stringFormatters)
         {
             this.parameterRegistry = new Dictionary<string, ExternalParameterNode>();
             this.constantsTable = new Dictionary<string, ConstantNodeBase>();
@@ -164,7 +158,6 @@ namespace IX.Math.WorkingSet
             this.reverseSymbolTable = new Dictionary<string, string>();
             this.stringFormatters = stringFormatters;
 
-            this.cancellationToken = cancellationToken;
             this.Expression = expression;
             this.definition = mathDefinition;
 

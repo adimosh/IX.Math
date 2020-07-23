@@ -250,12 +250,6 @@ namespace IX.Math.WorkingSet
             int currentIndex = 0, currentFinalIndex = 0;
             for (int i = 0; i < extractors.Length; i++)
             {
-                if (this.cancellationToken.IsCancellationRequested)
-                {
-                    // Cancellation time
-                    return null;
-                }
-
                 // We call the constant extractor
                 var ce = extractors[i];
                 var (success, value, index, length) = ce.ExtractConstant(
