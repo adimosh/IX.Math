@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
 using IX.Math.Extensibility;
-using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Nodes.Operators.Binary.Logical
 {
@@ -55,39 +54,6 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
         }
 
         /// <summary>
-        ///     Simplifies this node, if possible, reflexively returns otherwise.
-        /// </summary>
-        /// <returns>
-        ///     A simplified node, or this instance.
-        /// </returns>
-        public override NodeBase Simplify()
-        {
-            try
-            {
-                return this.Left switch
-                {
-                    IntegerNode nnLeft when this.Right is IntegerNode nnRight => this.GenerateConstantInteger(
-                        nnLeft.Value & nnRight.Value),
-                    BoolNode bnLeft when this.Right is BoolNode bnRight => this.GenerateConstantBoolean(
-                        bnLeft.Value & bnRight.Value),
-                    _ => this
-                };
-            }
-            catch (ExpressionNotValidLogicallyException)
-            {
-                throw;
-            }
-            catch (MathematicsEngineException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new ExpressionNotValidLogicallyException(ex);
-            }
-        }
-
-        /// <summary>
         ///     Creates a deep clone of the source object.
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
@@ -99,11 +65,50 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                 this.Right.DeepClone(context));
 
         /// <summary>
+        /// Generates simplified data.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting simplified data.</returns>
+        protected override long GenerateData(
+            long left,
+            long right) =>
+            left & right;
+
+        /// <summary>
+        /// Generates simplified data.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting simplified data.</returns>
+        protected override bool GenerateData(
+            bool left,
+            bool right) =>
+            left & right;
+
+        /// <summary>
+        /// Generates simplified data.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting simplified data.</returns>
+        protected override byte[] GenerateData(
+            byte[] left,
+            byte[] right) =>
+            PerformBinaryOperation(
+                left,
+                right);
+
+        /// <summary>
         /// Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
         /// <returns>A compiled expression, if one is possible.</returns>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0603:Delegate allocation from a method group",
+            Justification = "This is desirable.")]
         protected override Expression GenerateExpressionInternal(
             in SupportedValueType valueType,
             in ComparisonTolerance comparisonTolerance)
@@ -115,16 +120,16 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                     right,
                     isBinary) = this.GenerateParameterExpressions(in valueType, in comparisonTolerance);
 
-                if (isBinary)
+                if (!isBinary)
                 {
-                    Func<byte[], byte[], byte[]> del = PerformBinaryOperation;
-                    return Expression.Call(
-                        del.Method,
+                    return Expression.And(
                         left,
                         right);
                 }
 
-                return Expression.And(
+                Func<byte[], byte[], byte[]> del = PerformBinaryOperation;
+                return Expression.Call(
+                    del.Method,
                     left,
                     right);
             }

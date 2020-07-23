@@ -65,32 +65,32 @@ namespace IX.Math.WorkingSet
         /// <summary>
         ///     Gets the parameter registry.
         /// </summary>
-        private readonly IDictionary<string, ExternalParameterNode> ParameterRegistry;
+        private readonly IDictionary<string, ExternalParameterNode> parameterRegistry;
 
         /// <summary>
         ///     Gets the nonary functions.
         /// </summary>
-        private readonly Dictionary<string, Type> NonaryFunctions;
+        private readonly Dictionary<string, Type> nonaryFunctions;
 
         /// <summary>
         ///     Gets the ternary functions.
         /// </summary>
-        private readonly Dictionary<string, Type> TernaryFunctions;
+        private readonly Dictionary<string, Type> ternaryFunctions;
 
         /// <summary>
         ///     Gets the unary functions.
         /// </summary>
-        private readonly Dictionary<string, Type> UnaryFunctions;
+        private readonly Dictionary<string, Type> unaryFunctions;
 
         /// <summary>
         ///     Gets the binary functions.
         /// </summary>
-        private readonly Dictionary<string, Type> BinaryFunctions;
+        private readonly Dictionary<string, Type> binaryFunctions;
 
         /// <summary>
         /// Gets the string formatters.
         /// </summary>
-        private readonly List<IStringFormatter> StringFormatters;
+        private readonly List<IStringFormatter> stringFormatters;
 
         /// <summary>
         ///     The binary operators.
@@ -157,12 +157,12 @@ namespace IX.Math.WorkingSet
             List<IStringFormatter> stringFormatters,
             CancellationToken cancellationToken)
         {
-            this.ParameterRegistry = new Dictionary<string, ExternalParameterNode>();
+            this.parameterRegistry = new Dictionary<string, ExternalParameterNode>();
             this.constantsTable = new Dictionary<string, ConstantNodeBase>();
             this.reverseConstantsTable = new Dictionary<string, string>();
             this.symbolTable = new Dictionary<string, ExpressionSymbol>();
             this.reverseSymbolTable = new Dictionary<string, string>();
-            this.StringFormatters = stringFormatters;
+            this.stringFormatters = stringFormatters;
 
             this.cancellationToken = cancellationToken;
             this.Expression = expression;
@@ -184,16 +184,15 @@ namespace IX.Math.WorkingSet
                 mathDefinition.DivideSymbol,
                 mathDefinition.ModuloSymbol,
                 mathDefinition.MultiplySymbol,
-                mathDefinition.PowerSymbol,
                 mathDefinition.LeftShiftSymbol,
                 mathDefinition.RightShiftSymbol,
                 mathDefinition.NotSymbol
             };
 
-            this.NonaryFunctions = nonaryFunctions;
-            this.UnaryFunctions = unaryFunctions;
-            this.BinaryFunctions = binaryFunctions;
-            this.TernaryFunctions = ternaryFunctions;
+            this.nonaryFunctions = nonaryFunctions;
+            this.unaryFunctions = unaryFunctions;
+            this.binaryFunctions = binaryFunctions;
+            this.ternaryFunctions = ternaryFunctions;
 
             this.extractors = extractors;
             this.interpreters = interpreters;
@@ -251,12 +250,12 @@ namespace IX.Math.WorkingSet
             this.initialized = true;
 
             var i = 1;
-            var allOperatorsInOrder = this.allOperatorsInOrder;
-            var definition = this.definition;
+            var operatorsInOrder = this.allOperatorsInOrder;
+            var localDefinition = this.definition;
 
             #region Operators initialization
 
-            foreach (var op in allOperatorsInOrder.OrderByDescending(p => p.Length)
+            foreach (var op in operatorsInOrder.OrderByDescending(p => p.Length)
                 .Where(
                     (
                         p,
@@ -265,7 +264,7 @@ namespace IX.Math.WorkingSet
                                 q,
                                 pL2) => q.Length < pL2.Length && pL2.Contains(q),
                         p),
-                    allOperatorsInOrder)
+                    operatorsInOrder)
                 .OrderByDescending(p => p.Length))
             {
                 var s = $"@op{i}@";
@@ -275,101 +274,96 @@ namespace IX.Math.WorkingSet
                     s);
 
                 var allIndex = Array.IndexOf(
-                    allOperatorsInOrder,
+                    operatorsInOrder,
                     op);
                 if (allIndex != -1)
                 {
-                    allOperatorsInOrder[allIndex] = s;
+                    operatorsInOrder[allIndex] = s;
                 }
 
-                if (definition.AddSymbol == op)
+                if (localDefinition.AddSymbol == op)
                 {
-                    definition.AddSymbol = s;
+                    localDefinition.AddSymbol = s;
                 }
 
-                if (definition.AndSymbol == op)
+                if (localDefinition.AndSymbol == op)
                 {
-                    definition.AndSymbol = s;
+                    localDefinition.AndSymbol = s;
                 }
 
-                if (definition.DivideSymbol == op)
+                if (localDefinition.DivideSymbol == op)
                 {
-                    definition.DivideSymbol = s;
+                    localDefinition.DivideSymbol = s;
                 }
 
-                if (definition.ModuloSymbol == op)
+                if (localDefinition.ModuloSymbol == op)
                 {
-                    definition.ModuloSymbol = s;
+                    localDefinition.ModuloSymbol = s;
                 }
 
-                if (definition.NotEqualsSymbol == op)
+                if (localDefinition.NotEqualsSymbol == op)
                 {
-                    definition.NotEqualsSymbol = s;
+                    localDefinition.NotEqualsSymbol = s;
                 }
 
-                if (definition.EqualsSymbol == op)
+                if (localDefinition.EqualsSymbol == op)
                 {
-                    definition.EqualsSymbol = s;
+                    localDefinition.EqualsSymbol = s;
                 }
 
-                if (definition.GreaterThanOrEqualSymbol == op)
+                if (localDefinition.GreaterThanOrEqualSymbol == op)
                 {
-                    definition.GreaterThanOrEqualSymbol = s;
+                    localDefinition.GreaterThanOrEqualSymbol = s;
                 }
 
-                if (definition.GreaterThanSymbol == op)
+                if (localDefinition.GreaterThanSymbol == op)
                 {
-                    definition.GreaterThanSymbol = s;
+                    localDefinition.GreaterThanSymbol = s;
                 }
 
-                if (definition.LessThanOrEqualSymbol == op)
+                if (localDefinition.LessThanOrEqualSymbol == op)
                 {
-                    definition.LessThanOrEqualSymbol = s;
+                    localDefinition.LessThanOrEqualSymbol = s;
                 }
 
-                if (definition.LessThanSymbol == op)
+                if (localDefinition.LessThanSymbol == op)
                 {
-                    definition.LessThanSymbol = s;
+                    localDefinition.LessThanSymbol = s;
                 }
 
-                if (definition.MultiplySymbol == op)
+                if (localDefinition.MultiplySymbol == op)
                 {
-                    definition.MultiplySymbol = s;
+                    localDefinition.MultiplySymbol = s;
                 }
 
-                if (definition.NotSymbol == op)
+                if (localDefinition.NotSymbol == op)
                 {
-                    definition.NotSymbol = s;
+                    localDefinition.NotSymbol = s;
                 }
 
-                if (definition.OrSymbol == op)
+                if (localDefinition.OrSymbol == op)
                 {
-                    definition.OrSymbol = s;
+                    localDefinition.OrSymbol = s;
                 }
 
-                if (definition.PowerSymbol == op)
+                if (localDefinition.LeftShiftSymbol == op)
                 {
-                    definition.PowerSymbol = s;
+                    localDefinition.LeftShiftSymbol = s;
                 }
 
-                if (definition.LeftShiftSymbol == op)
+                if (localDefinition.RightShiftSymbol == op)
                 {
-                    definition.LeftShiftSymbol = s;
+                    localDefinition.RightShiftSymbol = s;
                 }
 
-                if (definition.RightShiftSymbol == op)
+                if (localDefinition.SubtractSymbol == op)
                 {
-                    definition.RightShiftSymbol = s;
+                    localDefinition.SubtractSymbol = s;
                 }
 
-                if (definition.SubtractSymbol == op)
+                if (localDefinition.XorSymbol == op)
                 {
-                    definition.SubtractSymbol = s;
-                }
-
-                if (definition.XorSymbol == op)
-                {
-                    definition.XorSymbol = s;
+                    localDefinition.XorSymbol = s;
                 }
 
                 i++;
@@ -385,7 +379,7 @@ namespace IX.Math.WorkingSet
             {
                 // First tier - Comparison and equation operators
                 {
-                    definition.GreaterThanOrEqualSymbol, (
+                    localDefinition.GreaterThanOrEqualSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new GreaterThanOrEqualOperatorNode(
@@ -395,7 +389,7 @@ namespace IX.Math.WorkingSet
                     10
                 },
                 {
-                    definition.LessThanOrEqualSymbol, (
+                    localDefinition.LessThanOrEqualSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new LessThanOrEqualOperatorNode(
@@ -405,7 +399,7 @@ namespace IX.Math.WorkingSet
                     10
                 },
                 {
-                    definition.GreaterThanSymbol, (
+                    localDefinition.GreaterThanSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new GreaterThanOperatorNode(
@@ -415,7 +409,7 @@ namespace IX.Math.WorkingSet
                     10
                 },
                 {
-                    definition.LessThanSymbol, (
+                    localDefinition.LessThanSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new LessThanOperatorNode(
@@ -425,7 +419,7 @@ namespace IX.Math.WorkingSet
                     10
                 },
                 {
-                    definition.NotEqualsSymbol, (
+                    localDefinition.NotEqualsSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new NotEqualsNode(
@@ -435,7 +429,7 @@ namespace IX.Math.WorkingSet
                     10
                 },
                 {
-                    definition.EqualsSymbol, (
+                    localDefinition.EqualsSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new EqualsNode(
@@ -447,7 +441,7 @@ namespace IX.Math.WorkingSet
 
                 // Second tier - Logical operators
                 {
-                    definition.OrSymbol, (
+                    localDefinition.OrSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new OrNode(
@@ -457,29 +451,29 @@ namespace IX.Math.WorkingSet
                     20
                 },
                 {
-                    definition.XorSymbol, (
+                    localDefinition.XorSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new XorNode(
                         definitionL1,
                         leftOperand,
                         rightOperand),
-                    definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 21 : 20
+                    localDefinition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 21 : 20
                 },
                 {
-                    definition.AndSymbol, (
+                    localDefinition.AndSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new AndNode(
                         definitionL1,
                         leftOperand,
                         rightOperand),
-                    definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 22 : 20
+                    localDefinition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 22 : 20
                 },
 
                 // Third tier - Arithmetic second-rank operators
                 {
-                    definition.AddSymbol, (
+                    localDefinition.AddSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new AddNode(
@@ -489,7 +483,7 @@ namespace IX.Math.WorkingSet
                     30
                 },
                 {
-                    definition.SubtractSymbol, (
+                    localDefinition.SubtractSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new SubtractNode(
@@ -501,7 +495,7 @@ namespace IX.Math.WorkingSet
 
                 // Fourth tier - Arithmetic first-rank operators
                 {
-                    definition.DivideSymbol, (
+                    localDefinition.DivideSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new DivideNode(
@@ -511,7 +505,7 @@ namespace IX.Math.WorkingSet
                     40
                 },
                 {
-                    definition.ModuloSymbol, (
+                    localDefinition.ModuloSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new ModuloNode(
@@ -521,7 +515,7 @@ namespace IX.Math.WorkingSet
                     40
                 },
                 {
-                    definition.MultiplySymbol, (
+                    localDefinition.MultiplySymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new MultiplyNode(
@@ -531,38 +525,26 @@ namespace IX.Math.WorkingSet
                     40
                 },
 
-                // Fifth tier - Power operator
+                // Fifth tier - Bitwise shift operators
                 {
-                    definition.PowerSymbol, (
-                        definitionL1,
-                        leftOperand,
-                        rightOperand) => new PowerNode(
-                        definitionL1,
-                        leftOperand,
-                        rightOperand),
-                    50
-                },
-
-                // Sixth tier - Bitwise shift operators
-                {
-                    definition.LeftShiftSymbol, (
+                    localDefinition.LeftShiftSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new LeftShiftNode(
                         definitionL1,
                         leftOperand,
                         rightOperand),
-                    60
+                    50
                 },
                 {
-                    definition.RightShiftSymbol, (
+                    localDefinition.RightShiftSymbol, (
                         definitionL1,
                         leftOperand,
                         rightOperand) => new RightShiftNode(
                         definitionL1,
                         leftOperand,
                         rightOperand),
-                    60
+                    50
                 }
             };
 
@@ -574,7 +556,7 @@ namespace IX.Math.WorkingSet
             {
                 // First tier - Negation and inversion
                 {
-                    definition.SubtractSymbol, (
+                    localDefinition.SubtractSymbol, (
                         definitionL1,
                         operand) => new Nodes.Operators.Unary.SubtractNode(
                         definitionL1,
@@ -582,7 +564,7 @@ namespace IX.Math.WorkingSet
                     1
                 },
                 {
-                    definition.NotSymbol, (
+                    localDefinition.NotSymbol, (
                         definitionL1,
                         operand) => new NotNode(
                         definitionL1,
@@ -594,12 +576,12 @@ namespace IX.Math.WorkingSet
             #endregion
 
             // All symbols
-            this.allSymbols = allOperatorsInOrder.Union(
+            this.allSymbols = operatorsInOrder.Union(
                     new[]
                     {
-                        definition.ParameterSeparator,
-                        definition.Parentheses.Item1,
-                        definition.Parentheses.Item2
+                        localDefinition.ParameterSeparator,
+                        localDefinition.Parentheses.Item1,
+                        localDefinition.Parentheses.Item2
                     })
                 .ToArray();
 
@@ -614,31 +596,31 @@ namespace IX.Math.WorkingSet
             this.GenerateNamedNumericSymbol(
                 "π",
                 global::System.Math.PI,
-                $"{definition.SpecialSymbolIndicators.Item1}pi{definition.SpecialSymbolIndicators.Item2}");
+                $"{localDefinition.SpecialSymbolIndicators.Item1}pi{localDefinition.SpecialSymbolIndicators.Item2}");
 
             // Golden ratio
             this.GenerateNamedNumericSymbol(
                 "φ",
                 1.6180339887498948,
-                $"{definition.SpecialSymbolIndicators.Item1}phi{definition.SpecialSymbolIndicators.Item2}");
+                $"{localDefinition.SpecialSymbolIndicators.Item1}phi{localDefinition.SpecialSymbolIndicators.Item2}");
 
             // Bernstein constant
             this.GenerateNamedNumericSymbol(
                 "β",
                 0.2801694990238691,
-                $"{definition.SpecialSymbolIndicators.Item1}beta{definition.SpecialSymbolIndicators.Item2}");
+                $"{localDefinition.SpecialSymbolIndicators.Item1}beta{localDefinition.SpecialSymbolIndicators.Item2}");
 
             // Euler-Mascheroni constant
             this.GenerateNamedNumericSymbol(
                 "γ",
                 0.5772156649015328,
-                $"{definition.SpecialSymbolIndicators.Item1}gamma{definition.SpecialSymbolIndicators.Item2}");
+                $"{localDefinition.SpecialSymbolIndicators.Item1}gamma{localDefinition.SpecialSymbolIndicators.Item2}");
 
             // Gauss-Kuzmin-Wirsing constant
             this.GenerateNamedNumericSymbol(
                 "λ",
                 0.3036630028987326,
-                $"{definition.SpecialSymbolIndicators.Item1}lambda{definition.SpecialSymbolIndicators.Item2}");
+                $"{localDefinition.SpecialSymbolIndicators.Item1}lambda{localDefinition.SpecialSymbolIndicators.Item2}");
 
             #endregion
         }

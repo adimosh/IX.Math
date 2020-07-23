@@ -98,7 +98,7 @@ namespace IX.Math.WorkingSet
             }
 
             // For each parameter from the table we've just populated, see where it's first used, and fill in that index as the order
-            foreach (var paramForOrdering in this.ParameterRegistry)
+            foreach (var paramForOrdering in this.parameterRegistry)
             {
                 paramForOrdering.Value.Order = Array.IndexOf(
                     splitExpression,
@@ -130,7 +130,7 @@ namespace IX.Math.WorkingSet
 
             return new ComputationBody(
                 body,
-                this.ParameterRegistry);
+                this.parameterRegistry);
         }
 
         [CanBeNull]
@@ -171,7 +171,7 @@ namespace IX.Math.WorkingSet
             }
 
             // Check whether expression is an external parameter
-            if (this.ParameterRegistry.TryGetValue(expression, out var parameter))
+            if (this.parameterRegistry.TryGetValue(expression, out var parameter))
             {
                 return parameter;
             }
@@ -279,7 +279,7 @@ namespace IX.Math.WorkingSet
                     }
 
                     return t(
-                            innerWorkingSet.StringFormatters,
+                            innerWorkingSet.stringFormatters,
                             left,
                             right)
                         .Simplify();
@@ -340,7 +340,7 @@ namespace IX.Math.WorkingSet
                     }
 
                     return t(
-                            this.StringFormatters,
+                            this.stringFormatters,
                             expr)
                         .Simplify();
                 }
@@ -401,23 +401,23 @@ namespace IX.Math.WorkingSet
                         switch (parameterExpressions.Length)
                         {
                             case 0:
-                                returnValue = this.NonaryFunctions.TryGetValue(
+                                returnValue = this.nonaryFunctions.TryGetValue(
                                     functionName,
                                     out Type t)
                                     ? ((NonaryFunctionNodeBase)Activator.CreateInstance(
                                         t,
-                                        this.StringFormatters)).Simplify()
+                                        this.stringFormatters)).Simplify()
                                     : null;
                                 break;
 
                             case 1:
-                                if (this.UnaryFunctions.TryGetValue(
+                                if (this.unaryFunctions.TryGetValue(
                                     functionName,
                                     out Type t1))
                                 {
                                     returnValue = ((UnaryFunctionNodeBase)Activator.CreateInstance(
                                         t1,
-                                        this.StringFormatters,
+                                        this.stringFormatters,
                                         this.GenerateExpression(parameterExpressions[0]))).Simplify();
                                 }
                                 else
@@ -428,13 +428,13 @@ namespace IX.Math.WorkingSet
                                 break;
 
                             case 2:
-                                if (this.BinaryFunctions.TryGetValue(
+                                if (this.binaryFunctions.TryGetValue(
                                     functionName,
                                     out Type t2))
                                 {
                                     returnValue = ((BinaryFunctionNodeBase)Activator.CreateInstance(
                                         t2,
-                                        this.StringFormatters,
+                                        this.stringFormatters,
                                         this.GenerateExpression(parameterExpressions[0]),
                                         this.GenerateExpression(parameterExpressions[1]))).Simplify();
                                 }
@@ -446,13 +446,13 @@ namespace IX.Math.WorkingSet
                                 break;
 
                             case 3:
-                                if (this.TernaryFunctions.TryGetValue(
+                                if (this.ternaryFunctions.TryGetValue(
                                     functionName,
                                     out Type t3))
                                 {
                                     returnValue = ((TernaryFunctionNodeBase)Activator.CreateInstance(
                                         t3,
-                                        this.StringFormatters,
+                                        this.stringFormatters,
                                         this.GenerateExpression(parameterExpressions[0]),
                                         this.GenerateExpression(parameterExpressions[1]),
                                         this.GenerateExpression(parameterExpressions[2]))).Simplify();

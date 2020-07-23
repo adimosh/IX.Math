@@ -134,7 +134,7 @@ namespace IX.Math.WorkingSet
             result = null;
             return false;
 
-            bool ParseByteArray(
+            static bool ParseByteArray(
                 string byteArrayExpression,
                 out byte[] byteArrayResult)
             {
@@ -212,7 +212,7 @@ namespace IX.Math.WorkingSet
 
             this.constantsTable.Add(
                 name,
-                new NumericNode(this.StringFormatters, value));
+                new NumericNode(this.stringFormatters, value));
             this.reverseConstantsTable.Add(
                 value.ToString(CultureInfo.CurrentCulture),
                 name);
@@ -312,7 +312,6 @@ namespace IX.Math.WorkingSet
 
                 // Returning to the same extractor until there ain't no more matches
                 i--;
-                continue;
             }
 
             return espan.Slice(
@@ -381,13 +380,13 @@ namespace IX.Math.WorkingSet
                     if (n is double d)
                     {
                         node = new NumericNode(
-                            this.StringFormatters,
+                            this.stringFormatters,
                             d);
                     }
                     else if (n is long i)
                     {
                         node = new IntegerNode(
-                            this.StringFormatters,
+                            this.stringFormatters,
                             i);
                     }
                 }
@@ -395,13 +394,13 @@ namespace IX.Math.WorkingSet
                     content,
                     out byte[] ba))
                 {
-                    node = new ByteArrayNode(this.StringFormatters, ba);
+                    node = new ByteArrayNode(this.stringFormatters, ba);
                 }
                 else if (bool.TryParse(
                     content,
                     out var b))
                 {
-                    node = new BoolNode(this.StringFormatters, b);
+                    node = new BoolNode(this.stringFormatters, b);
                 }
             }
 
@@ -474,31 +473,31 @@ namespace IX.Math.WorkingSet
             return value switch
             {
                 long l => new IntegerNode(
-                    this.StringFormatters,
+                    this.stringFormatters,
                     l)
                 {
                     OriginalStringValue = originalStringValue
                 },
                 double d => new NumericNode(
-                    this.StringFormatters,
+                    this.stringFormatters,
                     d)
                 {
                     OriginalStringValue = originalStringValue
                 },
                 bool b => new BoolNode(
-                    this.StringFormatters,
+                    this.stringFormatters,
                     b)
                 {
                     OriginalStringValue = originalStringValue
                 },
                 byte[] ba => new ByteArrayNode(
-                    this.StringFormatters,
+                    this.stringFormatters,
                     ba)
                 {
                     OriginalStringValue = originalStringValue
                 },
                 string s => new StringNode(
-                    this.StringFormatters,
+                    this.stringFormatters,
                     s)
                 {
                     OriginalStringValue = originalStringValue

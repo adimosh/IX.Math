@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
 using IX.Math.Extensibility;
+using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Nodes.Operators.Binary.Logical
 {
@@ -31,6 +32,84 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                 right)
         {
         }
+
+        /// <summary>
+        ///     Simplifies this node, if possible, reflexively returns otherwise.
+        /// </summary>
+        /// <returns>
+        ///     A simplified node, or this instance.
+        /// </returns>
+        public sealed override NodeBase Simplify()
+        {
+            if (!(this.Left is ConstantNodeBase left))
+            {
+                return this;
+            }
+
+            if (!(this.Right is ConstantNodeBase right))
+            {
+                return this;
+            }
+
+            if (left.TryGetInteger(out long lint) &&
+                right.TryGetInteger(out long rint))
+            {
+                return this.GenerateConstantInteger(
+                    this.GenerateData(
+                        lint,
+                        rint));
+            }
+
+            if (left.TryGetBoolean(out bool lbool) &&
+                right.TryGetBoolean(out bool rbool))
+            {
+                return this.GenerateConstantBoolean(
+                    this.GenerateData(
+                        lbool,
+                        rbool));
+            }
+
+            if (left.TryGetByteArray(out byte[] lbin) &&
+                right.TryGetByteArray(out byte[] rbin))
+            {
+                return this.GenerateConstantByteArray(
+                    this.GenerateData(
+                        lbin,
+                        rbin));
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Generates simplified data.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting simplified data.</returns>
+        protected abstract long GenerateData(
+                    long left,
+                    long right);
+
+        /// <summary>
+        /// Generates simplified data.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting simplified data.</returns>
+        protected abstract bool GenerateData(
+            bool left,
+            bool right);
+
+        /// <summary>
+        /// Generates simplified data.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>The resulting simplified data.</returns>
+        protected abstract byte[] GenerateData(
+            byte[] left,
+            byte[] right);
 
         /// <summary>
         /// Ensures that the operands are compatible, and refines the return type of this expression based on them.

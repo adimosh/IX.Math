@@ -31,6 +31,12 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         {
         }
 
+        /// <summary>
+        /// Ensures that the operands are compatible, and refines the return type of this expression based on them.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <exception cref="ExpressionNotValidLogicallyException">Calculation on unsupported types.</exception>
         protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(NodeBase left, NodeBase right)
         {
             const SupportableValueType logicalMaximumSupport =

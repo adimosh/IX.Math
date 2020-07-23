@@ -6,7 +6,8 @@
         ["*"] = false,
         ["/"] = true,
         ["&"] = false,
-        ["|"] = false
+        ["|"] = false,
+        ["^"] = false
     };
 #><#+
     IEnumerable<Tuple<string, string, string>> GenerateThreeFoldTestData(Dictionary<string, bool> operators)

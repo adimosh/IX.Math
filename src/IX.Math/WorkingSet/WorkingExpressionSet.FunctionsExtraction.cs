@@ -154,7 +154,7 @@ namespace IX.Math.WorkingSet
                             argPlaceholders.Add(
                                 this.CheckAndAdd(
                                     expressionSymbol,
-                                    s) ?? (!this.ParameterRegistry.ContainsKey(s)
+                                    s) ?? (!this.parameterRegistry.ContainsKey(s)
                                     ? SymbolExpressionGenerator.GenerateSymbolExpression(
                                         this.symbolTable,
                                         this.reverseSymbolTable,

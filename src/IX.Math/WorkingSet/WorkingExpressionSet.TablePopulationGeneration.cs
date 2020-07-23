@@ -50,7 +50,7 @@ namespace IX.Math.WorkingSet
                     continue;
                 }
 
-                if (this.ParameterRegistry.ContainsKey(exp))
+                if (this.parameterRegistry.ContainsKey(exp))
                 {
                     // We have a parameter
                     continue;
@@ -105,7 +105,7 @@ namespace IX.Math.WorkingSet
                             exp2 =
                                 $"{exp2.Substring(0, openIndex)}{this.definition.IndexerIndicators.Open}{constantValue.OriginalStringValue ?? constantValue.ValueAsString}{this.definition.IndexerIndicators.Close}";
 
-                            if (this.ParameterRegistry.ContainsKey(exp2))
+                            if (this.parameterRegistry.ContainsKey(exp2))
                             {
                                 // We have a parameter
                                 continue;
@@ -114,7 +114,7 @@ namespace IX.Math.WorkingSet
                     }
                 }
 
-                this.ParameterRegistry.Add(exp, new ExternalParameterNode(exp2, this.StringFormatters));
+                this.parameterRegistry.Add(exp, new ExternalParameterNode(exp2, this.stringFormatters));
             }
         }
     }

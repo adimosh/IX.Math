@@ -122,7 +122,7 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
-                    "x#y",
+                    "x^y",
                     new Dictionary<string, object>
                     {
                         ["x"] = 5,
@@ -181,7 +181,7 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
-                    "x#y",
+                    "x^y",
                     new Dictionary<string, object>
                     {
                         ["x"] = true,
@@ -191,7 +191,7 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
-                    "x#y",
+                    "x^y",
                     new Dictionary<string, object>
                     {
                         ["x"] = true,
@@ -272,7 +272,7 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
-                    "x^2",
+                    "pow(x,2)",
                     new Dictionary<string, object>
                     {
                         ["x"] = 2,
@@ -281,7 +281,7 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
-                    "x^3",
+                    "pow(x,3)",
                     new Dictionary<string, object>
                     {
                         ["x"] = 3,
@@ -656,7 +656,7 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
-                    "(2*max(x,500)-y)/(x^2)",
+                    "(2*max(x,500)-y)/pow(x,2)",
                     new Dictionary<string, object>
                     {
                         ["x"] = 217,
@@ -676,7 +676,7 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
-                    "min(max(x,y),max(y,500)*2-min(995,(x^10)))",
+                    "min(max(x,y),max(y,500)*2-min(995,pow(x,10)))",
                     new Dictionary<string, object>
                     {
                         ["x"] = 5,
