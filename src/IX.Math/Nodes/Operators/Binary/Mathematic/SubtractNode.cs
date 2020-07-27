@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
 using IX.Math.Extensibility;
-using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Nodes.Operators.Binary.Mathematic
 {
@@ -37,39 +36,26 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         }
 
         /// <summary>
-        ///     Simplifies this node, if possible, reflexively returns otherwise.
+        /// Calculates the constant value.
         /// </summary>
-        /// <returns>
-        ///     A simplified node, or this instance.
-        /// </returns>
-        public override NodeBase Simplify()
-        {
-            if (this.Left is NumericNode nnLeft && this.Right is NumericNode nnRight)
-            {
-                // Numeric
-                return this.GenerateConstantNumeric(nnLeft.Value - nnRight.Value);
-            }
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>Either a long or a double, depending on the circumstances.</returns>
+        protected override (bool, long, double) CalculateConstantValue(
+            long left,
+            long right) =>
+            (false, left - right, default);
 
-            if (this.Left is IntegerNode inLeft && this.Right is NumericNode niRight)
-            {
-                // Numeric
-                return this.GenerateConstantNumeric(inLeft.Value - niRight.Value);
-            }
-
-            if (this.Left is NumericNode niLeft && this.Right is IntegerNode inRight)
-            {
-                // Numeric
-                return this.GenerateConstantNumeric(niLeft.Value - inRight.Value);
-            }
-
-            if (this.Left is IntegerNode iiLeft && this.Right is IntegerNode iiRight)
-            {
-                // Integer
-                return this.GenerateConstantInteger(iiLeft.Value - iiRight.Value);
-            }
-
-            return this;
-        }
+        /// <summary>
+        /// Calculates the constant value.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>Either a long or a double, depending on the circumstances.</returns>
+        protected override (bool, long, double) CalculateConstantValue(
+            double left,
+            double right) =>
+            (true, default, left - right);
 
         /// <summary>
         ///     Creates a deep clone of the source object.

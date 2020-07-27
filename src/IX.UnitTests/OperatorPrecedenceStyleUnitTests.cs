@@ -47,6 +47,7 @@ namespace IX.UnitTests
                 MultiplySymbol = "*",
                 NotSymbol = "!",
                 OrSymbol = "|",
+                PowerSymbol = "#",
                 SubtractSymbol = "-",
                 XorSymbol = "^",
                 GreaterThanOrEqualSymbol = ">=",

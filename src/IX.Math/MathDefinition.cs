@@ -49,6 +49,7 @@ namespace IX.Math
             this.MultiplySymbol = definition.MultiplySymbol;
             this.NotSymbol = definition.NotSymbol;
             this.OrSymbol = definition.OrSymbol;
+            this.PowerSymbol = definition.PowerSymbol;
             this.LeftShiftSymbol = definition.LeftShiftSymbol;
             this.RightShiftSymbol = definition.RightShiftSymbol;
             this.SubtractSymbol = definition.SubtractSymbol;
@@ -81,6 +82,7 @@ namespace IX.Math
             MultiplySymbol = "*",
             NotSymbol = "!",
             OrSymbol = "|",
+            PowerSymbol = "#",
             SubtractSymbol = "-",
             XorSymbol = "^",
             GreaterThanOrEqualSymbol = ">=",
@@ -165,6 +167,13 @@ namespace IX.Math
         /// <value>The divide symbol.</value>
         [DataMember]
         public string ModuloSymbol { get; set; }
+
+        /// <summary>
+        /// Gets or sets a symbol for the power operation.
+        /// </summary>
+        /// <value>The power symbol.</value>
+        [DataMember]
+        public string PowerSymbol { get; set; }
 
         /// <summary>
         /// Gets or sets a symbol for the &quot;and&quot; logical operation.
@@ -303,6 +312,7 @@ namespace IX.Math
                 AndSymbol = this.AndSymbol,
                 DivideSymbol = this.DivideSymbol,
                 ModuloSymbol = this.ModuloSymbol,
+                PowerSymbol = this.PowerSymbol,
                 EqualsSymbol = this.EqualsSymbol,
                 GreaterThanOrEqualSymbol = this.GreaterThanOrEqualSymbol,
                 GreaterThanSymbol = this.GreaterThanSymbol,

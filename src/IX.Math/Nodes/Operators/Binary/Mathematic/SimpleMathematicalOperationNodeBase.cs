@@ -5,6 +5,7 @@
 using System.Collections.Generic;
 using IX.Math.Exceptions;
 using IX.Math.Extensibility;
+using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Nodes.Operators.Binary.Mathematic
 {
@@ -30,6 +31,58 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 right)
         {
         }
+
+        /// <summary>
+        ///     Simplifies this node, if possible, reflexively returns otherwise.
+        /// </summary>
+        /// <returns>A simplified node, or this instance.</returns>
+        public sealed override NodeBase Simplify()
+        {
+            if (!(this.Left is ConstantNodeBase lc) || !(this.Right is ConstantNodeBase rc))
+            {
+                return this;
+            }
+
+            if (lc.TryGetInteger(out long llv) && rc.TryGetInteger(out long rlv))
+            {
+                var (isNumeric, lv, dv) = this.CalculateConstantValue(
+                    llv,
+                    rlv);
+
+                return isNumeric ? this.GenerateConstantNumeric(dv) : (NodeBase)this.GenerateConstantInteger(lv);
+            }
+
+            if (lc.TryGetNumeric(out double ldv) && rc.TryGetNumeric(out double rdv))
+            {
+                var (isNumeric, lv, dv) = this.CalculateConstantValue(
+                    ldv,
+                    rdv);
+
+                return isNumeric ? this.GenerateConstantNumeric(dv) : (NodeBase)this.GenerateConstantInteger(lv);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Calculates the constant value.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>Either a long or a double, depending on the circumstances.</returns>
+        protected abstract (bool, long, double) CalculateConstantValue(
+            long left,
+            long right);
+
+        /// <summary>
+        /// Calculates the constant value.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>Either a long or a double, depending on the circumstances.</returns>
+        protected abstract (bool, long, double) CalculateConstantValue(
+            double left,
+            double right);
 
         /// <summary>
         /// Ensures that the operands are compatible, and refines the return type of this expression based on them.

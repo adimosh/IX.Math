@@ -538,7 +538,7 @@ namespace IX.Math.WorkingSet
                     localDefinition.ModuloSymbol, (
                         definitionL1,
                         leftOperand,
-                        rightOperand) => new ModuloNode(
+                        rightOperand) => new RemainderNode(
                         definitionL1,
                         leftOperand,
                         rightOperand),
@@ -555,7 +555,19 @@ namespace IX.Math.WorkingSet
                     40
                 },
 
-                // Fifth tier - Bitwise shift operators
+                // Fifth tier - Power operator
+                {
+                    localDefinition.PowerSymbol, (
+                        definitionL1,
+                        leftOperand,
+                        rightOperand) => new PowerNode(
+                        definitionL1,
+                        leftOperand,
+                        rightOperand),
+                    50
+                },
+
+                // Sixth tier - Bitwise shift operators
                 {
                     localDefinition.LeftShiftSymbol, (
                         definitionL1,
@@ -564,7 +576,7 @@ namespace IX.Math.WorkingSet
                         definitionL1,
                         leftOperand,
                         rightOperand),
-                    50
+                    60
                 },
                 {
                     localDefinition.RightShiftSymbol, (
@@ -574,7 +586,7 @@ namespace IX.Math.WorkingSet
                         definitionL1,
                         leftOperand,
                         rightOperand),
-                    50
+                    60
                 }
             };
 

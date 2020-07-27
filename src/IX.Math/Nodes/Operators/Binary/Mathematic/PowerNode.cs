@@ -1,4 +1,4 @@
-// <copyright file="DivideNode.cs" company="Adrian Mos">
+// <copyright file="PowerNode.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -10,19 +10,19 @@ using IX.Math.Extensibility;
 namespace IX.Math.Nodes.Operators.Binary.Mathematic
 {
     /// <summary>
-    ///     A node for a division operation.
+    ///     A node for a power operation.
     /// </summary>
     /// <seealso cref="SimpleMathematicalOperationNodeBase" />
-    [DebuggerDisplay("{" + nameof(Left) + "} / {" + nameof(Right) + "}")]
-    internal sealed class DivideNode : SimpleNumericOnlyMathematicalOperationNodeBase
+    [DebuggerDisplay("{" + nameof(Left) + "} # {" + nameof(Right) + "}")]
+    internal sealed class PowerNode : SimpleNumericOnlyMathematicalOperationNodeBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="IX.Math.Nodes.Operators.Binary.Mathematic.DivideNode" /> class.
+        /// Initializes a new instance of the <see cref="IX.Math.Nodes.Operators.Binary.Mathematic.PowerNode" /> class.
         /// </summary>
         /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
-        public DivideNode(
+        public PowerNode(
             List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right)
@@ -39,7 +39,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
-            new DivideNode(
+            new PowerNode(
                 this.StringFormatters,
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
@@ -53,7 +53,9 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         protected override double CalculateConstantValue(
             double left,
             double right) =>
-            left / right;
+            global::System.Math.Pow(
+                left,
+                right);
 
         /// <summary>
         /// Generates the expression.
@@ -64,7 +66,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         protected override Expression GenerateExpression(
             Expression leftOperandExpression,
             Expression rightOperandExpression) =>
-            Expression.Divide(
+            Expression.Power(
                 leftOperandExpression,
                 rightOperandExpression);
     }
