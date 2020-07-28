@@ -20,6 +20,7 @@ namespace IX.UnitTests.Data
         public static object[][] GenerateDataObjects() =>
             BasicOperatorsWithRandomNumbers()
                 .Union(SpecialCases())
+                .Union(Gathered())
                 .ToArray();
     }
 }

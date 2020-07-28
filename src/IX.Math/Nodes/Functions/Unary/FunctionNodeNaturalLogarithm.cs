@@ -19,7 +19,7 @@ namespace IX.Math.Nodes.Functions.Unary
     [UsedImplicitly]
     internal sealed class FunctionNodeNaturalLogarithm : NumericUnaryFunctionNodeBase
     {
-        private static readonly GlobalSystem.Func<double, double> CachedRepresentedFunction = GlobalSystem.Math.Asin;
+        private static readonly GlobalSystem.Func<double, double> CachedRepresentedFunction = GlobalSystem.Math.Log;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeNaturalLogarithm" /> class.
