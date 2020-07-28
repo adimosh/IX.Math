@@ -138,7 +138,15 @@ namespace IX.Math.WorkingSet
         /// </summary>
         private string[] allSymbols;
 
+        /// <summary>
+        ///     Whether or not this expression set has been initialized already.
+        /// </summary>
         private bool initialized;
+
+        /// <summary>
+        ///     The expression.
+        /// </summary>
+        private string expression;
 
         internal WorkingExpressionSet(
             string expression,
@@ -158,7 +166,7 @@ namespace IX.Math.WorkingSet
             this.reverseSymbolTable = new Dictionary<string, string>();
             this.stringFormatters = stringFormatters;
 
-            this.Expression = expression;
+            this.expression = expression;
             this.definition = mathDefinition;
 
             this.allOperatorsInOrder = new[]
@@ -177,6 +185,7 @@ namespace IX.Math.WorkingSet
                 mathDefinition.DivideSymbol,
                 mathDefinition.ModuloSymbol,
                 mathDefinition.MultiplySymbol,
+                mathDefinition.PowerSymbol,
                 mathDefinition.LeftShiftSymbol,
                 mathDefinition.RightShiftSymbol,
                 mathDefinition.NotSymbol
@@ -195,15 +204,7 @@ namespace IX.Math.WorkingSet
         }
 
         /// <summary>
-        ///     Gets or sets the expression.
-        /// </summary>
-        /// <value>
-        ///     The expression.
-        /// </value>
-        internal string Expression { get; set; }
-
-        /// <summary>
-        ///     Gets or sets a value indicating whether this <see cref="WorkingExpressionSet" /> is success.
+        ///     Gets a value indicating whether this <see cref="WorkingExpressionSet" /> is success.
         /// </summary>
         /// <value>
         ///     <c>true</c> if success; otherwise, <c>false</c>.
@@ -299,7 +300,7 @@ namespace IX.Math.WorkingSet
             {
                 var s = $"@op{i}@";
 
-                this.Expression = this.Expression.Replace(
+                this.expression = this.expression.Replace(
                     op,
                     s);
 
@@ -324,6 +325,11 @@ namespace IX.Math.WorkingSet
                 if (localDefinition.DivideSymbol == op)
                 {
                     localDefinition.DivideSymbol = s;
+                }
+
+                if (localDefinition.PowerSymbol == op)
+                {
+                    localDefinition.PowerSymbol = s;
                 }
 
                 if (localDefinition.ModuloSymbol == op)

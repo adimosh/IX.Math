@@ -281,7 +281,25 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
+                    "x#2",
+                    new Dictionary<string, object>
+                    {
+                        ["x"] = 2,
+                    },
+                    4.0,
+                },
+                new object[]
+                {
                     "pow(x,3)",
+                    new Dictionary<string, object>
+                    {
+                        ["x"] = 3,
+                    },
+                    27.0,
+                },
+                new object[]
+                {
+                    "x#3",
                     new Dictionary<string, object>
                     {
                         ["x"] = 3,
@@ -666,6 +684,16 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
+                    "(2*max(x,500)-y)/(x#2)",
+                    new Dictionary<string, object>
+                    {
+                        ["x"] = 217,
+                        ["y"] = 323,
+                    },
+                    0.014377030729045,
+                },
+                new object[]
+                {
                     "min(max(x,y),10)",
                     new Dictionary<string, object>
                     {
@@ -677,6 +705,16 @@ namespace IX.UnitTests.Data
                 new object[]
                 {
                     "min(max(x,y),max(y,500)*2-min(995,pow(x,10)))",
+                    new Dictionary<string, object>
+                    {
+                        ["x"] = 5,
+                        ["y"] = 3,
+                    },
+                    5D,
+                },
+                new object[]
+                {
+                    "min(max(x,y),max(y,500)*2-min(995,(x#10)))",
                     new Dictionary<string, object>
                     {
                         ["x"] = 5,

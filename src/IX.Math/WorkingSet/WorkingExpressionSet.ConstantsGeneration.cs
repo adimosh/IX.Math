@@ -226,7 +226,7 @@ namespace IX.Math.WorkingSet
 
         private string ExtractConstants()
         {
-            var originalExpression = this.Expression;
+            var originalExpression = this.expression;
 
             // We create a copy of our expression first
             var expressionChars = new char[originalExpression.Length * 2];
@@ -501,7 +501,7 @@ namespace IX.Math.WorkingSet
                     0,
                     1 + nameSpan.Length);
             }
-            while (this.Expression.AsSpan().Contains(
+            while (this.expression.AsSpan().Contains(
                        cc,
                        StringComparison.OrdinalIgnoreCase) ||
                    this.constantsTable.Keys.Contains(cc.ToString()));

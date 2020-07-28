@@ -42,7 +42,7 @@ namespace IX.Math.WorkingSet
         {
             // Stage 1. Extract literal constants from the expression
             // ======================================================
-            this.Expression = this.ExtractConstants();
+            this.expression = this.ExtractConstants();
 
             // Stage 2. Prepare expression for processing
             // ==========================================
@@ -53,7 +53,7 @@ namespace IX.Math.WorkingSet
             this.Initialize();
 
             var symbolValueToCompare = this.whitespaceRegex.Replace(
-                this.Expression,
+                this.expression,
                 string.Empty);
 
             this.symbolTable.Add(
@@ -80,7 +80,7 @@ namespace IX.Math.WorkingSet
             {
                 // We are not dealing with an expression, but with a value, let's try to compute it somehow
                 this.symbolTable[string.Empty]
-                    .Expression = this.Expression;
+                    .Expression = this.expression;
             }
 
             // Stage 4. Extract symbols
@@ -97,7 +97,7 @@ namespace IX.Math.WorkingSet
             // For each parameter from the table we've just populated, see where it's first used, and fill in that index as the order
             foreach (var paramForOrdering in this.parameterRegistry)
             {
-                paramForOrdering.Value.Order = this.Expression.CurrentCultureIndexOf(paramForOrdering.Key);
+                paramForOrdering.Value.Order = this.expression.CurrentCultureIndexOf(paramForOrdering.Key);
             }
 
             // Stage 5. Compute and return body
