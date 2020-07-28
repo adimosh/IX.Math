@@ -39,13 +39,25 @@ namespace IX.Math.Nodes.Operators.Unary
         /// <returns>
         ///     A simplified node, or this instance.
         /// </returns>
-        public override NodeBase Simplify() =>
-            this.Operand switch
+        public override NodeBase Simplify()
+        {
+            if (!(this.Operand is ConstantNodeBase c))
             {
-                IntegerNode integerNode => this.GenerateConstantInteger(~integerNode.Value),
-                BoolNode boolNode => this.GenerateConstantBoolean(!boolNode.Value),
-                _ => this
-            };
+                return this;
+            }
+
+            if (c.TryGetBoolean(out var bv))
+            {
+                return this.GenerateConstantBoolean(!bv);
+            }
+
+            if (c.TryGetInteger(out var iv))
+            {
+                return this.GenerateConstantInteger(~iv);
+            }
+
+            return this;
+        }
 
         /// <summary>
         ///     Creates a deep clone of the source object.

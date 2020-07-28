@@ -1,11 +1,14 @@
-using System;
+// <copyright file="TestData.Gathered.cs" company="Adrian Mos">
+// Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
+// </copyright>
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IX.UnitTests.Data
 {
+    /// <summary>
+    ///     Test data for IX.Math tests.
+    /// </summary>
     public partial class TestData
     {
         /// <summary>
@@ -20,6 +23,15 @@ namespace IX.UnitTests.Data
                     "ln(2*(8-3))",
                     null,
                     0L,
+                },
+                new object[]
+                {
+                    "!5=x",
+                    new Dictionary<string, object>
+                    {
+                        ["x"] = -6,
+                    },
+                    true,
                 },
             };
     }
