@@ -20,7 +20,7 @@ namespace IX.UnitTests.Data
             {
                 new object[]
                 {
-                    "ln(2*(8-3))",
+                    "ln(2*(8-3)-9)",
                     null,
                     0L,
                 },
