@@ -12,7 +12,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
@@ -76,5 +75,9 @@
       <DependentUpon>TestData.BasicOperatorsWithRandomNumbers.tt</DependentUpon>
     </Compile>
   </ItemGroup>
+
+  <PropertyGroup Condition="'$(IsTestProject)'!='true'">
+    <DefineConstants>$(DefineConstants);BUILDERROR</DefineConstants>
+  </PropertyGroup>
 
 </Project>

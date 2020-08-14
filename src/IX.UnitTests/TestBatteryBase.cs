@@ -5,6 +5,10 @@
 using System;
 using Xunit;
 
+#if BUILDERROR
+#error This compilation cannot take place without the proper MSBUILD properties set.
+#endif
+
 namespace IX.UnitTests
 {
     /// <summary>
