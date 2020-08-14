@@ -43,6 +43,8 @@ resources:
 
 jobs:
 - job:
+  workspace:
+    clean: all
   timeoutInMinutes: 40
   pool:
     name: Azure Pipelines
@@ -52,6 +54,8 @@ jobs:
     parameters:
       solutionName: 'IX.Math'
 - job:
+  workspace:
+    clean: all
   timeoutInMinutes: 20
   pool:
     name: Azure Pipelines
@@ -61,6 +65,8 @@ jobs:
     parameters:
       solutionName: 'IX.Math'
 - job:
+  workspace:
+    clean: all
   timeoutInMinutes: 20
   pool:
     name: Azure Pipelines
