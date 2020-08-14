@@ -48,15 +48,26 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
         {
             try
             {
-                if (this.Right is IntegerNode nRight)
+                if (!(this.Right is ConstantNodeBase nRight) || !nRight.TryGetInteger(out var rv))
                 {
-                    var intValue = Convert.ToInt32(nRight.Value);
-                    return this.Left switch
-                    {
-                        IntegerNode nLeft => this.GenerateConstantInteger(nLeft.Value >> intValue),
-                        ByteArrayNode baLeft => this.GenerateConstantByteArray(baLeft.Value.RightShift(intValue)),
-                        _ => this
-                    };
+                    return this;
+                }
+
+                if (!(this.Left is ConstantNodeBase nLeft))
+                {
+                    return this;
+                }
+
+                var intValue = Convert.ToInt32(rv);
+
+                if (nLeft.TryGetInteger(out var lvi))
+                {
+                    return this.GenerateConstantInteger(lvi >> intValue);
+                }
+
+                if (nLeft.TryGetByteArray(out var lvb))
+                {
+                    return this.GenerateConstantByteArray(lvb.RightShift(intValue));
                 }
 
                 return this;
