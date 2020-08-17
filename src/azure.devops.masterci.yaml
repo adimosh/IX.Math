@@ -50,6 +50,18 @@ jobs:
     name: Azure Pipelines
     vmImage: windows-latest
   steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'Build pre-process'
+    inputs:
+      command: custom
+      custom: msbuild
+      projects: src/IX.Math.UnitTests/IX.Math.UnitTests.csproj
+      arguments: '-c Debug -pp:$(Build.ArtifactStagingDirectory)/preprocess/ppresult.xml'
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish NuGet package artifacts'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/preprocess'
+      ArtifactName: NuGet
   - template: yaml/job-master-build.yml@templates
     parameters:
       solutionName: 'IX.Math'
