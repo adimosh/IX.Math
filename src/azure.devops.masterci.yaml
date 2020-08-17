@@ -50,17 +50,6 @@ jobs:
     name: Azure Pipelines
     vmImage: windows-latest
   steps:
-  - template: yaml/job-master-build.yml@templates
-    parameters:
-      solutionName: 'IX.Math'
-- job:
-  workspace:
-    clean: all
-  timeoutInMinutes: 20
-  pool:
-    name: Azure Pipelines
-    vmImage: ubuntu-latest
-  steps:
   - template: yaml/install-dotnetcore.yml@templates
   - task: DotNetCoreCLI@2
     displayName: 'Build pre-process'
@@ -100,6 +89,17 @@ jobs:
     parameters:
       configurationName: 'Release'
   - template: yaml/code-coverage.yml@templates
+- job:
+  workspace:
+    clean: all
+  timeoutInMinutes: 20
+  pool:
+    name: Azure Pipelines
+    vmImage: ubuntu-latest
+  steps:
+  - template: yaml/job-master-build.yml@templates
+    parameters:
+      solutionName: 'IX.Math'
 - job:
   workspace:
     clean: all
