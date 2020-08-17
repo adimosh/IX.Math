@@ -52,6 +52,12 @@ jobs:
   steps:
   - template: yaml/install-dotnetcore.yml@templates
   - task: DotNetCoreCLI@2
+    displayName: 'Restore interdependencies (project system)'
+    inputs:
+      command: restore
+      projects: src/IX.Math.sln
+      verbosityRestore: Minimal
+  - task: DotNetCoreCLI@2
     displayName: 'Build pre-process'
     inputs:
       command: custom
@@ -74,9 +80,13 @@ jobs:
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)/preprocess'
       ArtifactName: Preprocess
-  - template: yaml/build-solution.yml@templates
-    parameters:
-      solutionName: 'IX.Math'
+  - task: DotNetCoreCLI@2
+    displayName: 'Build in Debug'
+    inputs:
+      projects: src/IX.Math.sln
+      arguments: '-c Debug'
+      parameters:
+        solutionName: 'IX.Math'
   - template: yaml/test-solution.yml@templates
   - template: yaml/clean-solution.yml@templates
     parameters:
@@ -89,25 +99,25 @@ jobs:
     parameters:
       configurationName: 'Release'
   - template: yaml/code-coverage.yml@templates
-- job:
-  workspace:
-    clean: all
-  timeoutInMinutes: 20
-  pool:
-    name: Azure Pipelines
-    vmImage: ubuntu-latest
-  steps:
-  - template: yaml/job-master-build.yml@templates
-    parameters:
-      solutionName: 'IX.Math'
-- job:
-  workspace:
-    clean: all
-  timeoutInMinutes: 20
-  pool:
-    name: Azure Pipelines
-    vmImage: macOS-latest
-  steps:
-  - template: yaml/job-master-build.yml@templates
-    parameters:
-      solutionName: 'IX.Math'
+#- job:
+#  workspace:
+#    clean: all
+#  timeoutInMinutes: 20
+#  pool:
+#    name: Azure Pipelines
+#    vmImage: ubuntu-latest
+#  steps:
+#  - template: yaml/job-master-build.yml@templates
+#    parameters:
+#      solutionName: 'IX.Math'
+#- job:
+#  workspace:
+#    clean: all
+#  timeoutInMinutes: 20
+#  pool:
+#    name: Azure Pipelines
+#    vmImage: macOS-latest
+#  steps:
+#  - template: yaml/job-master-build.yml@templates
+#    parameters:
+#      solutionName: 'IX.Math'
