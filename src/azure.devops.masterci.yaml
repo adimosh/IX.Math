@@ -67,7 +67,7 @@ jobs:
       arguments: '-pp:t.ppresult.xml'
   - task: CopyFiles@2
     inputs:
-      contents: '*.result.xml'
+      contents: '*.ppresult.xml'
       targetFolder: '$(Build.ArtifactStagingDirectory)/preprocess'
   - task: PublishBuildArtifacts@1
     displayName: 'Publish NuGet package artifacts'
