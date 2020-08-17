@@ -59,7 +59,6 @@ jobs:
       arguments: '-pp:ppresult.xml'
   - task: CopyFiles@2
     inputs:
-      sourceFolder: 'src/IX.UnitTests/'
       contents: 'ppresult.xml'
       targetFolder: '$(Build.ArtifactStagingDirectory)/preprocess'
   - task: PublishBuildArtifacts@1
