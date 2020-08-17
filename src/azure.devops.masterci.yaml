@@ -56,7 +56,12 @@ jobs:
       command: custom
       custom: msbuild
       projects: src/IX.UnitTests/IX.UnitTests.csproj
-      arguments: '-pp:$(Build.ArtifactStagingDirectory)/preprocess/ppresult.xml'
+      arguments: '-pp:ppresult.xml'
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: 'src/IX.UnitTests/'
+      contents: 'ppresult.xml'
+      targetFolder: '$(Build.ArtifactStagingDirectory)/preprocess'
   - task: PublishBuildArtifacts@1
     displayName: 'Publish NuGet package artifacts'
     inputs:
