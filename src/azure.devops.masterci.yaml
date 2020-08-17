@@ -55,7 +55,7 @@ jobs:
     inputs:
       command: custom
       custom: msbuild
-      projects: src/IX.Math.UnitTests/IX.Math.UnitTests.csproj
+      projects: src/IX.UnitTests/IX.UnitTests.csproj
       arguments: '-c Debug -pp:$(Build.ArtifactStagingDirectory)/preprocess/ppresult.xml'
   - task: PublishBuildArtifacts@1
     displayName: 'Publish NuGet package artifacts'
