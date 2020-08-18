@@ -79,8 +79,4 @@
     </Compile>
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(IsTestProject)'!='true'">
-    <DefineConstants>$(DefineConstants);BUILDERROR</DefineConstants>
-  </PropertyGroup>
-
 </Project>
