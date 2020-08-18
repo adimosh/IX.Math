@@ -1,5 +1,3 @@
-<!--EXTERNAL_PROPERTIES: TargetFramework-->
-<!--EXTERNAL_PROPERTIES: IxDevOpsBuild-->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
@@ -15,31 +13,15 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>$(NoWarn);SA0001</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
-    <None Include="Data\TestData.BasicOperatorsWithRandomNumbers.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>TestData.BasicOperatorsWithRandomNumbers.tt</DependentUpon>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="IX.StandardExtensions.TestUtils" Version="0.5.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.0" />
+    <PackageReference Include="Moq" Version="4.14.5" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="xunit.runner.console" Version="2.4.1" />
-    <PackageReference Include="Moq" Version="4.14.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="IX.StandardExtensions.TestUtils" Version="0.5.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -58,13 +40,6 @@
     <None Update="TestInitializationData.tt">
       <Generator></Generator>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
