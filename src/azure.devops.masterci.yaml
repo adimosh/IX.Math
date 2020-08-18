@@ -29,6 +29,7 @@ variables:
   IxDevOpsBuild: true
   IxVersionPrefix: 1.0.0
   IxVersionSuffix: 'beta'
+  disable.coverage.autogenerate: true
   system.debug: false
 
 # Jobs should run in parallel
