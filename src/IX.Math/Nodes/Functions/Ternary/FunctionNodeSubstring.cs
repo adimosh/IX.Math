@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
@@ -37,17 +36,14 @@ namespace IX.Math.Nodes.Functions.Ternary
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeSubstring" /> class.
         /// </summary>
-        /// <param name="stringFormatter">The string formatter.</param>
         /// <param name="stringParameter">The string parameter.</param>
         /// <param name="numericParameter">The numeric parameter.</param>
         /// <param name="secondNumericParameter">The second numeric parameter.</param>
         public FunctionNodeSubstring(
-            List<IStringFormatter> stringFormatter,
             NodeBase stringParameter,
             NodeBase numericParameter,
             NodeBase secondNumericParameter)
             : base(
-                stringFormatter,
                 stringParameter,
                 numericParameter,
                 secondNumericParameter)
@@ -63,7 +59,6 @@ namespace IX.Math.Nodes.Functions.Ternary
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new FunctionNodeSubstring(
-                this.StringFormatters,
                 this.FirstParameter.DeepClone(context),
                 this.SecondParameter.DeepClone(context),
                 this.ThirdParameter.DeepClone(context));
@@ -89,7 +84,7 @@ namespace IX.Math.Nodes.Functions.Ternary
                 return this;
             }
 
-            return this.GenerateConstantString(
+            return GenerateConstantString(
                 stringParam.ValueAsString.Substring(
                     Convert.ToInt32(secondValue),
                     Convert.ToInt32(thirdValue)));

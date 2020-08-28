@@ -3,9 +3,7 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using IX.Math.Extensibility;
 using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Nodes.Functions.Ternary
@@ -19,7 +17,6 @@ namespace IX.Math.Nodes.Functions.Ternary
         /// <summary>
         /// Initializes a new instance of the <see cref="TernaryFunctionNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
         /// <param name="thirdParameter">The third parameter.</param>
@@ -38,11 +35,9 @@ namespace IX.Math.Nodes.Functions.Ternary
             "VirtualMemberCallInConstructor",
             Justification = "We specifically want this to happen.")]
         protected TernaryFunctionNodeBase(
-            List<IStringFormatter> stringFormatters,
             NodeBase firstParameter,
             NodeBase secondParameter,
             NodeBase thirdParameter)
-        : base(stringFormatters)
         {
             NodeBase firstParameterTemp = Requires.NotNull(firstParameter, nameof(firstParameter)).Simplify();
             NodeBase secondParameterTemp = Requires.NotNull(secondParameter, nameof(secondParameter)).Simplify();

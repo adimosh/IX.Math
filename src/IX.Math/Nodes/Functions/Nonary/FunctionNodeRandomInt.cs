@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Extensibility;
@@ -22,15 +21,13 @@ namespace IX.Math.Nodes.Functions.Nonary
     internal sealed class FunctionNodeRandomInt : NonaryFunctionNodeBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionNodeRandomInt"/> class.
+        ///     Initializes a new instance of the <see cref="FunctionNodeRandomInt" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
-        public FunctionNodeRandomInt(List<IStringFormatter> stringFormatters)
-            : base(stringFormatters)
+        public FunctionNodeRandomInt()
         {
             this.PossibleReturnType = SupportableValueType.Integer;
 
-            foreach (var possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
                 this.CalculatedCosts[possibleType] = (0, SupportedValueType.Unknown);
             }
@@ -50,10 +47,10 @@ namespace IX.Math.Nodes.Functions.Nonary
         /// <returns>
         ///     A deep clone.
         /// </returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeRandomInt(this.StringFormatters);
+        public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeRandomInt();
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>

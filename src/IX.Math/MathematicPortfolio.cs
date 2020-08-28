@@ -8,11 +8,13 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using IX.Math.Computation;
+using IX.Math.Exceptions;
 using IX.Math.Extensibility;
 using IX.Math.Extraction;
 using IX.Math.Generators;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
+using IX.Math.Obsolete;
 using IX.Math.WorkingSet;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Contracts;
@@ -30,6 +32,27 @@ namespace IX.Math
     [PublicAPI]
     public class MathematicPortfolio : DisposableBase, IMathematicPortfolio
     {
+        private static readonly ConcurrentDictionary<string, ExternalParameterNode> EmptyParameterRegistry = new ConcurrentDictionary<string, ExternalParameterNode>();
+
+        #if NET452
+        /// <summary>
+        /// Gets the current context of the mathematic portfolio.
+        /// </summary>
+        /// <value>
+        /// The current context.
+        /// </value>
+        [field: ThreadStatic]
+        public static ThreadStatic<MathematicPortfolio> CurrentContext { get; private set; }
+        #else
+        /// <summary>
+        /// Gets the current context of the mathematic portfolio.
+        /// </summary>
+        /// <value>
+        /// The current context.
+        /// </value>
+        public static AsyncLocal<MathematicPortfolio> CurrentContext { get; } = new AsyncLocal<MathematicPortfolio>();
+        #endif
+
         private readonly ConcurrentDictionary<ExpressionTypedKey, CompiledExpressionResult> compiledDelegate =
             new ConcurrentDictionary<ExpressionTypedKey, CompiledExpressionResult>();
 
@@ -40,9 +63,22 @@ namespace IX.Math
 
         private readonly MathDefinition workingDefinition;
 
-        private readonly List<IStringFormatter> stringFormatters;
+        internal readonly List<IStringFormatter> stringFormatters;
+
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP006:Implement IDisposable.",
+            Justification = "We have it correctly implemented, but the analyzer can't tell.")]
         private readonly LevelDictionary<Type, IConstantsExtractor> constantExtractors;
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP006:Implement IDisposable.",
+            Justification = "We have it correctly implemented, but the analyzer can't tell.")]
         private readonly LevelDictionary<Type, IConstantInterpreter> constantInterpreters;
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP006:Implement IDisposable.",
+            Justification = "We have it correctly implemented, but the analyzer can't tell.")]
         private readonly LevelDictionary<Type, IConstantPassThroughExtractor> constantPassThroughExtractors;
 
         private readonly Dictionary<string, Type> nonaryFunctions;
@@ -246,6 +282,14 @@ namespace IX.Math
                     ref incrementer,
                     this);
         }
+
+        /// <summary>
+        /// Gets the string formatters.
+        /// </summary>
+        /// <value>
+        /// The string formatters.
+        /// </value>
+        public IReadOnlyList<IStringFormatter> StringFormatters => this.stringFormatters;
 
         /// <summary>
         ///     Returns the prototypes of all registered functions.
@@ -494,7 +538,7 @@ namespace IX.Math
                 nameof(expression));
 
             var pars = parameters.ComputeToStandard();
-            ExpressionTypedKey etk = new ExpressionTypedKey(expression, tolerance, pars.Select(p => p.GetType()).ToArray());
+            var etk = new ExpressionTypedKey(expression, tolerance, pars.Select(p => p.GetType()).ToArray());
 
             var result = this.compiledDelegate.GetOrAdd(
                 etk,
@@ -514,7 +558,11 @@ namespace IX.Math
             {
                 return result.CompiledExpression.DynamicInvoke(pars);
             }
-            catch
+            catch (MathematicsEngineException)
+            {
+                throw;
+            }
+            catch (Exception)
             {
                 return expression;
             }
@@ -531,6 +579,15 @@ namespace IX.Math
                 }
 
                 var localTolerance = key.Tolerance;
+
+#if NET452
+                if (CurrentContext?.Value != this)
+                {
+                    CurrentContext = new ThreadStatic<MathematicPortfolio>(this);
+                }
+#else
+                CurrentContext.Value = this;
+#endif
 
                 using var clonedComputedExpression = computedExpression.DeepClone();
                 var (success, isConstant, @delegate, constantValue) = clonedComputedExpression.CompileDelegate(
@@ -564,6 +621,15 @@ namespace IX.Math
 
         private ComputedExpression ValueFactory(string expression)
         {
+            #if NET452
+            if (CurrentContext?.Value != this)
+            {
+                CurrentContext = new ThreadStatic<MathematicPortfolio>(this);
+            }
+            #else
+            CurrentContext.Value = this;
+            #endif
+
             if (this.constantPassThroughExtractors.KeysByLevel.SelectMany(p => p.Value)
                 .Any(
                     (
@@ -579,10 +645,9 @@ namespace IX.Math
                 return new ComputedExpression(
                     expression,
                     new StringNode(
-                        this.stringFormatters,
                         expression),
                     true,
-                    new Dictionary<string, ExternalParameterNode>(),
+                    EmptyParameterRegistry,
                     this.stringFormatters);
             }
 
@@ -594,8 +659,7 @@ namespace IX.Math
                 this.binaryFunctions,
                 this.ternaryFunctions,
                 this.constantExtractors,
-                this.constantInterpreters,
-                this.stringFormatters);
+                this.constantInterpreters);
             ComputationBody cb = workingSet.CreateBody();
 
             ComputedExpression result = !workingSet.Success

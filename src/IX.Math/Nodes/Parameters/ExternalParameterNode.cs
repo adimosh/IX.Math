@@ -3,19 +3,17 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Parameters
 {
     /// <summary>
-    /// A class representing an external parameter node.
+    ///     A class representing an external parameter node.
     /// </summary>
     /// <seealso cref="IX.Math.Nodes.NodeBase" />
     [PublicAPI]
@@ -27,58 +25,34 @@ namespace IX.Math.Nodes.Parameters
         private Type parameterType;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExternalParameterNode" /> class.
+        ///     Initializes a new instance of the <see cref="ExternalParameterNode" /> class.
         /// </summary>
         /// <param name="name">The name.</param>
-        /// <param name="stringFormatters">The string formatters.</param>
-        internal ExternalParameterNode(
-            string name,
-            List<IStringFormatter> stringFormatters)
-            : base(stringFormatters)
+        internal ExternalParameterNode(string name)
         {
-            this.Name = Requires.NotNullOrWhiteSpace(name, nameof(name));
+            this.Name = Requires.NotNullOrWhiteSpace(
+                name,
+                nameof(name));
 
-            this.CalculatedCosts.Add(SupportedValueType.Numeric, (0, SupportedValueType.Numeric));
-            this.CalculatedCosts.Add(SupportedValueType.Integer, (0, SupportedValueType.Integer));
-            this.CalculatedCosts.Add(SupportedValueType.ByteArray, (0, SupportedValueType.ByteArray));
-            this.CalculatedCosts.Add(SupportedValueType.Boolean, (0, SupportedValueType.Boolean));
-            this.CalculatedCosts.Add(SupportedValueType.String, (0, SupportedValueType.String));
+            this.CalculatedCosts.Add(
+                SupportedValueType.Numeric,
+                (0, SupportedValueType.Numeric));
+            this.CalculatedCosts.Add(
+                SupportedValueType.Integer,
+                (0, SupportedValueType.Integer));
+            this.CalculatedCosts.Add(
+                SupportedValueType.ByteArray,
+                (0, SupportedValueType.ByteArray));
+            this.CalculatedCosts.Add(
+                SupportedValueType.Boolean,
+                (0, SupportedValueType.Boolean));
+            this.CalculatedCosts.Add(
+                SupportedValueType.String,
+                (0, SupportedValueType.String));
 
             this.IsFunction = true;
             this.ParameterType = SupportedValueType.Unknown;
         }
-
-        /// <summary>
-        /// Gets or sets the order.
-        /// </summary>
-        /// <value>
-        /// The order.
-        /// </value>
-        public int Order { get; set; }
-
-        /// <summary>
-        /// Gets the name.
-        /// </summary>
-        /// <value>
-        /// The name.
-        /// </value>
-        public string Name { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether this parameter node is a function.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if this parameter node is a function; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsFunction { get; private set; }
-
-        /// <summary>
-        /// Gets the type of the parameter.
-        /// </summary>
-        /// <value>
-        /// The type of the parameter.
-        /// </value>
-        public SupportedValueType ParameterType { get; private set; }
 
         /// <summary>
         ///     Gets a value indicating whether or not this node is actually a constant.
@@ -95,19 +69,18 @@ namespace IX.Math.Nodes.Parameters
         public override bool IsTolerant => false;
 
         /// <summary>
-        ///     Gets a value indicating whether this node requires preservation of the original expression.
+        ///     Gets the name.
         /// </summary>
         /// <value>
-        ///     <see langword="true" /> if the node requires original expression preservation, or <see langword="false" />
-        ///     if it can be polynomially-reduced.
+        ///     The name.
         /// </value>
-        public override bool RequiresPreservedExpression => this.IsFunction;
+        public string Name { get; }
 
         /// <summary>
-        /// Gets the parameter definition expression.
+        ///     Gets the parameter definition expression.
         /// </summary>
         /// <value>
-        /// The parameter definition expression.
+        ///     The parameter definition expression.
         /// </value>
         public ParameterExpression ParameterDefinitionExpression
         {
@@ -120,7 +93,40 @@ namespace IX.Math.Nodes.Parameters
         }
 
         /// <summary>
-        /// Determines the type of the parameter.
+        ///     Gets a value indicating whether this node requires preservation of the original expression.
+        /// </summary>
+        /// <value>
+        ///     <see langword="true" /> if the node requires original expression preservation, or <see langword="false" />
+        ///     if it can be polynomially-reduced.
+        /// </value>
+        public override bool RequiresPreservedExpression => this.IsFunction;
+
+        /// <summary>
+        ///     Gets a value indicating whether this parameter node is a function.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if this parameter node is a function; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsFunction { get; private set; }
+
+        /// <summary>
+        ///     Gets or sets the order.
+        /// </summary>
+        /// <value>
+        ///     The order.
+        /// </value>
+        public int Order { get; set; }
+
+        /// <summary>
+        ///     Gets the type of the parameter.
+        /// </summary>
+        /// <value>
+        ///     The type of the parameter.
+        /// </value>
+        public SupportedValueType ParameterType { get; private set; }
+
+        /// <summary>
+        ///     Determines the type of the parameter.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <exception cref="ExpressionNotValidLogicallyException">Expression is not valid.</exception>
@@ -192,7 +198,7 @@ namespace IX.Math.Nodes.Parameters
             this.PossibleReturnType = GetSupportableConversions(in svt);
 
             this.CalculatedCosts.Clear();
-            foreach (var possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
                 this.CalculatedCosts[possibleType] = (GetStandardConversionStrategyCost(
                     in svt,
@@ -209,10 +215,10 @@ namespace IX.Math.Nodes.Parameters
         {
             if (!context.ParameterRegistry.TryGetValue(
                 this.Name,
-                out var result))
+                out ExternalParameterNode result))
             {
                 // We might have a indexed variable with a discovered indexer
-                var par = context.ParameterRegistry.FirstOrDefault(p => p.Value.Name == this.Name)
+                ExternalParameterNode par = context.ParameterRegistry.FirstOrDefault(p => p.Value.Name == this.Name)
                     .Value;
                 if (par == null)
                 {
@@ -232,10 +238,10 @@ namespace IX.Math.Nodes.Parameters
         public override NodeBase Simplify() => this;
 
         /// <summary>
-        /// Verifies this node and all nodes above it for logical validity.
+        ///     Verifies this node and all nodes above it for logical validity.
         /// </summary>
         /// <remarks>
-        /// <para>This method is expected to be overridden, and is a good place to do type restriction verification.</para>
+        ///     <para>This method is expected to be overridden, and is a good place to do type restriction verification.</para>
         /// </remarks>
         public override void Verify()
         {
@@ -246,7 +252,7 @@ namespace IX.Math.Nodes.Parameters
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -273,10 +279,8 @@ namespace IX.Math.Nodes.Parameters
             {
                 return this.compiledParameterValueExpression = Expression.Invoke(this.compiledParameterExpression);
             }
-            else
-            {
-                return this.compiledParameterValueExpression = this.compiledParameterExpression;
-            }
+
+            return this.compiledParameterValueExpression = this.compiledParameterExpression;
         }
     }
 }

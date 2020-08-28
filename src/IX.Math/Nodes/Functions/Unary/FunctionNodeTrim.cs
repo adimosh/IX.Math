@@ -3,12 +3,12 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
 using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
+using IX.Math.Obsolete;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Functions.Unary
@@ -25,13 +25,10 @@ namespace IX.Math.Nodes.Functions.Unary
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeTrim"/> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="parameter">The parameter.</param>
         public FunctionNodeTrim(
-            List<IStringFormatter> stringFormatters,
             NodeBase parameter)
             : base(
-                stringFormatters,
                 parameter)
         {
         }
@@ -45,7 +42,7 @@ namespace IX.Math.Nodes.Functions.Unary
         public override NodeBase Simplify() =>
             this.Parameter switch
             {
-                ConstantNodeBase cn when cn.TryGetString(out var s) => this.GenerateConstantString(s.Trim()),
+                ConstantNodeBase cn when cn.TryGetString(out var s) => GenerateConstantString(s.Trim()),
                 _ => this
             };
 
@@ -58,7 +55,6 @@ namespace IX.Math.Nodes.Functions.Unary
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new FunctionNodeTrim(
-                this.StringFormatters,
                 this.Parameter.DeepClone(context));
 
         /// <summary>
@@ -99,7 +95,7 @@ namespace IX.Math.Nodes.Functions.Unary
                         in comparisonTolerance),
                     nameof(string.Trim),
 #if NET452
-                    new Type[0]);
+                    DotNet452Mitigation.EmptyTypeArray);
 #else
                     Array.Empty<Type>());
 #endif

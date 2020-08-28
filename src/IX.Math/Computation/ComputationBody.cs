@@ -2,9 +2,9 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Parameters;
+using IX.StandardExtensions.Efficiency;
 using JetBrains.Annotations;
 
 namespace IX.Math.Computation
@@ -19,19 +19,20 @@ namespace IX.Math.Computation
         internal readonly NodeBase BodyNode;
 
         [CanBeNull]
-        internal readonly IDictionary<string, ExternalParameterNode> ParameterRegistry;
+        internal readonly ConcurrentDictionary<string, ExternalParameterNode> ParameterRegistry;
 
         internal ComputationBody(
             NodeBase bodyNode,
-            IDictionary<string, ExternalParameterNode> parameterRegistry)
+            ConcurrentDictionary<string, ExternalParameterNode> parameterRegistry)
         {
             this.BodyNode = bodyNode;
             this.ParameterRegistry = parameterRegistry;
         }
 
+        [UsedImplicitly]
         internal void Deconstruct(
             out NodeBase bodyNode,
-            out IDictionary<string, ExternalParameterNode> parameterRegistry)
+            out ConcurrentDictionary<string, ExternalParameterNode> parameterRegistry)
         {
             bodyNode = this.BodyNode;
             parameterRegistry = this.ParameterRegistry;

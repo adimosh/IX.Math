@@ -2,8 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
-using IX.Math.Extensibility;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Functions.Nonary
@@ -15,15 +13,6 @@ namespace IX.Math.Nodes.Functions.Nonary
     [PublicAPI]
     public abstract class NonaryFunctionNodeBase : FunctionNodeBase
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NonaryFunctionNodeBase"/> class.
-        /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
-        protected NonaryFunctionNodeBase(List<IStringFormatter> stringFormatters)
-            : base(stringFormatters)
-        {
-        }
-
         /// <summary>
         ///     Gets a value indicating whether this node supports tolerance.
         /// </summary>

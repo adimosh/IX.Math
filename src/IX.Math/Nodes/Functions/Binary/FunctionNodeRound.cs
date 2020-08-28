@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
@@ -25,11 +24,9 @@ namespace IX.Math.Nodes.Functions.Binary
     internal sealed class FunctionNodeRound : NumericOperationBinaryFunctionNodeBase
     {
         public FunctionNodeRound(
-            List<IStringFormatter> stringFormatters,
             NodeBase floatNode,
             NodeBase intNode)
             : base(
-                stringFormatters,
                 floatNode,
                 intNode)
         {
@@ -42,7 +39,6 @@ namespace IX.Math.Nodes.Functions.Binary
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new FunctionNodeRound(
-                this.StringFormatters,
                 this.FirstParameter.DeepClone(context),
                 this.SecondParameter.DeepClone(context));
 
@@ -59,7 +55,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 return this;
             }
 
-            return this.GenerateConstantNumeric(
+            return GenerateConstantNumeric(
                 GlobalSystem.Math.Round(
                     first,
                     GlobalSystem.Convert.ToInt32(second)));

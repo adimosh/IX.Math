@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
@@ -24,11 +23,9 @@ namespace IX.Math.Nodes.Functions.Binary
     internal sealed class FunctionNodeTrimBody : StringBinaryFunctionNodeBase
     {
         public FunctionNodeTrimBody(
-            List<IStringFormatter> stringFormatters,
             NodeBase stringParameter,
             NodeBase numericParameter)
             : base(
-                stringFormatters,
                 stringParameter,
                 numericParameter)
         {
@@ -43,7 +40,6 @@ namespace IX.Math.Nodes.Functions.Binary
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new FunctionNodeTrimBody(
-                this.StringFormatters,
                 this.FirstParameter.DeepClone(context),
                 this.SecondParameter.DeepClone(context));
 
@@ -62,7 +58,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 return this;
             }
 
-            return this.GenerateConstantString(first.Replace(second, string.Empty));
+            return GenerateConstantString(first.Replace(second, string.Empty));
         }
 
         /// <summary>

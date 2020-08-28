@@ -2,9 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Nodes.Operators.Binary.Mathematic
@@ -18,15 +16,12 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleMathematicalOperationNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         protected private SimpleMathematicalOperationNodeBase(
-            List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right)
             : base(
-                stringFormatters,
                 left,
                 right)
         {
@@ -49,7 +44,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                     llv,
                     rlv);
 
-                return isNumeric ? this.GenerateConstantNumeric(dv) : (NodeBase)this.GenerateConstantInteger(lv);
+                return isNumeric ? GenerateConstantNumeric(dv) : (NodeBase)GenerateConstantInteger(lv);
             }
 
             if (lc.TryGetNumeric(out double ldv) && rc.TryGetNumeric(out double rdv))
@@ -58,7 +53,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                     ldv,
                     rdv);
 
-                return isNumeric ? this.GenerateConstantNumeric(dv) : (NodeBase)this.GenerateConstantInteger(lv);
+                return isNumeric ? GenerateConstantNumeric(dv) : (NodeBase)GenerateConstantInteger(lv);
             }
 
             return this;
@@ -141,8 +136,8 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
 
                 checked
                 {
-                    totalIntCost = this.GetTotalConversionCosts(in intCost, SupportedValueType.Integer, in supportedType);
-                    totalNumericCost = this.GetTotalConversionCosts(in numericCost, SupportedValueType.Numeric, in supportedType);
+                    totalIntCost = GetTotalConversionCosts(in intCost, SupportedValueType.Integer, in supportedType);
+                    totalNumericCost = GetTotalConversionCosts(in numericCost, SupportedValueType.Numeric, in supportedType);
                 }
 
                 if (totalNumericCost < totalIntCost)

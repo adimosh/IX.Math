@@ -3,9 +3,7 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using IX.Math.Extensibility;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
@@ -27,10 +25,9 @@ namespace IX.Math.Nodes.Constants
         /// <summary>
         /// Initializes a new instance of the <see cref="ByteArrayNode" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="value">The node's boolean value.</param>
-        internal ByteArrayNode(List<IStringFormatter> stringFormatters, byte[] value)
-            : base(stringFormatters, value)
+        internal ByteArrayNode(byte[] value)
+            : base(value)
         {
         }
 
@@ -39,10 +36,7 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) =>
-            new ByteArrayNode(
-                this.StringFormatters,
-                this.Value);
+        public override NodeBase DeepClone(NodeCloningContext context) => new ByteArrayNode(this.Value);
 
         /// <summary>
         /// Tries to get a byte array value out of this constant node.

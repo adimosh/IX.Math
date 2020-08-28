@@ -2,9 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics;
-using IX.Math.Extensibility;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
@@ -20,10 +18,9 @@ namespace IX.Math.Nodes.Constants
         /// <summary>
         /// Initializes a new instance of the <see cref="BoolNode" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="value">The node's boolean value.</param>
-        internal BoolNode(List<IStringFormatter> stringFormatters, bool value)
-            : base(stringFormatters, value)
+        internal BoolNode(bool value)
+            : base(value)
         {
         }
 
@@ -32,10 +29,7 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) =>
-            new BoolNode(
-                this.StringFormatters,
-                this.Value);
+        public override NodeBase DeepClone(NodeCloningContext context) => new BoolNode(this.Value);
 
         /// <summary>
         /// Tries to get a boolean value out of this constant node.

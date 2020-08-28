@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Extensibility;
@@ -26,15 +25,12 @@ namespace IX.Math.Nodes.Functions.Binary
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeRandom" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
         public FunctionNodeRandom(
-            List<IStringFormatter> stringFormatters,
             NodeBase firstParameter,
             NodeBase secondParameter)
             : base(
-                stringFormatters,
                 firstParameter,
                 secondParameter)
         {
@@ -71,7 +67,6 @@ namespace IX.Math.Nodes.Functions.Binary
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new FunctionNodeRandom(
-                this.StringFormatters,
                 this.FirstParameter.DeepClone(context),
                 this.SecondParameter.DeepClone(context));
 

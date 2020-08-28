@@ -2,11 +2,9 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using JetBrains.Annotations;
 using DiagCA = System.Diagnostics.CodeAnalysis;
@@ -23,13 +21,10 @@ namespace IX.Math.Nodes.Operators.Unary
         /// <summary>
         /// Initializes a new instance of the <see cref="SubtractNode" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="operand">The operand.</param>
         public SubtractNode(
-            List<IStringFormatter> stringFormatters,
             [NotNull] NodeBase operand)
             : base(
-                stringFormatters,
                 operand)
         {
         }
@@ -43,8 +38,8 @@ namespace IX.Math.Nodes.Operators.Unary
         public override NodeBase Simplify() =>
             this.Operand switch
             {
-                IntegerNode integerNode => this.GenerateConstantInteger(-integerNode.Value),
-                NumericNode numericNode => this.GenerateConstantNumeric(-numericNode.Value),
+                IntegerNode integerNode => GenerateConstantInteger(-integerNode.Value),
+                NumericNode numericNode => GenerateConstantNumeric(-numericNode.Value),
                 _ => this
             };
 
@@ -54,9 +49,7 @@ namespace IX.Math.Nodes.Operators.Unary
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
-            new SubtractNode(
-                this.StringFormatters,
-                this.Operand.DeepClone(context));
+            new SubtractNode(this.Operand.DeepClone(context));
 
         /// <summary>
         ///     Ensures that the operands are compatible, and refines the return type of this expression based on them.

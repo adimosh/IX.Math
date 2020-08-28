@@ -3,9 +3,7 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using IX.Math.Extensibility;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
@@ -25,10 +23,9 @@ namespace IX.Math.Nodes.Constants
         /// <summary>
         /// Initializes a new instance of the <see cref="IntegerNode" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="value">The node's boolean value.</param>
-        internal IntegerNode(List<IStringFormatter> stringFormatters, long value)
-            : base(stringFormatters, value)
+        internal IntegerNode(long value)
+            : base(value)
         {
             this.numericRepresentation = Convert.ToDouble(value);
 
@@ -40,10 +37,7 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) =>
-            new IntegerNode(
-                this.StringFormatters,
-                this.Value);
+        public override NodeBase DeepClone(NodeCloningContext context) => new IntegerNode(this.Value);
 
         /// <summary>
         /// Tries to get an integer value out of this constant node.

@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
@@ -25,13 +24,10 @@ namespace IX.Math.Nodes.Functions.Unary
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeLength"/> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="parameter">The parameter.</param>
         public FunctionNodeLength(
-            List<IStringFormatter> stringFormatters,
             NodeBase parameter)
             : base(
-                stringFormatters,
                 parameter)
         {
         }
@@ -45,8 +41,8 @@ namespace IX.Math.Nodes.Functions.Unary
         public override NodeBase Simplify() =>
             this.Parameter switch
             {
-                ConstantNodeBase cn when cn.TryGetByteArray(out var ba) => this.GenerateConstantInteger(ba.LongLength),
-                ConstantNodeBase cn when cn.TryGetString(out var s) => this.GenerateConstantInteger(Convert.ToInt64(s.Length)),
+                ConstantNodeBase cn when cn.TryGetByteArray(out var ba) => GenerateConstantInteger(ba.LongLength),
+                ConstantNodeBase cn when cn.TryGetString(out var s) => GenerateConstantInteger(Convert.ToInt64(s.Length)),
                 _ => this
             };
 
@@ -59,7 +55,6 @@ namespace IX.Math.Nodes.Functions.Unary
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new FunctionNodeLength(
-                this.StringFormatters,
                 this.Parameter.DeepClone(context));
 
         /// <summary>

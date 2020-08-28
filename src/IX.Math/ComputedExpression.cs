@@ -13,11 +13,11 @@ using IX.Math.Extensibility;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
+using IX.Math.Obsolete;
 using IX.StandardExtensions;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Efficiency;
-using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -29,12 +29,12 @@ namespace IX.Math
     public sealed class ComputedExpression : DisposableBase, IDeepCloneable<ComputedExpression>
     {
 #if NET452
-        private static readonly ReadOnlyCollection<Type> EmptyTypeCollection = new ReadOnlyCollection<Type>(new Type[0]);
+        private static readonly ReadOnlyCollection<Type> EmptyTypeCollection = new ReadOnlyCollection<Type>(DotNet452Mitigation.EmptyTypeArray);
 #else
         private static readonly ReadOnlyCollection<Type> EmptyTypeCollection = new ReadOnlyCollection<Type>(Array.Empty<Type>());
 #endif
 
-        private readonly IDictionary<string, ExternalParameterNode> parametersRegistry;
+        private readonly ConcurrentDictionary<string, ExternalParameterNode> parametersRegistry;
         private readonly List<IStringFormatter> stringFormatters;
 
         private readonly string initialExpression;
@@ -44,7 +44,7 @@ namespace IX.Math
             string initialExpression,
             NodeBase body,
             bool isRecognized,
-            IDictionary<string, ExternalParameterNode> parameterRegistry,
+            ConcurrentDictionary<string, ExternalParameterNode> parameterRegistry,
             List<IStringFormatter> stringFormatters)
         {
             this.parametersRegistry = parameterRegistry;
@@ -107,21 +107,22 @@ namespace IX.Math
         /// Creates a deep clone of the source object.
         /// </summary>
         /// <returns>A deep clone.</returns>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0603:Delegate allocation from a method group", Justification = "<Pending>")]
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0603:Delegate allocation from a method group",
+            Justification = "This is how ForEach works.")]
         public ComputedExpression DeepClone()
         {
             var registry = new ConcurrentDictionary<string, ExternalParameterNode>();
-            this.parametersRegistry.ForEach(
-                DoParameters,
-                registry);
-
-            void DoParameters(
-                KeyValuePair<string, ExternalParameterNode> p,
-                ConcurrentDictionary<string, ExternalParameterNode> r) =>
-                    _ = r.TryAdd(p.Key, new ExternalParameterNode(p.Value.Name, this.stringFormatters)
+            foreach (var p in this.parametersRegistry)
+            {
+                registry.TryAdd(
+                    p.Key,
+                    new ExternalParameterNode(p.Value.Name)
                     {
                         Order = p.Value.Order
                     });
+            }
 
             var context = new NodeCloningContext(registry);
 
@@ -165,36 +166,46 @@ namespace IX.Math
                 return (true, true, default, ((ConstantNodeBase)this.body).ValueAsObject);
             }
 
-            for (int i = 0; i < parameterContexts.Length; i++)
-            {
-                parameterContexts[i].DetermineParameterType(parameterTypes[i]);
-            }
-
-            this.body.Verify();
-
-            Expression localBody = this.body.GenerateExpression(this.body.CalculateLeastCostlyStrategy(), in tolerance);
-
-            Delegate del;
             try
             {
-                del = Expression.Lambda(
-                        localBody,
-                        this.parametersRegistry.Values
-                            .OrderBy(p => p.Order)
-                            .Select(p => p.ParameterDefinitionExpression))
-                    .Compile();
+                for (int i = 0; i < parameterContexts.Length; i++)
+                {
+                    parameterContexts[i].DetermineParameterType(parameterTypes[i]);
+                }
+
+                this.body.Verify();
+
+                Expression localBody = this.body.GenerateExpression(this.body.CalculateLeastCostlyStrategy(), in tolerance);
+
+                Delegate del;
+                try
+                {
+                    del = Expression.Lambda(
+                            localBody,
+                            this.parametersRegistry.Values.OrderBy(p => p.Order)
+                                .Select(p => p.ParameterDefinitionExpression))
+                        .Compile();
+                }
+                catch (MathematicsEngineException)
+                {
+                    throw;
+                }
+                catch (ExpressionNotValidLogicallyException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    throw new ExpressionNotValidLogicallyException(e);
+                }
+
+                return (true, false, del, default);
             }
-            catch (MathematicsEngineException)
-            {
-                throw;
-            }
-            catch
+            catch (ExpressionNotValidLogicallyException)
             {
                 // Delegate could not be compiled with the given arguments.
                 return (false, default, default, default);
             }
-
-            return (true, false, del, default);
         }
 
         /// <summary>

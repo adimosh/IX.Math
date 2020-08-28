@@ -3,10 +3,8 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Nodes.Operators.Binary.Mathematic
@@ -16,15 +14,12 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleNumericOnlyMathematicalOperationNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         protected private SimpleNumericOnlyMathematicalOperationNodeBase(
-            List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right)
             : base(
-                stringFormatters,
                 left,
                 right)
         {
@@ -43,7 +38,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
 
             if (lc.TryGetNumeric(out double ldv) && rc.TryGetNumeric(out double rdv))
             {
-                return this.GenerateConstantNumeric(this.CalculateConstantValue(
+                return GenerateConstantNumeric(this.CalculateConstantValue(
                     ldv,
                     rdv));
             }

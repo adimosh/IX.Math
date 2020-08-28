@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using IX.Math.Extensibility;
 using JetBrains.Annotations;
@@ -26,13 +25,10 @@ namespace IX.Math.Nodes.Functions.Unary
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeTruncate" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="parameter">The parameter.</param>
         public FunctionNodeTruncate(
-            List<IStringFormatter> stringFormatters,
             NodeBase parameter)
             : base(
-                stringFormatters,
                 parameter)
         {
         }
@@ -54,7 +50,6 @@ namespace IX.Math.Nodes.Functions.Unary
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new FunctionNodeTruncate(
-                this.StringFormatters,
                 this.Parameter.DeepClone(context));
     }
 }

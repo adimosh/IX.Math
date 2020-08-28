@@ -3,10 +3,8 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
-using IX.Math.Extensibility;
 using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
@@ -24,18 +22,17 @@ namespace IX.Math.Formatters
         /// </summary>
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="value">The value.</param>
-        /// <param name="formatters">The formatters.</param>
         /// <returns>A formatted string, if the input type is supported.</returns>
         public static string FormatIntoString<T>(
-            T value,
-            List<IStringFormatter> formatters)
+            T value)
         {
-            if (formatters == null)
+            var sf = MathematicPortfolio.CurrentContext?.Value?.stringFormatters;
+            if (sf == null)
             {
                 return ToStringRegular(value);
             }
 
-            foreach (var formatter in formatters)
+            foreach (var formatter in sf)
             {
                 var (success, result) = formatter.ParseIntoString(value);
                 if (success)
@@ -63,28 +60,25 @@ namespace IX.Math.Formatters
         /// Creates the string conversion expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
-        /// <param name="stringFormatters">The string formatters. This parameter can be null.</param>
         /// <returns>An expression representing the string transformation.</returns>
         [DiagCA.SuppressMessage(
-                    "Performance",
-                    "HAA0301:Closure Allocation Source",
-                    Justification = "We're actively looking for closures in this method.")]
+            "Performance",
+            "HAA0301:Closure Allocation Source",
+            Justification = "We're actively looking for closures in this method.")]
         [DiagCA.SuppressMessage(
-                    "Performance",
-                    "HAA0302:Display class allocation to capture closure",
-                    Justification = "We're actively looking for closures in this method.")]
+            "Performance",
+            "HAA0302:Display class allocation to capture closure",
+            Justification = "We're actively looking for closures in this method.")]
         [DiagCA.SuppressMessage(
-                    "ReSharper",
-                    "AssignNullToNotNullAttribute",
-                    Justification = "We've checked manually.")]
+            "ReSharper",
+            "AssignNullToNotNullAttribute",
+            Justification = "We've checked manually.")]
         [DiagCA.SuppressMessage(
-                    "ReSharper",
-                    "InvertIf",
-                    Justification = "We don't care about inverting ifs here.")]
+            "ReSharper",
+            "InvertIf",
+            Justification = "We don't care about inverting ifs here.")]
         [NotNull]
-        public static Expression CreateStringConversionExpression(
-                    Expression expression,
-                    List<IStringFormatter> stringFormatters)
+        public static Expression CreateStringConversionExpression(Expression expression)
         {
             Requires.NotNull(
                 expression,
@@ -95,15 +89,13 @@ namespace IX.Math.Formatters
                 return expression;
             }
 
-            bool areFormatters = (stringFormatters?.Count ?? 0) > 0;
+            bool areFormatters = (MathematicPortfolio.CurrentContext.Value.StringFormatters?.Count ?? 0) > 0;
 
             if (expression.Type == typeof(long))
             {
                 if (areFormatters)
                 {
-                    Expression<Func<long, string>> innerLambda = value => FormatIntoString(
-                        value,
-                        stringFormatters);
+                    Expression<Func<long, string>> innerLambda = value => FormatIntoString(value);
                     return Expression.Invoke(
                         innerLambda,
                         expression);
@@ -124,9 +116,7 @@ namespace IX.Math.Formatters
             {
                 if (areFormatters)
                 {
-                    Expression<Func<int, string>> innerLambda = value => FormatIntoString(
-                        value,
-                        stringFormatters);
+                    Expression<Func<int, string>> innerLambda = value => FormatIntoString(value);
                     return Expression.Invoke(
                         innerLambda,
                         expression);
@@ -147,9 +137,7 @@ namespace IX.Math.Formatters
             {
                 if (areFormatters)
                 {
-                    Expression<Func<bool, string>> innerLambda = value => FormatIntoString(
-                        value,
-                        stringFormatters);
+                    Expression<Func<bool, string>> innerLambda = value => FormatIntoString(value);
                     return Expression.Invoke(
                         innerLambda,
                         expression);
@@ -170,9 +158,7 @@ namespace IX.Math.Formatters
             {
                 if (areFormatters)
                 {
-                    Expression<Func<double, string>> innerLambda = value => FormatIntoString(
-                        value,
-                        stringFormatters);
+                    Expression<Func<double, string>> innerLambda = value => FormatIntoString(value);
                     return Expression.Invoke(
                         innerLambda,
                         expression);
@@ -193,9 +179,7 @@ namespace IX.Math.Formatters
             {
                 if (areFormatters)
                 {
-                    Expression<Func<byte[], string>> innerLambda = value => FormatIntoString(
-                        value,
-                        stringFormatters);
+                    Expression<Func<byte[], string>> innerLambda = value => FormatIntoString(value);
                     return Expression.Invoke(
                         innerLambda,
                         expression);

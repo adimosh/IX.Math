@@ -82,7 +82,7 @@ namespace IX.Math.WorkingSet
                 // We check whether or not we have an indexer in the constant name
                 if (exp2.CurrentCultureEndsWith(this.definition.IndexerIndicators.Close))
                 {
-                    var openIndex = exp2.IndexOf(this.definition.IndexerIndicators.Open);
+                    var openIndex = exp2.CurrentCultureIndexOf(this.definition.IndexerIndicators.Open);
 
                     if (openIndex != -1)
                     {
@@ -107,7 +107,7 @@ namespace IX.Math.WorkingSet
                     }
                 }
 
-                this.parameterRegistry.Add(exp, new ExternalParameterNode(exp2, this.stringFormatters));
+                _ = this.parameterRegistry.TryAdd(exp, new ExternalParameterNode(exp2));
             }
         }
     }

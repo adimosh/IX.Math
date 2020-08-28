@@ -2,12 +2,11 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
+using System;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Globalization;
@@ -24,19 +23,16 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         /// <summary>
         /// Initializes a new instance of the <see cref="InequationOperatorNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
         /// <param name="equals">if set to <c>true</c>, make the operator also equate the values.</param>
         /// <param name="lessThan">if set to <c>true</c>, the operator is less than, otherwise it is greater than.</param>
         internal InequationOperatorNodeBase(
-            List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right,
             bool equals,
             bool lessThan)
             : base(
-                stringFormatters,
                 left,
                 right)
         {
@@ -50,44 +46,74 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         /// <returns>
         ///     A simplified node, or this instance.
         /// </returns>
-        public override NodeBase Simplify() =>
-            this.Left switch
+        public sealed override NodeBase Simplify()
+        {
+            // Let's check that both are constant
+            if (!(this.Left is ConstantNodeBase left) || !(this.Right is ConstantNodeBase right))
             {
-                #region String simplification
-                StringNode snLeft when this.Right is StringNode snRight && this.equals && this.lessThan => this.GenerateConstantBoolean(
-                    snLeft.Value.CurrentCultureCompareTo(snRight.Value) <= 0),
-                StringNode snLeft when this.Right is StringNode snRight && this.equals && !this.lessThan => this.GenerateConstantBoolean(
-                    snLeft.Value.CurrentCultureCompareTo(snRight.Value) >= 0),
-                StringNode snLeft when this.Right is StringNode snRight && !this.equals && this.lessThan => this.GenerateConstantBoolean(
-                    snLeft.Value.CurrentCultureCompareTo(snRight.Value) < 0),
-                StringNode snLeft when this.Right is StringNode snRight && !this.equals && !this.lessThan => this.GenerateConstantBoolean(
-                    snLeft.Value.CurrentCultureCompareTo(snRight.Value) > 0),
-                #endregion
+                return this;
+            }
 
-                #region Boolean simplification
-                BoolNode bnLeft when this.Right is BoolNode bnRight && this.equals && this.lessThan => this.GenerateConstantBoolean(
-                    !bnLeft.Value || bnRight.Value),
-                BoolNode bnLeft when this.Right is BoolNode bnRight && this.equals && !this.lessThan => this.GenerateConstantBoolean(
-                    bnLeft.Value || !bnRight.Value),
-                BoolNode bnLeft when this.Right is BoolNode bnRight && !this.equals && this.lessThan => this.GenerateConstantBoolean(
-                    !bnLeft.Value && bnRight.Value),
-                BoolNode bnLeft when this.Right is BoolNode bnRight && !this.equals && !this.lessThan => this.GenerateConstantBoolean(
-                    bnLeft.Value && !bnRight.Value),
-                #endregion
+            // If they are both boolean, we should treat that case first
+            if (left.TryGetBoolean(out bool bvl) && right.TryGetBoolean(out bool bvr))
+            {
+                return (this.equals, this.lessThan) switch
+                {
+                    (true, true) => GenerateConstantBoolean(!bvl || bvr),
+                    (false, true) => GenerateConstantBoolean(!bvl || bvr),
+                    (true, false) => GenerateConstantBoolean(bvl || !bvr),
+                    (false, false) => GenerateConstantBoolean(bvl || !bvr)
+                };
+            }
 
-                #region Binary simplification
-                ByteArrayNode baLeft when this.Right is ByteArrayNode baRight && this.equals && this.lessThan => this.GenerateConstantBoolean(
-                    baLeft.Value.SequenceCompareWithMsb(baRight.Value) <= 0),
-                ByteArrayNode baLeft when this.Right is ByteArrayNode baRight && this.equals && !this.lessThan => this.GenerateConstantBoolean(
-                    baLeft.Value.SequenceCompareWithMsb(baRight.Value) >= 0),
-                ByteArrayNode baLeft when this.Right is ByteArrayNode baRight && !this.equals && this.lessThan => this.GenerateConstantBoolean(
-                    baLeft.Value.SequenceCompareWithMsb(baRight.Value) < 0),
-                ByteArrayNode baLeft when this.Right is ByteArrayNode baRight && !this.equals && !this.lessThan => this.GenerateConstantBoolean(
-                    baLeft.Value.SequenceCompareWithMsb(baRight.Value) > 0),
-                #endregion
+            // If they are both binary, but not both integer or numeric
+            if (left.TryGetByteArray(out byte[] bavl) &&
+                right.TryGetByteArray(out byte[] bavr))
+            {
+                bool bli = left.CheckSupportedType(SupportableValueType.Integer);
+                bool bln = left.CheckSupportedType(SupportableValueType.Numeric);
+                bool bri = right.CheckSupportedType(SupportableValueType.Integer);
+                bool brn = right.CheckSupportedType(SupportableValueType.Numeric);
 
-                _ => this
-            };
+                if ((bli || bln) && (bri || brn))
+                {
+                    return this;
+                }
+
+                return (this.equals, this.lessThan) switch
+                {
+                    (true, true) => GenerateConstantBoolean(bavl.SequenceCompareWithMsb(bavr) >= 0),
+                    (false, true) => GenerateConstantBoolean(bavl.SequenceCompareWithMsb(bavr) > 0),
+                    (true, false) => GenerateConstantBoolean(bavl.SequenceCompareWithMsb(bavr) <= 0),
+                    (false, false) => GenerateConstantBoolean(bavl.SequenceCompareWithMsb(bavr) < 0)
+                };
+            }
+
+            // If they are both string, but not both integer or numeric
+            if (left.TryGetString(out string svl) &&
+                right.TryGetString(out string svr))
+            {
+                bool bli = left.CheckSupportedType(SupportableValueType.Integer);
+                bool bln = left.CheckSupportedType(SupportableValueType.Numeric);
+                bool bri = right.CheckSupportedType(SupportableValueType.Integer);
+                bool brn = right.CheckSupportedType(SupportableValueType.Numeric);
+
+                if ((bli || bln) && (bri || brn))
+                {
+                    return this;
+                }
+
+                return (this.equals, this.lessThan) switch
+                {
+                    (true, true) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) >= 0),
+                    (false, true) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) > 0),
+                    (true, false) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) <= 0),
+                    (false, false) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) < 0)
+                };
+            }
+
+            return this;
+        }
 
         /// <summary>
         /// Generates the expression that this node represents.
@@ -99,233 +125,248 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "We want it this way.")]
-        protected override Expression GenerateExpressionInternal(
+        protected sealed override Expression GenerateExpressionInternal(
             in SupportedValueType valueType,
             in ComparisonTolerance comparisonTolerance)
         {
-            var (leftExpression, rightExpression, internalType) = this.GetExpressionArguments(in comparisonTolerance);
-
-            switch (internalType)
+            try
             {
-#region Strings
+                var (leftExpression, rightExpression, internalType) = this.GetExpressionArguments(in comparisonTolerance);
 
-                case SupportedValueType.String:
+                switch (internalType)
                 {
-                    MethodInfo mi = typeof(string).GetMethodWithExactParameters(
-                                        nameof(string.Compare),
-                                        typeof(string),
-                                        typeof(string),
-                                        typeof(bool),
-                                        typeof(CultureInfo)) ??
-                                    throw new MathematicsEngineException();
-                    var leftOperand = Expression.Call(
-                        mi,
-                        leftExpression,
-                        rightExpression,
-                        Expression.Constant(
-                            false,
-                            typeof(bool)),
-                        Expression.Property(
-                            null,
-                            typeof(CultureInfo),
-                            nameof(CultureInfo.CurrentCulture)));
-                    var rightOperand = Expression.Constant(
-                        0,
-                        typeof(int));
+                    #region Strings
 
-                    if (this.equals)
-                    {
-                        if (this.lessThan)
+                    case SupportedValueType.String:
                         {
-                            return Expression.LessThanOrEqual(
-                                leftOperand,
-                                rightOperand);
-                        }
-                        else
-                        {
-                            return Expression.GreaterThanOrEqual(
-                                leftOperand,
-                                rightOperand);
-                        }
-                    }
-                    else
-                    {
-                        if (this.lessThan)
-                        {
-                            return Expression.LessThan(
-                                leftOperand,
-                                rightOperand);
-                        }
-                        else
-                        {
-                            return Expression.GreaterThan(
-                                leftOperand,
-                                rightOperand);
-                        }
-                    }
-                }
-
-#endregion
-
-#region Booleans
-
-                case SupportedValueType.Boolean:
-                {
-                    var testExpression = Expression.Equal(
-                        leftExpression,
-                        Expression.Constant(
-                            true,
-                            typeof(bool)));
-
-                    if (this.equals)
-                    {
-                        if (this.lessThan)
-                        {
-                            return Expression.Condition(
-                                testExpression,
+                            MethodInfo mi = typeof(string).GetMethodWithExactParameters(
+                                                nameof(string.Compare),
+                                                typeof(string),
+                                                typeof(string),
+                                                typeof(bool),
+                                                typeof(CultureInfo)) ??
+                                            throw new MathematicsEngineException();
+                            var leftOperand = Expression.Call(
+                                mi,
+                                leftExpression,
                                 rightExpression,
                                 Expression.Constant(
-                                    true,
-                                    typeof(bool)));
-                        }
-                        else
-                        {
-                            return Expression.Condition(
-                                testExpression,
-                                Expression.Constant(
-                                    true,
-                                    typeof(bool)),
-                                Expression.Negate(rightExpression));
-                        }
-                    }
-                    else
-                    {
-                        if (this.lessThan)
-                        {
-                            return Expression.Condition(
-                                testExpression,
-                                Expression.Constant(
                                     false,
                                     typeof(bool)),
-                                rightExpression);
+                                Expression.Property(
+                                    null,
+                                    typeof(CultureInfo),
+                                    nameof(CultureInfo.CurrentCulture)));
+                            var rightOperand = Expression.Constant(
+                                0,
+                                typeof(int));
+
+                            if (this.equals)
+                            {
+                                if (this.lessThan)
+                                {
+                                    return Expression.LessThanOrEqual(
+                                        leftOperand,
+                                        rightOperand);
+                                }
+                                else
+                                {
+                                    return Expression.GreaterThanOrEqual(
+                                        leftOperand,
+                                        rightOperand);
+                                }
+                            }
+                            else
+                            {
+                                if (this.lessThan)
+                                {
+                                    return Expression.LessThan(
+                                        leftOperand,
+                                        rightOperand);
+                                }
+                                else
+                                {
+                                    return Expression.GreaterThan(
+                                        leftOperand,
+                                        rightOperand);
+                                }
+                            }
                         }
-                        else
+
+                    #endregion
+
+                    #region Booleans
+
+                    case SupportedValueType.Boolean:
                         {
-                            return Expression.Condition(
-                                testExpression,
-                                Expression.Negate(rightExpression),
+                            var testExpression = Expression.Equal(
+                                leftExpression,
                                 Expression.Constant(
-                                    false,
+                                    true,
                                     typeof(bool)));
+
+                            if (this.equals)
+                            {
+                                if (this.lessThan)
+                                {
+                                    return Expression.Condition(
+                                        testExpression,
+                                        rightExpression,
+                                        Expression.Constant(
+                                            true,
+                                            typeof(bool)));
+                                }
+                                else
+                                {
+                                    return Expression.Condition(
+                                        testExpression,
+                                        Expression.Constant(
+                                            true,
+                                            typeof(bool)),
+                                        Expression.Negate(rightExpression));
+                                }
+                            }
+                            else
+                            {
+                                if (this.lessThan)
+                                {
+                                    return Expression.Condition(
+                                        testExpression,
+                                        Expression.Constant(
+                                            false,
+                                            typeof(bool)),
+                                        rightExpression);
+                                }
+                                else
+                                {
+                                    return Expression.Condition(
+                                        testExpression,
+                                        Expression.Negate(rightExpression),
+                                        Expression.Constant(
+                                            false,
+                                            typeof(bool)));
+                                }
+                            }
                         }
-                    }
+
+                    #endregion
+
+                    #region Byte arrays
+
+                    case SupportedValueType.ByteArray:
+                        {
+                            var mi = typeof(ArrayExtensions).GetMethodWithExactParameters(
+                                         nameof(ArrayExtensions.SequenceCompareWithMsb),
+                                         typeof(byte[]),
+                                         typeof(byte[])) ??
+                                     throw new MathematicsEngineException();
+                            var leftOperand = Expression.Call(
+                                mi,
+                                leftExpression,
+                                rightExpression);
+                            var rightOperand = Expression.Constant(
+                                0,
+                                typeof(int));
+
+                            if (this.equals)
+                            {
+                                if (this.lessThan)
+                                {
+                                    return Expression.LessThanOrEqual(
+                                        leftOperand,
+                                        rightOperand);
+                                }
+                                else
+                                {
+                                    return Expression.GreaterThanOrEqual(
+                                        leftOperand,
+                                        rightOperand);
+                                }
+                            }
+                            else
+                            {
+                                if (this.lessThan)
+                                {
+                                    return Expression.LessThan(
+                                        leftOperand,
+                                        rightOperand);
+                                }
+                                else
+                                {
+                                    return Expression.GreaterThan(
+                                        leftOperand,
+                                        rightOperand);
+                                }
+                            }
+                        }
+
+                    #endregion
+
+                    #region Numbers
+
+                    case SupportedValueType.Integer:
+                    case SupportedValueType.Numeric:
+                        {
+                            if (!comparisonTolerance.IsEmpty)
+                            {
+                                var possibleTolerantExpression = this.PossibleToleranceExpression(
+                                    leftExpression,
+                                    rightExpression,
+                                    in comparisonTolerance);
+
+                                if (possibleTolerantExpression != null)
+                                {
+                                    // Valid tolerance expression
+                                    return possibleTolerantExpression;
+                                }
+                            }
+
+                            if (this.equals)
+                            {
+                                if (this.lessThan)
+                                {
+                                    return Expression.LessThanOrEqual(
+                                        leftExpression,
+                                        rightExpression);
+                                }
+                                else
+                                {
+                                    return Expression.GreaterThanOrEqual(
+                                        leftExpression,
+                                        rightExpression);
+                                }
+                            }
+                            else
+                            {
+                                if (this.lessThan)
+                                {
+                                    return Expression.LessThan(
+                                        leftExpression,
+                                        rightExpression);
+                                }
+                                else
+                                {
+                                    return Expression.GreaterThan(
+                                        leftExpression,
+                                        rightExpression);
+                                }
+                            }
+                        }
+
+                        #endregion
                 }
-
-#endregion
-
-#region Byte arrays
-
-                case SupportedValueType.ByteArray:
-                {
-                    var mi = typeof(ArrayExtensions).GetMethodWithExactParameters(
-                                 nameof(ArrayExtensions.SequenceCompareWithMsb),
-                                 typeof(byte[]),
-                                 typeof(byte[])) ??
-                             throw new MathematicsEngineException();
-                    var leftOperand = Expression.Call(
-                        mi,
-                        leftExpression,
-                        rightExpression);
-                    var rightOperand = Expression.Constant(
-                        0,
-                        typeof(int));
-
-                    if (this.equals)
-                    {
-                        if (this.lessThan)
-                        {
-                            return Expression.LessThanOrEqual(
-                                leftOperand,
-                                rightOperand);
-                        }
-                        else
-                        {
-                            return Expression.GreaterThanOrEqual(
-                                leftOperand,
-                                rightOperand);
-                        }
-                    }
-                    else
-                    {
-                        if (this.lessThan)
-                        {
-                            return Expression.LessThan(
-                                leftOperand,
-                                rightOperand);
-                        }
-                        else
-                        {
-                            return Expression.GreaterThan(
-                                leftOperand,
-                                rightOperand);
-                        }
-                    }
-                }
-
-#endregion
-
-#region Numbers
-
-                case SupportedValueType.Integer:
-                case SupportedValueType.Numeric:
-                {
-                    if (!comparisonTolerance.IsEmpty)
-                    {
-                        var possibleTolerantExpression = this.PossibleToleranceExpression(
-                            leftExpression,
-                            rightExpression,
-                            in comparisonTolerance);
-
-                        if (possibleTolerantExpression != null)
-                        {
-                            // Valid tolerance expression
-                            return possibleTolerantExpression;
-                        }
-                    }
-
-                    if (this.equals)
-                    {
-                        if (this.lessThan)
-                        {
-                            return Expression.LessThanOrEqual(
-                                leftExpression,
-                                rightExpression);
-                        }
-                        else
-                        {
-                            return Expression.GreaterThanOrEqual(
-                                leftExpression,
-                                rightExpression);
-                        }
-                    }
-                    else
-                    {
-                        if (this.lessThan)
-                        {
-                            return Expression.LessThan(
-                                leftExpression,
-                                rightExpression);
-                        }
-                        else
-                        {
-                            return Expression.GreaterThan(
-                                leftExpression,
-                                rightExpression);
-                        }
-                    }
-                }
-
-#endregion
+            }
+            catch (ExpressionNotValidLogicallyException)
+            {
+                throw;
+            }
+            catch (MathematicsEngineException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ExpressionNotValidLogicallyException(ex);
             }
 
             throw new MathematicsEngineException();
@@ -437,29 +478,13 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                 if (tolerance.ProportionalTolerance.Value > 1D)
                 {
                     // Proportional tolerance
-                    string methodName;
-                    if (this.equals)
+                    string methodName = (this.equals, this.lessThan) switch
                     {
-                        if (this.lessThan)
-                        {
-                            methodName = nameof(ToleranceFunctions.LessThanOrEqualProportionTolerant);
-                        }
-                        else
-                        {
-                            methodName = nameof(ToleranceFunctions.GreaterThanOrEqualProportionTolerant);
-                        }
-                    }
-                    else
-                    {
-                        if (this.lessThan)
-                        {
-                            methodName = nameof(ToleranceFunctions.LessThanProportionTolerant);
-                        }
-                        else
-                        {
-                            methodName = nameof(ToleranceFunctions.GreaterThanProportionTolerant);
-                        }
-                    }
+                        (true, true) => nameof(ToleranceFunctions.LessThanOrEqualProportionTolerant),
+                        (true, false) => nameof(ToleranceFunctions.GreaterThanOrEqualProportionTolerant),
+                        (false, true) => nameof(ToleranceFunctions.LessThanProportionTolerant),
+                        (false, false) => nameof(ToleranceFunctions.GreaterThanProportionTolerant),
+                    };
 
                     MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
                         methodName,
@@ -481,29 +506,13 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                 if (tolerance.ProportionalTolerance.Value < 1D && tolerance.ProportionalTolerance.Value > 0D)
                 {
                     // Percentage tolerance
-                    string methodName;
-                    if (this.equals)
+                    string methodName = (this.equals, this.lessThan) switch
                     {
-                        if (this.lessThan)
-                        {
-                            methodName = nameof(ToleranceFunctions.LessThanOrEqualPercentageTolerant);
-                        }
-                        else
-                        {
-                            methodName = nameof(ToleranceFunctions.GreaterThanOrEqualPercentageTolerant);
-                        }
-                    }
-                    else
-                    {
-                        if (this.lessThan)
-                        {
-                            methodName = nameof(ToleranceFunctions.LessThanPercentageTolerant);
-                        }
-                        else
-                        {
-                            methodName = nameof(ToleranceFunctions.GreaterThanPercentageTolerant);
-                        }
-                    }
+                        (true, true) => nameof(ToleranceFunctions.LessThanOrEqualPercentageTolerant),
+                        (true, false) => nameof(ToleranceFunctions.GreaterThanOrEqualPercentageTolerant),
+                        (false, true) => nameof(ToleranceFunctions.LessThanPercentageTolerant),
+                        (false, false) => nameof(ToleranceFunctions.GreaterThanPercentageTolerant),
+                    };
 
                     MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
                         methodName,

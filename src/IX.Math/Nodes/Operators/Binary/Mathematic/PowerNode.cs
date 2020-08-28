@@ -2,10 +2,8 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using IX.Math.Extensibility;
 
 namespace IX.Math.Nodes.Operators.Binary.Mathematic
 {
@@ -19,15 +17,12 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// <summary>
         /// Initializes a new instance of the <see cref="IX.Math.Nodes.Operators.Binary.Mathematic.PowerNode" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
         public PowerNode(
-            List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right)
             : base(
-                stringFormatters,
                 left,
                 right)
         {
@@ -40,7 +35,6 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new PowerNode(
-                this.StringFormatters,
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
 

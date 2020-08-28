@@ -2,10 +2,8 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Nodes.Functions.Binary
@@ -19,15 +17,12 @@ namespace IX.Math.Nodes.Functions.Binary
         /// <summary>
         /// Initializes a new instance of the <see cref="IntegerOrNumericBinaryFunctionNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
         protected IntegerOrNumericBinaryFunctionNodeBase(
-            List<IStringFormatter> stringFormatters,
             NodeBase firstParameter,
             NodeBase secondParameter)
             : base(
-                stringFormatters,
                 firstParameter,
                 secondParameter)
         {

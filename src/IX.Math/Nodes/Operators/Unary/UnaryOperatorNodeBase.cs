@@ -3,8 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using IX.Math.Extensibility;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
@@ -19,7 +17,6 @@ namespace IX.Math.Nodes.Operators.Unary
         /// <summary>
         ///     Initializes a new instance of the <see cref="UnaryOperatorNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="operand">The operand.</param>
         /// <exception cref="ArgumentNullException">
         ///     operand
@@ -34,9 +31,7 @@ namespace IX.Math.Nodes.Operators.Unary
             "CA2214:Do not call overridable methods in constructors",
             Justification = "We want this here.")]
         protected private UnaryOperatorNodeBase(
-            List<IStringFormatter> stringFormatters,
             [NotNull] NodeBase operand)
-            : base(stringFormatters)
         {
             NodeBase tempOperand = Requires.NotNull(
                 operand,

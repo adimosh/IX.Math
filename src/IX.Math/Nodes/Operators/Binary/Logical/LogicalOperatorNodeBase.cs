@@ -2,10 +2,8 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Nodes.Operators.Binary.Logical
@@ -19,15 +17,12 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
         /// <summary>
         /// Initializes a new instance of the <see cref="LogicalOperatorNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         protected private LogicalOperatorNodeBase(
-            List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right)
             : base(
-                stringFormatters,
                 left,
                 right)
         {
@@ -54,7 +49,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
             if (left.TryGetInteger(out long lint) &&
                 right.TryGetInteger(out long rint))
             {
-                return this.GenerateConstantInteger(
+                return GenerateConstantInteger(
                     this.GenerateData(
                         lint,
                         rint));
@@ -63,7 +58,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
             if (left.TryGetBoolean(out bool lbool) &&
                 right.TryGetBoolean(out bool rbool))
             {
-                return this.GenerateConstantBoolean(
+                return GenerateConstantBoolean(
                     this.GenerateData(
                         lbool,
                         rbool));
@@ -72,7 +67,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
             if (left.TryGetByteArray(out byte[] lbin) &&
                 right.TryGetByteArray(out byte[] rbin))
             {
-                return this.GenerateConstantByteArray(
+                return GenerateConstantByteArray(
                     this.GenerateData(
                         lbin,
                         rbin));
@@ -193,17 +188,17 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
 
             foreach (var supportedOption in GetSupportedTypeOptions(this.PossibleReturnType))
             {
-                int intTotalCost = this.GetTotalConversionCosts(
+                int intTotalCost = GetTotalConversionCosts(
                     in intCost,
                     SupportedValueType.Integer,
                     in supportedOption);
 
-                int byteArrayTotalCost = this.GetTotalConversionCosts(
+                int byteArrayTotalCost = GetTotalConversionCosts(
                     in byteArrayCost,
                     SupportedValueType.ByteArray,
                     in supportedOption);
 
-                int boolTotalCost = this.GetTotalConversionCosts(
+                int boolTotalCost = GetTotalConversionCosts(
                     in boolCost,
                     SupportedValueType.Boolean,
                     in supportedOption);

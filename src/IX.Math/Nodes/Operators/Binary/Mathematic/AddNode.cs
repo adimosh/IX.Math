@@ -3,13 +3,10 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
-using IX.Math.Formatters;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Extensions;
 
@@ -25,15 +22,12 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// <summary>
         /// Initializes a new instance of the <see cref="AddNode" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
         public AddNode(
-            List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right)
             : base(
-                stringFormatters,
                 left,
                 right)
         {
@@ -71,91 +65,48 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// </returns>
         public override NodeBase Simplify()
         {
-            if (this.Left.IsConstant != this.Right.IsConstant)
+            // Constant check
+            if (!(this.Left is ConstantNodeBase left) || !(this.Right is ConstantNodeBase right))
             {
                 return this;
             }
 
-            if (!this.Left.IsConstant)
+            // We have two integer-convertible constants
+            if (left.TryGetInteger(out long liv) && left.TryGetInteger(out long riv))
             {
-                return this;
+                if (left is NumericNode && right is NumericNode)
+                {
+                    // We have an addition of two numeric nodes that happen to be integer in value
+                    return GenerateConstantNumeric(Convert.ToDouble(liv + riv));
+                }
+
+                // Otherwise, we have integer values
+                return GenerateConstantInteger(liv + riv);
             }
 
-            switch (this.Left)
+            // We have two numeric-convertible constants
+            if (left.TryGetNumeric(out double lnv) && left.TryGetNumeric(out double rnv))
             {
-                // Numeric simplification
-                case NumericNode cLeft when this.Right is NumericNode cRight:
-                    return this.GenerateConstantNumeric(cLeft.Value + cRight.Value);
-                case NumericNode cLeft when this.Right is IntegerNode cRight:
-                    return this.GenerateConstantNumeric(cLeft.Value + cRight.Value);
-                case IntegerNode cLeft when this.Right is NumericNode cRight:
-                    return this.GenerateConstantNumeric(cLeft.Value + cRight.Value);
-                case IntegerNode cLeft when this.Right is IntegerNode cRight:
-                    return this.GenerateConstantInteger(cLeft.Value + cRight.Value);
-
-                // Bite array simplification
-                case ByteArrayNode cLeft when this.Right is ByteArrayNode cRight:
-                    return this.GenerateConstantByteArray(
-                        Stitch(
-                            cLeft.Value,
-                            cRight.Value));
-
-                // String simplification
-                case StringNode cLeft when this.Right is StringNode cRight:
-                    return this.GenerateConstantString(cLeft.Value + cRight.Value);
-                case NumericNode cLeft when this.Right is StringNode cRight:
-                    return this.GenerateConstantString(
-                        StringFormatter.FormatIntoString(
-                            cLeft.Value,
-                            this.StringFormatters) +
-                        cRight.Value);
-                case StringNode cLeft when this.Right is NumericNode cRight:
-                    return this.GenerateConstantString(
-                        cLeft.Value +
-                        StringFormatter.FormatIntoString(
-                            cRight.Value,
-                            this.StringFormatters));
-                case IntegerNode cLeft when this.Right is StringNode cRight:
-                    return this.GenerateConstantString(
-                        StringFormatter.FormatIntoString(
-                            cLeft.Value,
-                            this.StringFormatters) +
-                        cRight.Value);
-                case StringNode cLeft when this.Right is IntegerNode cRight:
-                    return this.GenerateConstantString(
-                        cLeft.Value +
-                        StringFormatter.FormatIntoString(
-                            cRight.Value,
-                            this.StringFormatters));
-                case BoolNode cLeft when this.Right is StringNode cRight:
-                    return this.GenerateConstantString(
-                        StringFormatter.FormatIntoString(
-                            cLeft.Value,
-                            this.StringFormatters) +
-                        cRight.Value);
-                case StringNode cLeft when this.Right is BoolNode cRight:
-                    return this.GenerateConstantString(
-                        cLeft.Value +
-                        StringFormatter.FormatIntoString(
-                            cRight.Value,
-                            this.StringFormatters));
-                case ByteArrayNode cLeft when this.Right is StringNode cRight:
-                    return this.GenerateConstantString(
-                        StringFormatter.FormatIntoString(
-                            cLeft.Value,
-                            this.StringFormatters) +
-                        cRight.Value);
-                case StringNode cLeft when this.Right is ByteArrayNode cRight:
-                    return this.GenerateConstantString(
-                        cLeft.Value +
-                        StringFormatter.FormatIntoString(
-                            cRight.Value,
-                            this.StringFormatters));
-
-                // Anything else
-                default:
-                    return this;
+                return GenerateConstantNumeric(lnv + rnv);
             }
+
+            // We have two binary-convertible constants
+            if (left.TryGetByteArray(out byte[] lbav) && left.TryGetByteArray(out byte[] rbav))
+            {
+                return GenerateConstantByteArray(
+                    Stitch(
+                        lbav,
+                        rbav));
+            }
+
+            // We have string-able constants
+            if (left.TryGetString(out string lsv) && left.TryGetString(out string rsv))
+            {
+                return GenerateConstantString(lsv + rsv);
+            }
+
+            // Anything else
+            return this;
         }
 
         /// <summary>
@@ -165,7 +116,6 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new AddNode(
-                this.StringFormatters,
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
 
@@ -239,10 +189,10 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             // Let's populate the cost tables
             foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
-                int totalIntCost = this.GetTotalConversionCosts(in intCost, SupportedValueType.Integer, supportedType);
-                int totalNumericCost = this.GetTotalConversionCosts(in numericCost, SupportedValueType.Numeric, supportedType);
-                int totalBinaryCost = this.GetTotalConversionCosts(in binaryCost, SupportedValueType.ByteArray, supportedType);
-                int totalStringCost = this.GetTotalConversionCosts(in stringCost, SupportedValueType.String, supportedType);
+                int totalIntCost = GetTotalConversionCosts(in intCost, SupportedValueType.Integer, supportedType);
+                int totalNumericCost = GetTotalConversionCosts(in numericCost, SupportedValueType.Numeric, supportedType);
+                int totalBinaryCost = GetTotalConversionCosts(in binaryCost, SupportedValueType.ByteArray, supportedType);
+                int totalStringCost = GetTotalConversionCosts(in stringCost, SupportedValueType.String, supportedType);
 
                 int minimalCost = global::System.Math.Min(
                     global::System.Math.Min(totalIntCost, totalNumericCost),

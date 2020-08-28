@@ -3,8 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
-using IX.Math.Extensibility;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
@@ -20,7 +18,6 @@ namespace IX.Math.Nodes.Functions.Unary
         /// <summary>
         /// Initializes a new instance of the <see cref="UnaryFunctionNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="parameter">The parameter.</param>
         /// <exception cref="ArgumentNullException">parameter is <c>null</c> (<c>Nothing</c> in ).</exception>
         [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
@@ -28,9 +25,7 @@ namespace IX.Math.Nodes.Functions.Unary
             "CA2214:Do not call overridable methods in constructors",
             Justification = "This is OK and expected at this point.")]
         protected UnaryFunctionNodeBase(
-            List<IStringFormatter> stringFormatters,
             [NotNull] NodeBase parameter)
-        : base(stringFormatters)
         {
             NodeBase parameterTemp = Requires.NotNull(parameter, nameof(parameter));
 

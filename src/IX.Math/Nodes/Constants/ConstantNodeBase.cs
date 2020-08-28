@@ -2,8 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
-using IX.Math.Extensibility;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
@@ -18,8 +16,7 @@ namespace IX.Math.Nodes.Constants
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstantNodeBase"/> class.
         /// </summary>
-        protected private ConstantNodeBase(List<IStringFormatter> stringFormatters)
-            : base(stringFormatters)
+        protected private ConstantNodeBase()
         {
         }
 

@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
@@ -33,13 +32,10 @@ namespace IX.Math.Nodes.Functions.Unary
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeAbsolute" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="parameter">The parameter.</param>
         public FunctionNodeAbsolute(
-            List<IStringFormatter> stringFormatters,
             NodeBase parameter)
             : base(
-                stringFormatters,
                 parameter)
         {
         }
@@ -56,12 +52,12 @@ namespace IX.Math.Nodes.Functions.Unary
             {
                 if (c.TryGetInteger(out var i))
                 {
-                    return this.GenerateConstantInteger(GlobalSystem.Math.Abs(i));
+                    return GenerateConstantInteger(GlobalSystem.Math.Abs(i));
                 }
 
                 if (c.TryGetNumeric(out var n))
                 {
-                    return this.GenerateConstantNumeric(GlobalSystem.Math.Abs(n));
+                    return GenerateConstantNumeric(GlobalSystem.Math.Abs(n));
                 }
             }
 
@@ -77,7 +73,6 @@ namespace IX.Math.Nodes.Functions.Unary
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new FunctionNodeAbsolute(
-                this.StringFormatters,
                 this.Parameter.DeepClone(context));
 
         /// <summary>

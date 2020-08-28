@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
@@ -36,17 +35,14 @@ namespace IX.Math.Nodes.Functions.Ternary
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeReplace" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="stringParameter">The string parameter.</param>
         /// <param name="numericParameter">The numeric parameter.</param>
         /// <param name="secondNumericParameter">The second numeric parameter.</param>
         public FunctionNodeReplace(
-            List<IStringFormatter> stringFormatters,
             NodeBase stringParameter,
             NodeBase numericParameter,
             NodeBase secondNumericParameter)
             : base(
-                stringFormatters,
                 stringParameter,
                 numericParameter,
                 secondNumericParameter)
@@ -62,7 +58,6 @@ namespace IX.Math.Nodes.Functions.Ternary
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new FunctionNodeReplace(
-                this.StringFormatters,
                 this.FirstParameter.DeepClone(context),
                 this.SecondParameter.DeepClone(context),
                 this.ThirdParameter.DeepClone(context));
@@ -79,7 +74,7 @@ namespace IX.Math.Nodes.Functions.Ternary
                 this.SecondParameter is ConstantNodeBase second &&
                 this.ThirdParameter is ConstantNodeBase third)
             {
-                return this.GenerateConstantString(
+                return GenerateConstantString(
                     first.ValueAsString.Replace(
                         second.ValueAsString,
                         third.ValueAsString));

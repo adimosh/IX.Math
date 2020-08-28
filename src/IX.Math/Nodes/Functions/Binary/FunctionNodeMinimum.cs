@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Extensibility;
@@ -25,15 +24,12 @@ namespace IX.Math.Nodes.Functions.Binary
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeMinimum" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
         public FunctionNodeMinimum(
-            List<IStringFormatter> stringFormatters,
             NodeBase firstParameter,
             NodeBase secondParameter)
             : base(
-                stringFormatters,
                 firstParameter,
                 secondParameter)
         {
@@ -48,7 +44,6 @@ namespace IX.Math.Nodes.Functions.Binary
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new FunctionNodeMinimum(
-                this.StringFormatters,
                 this.FirstParameter.DeepClone(context),
                 this.SecondParameter.DeepClone(context));
 
@@ -70,13 +65,13 @@ namespace IX.Math.Nodes.Functions.Binary
 
             if (integer)
             {
-                return this.GenerateConstantInteger(
+                return GenerateConstantInteger(
                     GlobalSystem.Math.Min(
                         intFirst,
                         intSecond));
             }
 
-            return this.GenerateConstantNumeric(
+            return GenerateConstantNumeric(
                 GlobalSystem.Math.Min(
                     doubleFirst,
                     doubleSecond));

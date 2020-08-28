@@ -8,7 +8,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 using IX.Math.Formatters;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions;
@@ -57,10 +56,9 @@ namespace IX.Math.Nodes
         private Expression stringExpression;
         private Expression boolExpression;
 
-        protected private NodeBase(List<IStringFormatter> stringFormatters)
+        protected private NodeBase()
         {
             this.PossibleReturnType = SupportableValueType.All;
-            this.StringFormatters = stringFormatters;
 
             this.CalculatedCosts = new Dictionary<SupportedValueType, (int, SupportedValueType)>();
         }
@@ -95,14 +93,6 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <value>The node return type.</value>
         public SupportableValueType PossibleReturnType { get; protected set; }
-
-        /// <summary>
-        /// Gets the string formatters.
-        /// </summary>
-        /// <value>
-        /// The string formatters.
-        /// </value>
-        protected List<IStringFormatter> StringFormatters { get; private set; }
 
         /// <summary>
         /// Gets the calculated costs.
@@ -360,7 +350,7 @@ namespace IX.Math.Nodes
             "Performance",
             "EPS02:Non-readonly struct used as in-parameter",
             Justification = "It's a primitive type, the compiler can handle it.")]
-        protected int GetTotalConversionCosts(in int initialCost, in SupportedValueType fromType, in SupportedValueType toType)
+        protected static int GetTotalConversionCosts(in int initialCost, in SupportedValueType fromType, in SupportedValueType toType)
         {
             int intTotalCost;
             if (initialCost == int.MaxValue)
@@ -474,41 +464,49 @@ namespace IX.Math.Nodes
                 throw new ExpressionNotValidLogicallyException();
             }
 
-            switch (valueType)
+            try
             {
-                case SupportedValueType.Integer:
-                    return this.integerExpression ??
-                           this.ConvertToIntegerExpression(
-                               this.GenerateExpressionInternal(
-                                   in valueType,
-                                   in comparisonTolerance));
-                case SupportedValueType.Numeric:
-                    return this.numericExpression ??
-                           this.ConvertToNumericExpression(
-                               this.GenerateExpressionInternal(
-                                   in valueType,
-                                   in comparisonTolerance));
-                case SupportedValueType.ByteArray:
-                    return this.byteArrayExpression ??
-                           this.ConvertToByteArrayExpression(
-                               this.GenerateExpressionInternal(
-                                   in valueType,
-                                   in comparisonTolerance));
-                case SupportedValueType.String:
-                    return this.stringExpression ??
-                           StringFormatter.CreateStringConversionExpression(
-                               this.GenerateExpressionInternal(
-                                   in valueType,
-                                   in comparisonTolerance),
-                               this.StringFormatters);
-                case SupportedValueType.Boolean:
-                    return this.boolExpression ??
-                           this.ConvertToBooleanExpression(
-                               this.GenerateExpressionInternal(
-                                   in valueType,
-                                   in comparisonTolerance));
-                default:
-                    throw new MathematicsEngineException();
+                return valueType switch
+                {
+                    SupportedValueType.Integer => this.integerExpression ??
+                                                  ConvertToIntegerExpression(
+                                                      this.GenerateExpressionInternal(
+                                                          in valueType,
+                                                          in comparisonTolerance)),
+                    SupportedValueType.Numeric => this.numericExpression ??
+                                                  ConvertToNumericExpression(
+                                                      this.GenerateExpressionInternal(
+                                                          in valueType,
+                                                          in comparisonTolerance)),
+                    SupportedValueType.ByteArray => this.byteArrayExpression ??
+                                                    ConvertToByteArrayExpression(
+                                                        this.GenerateExpressionInternal(
+                                                            in valueType,
+                                                            in comparisonTolerance)),
+                    SupportedValueType.String => this.stringExpression ??
+                                                 StringFormatter.CreateStringConversionExpression(
+                                                     this.GenerateExpressionInternal(
+                                                         in valueType,
+                                                         in comparisonTolerance)),
+                    SupportedValueType.Boolean => this.boolExpression ??
+                                                  ConvertToBooleanExpression(
+                                                      this.GenerateExpressionInternal(
+                                                          in valueType,
+                                                          in comparisonTolerance)),
+                    _ => throw new MathematicsEngineException(),
+                };
+            }
+            catch (ExpressionNotValidLogicallyException)
+            {
+                throw;
+            }
+            catch (MathematicsEngineException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ExpressionNotValidLogicallyException(ex);
             }
         }
 
@@ -605,7 +603,7 @@ namespace IX.Math.Nodes
         /// <param name="originalExpression">The original expression.</param>
         /// <returns>A converted expression.</returns>
         /// <exception cref="MathematicsEngineException">An internal exception that cannot be avoided.</exception>
-        protected Expression ConvertToByteArrayExpression(Expression originalExpression)
+        protected static Expression ConvertToByteArrayExpression(Expression originalExpression)
         {
             Requires.NotNull(
                 originalExpression,
@@ -640,7 +638,7 @@ namespace IX.Math.Nodes
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "This is intended.")]
-        protected Expression ConvertToNumericExpression(Expression originalExpression)
+        protected static Expression ConvertToNumericExpression(Expression originalExpression)
         {
             Requires.NotNull(
                 originalExpression,
@@ -697,7 +695,7 @@ namespace IX.Math.Nodes
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "This is intended.")]
-        protected Expression ConvertToBooleanExpression(Expression originalExpression)
+        protected static Expression ConvertToBooleanExpression(Expression originalExpression)
         {
             Requires.NotNull(
                 originalExpression,
@@ -734,7 +732,7 @@ namespace IX.Math.Nodes
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "This is intended.")]
-        protected Expression ConvertToIntegerExpression(Expression originalExpression)
+        protected static Expression ConvertToIntegerExpression(Expression originalExpression)
         {
             Requires.NotNull(
                 originalExpression,
@@ -792,35 +790,35 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>The constant node.</returns>
-        public IntegerNode GenerateConstantInteger(long value) => new IntegerNode(this.StringFormatters, value);
+        public static IntegerNode GenerateConstantInteger(long value) => new IntegerNode(value);
 
         /// <summary>
         /// Generates a constant node.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>The constant node.</returns>
-        public NumericNode GenerateConstantNumeric(double value) => new NumericNode(this.StringFormatters, value);
+        public static NumericNode GenerateConstantNumeric(double value) => new NumericNode(value);
 
         /// <summary>
         /// Generates a constant node.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>The constant node.</returns>
-        public ByteArrayNode GenerateConstantByteArray(byte[] value) => new ByteArrayNode(this.StringFormatters, value);
+        public static ByteArrayNode GenerateConstantByteArray(byte[] value) => new ByteArrayNode(value);
 
         /// <summary>
         /// Generates a constant node.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>The constant node.</returns>
-        public BoolNode GenerateConstantBoolean(bool value) => new BoolNode(this.StringFormatters, value);
+        public static BoolNode GenerateConstantBoolean(bool value) => new BoolNode(value);
 
         /// <summary>
         /// Generates a constant node.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>The constant node.</returns>
-        public StringNode GenerateConstantString(string value) => new StringNode(this.StringFormatters, value);
+        public static StringNode GenerateConstantString(string value) => new StringNode(value);
 
         #endregion
     }

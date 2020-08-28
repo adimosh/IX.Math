@@ -2,9 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics;
-using IX.Math.Extensibility;
 
 namespace IX.Math.Nodes.Operators.Binary.Comparison
 {
@@ -14,15 +12,12 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         /// <summary>
         /// Initializes a new instance of the <see cref="GreaterThanOperatorNode"/> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
         public GreaterThanOperatorNode(
-            List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right)
             : base(
-                stringFormatters,
                 left,
                 right,
                 false,
@@ -37,7 +32,6 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new GreaterThanOperatorNode(
-                this.StringFormatters,
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
     }

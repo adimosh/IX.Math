@@ -4,11 +4,9 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 
 namespace IX.Math.Nodes.Operators.Binary.Logical
 {
@@ -22,15 +20,12 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
         /// <summary>
         /// Initializes a new instance of the <see cref="XorNode" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
         public XorNode(
-            List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right)
             : base(
-                stringFormatters,
                 left,
                 right)
         {
@@ -42,7 +37,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The result of the operation.</returns>
-        public static byte[] PerformBinaryOperation(
+        private static byte[] PerformBinaryOperation(
             byte[] left,
             byte[] right)
         {
@@ -60,7 +55,6 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new XorNode(
-                this.StringFormatters,
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
 

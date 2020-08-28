@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Text;
+using IX.Math.Obsolete;
 using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
 
@@ -12,10 +13,6 @@ namespace IX.Math.Extraction
 {
     internal static class ExternalParametersExtractor
     {
-#if NET452
-        private static readonly byte[] emptyArray = new byte[0];
-#endif
-
         [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Performance",
             "HAA0301:Closure Allocation Source",
@@ -302,7 +299,7 @@ namespace IX.Math.Extraction
                                         if (ba == null)
                                         {
 #if NET452
-                                            return emptyArray;
+                                            return DotNet452Mitigation.EmptyByteAttay;
 #else
                                             return Array.Empty<byte>();
 #endif

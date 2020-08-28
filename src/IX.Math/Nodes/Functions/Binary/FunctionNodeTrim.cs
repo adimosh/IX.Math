@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
@@ -25,11 +24,9 @@ namespace IX.Math.Nodes.Functions.Binary
     internal sealed class FunctionNodeTrim : StringBinaryFunctionNodeBase
     {
         public FunctionNodeTrim(
-            List<IStringFormatter> stringFormatters,
             NodeBase stringParameter,
             NodeBase numericParameter)
             : base(
-                stringFormatters,
                 stringParameter,
                 numericParameter)
         {
@@ -43,7 +40,6 @@ namespace IX.Math.Nodes.Functions.Binary
         /// A deep clone.
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeTrim(
-            this.StringFormatters,
             this.FirstParameter.DeepClone(context),
             this.SecondParameter.DeepClone(context));
 
@@ -62,7 +58,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 return this;
             }
 
-            return this.GenerateConstantString(first.Trim(second.ToCharArray()));
+            return GenerateConstantString(first.Trim(second.ToCharArray()));
         }
 
         /// <summary>

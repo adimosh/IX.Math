@@ -2,10 +2,8 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 
 namespace IX.Math.Nodes.Operators.Binary.Comparison
 {
@@ -18,15 +16,12 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         /// <summary>
         /// Initializes a new instance of the <see cref="ComparisonNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
         protected private ComparisonNodeBase(
-            List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right)
             : base(
-                stringFormatters,
                 left,
                 right)
         {

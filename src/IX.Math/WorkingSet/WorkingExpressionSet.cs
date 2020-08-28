@@ -19,6 +19,7 @@ using IX.Math.Nodes.Operators.Binary.Mathematic;
 using IX.Math.Nodes.Operators.Unary;
 using IX.Math.Nodes.Parameters;
 using IX.StandardExtensions.ComponentModel;
+using IX.StandardExtensions.Efficiency;
 using IX.StandardExtensions.Extensions;
 using IX.System.Collections.Generic;
 using DiagCA = System.Diagnostics.CodeAnalysis;
@@ -60,7 +61,7 @@ namespace IX.Math.WorkingSet
         /// <summary>
         ///     Gets the parameter registry.
         /// </summary>
-        private readonly IDictionary<string, ExternalParameterNode> parameterRegistry;
+        private readonly ConcurrentDictionary<string, ExternalParameterNode> parameterRegistry;
 
         /// <summary>
         ///     Gets the nonary functions.
@@ -83,11 +84,6 @@ namespace IX.Math.WorkingSet
         private readonly Dictionary<string, Type> binaryFunctions;
 
         /// <summary>
-        /// Gets the string formatters.
-        /// </summary>
-        private readonly List<IStringFormatter> stringFormatters;
-
-        /// <summary>
         ///     The binary operators.
         /// </summary>
         [DiagCA.SuppressMessage(
@@ -98,7 +94,7 @@ namespace IX.Math.WorkingSet
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "This is correct, but the analyzer can't tell.")]
-        private LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase>> binaryOperators;
+        private LevelDictionary<string, Func<NodeBase, NodeBase, BinaryOperatorNodeBase>> binaryOperators;
 
         /// <summary>
         ///     The unary operators.
@@ -111,7 +107,7 @@ namespace IX.Math.WorkingSet
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "This is correct, but the analyzer can't tell.")]
-        private LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase>> unaryOperators;
+        private LevelDictionary<string, Func<NodeBase, UnaryOperatorNodeBase>> unaryOperators;
 
         /// <summary>
         ///     The constants table.
@@ -156,15 +152,13 @@ namespace IX.Math.WorkingSet
             Dictionary<string, Type> binaryFunctions,
             Dictionary<string, Type> ternaryFunctions,
             LevelDictionary<Type, IConstantsExtractor> extractors,
-            LevelDictionary<Type, IConstantInterpreter> interpreters,
-            List<IStringFormatter> stringFormatters)
+            LevelDictionary<Type, IConstantInterpreter> interpreters)
         {
-            this.parameterRegistry = new Dictionary<string, ExternalParameterNode>();
+            this.parameterRegistry = new ConcurrentDictionary<string, ExternalParameterNode>();
             this.constantsTable = new Dictionary<string, ConstantNodeBase>();
             this.reverseConstantsTable = new Dictionary<string, string>();
             this.symbolTable = new Dictionary<string, ExpressionSymbol>();
             this.reverseSymbolTable = new Dictionary<string, string>();
-            this.stringFormatters = stringFormatters;
 
             this.expression = expression;
             this.definition = mathDefinition;
@@ -411,65 +405,53 @@ namespace IX.Math.WorkingSet
             // ======================================
             #region Binary operators
 
-            this.binaryOperators = new LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase>>
+            this.binaryOperators = new LevelDictionary<string, Func<NodeBase, NodeBase, BinaryOperatorNodeBase>>
             {
                 // First tier - Comparison and equation operators
                 {
                     localDefinition.GreaterThanOrEqualSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new GreaterThanOrEqualOperatorNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     10
                 },
                 {
                     localDefinition.LessThanOrEqualSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new LessThanOrEqualOperatorNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     10
                 },
                 {
                     localDefinition.GreaterThanSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new GreaterThanOperatorNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     10
                 },
                 {
                     localDefinition.LessThanSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new LessThanOperatorNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     10
                 },
                 {
                     localDefinition.NotEqualsSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new NotEqualsNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     10
                 },
                 {
                     localDefinition.EqualsSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new EqualsNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     10
@@ -478,30 +460,24 @@ namespace IX.Math.WorkingSet
                 // Second tier - Logical operators
                 {
                     localDefinition.OrSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new OrNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     20
                 },
                 {
                     localDefinition.XorSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new XorNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     localDefinition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 21 : 20
                 },
                 {
                     localDefinition.AndSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new AndNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     localDefinition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 22 : 20
@@ -510,20 +486,16 @@ namespace IX.Math.WorkingSet
                 // Third tier - Arithmetic second-rank operators
                 {
                     localDefinition.AddSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new AddNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     30
                 },
                 {
                     localDefinition.SubtractSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new SubtractNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     30
@@ -532,30 +504,24 @@ namespace IX.Math.WorkingSet
                 // Fourth tier - Arithmetic first-rank operators
                 {
                     localDefinition.DivideSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new DivideNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     40
                 },
                 {
                     localDefinition.ModuloSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new RemainderNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     40
                 },
                 {
                     localDefinition.MultiplySymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new MultiplyNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     40
@@ -564,10 +530,8 @@ namespace IX.Math.WorkingSet
                 // Fifth tier - Power operator
                 {
                     localDefinition.PowerSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new PowerNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     50
@@ -576,20 +540,16 @@ namespace IX.Math.WorkingSet
                 // Sixth tier - Bitwise shift operators
                 {
                     localDefinition.LeftShiftSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new LeftShiftNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     60
                 },
                 {
                     localDefinition.RightShiftSymbol, (
-                        definitionL1,
                         leftOperand,
                         rightOperand) => new RightShiftNode(
-                        definitionL1,
                         leftOperand,
                         rightOperand),
                     60
@@ -600,22 +560,18 @@ namespace IX.Math.WorkingSet
 
             #region Unary operators
 
-            this.unaryOperators = new LevelDictionary<string, Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase>>
+            this.unaryOperators = new LevelDictionary<string, Func<NodeBase, UnaryOperatorNodeBase>>
             {
                 // First tier - Negation and inversion
                 {
                     localDefinition.SubtractSymbol, (
-                        definitionL1,
                         operand) => new Nodes.Operators.Unary.SubtractNode(
-                        definitionL1,
                         operand),
                     1
                 },
                 {
                     localDefinition.NotSymbol, (
-                        definitionL1,
                         operand) => new NotNode(
-                        definitionL1,
                         operand),
                     1
                 }

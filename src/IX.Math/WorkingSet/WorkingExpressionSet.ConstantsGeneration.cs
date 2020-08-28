@@ -121,7 +121,7 @@ namespace IX.Math.WorkingSet
             {
                 if (expression.Length > 2)
                 {
-                    return ParseByteArray(
+                    return ParseByteArrayLocal(
                         expression.Substring(2),
                         out result);
                 }
@@ -133,7 +133,7 @@ namespace IX.Math.WorkingSet
             result = null;
             return false;
 
-            static bool ParseByteArray(
+            static bool ParseByteArrayLocal(
                 string byteArrayExpression,
                 out byte[] byteArrayResult)
             {
@@ -211,7 +211,7 @@ namespace IX.Math.WorkingSet
 
             this.constantsTable.Add(
                 name,
-                new NumericNode(this.stringFormatters, value));
+                new NumericNode(value));
             this.reverseConstantsTable.Add(
                 value.ToString(CultureInfo.CurrentCulture),
                 name);
@@ -342,56 +342,12 @@ namespace IX.Math.WorkingSet
                 return key;
             }
 
-            ConstantNodeBase node = null;
-
-            // Go through each interpreter
-            foreach (var interpreter in this.interpreters.KeysByLevel.SelectMany(p => p.Value))
+            // Let's interpret this
+            if (!this.TryInterpretStringValue(
+                content,
+                out var value))
             {
-                var (success, result) = this.interpreters[interpreter].EvaluateIsConstant(content, this.definition);
-                if (success)
-                {
-                    node = this.CreateConstant(result, content);
-                    break;
-                }
-            }
-
-            // Standard formatters
-            if (node == null)
-            {
-                if (ParseNumeric(
-                    content,
-                    out object n))
-                {
-                    if (n is double d)
-                    {
-                        node = new NumericNode(
-                            this.stringFormatters,
-                            d);
-                    }
-                    else if (n is long i)
-                    {
-                        node = new IntegerNode(
-                            this.stringFormatters,
-                            i);
-                    }
-                }
-                else if (ParseByteArray(
-                    content,
-                    out byte[] ba))
-                {
-                    node = new ByteArrayNode(this.stringFormatters, ba);
-                }
-                else if (bool.TryParse(
-                    content,
-                    out var b))
-                {
-                    node = new BoolNode(this.stringFormatters, b);
-                }
-            }
-
-            // Node not recognized
-            if (node == null)
-            {
+                // Could not interpret
                 return null;
             }
 
@@ -402,13 +358,60 @@ namespace IX.Math.WorkingSet
             // Add constant data to tables
             this.constantsTable.Add(
                 name,
-                node);
+                this.CreateConstant(value, content));
             this.reverseConstantsTable.Add(
                 content,
                 name);
 
             // Return
             return name;
+        }
+
+        private bool TryInterpretStringValue(
+            string content,
+            out object value)
+        {
+            // Go through each interpreter
+            foreach (var interpreter in this.interpreters.KeysByLevel.SelectMany(p => p.Value))
+            {
+                var (success, result) = this.interpreters[interpreter]
+                    .EvaluateIsConstant(
+                        content,
+                        this.definition);
+                if (success)
+                {
+                    value = result;
+                    return true;
+                }
+            }
+
+            // Standard formatters
+            if (ParseNumeric(
+                content,
+                out object n))
+            {
+                value = n;
+                return true;
+            }
+
+            if (ParseByteArray(
+                content,
+                out byte[] ba))
+            {
+                value = ba;
+                return true;
+            }
+
+            if (bool.TryParse(
+                content,
+                out var b))
+            {
+                value = b;
+                return true;
+            }
+
+            value = default;
+            return false;
         }
 
         private string AddExtractedValue(
@@ -451,31 +454,26 @@ namespace IX.Math.WorkingSet
             return value switch
             {
                 long l => new IntegerNode(
-                    this.stringFormatters,
                     l)
                 {
                     OriginalStringValue = originalStringValue
                 },
                 double d => new NumericNode(
-                    this.stringFormatters,
                     d)
                 {
                     OriginalStringValue = originalStringValue
                 },
                 bool b => new BoolNode(
-                    this.stringFormatters,
                     b)
                 {
                     OriginalStringValue = originalStringValue
                 },
                 byte[] ba => new ByteArrayNode(
-                    this.stringFormatters,
                     ba)
                 {
                     OriginalStringValue = originalStringValue
                 },
                 string s => new StringNode(
-                    this.stringFormatters,
                     s)
                 {
                     OriginalStringValue = originalStringValue

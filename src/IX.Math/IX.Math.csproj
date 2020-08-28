@@ -28,11 +28,6 @@
   <ItemGroup Condition="'$(TargetFramework)'=='net452' OR '$(TargetFramework)'=='net46'">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Obsolete\**" />
-    <EmbeddedResource Remove="Obsolete\**" />
-    <None Remove="Obsolete\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="IX.Abstractions.Collections" Version="[0.5.3,0.6)" />

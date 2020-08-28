@@ -3,9 +3,7 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using IX.Math.Extensibility;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
@@ -21,7 +19,6 @@ namespace IX.Math.Nodes.Functions.Binary
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryFunctionNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
         /// <exception cref="ArgumentNullException"><paramref name="firstParameter" />
@@ -31,10 +28,8 @@ namespace IX.Math.Nodes.Functions.Binary
         [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor", Justification = "We specifically want this to happen.")]
         [SuppressMessage("Usage", "CA2214:Do not call overridable methods in constructors", Justification = "We specifically want this to happen.")]
         protected BinaryFunctionNodeBase(
-            List<IStringFormatter> stringFormatters,
             NodeBase firstParameter,
             NodeBase secondParameter)
-            : base(stringFormatters)
         {
             NodeBase firstParameterTemp = Requires.NotNull(firstParameter, nameof(firstParameter)).Simplify();
             NodeBase secondParameterTemp = Requires.NotNull(secondParameter, nameof(secondParameter)).Simplify();

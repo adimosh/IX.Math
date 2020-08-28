@@ -2,9 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using IX.Math.Extensibility;
 using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Nodes.Operators.Binary
@@ -18,7 +16,6 @@ namespace IX.Math.Nodes.Operators.Binary
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryOperatorNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         [SuppressMessage(
@@ -30,10 +27,8 @@ namespace IX.Math.Nodes.Operators.Binary
             "CA2214:Do not call overridable methods in constructors",
             Justification = "We specifically want this to happen.")]
         protected private BinaryOperatorNodeBase(
-            List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right)
-            : base(stringFormatters)
         {
             var leftProcessed = Requires.NotNull(
                 left,

@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Extensibility;
@@ -24,9 +23,7 @@ namespace IX.Math.Nodes.Functions.Nonary
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeRandom"/> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
-        public FunctionNodeRandom(List<IStringFormatter> stringFormatters)
-            : base(stringFormatters)
+        public FunctionNodeRandom()
         {
             this.PossibleReturnType = SupportableValueType.Numeric;
 
@@ -50,7 +47,7 @@ namespace IX.Math.Nodes.Functions.Nonary
         /// <returns>
         ///     A deep clone.
         /// </returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeRandom(this.StringFormatters);
+        public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeRandom();
 
         /// <summary>
         /// Generates the expression that this node represents.

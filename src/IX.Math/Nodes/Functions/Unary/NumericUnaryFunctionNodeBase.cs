@@ -3,9 +3,7 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 
 namespace IX.Math.Nodes.Functions.Unary
@@ -19,13 +17,10 @@ namespace IX.Math.Nodes.Functions.Unary
         /// <summary>
         /// Initializes a new instance of the <see cref="NumericUnaryFunctionNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="parameter">The parameter.</param>
         protected NumericUnaryFunctionNodeBase(
-            List<IStringFormatter> stringFormatters,
             NodeBase parameter)
             : base(
-                stringFormatters,
                 parameter)
         {
         }
@@ -48,7 +43,7 @@ namespace IX.Math.Nodes.Functions.Unary
 
             if (success)
             {
-                return this.GenerateConstantNumeric(this.RepresentedFunction(value));
+                return GenerateConstantNumeric(this.RepresentedFunction(value));
             }
 
             return this;

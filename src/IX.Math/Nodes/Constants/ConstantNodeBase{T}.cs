@@ -2,10 +2,8 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using IX.Math.Extensibility;
 using IX.Math.Formatters;
 using JetBrains.Annotations;
 
@@ -20,8 +18,9 @@ namespace IX.Math.Nodes.Constants
     public abstract class ConstantNodeBase<T> : ConstantNodeBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConstantNodeBase{T}"/> class.
+        /// Initializes a new instance of the <see cref="ConstantNodeBase{T}" /> class.
         /// </summary>
+        /// <param name="value">The constant value.</param>
         [SuppressMessage(
             "Usage",
             "CA2214:Do not call overridable methods in constructors",
@@ -30,14 +29,11 @@ namespace IX.Math.Nodes.Constants
             "ReSharper",
             "VirtualMemberCallInConstructor",
             Justification = "We specifically intend this to happen.")]
-        protected private ConstantNodeBase(List<IStringFormatter> stringFormatters, T value)
-            : base(stringFormatters)
+        protected private ConstantNodeBase(T value)
         {
             this.Value = value;
 
-            this.ValueAsString = StringFormatter.FormatIntoString(
-                value,
-                stringFormatters);
+            this.ValueAsString = StringFormatter.FormatIntoString(value);
 
             this.PossibleReturnType = this.GetSupportedTypes(value);
 
@@ -63,6 +59,10 @@ namespace IX.Math.Nodes.Constants
         /// <value>
         /// The value as object.
         /// </value>
+        [SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "That's the point of this property.")]
         public override object ValueAsObject => this.Value;
 
         /// <summary>
@@ -97,29 +97,24 @@ namespace IX.Math.Nodes.Constants
                     typeof(string));
             }
 
-            switch (valueType)
+            return valueType switch
             {
-                case SupportedValueType.Integer when this.TryGetInteger(out var v):
-                    return Expression.Constant(
-                        v,
-                        typeof(long));
-                case SupportedValueType.Numeric when this.TryGetNumeric(out var v):
-                    return Expression.Constant(
-                        v,
-                        typeof(double));
-                case SupportedValueType.ByteArray when this.TryGetByteArray(out var v):
-                    return Expression.Constant(
-                        v,
-                        typeof(byte[]));
-                case SupportedValueType.Boolean when this.TryGetBoolean(out var v):
-                    return Expression.Constant(
-                        v,
-                        typeof(bool));
-                default:
-                    return Expression.Constant(
-                        this.Value,
-                        typeof(T));
-            }
+                SupportedValueType.Integer when this.TryGetInteger(out var v) => Expression.Constant(
+                    v,
+                    typeof(long)),
+                SupportedValueType.Numeric when this.TryGetNumeric(out var v) => Expression.Constant(
+                    v,
+                    typeof(double)),
+                SupportedValueType.ByteArray when this.TryGetByteArray(out var v) => Expression.Constant(
+                    v,
+                    typeof(byte[])),
+                SupportedValueType.Boolean when this.TryGetBoolean(out var v) => Expression.Constant(
+                    v,
+                    typeof(bool)),
+                _ => Expression.Constant(
+                    this.Value,
+                    typeof(T)),
+            };
         }
 
         /// <summary>

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using IX.Math.Obsolete;
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -16,21 +17,20 @@ namespace IX.Math
     [PublicAPI]
     public readonly struct ExpressionTypedKey : IEquatable<ExpressionTypedKey>
     {
-#if NET452
-        private static readonly Type[] emptyArray = new Type[0];
-#endif
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTypedKey"/> struct.
         /// </summary>
         /// <param name="expression">The expression.</param>
         public ExpressionTypedKey(string expression)
+#if NET452
             : this(
                 expression,
                 default,
-#if NET452
-                emptyArray)
+                DotNet452Mitigation.EmptyTypeArray)
 #else
+            : this(
+                expression,
+                default,
                 Array.Empty<Type>())
 #endif
         {
@@ -59,12 +59,15 @@ namespace IX.Math
         public ExpressionTypedKey(
             string expression,
             ComparisonTolerance tolerance)
+#if NET452
             : this(
                 expression,
                 tolerance,
-#if NET452
-                emptyArray)
+                DotNet452Mitigation.EmptyTypeArray)
 #else
+            : this(
+                expression,
+                tolerance,
                 Array.Empty<Type>())
 #endif
         {

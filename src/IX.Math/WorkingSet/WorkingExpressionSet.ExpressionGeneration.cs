@@ -3,13 +3,11 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using IX.Math.Computation;
 using IX.Math.Exceptions;
 using IX.Math.ExpressionState;
-using IX.Math.Extensibility;
 using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
@@ -19,6 +17,7 @@ using IX.Math.Nodes.Functions.Ternary;
 using IX.Math.Nodes.Functions.Unary;
 using IX.Math.Nodes.Operators.Binary;
 using IX.Math.Nodes.Operators.Unary;
+using IX.Math.Obsolete;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Globalization;
 using JetBrains.Annotations;
@@ -215,7 +214,7 @@ namespace IX.Math.WorkingSet
 
                     if (!innerWorkingSet.binaryOperators.TryGetValue(
                         op,
-                        out Func<List<IStringFormatter>, NodeBase, NodeBase, BinaryOperatorNodeBase> t))
+                        out Func<NodeBase, NodeBase, BinaryOperatorNodeBase> t))
                     {
                         // Binary operator not actually found.
                         return null;
@@ -253,7 +252,6 @@ namespace IX.Math.WorkingSet
                     }
 
                     return t(
-                            innerWorkingSet.stringFormatters,
                             left,
                             right)
                         .Simplify();
@@ -286,7 +284,7 @@ namespace IX.Math.WorkingSet
                     if (!s.CurrentCultureStartsWith(op) ||
                     !this.unaryOperators.TryGetValue(
                         op,
-                        out Func<List<IStringFormatter>, NodeBase, UnaryOperatorNodeBase> t))
+                        out Func<NodeBase, UnaryOperatorNodeBase> t))
                     {
                         // The unary operator is not valid.
                         return null;
@@ -308,7 +306,6 @@ namespace IX.Math.WorkingSet
                     }
 
                     return t(
-                            this.stringFormatters,
                             expr)
                         .Simplify();
                 }
@@ -343,7 +340,7 @@ namespace IX.Math.WorkingSet
                         if (string.IsNullOrWhiteSpace(expressionValue))
                         {
 #if NET452
-                            parameterExpressions = new string[0];
+                            parameterExpressions = DotNet452Mitigation.EmptyStringArray;
 #else
                             parameterExpressions = Array.Empty<string>();
 #endif
@@ -369,8 +366,7 @@ namespace IX.Math.WorkingSet
                                     functionName,
                                     out Type t)
                                     ? ((NonaryFunctionNodeBase)Activator.CreateInstance(
-                                        t,
-                                        this.stringFormatters)).Simplify()
+                                        t)).Simplify()
                                     : null;
                                 break;
 
@@ -381,7 +377,6 @@ namespace IX.Math.WorkingSet
                                 {
                                     returnValue = ((UnaryFunctionNodeBase)Activator.CreateInstance(
                                         t1,
-                                        this.stringFormatters,
                                         this.GenerateExpression(parameterExpressions[0]))).Simplify();
                                 }
                                 else
@@ -398,7 +393,6 @@ namespace IX.Math.WorkingSet
                                 {
                                     returnValue = ((BinaryFunctionNodeBase)Activator.CreateInstance(
                                         t2,
-                                        this.stringFormatters,
                                         this.GenerateExpression(parameterExpressions[0]),
                                         this.GenerateExpression(parameterExpressions[1]))).Simplify();
                                 }
@@ -416,7 +410,6 @@ namespace IX.Math.WorkingSet
                                 {
                                     returnValue = ((TernaryFunctionNodeBase)Activator.CreateInstance(
                                         t3,
-                                        this.stringFormatters,
                                         this.GenerateExpression(parameterExpressions[0]),
                                         this.GenerateExpression(parameterExpressions[1]),
                                         this.GenerateExpression(parameterExpressions[2]))).Simplify();

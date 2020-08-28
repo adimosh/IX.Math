@@ -3,12 +3,10 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Extensions;
 
@@ -28,11 +26,9 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
                                                          throw new MathematicsEngineException();
 
         public RightShiftNode(
-            List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right)
             : base(
-                stringFormatters,
                 left,
                 right)
         {
@@ -62,12 +58,12 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
 
                 if (nLeft.TryGetInteger(out var lvi))
                 {
-                    return this.GenerateConstantInteger(lvi >> intValue);
+                    return GenerateConstantInteger(lvi >> intValue);
                 }
 
                 if (nLeft.TryGetByteArray(out var lvb))
                 {
-                    return this.GenerateConstantByteArray(lvb.RightShift(intValue));
+                    return GenerateConstantByteArray(lvb.RightShift(intValue));
                 }
 
                 return this;
@@ -92,7 +88,6 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new RightShiftNode(
-                this.StringFormatters,
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
 

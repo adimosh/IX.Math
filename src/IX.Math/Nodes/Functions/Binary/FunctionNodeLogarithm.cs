@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Extensibility;
@@ -23,15 +22,12 @@ namespace IX.Math.Nodes.Functions.Binary
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeLogarithm" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
         public FunctionNodeLogarithm(
-            List<IStringFormatter> stringFormatters,
             NodeBase firstParameter,
             NodeBase secondParameter)
             : base(
-                stringFormatters,
                 firstParameter,
                 secondParameter)
         {
@@ -45,7 +41,6 @@ namespace IX.Math.Nodes.Functions.Binary
         /// A deep clone.
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeLogarithm(
-            this.StringFormatters,
             this.FirstParameter.DeepClone(context),
             this.SecondParameter.DeepClone(context));
 
@@ -64,7 +59,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 return this;
             }
 
-            return this.GenerateConstantNumeric(
+            return GenerateConstantNumeric(
                 GlobalSystem.Math.Log(
                     first,
                     second));

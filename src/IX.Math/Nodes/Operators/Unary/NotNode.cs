@@ -2,11 +2,9 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using JetBrains.Annotations;
 
@@ -22,13 +20,10 @@ namespace IX.Math.Nodes.Operators.Unary
         /// <summary>
         /// Initializes a new instance of the <see cref="NotNode" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="operand">The operand.</param>
         public NotNode(
-            List<IStringFormatter> stringFormatters,
             [NotNull] NodeBase operand)
             : base(
-                stringFormatters,
                 operand)
         {
         }
@@ -48,12 +43,12 @@ namespace IX.Math.Nodes.Operators.Unary
 
             if (c.TryGetBoolean(out var bv))
             {
-                return this.GenerateConstantBoolean(!bv);
+                return GenerateConstantBoolean(!bv);
             }
 
             if (c.TryGetInteger(out var iv))
             {
-                return this.GenerateConstantInteger(~iv);
+                return GenerateConstantInteger(~iv);
             }
 
             return this;
@@ -64,9 +59,7 @@ namespace IX.Math.Nodes.Operators.Unary
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new NotNode(
-            this.StringFormatters,
-            this.Operand.DeepClone(context));
+        public override NodeBase DeepClone(NodeCloningContext context) => new NotNode(this.Operand.DeepClone(context));
 
         /// <summary>
         ///     Ensures that the operands are compatible, and refines the return type of this expression based on them.

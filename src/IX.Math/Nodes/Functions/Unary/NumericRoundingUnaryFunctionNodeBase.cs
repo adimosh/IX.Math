@@ -3,10 +3,9 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Functions.Unary
 {
@@ -14,18 +13,16 @@ namespace IX.Math.Nodes.Functions.Unary
     ///     A base class for numeric unary functions.
     /// </summary>
     /// <seealso cref="UnaryFunctionNodeBase" />
+    [PublicAPI]
     public abstract class NumericRoundingUnaryFunctionNodeBase : UnaryFunctionNodeBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NumericRoundingUnaryFunctionNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="parameter">The parameter.</param>
         protected NumericRoundingUnaryFunctionNodeBase(
-            List<IStringFormatter> stringFormatters,
             NodeBase parameter)
             : base(
-                stringFormatters,
                 parameter)
         {
         }
@@ -51,10 +48,10 @@ namespace IX.Math.Nodes.Functions.Unary
                 if (isInteger)
                 {
                     // Constant integers do not need rounding
-                    return this.GenerateConstantInteger(iValue);
+                    return GenerateConstantInteger(iValue);
                 }
 
-                return this.GenerateConstantNumeric(this.RepresentedFunction(value));
+                return GenerateConstantNumeric(this.RepresentedFunction(value));
             }
 
             if (this.Parameter.PossibleReturnType == SupportableValueType.Integer)

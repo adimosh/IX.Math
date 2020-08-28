@@ -2,9 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using IX.Math.Exceptions;
-using IX.Math.Extensibility;
 
 namespace IX.Math.Nodes.Operators.Binary.Bitwise
 {
@@ -17,15 +15,12 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
         /// <summary>
         /// Initializes a new instance of the <see cref="ByteShiftOperatorNodeBase" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         protected private ByteShiftOperatorNodeBase(
-            List<IStringFormatter> stringFormatters,
             NodeBase left,
             NodeBase right)
             : base(
-                stringFormatters,
                 left,
                 right)
         {

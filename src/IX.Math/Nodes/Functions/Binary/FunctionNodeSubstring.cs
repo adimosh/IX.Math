@@ -3,7 +3,6 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
@@ -27,15 +26,12 @@ namespace IX.Math.Nodes.Functions.Binary
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionNodeSubstring" /> class.
         /// </summary>
-        /// <param name="stringFormatters">The string formatters.</param>
         /// <param name="stringParameter">The string parameter.</param>
         /// <param name="numericParameter">The numeric parameter.</param>
         public FunctionNodeSubstring(
-            List<IStringFormatter> stringFormatters,
             NodeBase stringParameter,
             NodeBase numericParameter)
             : base(
-                stringFormatters,
                 stringParameter,
                 numericParameter)
         {
@@ -49,7 +45,6 @@ namespace IX.Math.Nodes.Functions.Binary
         /// A deep clone.
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeSubstring(
-            this.StringFormatters,
             this.FirstParameter.DeepClone(context),
             this.SecondParameter.DeepClone(context));
 
@@ -68,7 +63,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 return this;
             }
 
-            return this.GenerateConstantString(first.Substring(Convert.ToInt32(second)));
+            return GenerateConstantString(first.Substring(Convert.ToInt32(second)));
         }
 
         /// <summary>
