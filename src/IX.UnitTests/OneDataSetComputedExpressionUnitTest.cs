@@ -25,13 +25,9 @@ namespace IX.UnitTests
         {
             new object[]
             {
-                "leftOperand-rightOperand",
-                new Dictionary<string, object>
-                {
-                    ["leftOperand"] = 5745786L,
-                    ["rightOperand"] = 1986373029L,
-                },
-                -1980627243L,
+                "-\"17\"",
+                null,
+                -17L,
             },
         };
 

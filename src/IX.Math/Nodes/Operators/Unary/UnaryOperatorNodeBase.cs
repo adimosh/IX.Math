@@ -37,7 +37,7 @@ namespace IX.Math.Nodes.Operators.Unary
                 operand,
                 nameof(operand));
 
-            this.EnsureCompatibleOperandsAndRefineReturnType(tempOperand);
+            this.EnsureCompatibleOperandsAndRefineReturnType(ref tempOperand);
 
             this.Operand = tempOperand;
         }
@@ -86,13 +86,14 @@ namespace IX.Math.Nodes.Operators.Unary
 
             this.Operand.Verify();
 
-            this.EnsureCompatibleOperandsAndRefineReturnType(this.Operand);
+            var tempOperand = this.Operand;
+            this.EnsureCompatibleOperandsAndRefineReturnType(ref tempOperand);
         }
 
         /// <summary>
         ///     Ensures that the operands are compatible, and refines the return type of this expression based on them.
         /// </summary>
         /// <param name="operand">The operand.</param>
-        protected abstract void EnsureCompatibleOperandsAndRefineReturnType(NodeBase operand);
+        protected abstract void EnsureCompatibleOperandsAndRefineReturnType(ref NodeBase operand);
     }
 }

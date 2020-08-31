@@ -55,11 +55,15 @@ namespace IX.Math.Nodes.Operators.Unary
         ///     Ensures that the operands are compatible, and refines the return type of this expression based on them.
         /// </summary>
         /// <param name="operand">The operand.</param>
-        protected override void EnsureCompatibleOperandsAndRefineReturnType(NodeBase operand)
+        protected override void EnsureCompatibleOperandsAndRefineReturnType(ref NodeBase operand)
         {
             this.CalculatedCosts.Clear();
 
-            var supportedType = operand.VerifyPossibleType(SupportableValueType.Numeric | SupportableValueType.Integer);
+            SupportableValueType supportedType;
+
+            supportedType = operand.VerifyPossibleType(SupportableValueType.Numeric | SupportableValueType.Integer | SupportableValueType.String);
+
+            supportedType &= SupportableValueType.Numeric | SupportableValueType.Integer;
 
             if (supportedType == SupportableValueType.Numeric)
             {
@@ -124,7 +128,49 @@ namespace IX.Math.Nodes.Operators.Unary
             }
             else
             {
-                throw new MathematicsEngineException();
+                supportedType = operand.VerifyPossibleType(SupportableValueType.String);
+
+                if (supportedType == SupportableValueType.String)
+                {
+                    operand = GenerateNumericOrIntegerConversionNode(operand);
+
+                    int boolCost = operand.CalculateStrategyCost(SupportedValueType.Numeric);
+                    int intCost = operand.CalculateStrategyCost(SupportedValueType.Integer);
+                    this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Numeric) |
+                                              GetSupportableConversions(SupportedValueType.Integer);
+
+                    foreach (var svt in GetSupportedTypeOptions(this.PossibleReturnType))
+                    {
+                        int totalBoolCost = GetStandardConversionStrategyCost(
+                            SupportedValueType.Numeric,
+                            in svt);
+                        if (totalBoolCost != int.MaxValue)
+                        {
+                            totalBoolCost += boolCost;
+                        }
+
+                        int totalIntCost = GetStandardConversionStrategyCost(
+                            SupportedValueType.Integer,
+                            in svt);
+                        if (totalIntCost != int.MaxValue)
+                        {
+                            totalIntCost += intCost;
+                        }
+
+                        if (totalIntCost <= totalBoolCost)
+                        {
+                            this.CalculatedCosts[svt] = (totalIntCost, SupportedValueType.Integer);
+                        }
+                        else
+                        {
+                            this.CalculatedCosts[svt] = (totalBoolCost, SupportedValueType.Numeric);
+                        }
+                    }
+                }
+                else
+                {
+                    throw new ExpressionNotValidLogicallyException();
+                }
             }
         }
 
@@ -155,7 +201,7 @@ namespace IX.Math.Nodes.Operators.Unary
 
             return Expression.Subtract(
                 Expression.Constant(
-                    tuple.InternalType == SupportedValueType.Integer ? 0L : 0D,
+                    tuple.InternalType == SupportedValueType.Integer ? (object)0L : (object)0D,
                     tuple.InternalType == SupportedValueType.Integer ? typeof(long) : typeof(double)),
                 operandExpression);
         }

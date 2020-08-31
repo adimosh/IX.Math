@@ -65,7 +65,7 @@ namespace IX.Math.Nodes.Operators.Unary
         ///     Ensures that the operands are compatible, and refines the return type of this expression based on them.
         /// </summary>
         /// <param name="operand">The operand.</param>
-        protected override void EnsureCompatibleOperandsAndRefineReturnType(NodeBase operand)
+        protected override void EnsureCompatibleOperandsAndRefineReturnType(ref NodeBase operand)
         {
             this.CalculatedCosts.Clear();
 

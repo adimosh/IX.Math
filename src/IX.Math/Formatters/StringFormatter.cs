@@ -3,8 +3,10 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
+using IX.Math.Extensibility;
 using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
@@ -26,7 +28,7 @@ namespace IX.Math.Formatters
         public static string FormatIntoString<T>(
             T value)
         {
-            var sf = MathematicPortfolio.CurrentContext?.Value?.stringFormatters;
+            var sf = (List<IStringFormatter>)MathematicPortfolio.CurrentContext?.Value?.StringFormatters;
             if (sf == null)
             {
                 return ToStringRegular(value);

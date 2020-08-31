@@ -29,7 +29,7 @@ namespace IX.Math.Nodes
         "StyleCop.CSharp.OrderingRules",
         "SA1204:Static elements should appear before instance elements",
         Justification = "It works better to just have methods properly grouped.")]
-    public abstract class NodeBase : IContextAwareDeepCloneable<NodeCloningContext, NodeBase>
+    public abstract partial class NodeBase : IContextAwareDeepCloneable<NodeCloningContext, NodeBase>
     {
         #region Cached MethodInfo objects
 

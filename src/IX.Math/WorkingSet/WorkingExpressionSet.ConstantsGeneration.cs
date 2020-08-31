@@ -7,9 +7,11 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using IX.Math.Exceptions;
+using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Globalization;
+using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace IX.Math.WorkingSet
@@ -27,7 +29,7 @@ namespace IX.Math.WorkingSet
 
         private static readonly Regex BitRepresentationRegex = new Regex("^[01]{8}$");
 
-        private static bool ParseNumeric(
+        internal static bool ParseNumeric(
             string expression,
             out object result)
         {
@@ -109,7 +111,7 @@ namespace IX.Math.WorkingSet
             }
         }
 
-        private static bool ParseByteArray(
+        internal static bool ParseByteArray(
             string expression,
             out byte[] result)
         {
@@ -372,9 +374,12 @@ namespace IX.Math.WorkingSet
             out object value)
         {
             // Go through each interpreter
-            foreach (var interpreter in this.interpreters.KeysByLevel.SelectMany(p => p.Value))
+            var interpreters =
+                (LevelDictionary<Type, IConstantInterpreter>)MathematicPortfolio.CurrentContext.Value
+                    .ConstantInterpreters;
+            foreach (var interpreter in interpreters.KeysByLevel.SelectMany(p => p.Value))
             {
-                var (success, result) = this.interpreters[interpreter]
+                var (success, result) = interpreters[interpreter]
                     .EvaluateIsConstant(
                         content,
                         this.definition);

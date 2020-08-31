@@ -63,7 +63,7 @@ namespace IX.Math
 
         private readonly MathDefinition workingDefinition;
 
-        internal readonly List<IStringFormatter> stringFormatters;
+        private readonly List<IStringFormatter> stringFormatters;
 
         [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
             "IDisposableAnalyzers.Correctness",
@@ -290,6 +290,14 @@ namespace IX.Math
         /// The string formatters.
         /// </value>
         public IReadOnlyList<IStringFormatter> StringFormatters => this.stringFormatters;
+
+        /// <summary>
+        /// Gets the constant interpreters.
+        /// </summary>
+        /// <value>
+        /// The constant interpreters.
+        /// </value>
+        public IDictionary<Type, IConstantInterpreter> ConstantInterpreters => this.constantInterpreters;
 
         /// <summary>
         ///     Returns the prototypes of all registered functions.
@@ -658,8 +666,7 @@ namespace IX.Math
                 this.unaryFunctions,
                 this.binaryFunctions,
                 this.ternaryFunctions,
-                this.constantExtractors,
-                this.constantInterpreters);
+                this.constantExtractors);
             ComputationBody cb = workingSet.CreateBody();
 
             ComputedExpression result = !workingSet.Success

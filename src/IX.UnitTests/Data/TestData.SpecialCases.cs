@@ -620,6 +620,12 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
+                    "-\"17\"",
+                    null,
+                    -17L,
+                },
+                new object[]
+                {
                     "sqrt(x)",
                     new Dictionary<string, object>
                     {

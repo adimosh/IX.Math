@@ -54,11 +54,6 @@ namespace IX.Math.WorkingSet
         private readonly LevelDictionary<Type, IConstantsExtractor> extractors;
 
         /// <summary>
-        ///     Gets the constant interpreters.
-        /// </summary>
-        private readonly LevelDictionary<Type, IConstantInterpreter> interpreters;
-
-        /// <summary>
         ///     Gets the parameter registry.
         /// </summary>
         private readonly ConcurrentDictionary<string, ExternalParameterNode> parameterRegistry;
@@ -151,8 +146,7 @@ namespace IX.Math.WorkingSet
             Dictionary<string, Type> unaryFunctions,
             Dictionary<string, Type> binaryFunctions,
             Dictionary<string, Type> ternaryFunctions,
-            LevelDictionary<Type, IConstantsExtractor> extractors,
-            LevelDictionary<Type, IConstantInterpreter> interpreters)
+            LevelDictionary<Type, IConstantsExtractor> extractors)
         {
             this.parameterRegistry = new ConcurrentDictionary<string, ExternalParameterNode>();
             this.constantsTable = new Dictionary<string, ConstantNodeBase>();
@@ -191,7 +185,6 @@ namespace IX.Math.WorkingSet
             this.ternaryFunctions = ternaryFunctions;
 
             this.extractors = extractors;
-            this.interpreters = interpreters;
 
             this.functionRegex = new Regex(
                 $@"(?'functionName'.*?){Regex.Escape(mathDefinition.Parentheses.Item1)}(?'expression'.*?){Regex.Escape(mathDefinition.Parentheses.Item2)}");
