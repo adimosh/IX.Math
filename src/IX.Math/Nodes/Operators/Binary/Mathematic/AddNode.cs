@@ -72,7 +72,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             }
 
             // We have two integer-convertible constants
-            if (left.TryGetInteger(out long liv) && left.TryGetInteger(out long riv))
+            if (left.TryGetInteger(out long liv) && right.TryGetInteger(out long riv))
             {
                 if (left is NumericNode && right is NumericNode)
                 {
@@ -85,13 +85,13 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             }
 
             // We have two numeric-convertible constants
-            if (left.TryGetNumeric(out double lnv) && left.TryGetNumeric(out double rnv))
+            if (left.TryGetNumeric(out double lnv) && right.TryGetNumeric(out double rnv))
             {
                 return GenerateConstantNumeric(lnv + rnv);
             }
 
             // We have two binary-convertible constants
-            if (left.TryGetByteArray(out byte[] lbav) && left.TryGetByteArray(out byte[] rbav))
+            if (left.TryGetByteArray(out byte[] lbav) && right.TryGetByteArray(out byte[] rbav))
             {
                 return GenerateConstantByteArray(
                     Stitch(
@@ -100,7 +100,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             }
 
             // We have string-able constants
-            if (left.TryGetString(out string lsv) && left.TryGetString(out string rsv))
+            if (left.TryGetString(out string lsv) && right.TryGetString(out string rsv))
             {
                 return GenerateConstantString(lsv + rsv);
             }

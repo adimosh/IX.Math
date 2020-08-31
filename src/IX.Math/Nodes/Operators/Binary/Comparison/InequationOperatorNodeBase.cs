@@ -105,10 +105,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
 
                 return (this.equals, this.lessThan) switch
                 {
-                    (true, true) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) >= 0),
-                    (false, true) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) > 0),
-                    (true, false) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) <= 0),
-                    (false, false) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) < 0)
+                    (true, true) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) <= 0),
+                    (false, true) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) < 0),
+                    (true, false) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) >= 0),
+                    (false, false) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) > 0)
                 };
             }
 
