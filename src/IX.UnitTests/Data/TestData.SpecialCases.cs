@@ -626,6 +626,39 @@ namespace IX.UnitTests.Data
                 },
                 new object[]
                 {
+                    "-x",
+                    new Dictionary<string, object>
+                    {
+                        ["x"] = "17",
+                    },
+                    -17L,
+                },
+                new object[]
+                {
+                    "\"17\"-5",
+                    null,
+                    12L,
+                },
+                new object[]
+                {
+                    "x-5",
+                    new Dictionary<string, object>
+                    {
+                        ["x"] = "17",
+                    },
+                    12L,
+                },
+                new object[]
+                {
+                    "\"17\"-x",
+                    new Dictionary<string, object>
+                    {
+                        ["x"] = 5,
+                    },
+                    12L,
+                },
+                new object[]
+                {
                     "sqrt(x)",
                     new Dictionary<string, object>
                     {

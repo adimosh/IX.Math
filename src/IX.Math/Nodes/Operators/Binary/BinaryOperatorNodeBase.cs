@@ -75,7 +75,7 @@ namespace IX.Math.Nodes.Operators.Binary
         /// <value>
         ///     The left operand.
         /// </value>
-        protected NodeBase Left { get; }
+        protected NodeBase Left { get; private set; }
 
         /// <summary>
         ///     Gets the right operand.
@@ -83,7 +83,7 @@ namespace IX.Math.Nodes.Operators.Binary
         /// <value>
         ///     The right operand.
         /// </value>
-        protected NodeBase Right { get; }
+        protected NodeBase Right { get; private set; }
 
         /// <summary>
         /// Verifies this node and all nodes above it for logical validity.
@@ -104,6 +104,9 @@ namespace IX.Math.Nodes.Operators.Binary
             this.EnsureCompatibleOperandsAndRefineReturnType(
                 ref leftProcessed,
                 ref rightProcessed);
+
+            this.Left = leftProcessed;
+            this.Right = rightProcessed;
         }
 
         /// <summary>

@@ -72,7 +72,7 @@ namespace IX.Math.Nodes.Operators.Unary
         ///     The operand.
         /// </value>
         [NotNull]
-        protected NodeBase Operand { get; }
+        protected NodeBase Operand { get; private set; }
 
         /// <summary>
         ///     Verifies this node and all nodes above it for logical validity.
@@ -88,6 +88,7 @@ namespace IX.Math.Nodes.Operators.Unary
 
             var tempOperand = this.Operand;
             this.EnsureCompatibleOperandsAndRefineReturnType(ref tempOperand);
+            this.Operand = tempOperand;
         }
 
         /// <summary>
