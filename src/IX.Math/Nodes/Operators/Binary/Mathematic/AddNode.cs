@@ -125,8 +125,8 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         protected override void EnsureCompatibleOperandsAndRefineReturnType(
-            NodeBase left,
-            NodeBase right)
+            ref NodeBase left,
+            ref NodeBase right)
         {
             const SupportableValueType completeSupport =
                 SupportableValueType.Integer |

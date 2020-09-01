@@ -189,6 +189,55 @@ namespace IX.Math.WorkingSet
             }
         }
 
+        internal static bool TryInterpretStringValue(
+            string content,
+            out object value)
+        {
+            // Go through each interpreter
+            var interpreters =
+                (LevelDictionary<Type, IConstantInterpreter>)MathematicPortfolio.CurrentContext.Value
+                    .ConstantInterpreters;
+            foreach (var interpreter in interpreters.KeysByLevel.SelectMany(p => p.Value))
+            {
+                var (success, result) = interpreters[interpreter]
+                    .EvaluateIsConstant(
+                        content);
+                if (success)
+                {
+                    value = result;
+                    return true;
+                }
+            }
+
+            // Standard formatters
+            if (ParseNumeric(
+                content,
+                out object n))
+            {
+                value = n;
+                return true;
+            }
+
+            if (ParseByteArray(
+                content,
+                out byte[] ba))
+            {
+                value = ba;
+                return true;
+            }
+
+            if (bool.TryParse(
+                content,
+                out var b))
+            {
+                value = b;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
         /// <summary>
         /// Generates a named numeric symbol.
         /// </summary>
@@ -345,7 +394,7 @@ namespace IX.Math.WorkingSet
             }
 
             // Let's interpret this
-            if (!this.TryInterpretStringValue(
+            if (!TryInterpretStringValue(
                 content,
                 out var value))
             {
@@ -367,56 +416,6 @@ namespace IX.Math.WorkingSet
 
             // Return
             return name;
-        }
-
-        private bool TryInterpretStringValue(
-            string content,
-            out object value)
-        {
-            // Go through each interpreter
-            var interpreters =
-                (LevelDictionary<Type, IConstantInterpreter>)MathematicPortfolio.CurrentContext.Value
-                    .ConstantInterpreters;
-            foreach (var interpreter in interpreters.KeysByLevel.SelectMany(p => p.Value))
-            {
-                var (success, result) = interpreters[interpreter]
-                    .EvaluateIsConstant(
-                        content,
-                        this.definition);
-                if (success)
-                {
-                    value = result;
-                    return true;
-                }
-            }
-
-            // Standard formatters
-            if (ParseNumeric(
-                content,
-                out object n))
-            {
-                value = n;
-                return true;
-            }
-
-            if (ParseByteArray(
-                content,
-                out byte[] ba))
-            {
-                value = ba;
-                return true;
-            }
-
-            if (bool.TryParse(
-                content,
-                out var b))
-            {
-                value = b;
-                return true;
-            }
-
-            value = default;
-            return false;
         }
 
         private string AddExtractedValue(

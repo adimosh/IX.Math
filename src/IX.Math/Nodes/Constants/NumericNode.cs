@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using IX.Math.Conversion;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
@@ -92,14 +93,12 @@ namespace IX.Math.Nodes.Constants
 
             this.binaryRepresentation = BitConverter.GetBytes(value);
 
-            if (value <= long.MaxValue && value >= long.MinValue)
+            if (InternalTypeDirectConversions.ToInteger(
+                value,
+                out var i))
             {
-                var numericAbs = global::System.Math.Abs(value);
-                if (numericAbs - global::System.Math.Floor(numericAbs) < double.Epsilon)
-                {
-                    this.supportableTypes |= SupportableValueType.Integer;
-                    this.possibleInteger = Convert.ToInt64(value);
-                }
+                this.supportableTypes |= SupportableValueType.Integer;
+                this.possibleInteger = i;
             }
 
             return this.supportableTypes;

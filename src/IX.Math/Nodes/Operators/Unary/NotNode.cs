@@ -69,6 +69,7 @@ namespace IX.Math.Nodes.Operators.Unary
         {
             this.CalculatedCosts.Clear();
 
+            EnsureNode(ref operand, SupportableValueType.Boolean | SupportableValueType.Integer);
             var supportedType = operand.VerifyPossibleType(SupportableValueType.Boolean | SupportableValueType.Integer);
 
             if (supportedType == SupportableValueType.Boolean)

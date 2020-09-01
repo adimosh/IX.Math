@@ -85,8 +85,11 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <exception cref="ExpressionNotValidLogicallyException">Calculation on unsupported types.</exception>
-        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(NodeBase left, NodeBase right)
+        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(ref NodeBase left, ref NodeBase right)
         {
+            EnsureNode(ref left, SupportableValueType.Numeric | SupportableValueType.Integer);
+            EnsureNode(ref right, SupportableValueType.Numeric | SupportableValueType.Integer);
+
             const SupportableValueType logicalMaximumSupport =
                 SupportableValueType.Integer | SupportableValueType.Numeric;
 

@@ -31,7 +31,7 @@ namespace IX.Math.Nodes.Conversion
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new ByteArrayDesiredFromStringConversionNode(
-                this.ConvertFromNode);
+                this.ConvertFromNode.DeepClone(context));
 
         /// <summary>
         /// Generates the expression that this node represents.
@@ -44,21 +44,28 @@ namespace IX.Math.Nodes.Conversion
             in ComparisonTolerance comparisonTolerance)
         {
             return Expression.Call(
-                ((Func<string, byte[]>)ParseNumeric).Method,
+                ((Func<string, byte[]>)ParseByteArray).Method,
                 this.ConvertFromNode.GenerateExpression(
                     SupportedValueType.String,
                     in comparisonTolerance));
 
-            static byte[] ParseNumeric(string input)
+            static byte[] ParseByteArray(string input)
             {
-                if (!WorkingExpressionSet.ParseByteArray(
+                if (!WorkingExpressionSet.TryInterpretStringValue(
                     input,
                     out var result))
                 {
                     throw new InvalidCastException();
                 }
 
-                return result;
+                return result switch
+                {
+                    long l => BitConverter.GetBytes(l),
+                    double d => BitConverter.GetBytes(d),
+                    byte[] ba => ba,
+                    bool b => BitConverter.GetBytes(b),
+                    _ => throw new InvalidCastException()
+                };
             }
         }
     }

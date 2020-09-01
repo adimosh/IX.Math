@@ -1,4 +1,4 @@
-// <copyright file="NumericOrIntegerDesiredFromStringConversionNode.cs" company="Adrian Mos">
+// <copyright file="AnythingDesiredFromStringConversionNode.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -13,15 +13,15 @@ namespace IX.Math.Nodes.Conversion
     /// A conversion node for when a numeric type is desired.
     /// </summary>
     /// <seealso cref="IX.Math.Nodes.Conversion.ConversionNodeBase" />
-    public class NumericOrIntegerDesiredFromStringConversionNode : ConversionNodeBase
+    public class AnythingDesiredFromStringConversionNode : ConversionNodeBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NumericOrIntegerDesiredFromStringConversionNode"/> class.
+        /// Initializes a new instance of the <see cref="AnythingDesiredFromStringConversionNode"/> class.
         /// </summary>
         /// <param name="sourceNode">The source node.</param>
-        public NumericOrIntegerDesiredFromStringConversionNode(
+        public AnythingDesiredFromStringConversionNode(
             [JetBrains.Annotations.NotNull] NodeBase sourceNode)
-        : base(sourceNode, SupportableValueType.Numeric | SupportableValueType.Integer)
+        : base(sourceNode, SupportableValueType.Numeric | SupportableValueType.Integer | SupportableValueType.ByteArray | SupportableValueType.Boolean)
         {
         }
 
@@ -31,7 +31,7 @@ namespace IX.Math.Nodes.Conversion
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
-            new NumericOrIntegerDesiredFromStringConversionNode(
+            new AnythingDesiredFromStringConversionNode(
                 this.ConvertFromNode.DeepClone(context));
 
         /// <summary>
@@ -55,6 +55,18 @@ namespace IX.Math.Nodes.Conversion
                 case SupportedValueType.Integer:
                     return Expression.Call(
                         ((Func<string, long>)InternalTypeDirectConversions.ParseInteger).Method,
+                        this.ConvertFromNode.GenerateExpression(
+                            SupportedValueType.String,
+                            in comparisonTolerance));
+                case SupportedValueType.ByteArray:
+                    return Expression.Call(
+                        ((Func<string, byte[]>)InternalTypeDirectConversions.ParseByteArray).Method,
+                        this.ConvertFromNode.GenerateExpression(
+                            SupportedValueType.String,
+                            in comparisonTolerance));
+                case SupportedValueType.Boolean:
+                    return Expression.Call(
+                        ((Func<string, bool>)InternalTypeDirectConversions.ParseBoolean).Method,
                         this.ConvertFromNode.GenerateExpression(
                             SupportedValueType.String,
                             in comparisonTolerance));

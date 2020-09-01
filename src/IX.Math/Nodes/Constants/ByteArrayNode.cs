@@ -4,6 +4,7 @@
 
 using System;
 using System.Diagnostics;
+using IX.Math.Conversion;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
@@ -104,15 +105,13 @@ namespace IX.Math.Nodes.Constants
                 }
 
                 // Integer-compatible
-                this.possibleInteger = BitConverter.ToInt64(
-                    value,
-                    0);
+                _ = InternalTypeDirectConversions.ToInteger(value, out var i);
+                this.possibleInteger = i;
                 this.supportableType |= SupportableValueType.Integer;
 
                 // Numeric-compatible
-                this.possibleNumeric = BitConverter.ToDouble(
-                    value,
-                    0);
+                _ = InternalTypeDirectConversions.ToNumeric(value, out var n);
+                this.possibleNumeric = n;
                 this.supportableType |= SupportableValueType.Numeric;
             }
 

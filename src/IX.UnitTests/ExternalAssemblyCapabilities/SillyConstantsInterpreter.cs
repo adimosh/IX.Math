@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using IX.Math;
 using IX.Math.Extensibility;
 using IX.StandardExtensions.Globalization;
 using JetBrains.Annotations;
@@ -21,7 +20,6 @@ namespace IX.UnitTests.ExternalAssemblyCapabilities
         /// Evaluates part of an expression, determining whether or not it is a constant.
         /// </summary>
         /// <param name="expressionPart">The expression part.</param>
-        /// <param name="definition">The mathematic definition.</param>
         /// <returns>
         /// <c>true</c>, along with the evaluated node, if the expression part correctly evaluates to a constant, <c>false</c>
         /// otherwise.
@@ -43,8 +41,7 @@ namespace IX.UnitTests.ExternalAssemblyCapabilities
         /// </para>
         /// </remarks>
         public (bool Success, object Value) EvaluateIsConstant(
-            string expressionPart,
-            MathDefinition definition) =>
+            string expressionPart) =>
             expressionPart.CurrentCultureEqualsInsensitive("bumblydumb") ? (true, 2L) : (false, default);
     }
 }

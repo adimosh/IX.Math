@@ -562,6 +562,8 @@ namespace IX.Math
                 return result.ConstantValue;
             }
 
+            this.SetThreadPortfolio();
+
             try
             {
                 return result.CompiledExpression.DynamicInvoke(pars);
@@ -588,14 +590,7 @@ namespace IX.Math
 
                 var localTolerance = key.Tolerance;
 
-#if NET452
-                if (CurrentContext?.Value != this)
-                {
-                    CurrentContext = new ThreadStatic<MathematicPortfolio>(this);
-                }
-#else
-                CurrentContext.Value = this;
-#endif
+                this.SetThreadPortfolio();
 
                 using var clonedComputedExpression = computedExpression.DeepClone();
                 var (success, isConstant, @delegate, constantValue) = clonedComputedExpression.CompileDelegate(
@@ -627,16 +622,21 @@ namespace IX.Math
             base.DisposeManagedContext();
         }
 
-        private ComputedExpression ValueFactory(string expression)
+        private void SetThreadPortfolio()
         {
-            #if NET452
+#if NET452
             if (CurrentContext?.Value != this)
             {
                 CurrentContext = new ThreadStatic<MathematicPortfolio>(this);
             }
-            #else
+#else
             CurrentContext.Value = this;
-            #endif
+#endif
+        }
+
+        private ComputedExpression ValueFactory(string expression)
+        {
+            this.SetThreadPortfolio();
 
             if (this.constantPassThroughExtractors.KeysByLevel.SelectMany(p => p.Value)
                 .Any(

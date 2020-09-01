@@ -3,9 +3,8 @@
 // </copyright>
 
 using System;
-using System.Globalization;
 using System.Linq.Expressions;
-using IX.Math.WorkingSet;
+using IX.Math.Conversion;
 
 namespace IX.Math.Nodes.Conversion
 {
@@ -32,7 +31,7 @@ namespace IX.Math.Nodes.Conversion
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
             new NumericDesiredFromStringConversionNode(
-                this.ConvertFromNode);
+                this.ConvertFromNode.DeepClone(context));
 
         /// <summary>
         /// Generates the expression that this node represents.
@@ -42,25 +41,10 @@ namespace IX.Math.Nodes.Conversion
         /// <returns>A compiled expression, if one is possible.</returns>
         protected override Expression GenerateExpressionInternal(
             in SupportedValueType valueType,
-            in ComparisonTolerance comparisonTolerance)
-        {
-            return Expression.Call(
-                ((Func<string, double>)ParseNumeric).Method,
-                this.ConvertFromNode.GenerateExpression(
-                    SupportedValueType.String,
-                    in comparisonTolerance));
-
-            static double ParseNumeric(string input)
-            {
-                if (!WorkingExpressionSet.ParseNumeric(
-                    input,
-                    out var result))
-                {
-                    throw new InvalidCastException();
-                }
-
-                return Convert.ToDouble(result, CultureInfo.CurrentCulture);
-            }
-        }
+            in ComparisonTolerance comparisonTolerance) => Expression.Call(
+            ((Func<string, double>)InternalTypeDirectConversions.ParseNumeric).Method,
+            this.ConvertFromNode.GenerateExpression(
+                SupportedValueType.String,
+                in comparisonTolerance));
     }
 }

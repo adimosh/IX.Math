@@ -72,8 +72,11 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <exception cref="ExpressionNotValidLogicallyException">There is no way to calculate this expression.</exception>
-        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(NodeBase left, NodeBase right)
+        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(ref NodeBase left, ref NodeBase right)
         {
+            EnsureNode(ref left, SupportableValueType.Numeric);
+            EnsureNode(ref right, SupportableValueType.Numeric);
+
             var leftType = left.VerifyPossibleType(SupportableValueType.Numeric);
             var rightType = right.VerifyPossibleType(SupportableValueType.Numeric);
 

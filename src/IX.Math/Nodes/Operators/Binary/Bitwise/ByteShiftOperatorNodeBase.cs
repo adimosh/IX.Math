@@ -31,9 +31,13 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
-        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(NodeBase left, NodeBase right)
+        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(ref NodeBase left, ref NodeBase right)
         {
             this.CalculatedCosts.Clear();
+
+            EnsureNode(ref left, SupportableValueType.Integer | SupportableValueType.ByteArray);
+            EnsureNode(ref right, SupportableValueType.Integer);
+
             _ = right.VerifyPossibleType(SupportableValueType.Integer);
             var leftType = left.VerifyPossibleType(SupportableValueType.Integer | SupportableValueType.ByteArray);
 

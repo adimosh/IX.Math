@@ -115,8 +115,8 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
         /// The verification methods of the operands did not behave properly.
         /// </exception>
         protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(
-            NodeBase left,
-            NodeBase right)
+            ref NodeBase left,
+            ref NodeBase right)
         {
             const SupportableValueType logicalMaximumSupport =
                 SupportableValueType.Integer | SupportableValueType.Boolean | SupportableValueType.ByteArray;

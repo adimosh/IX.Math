@@ -4,6 +4,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Conversion
@@ -32,6 +33,8 @@ namespace IX.Math.Nodes.Conversion
             [JetBrains.Annotations.NotNull] NodeBase sourceNode,
             SupportableValueType destinationType)
         {
+            Requires.NotNull(sourceNode, nameof(sourceNode));
+
             var possibleReturns = GetSupportedTypeOptions(destinationType)
                 .SelectMany(p => GetSupportedTypeOptions(GetSupportableConversions(in p)))
                 .Distinct()
@@ -39,7 +42,7 @@ namespace IX.Math.Nodes.Conversion
 
             foreach (var possibleReturn in possibleReturns)
             {
-                this.CalculatedCosts[possibleReturn] = (0, possibleReturn);
+                this.CalculatedCosts[possibleReturn] = (10 + sourceNode.CalculateStrategyCost(SupportedValueType.String), possibleReturn);
             }
 
             this.ConvertFromNode = sourceNode;

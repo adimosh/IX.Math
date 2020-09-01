@@ -39,10 +39,11 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(
-            NodeBase left,
-            NodeBase right)
+            ref NodeBase left,
+            ref NodeBase right)
         {
             this.CalculatedCosts.Clear();
+
             var commonSupportedTypes = left.PossibleReturnType & right.PossibleReturnType;
 
             if (commonSupportedTypes == SupportableValueType.None)

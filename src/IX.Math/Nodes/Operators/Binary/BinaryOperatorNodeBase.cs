@@ -38,8 +38,8 @@ namespace IX.Math.Nodes.Operators.Binary
                 nameof(right)).Simplify();
 
             this.EnsureCompatibleOperandsAndRefineReturnType(
-                leftProcessed,
-                rightProcessed);
+                ref leftProcessed,
+                ref rightProcessed);
 
             this.Left = leftProcessed;
             this.Right = rightProcessed;
@@ -98,9 +98,12 @@ namespace IX.Math.Nodes.Operators.Binary
             this.Left.Verify();
             this.Right.Verify();
 
+            var leftProcessed = this.Left;
+            var rightProcessed = this.Right;
+
             this.EnsureCompatibleOperandsAndRefineReturnType(
-                this.Left,
-                this.Right);
+                ref leftProcessed,
+                ref rightProcessed);
         }
 
         /// <summary>
@@ -109,7 +112,7 @@ namespace IX.Math.Nodes.Operators.Binary
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         protected abstract void EnsureCompatibleOperandsAndRefineReturnType(
-            NodeBase left,
-            NodeBase right);
+            ref NodeBase left,
+            ref NodeBase right);
     }
 }

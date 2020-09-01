@@ -16,7 +16,6 @@ namespace IX.Math.Extensibility
         ///     Evaluates part of an expression, determining whether or not it is a constant.
         /// </summary>
         /// <param name="expressionPart">The expression part.</param>
-        /// <param name="mathDefinition">The math definition.</param>
         /// <returns>
         ///     <c>true</c>, along with the evaluated node, if the expression part correctly evaluates to a constant, <c>false</c>
         ///     otherwise.
@@ -37,7 +36,6 @@ namespace IX.Math.Extensibility
         ///     </para>
         /// </remarks>
         (bool Success, object Value) EvaluateIsConstant(
-            string expressionPart,
-            MathDefinition mathDefinition);
+            string expressionPart);
     }
 }

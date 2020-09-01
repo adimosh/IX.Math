@@ -59,11 +59,9 @@ namespace IX.Math.Nodes.Operators.Unary
         {
             this.CalculatedCosts.Clear();
 
-            SupportableValueType supportedType;
+            EnsureNode(ref operand, SupportableValueType.Numeric | SupportableValueType.Integer);
 
-            supportedType = operand.VerifyPossibleType(SupportableValueType.Numeric | SupportableValueType.Integer | SupportableValueType.String);
-
-            supportedType &= SupportableValueType.Numeric | SupportableValueType.Integer;
+            SupportableValueType supportedType = operand.VerifyPossibleType(SupportableValueType.Numeric | SupportableValueType.Integer);
 
             if (supportedType == SupportableValueType.Numeric)
             {
@@ -128,49 +126,7 @@ namespace IX.Math.Nodes.Operators.Unary
             }
             else
             {
-                supportedType = operand.VerifyPossibleType(SupportableValueType.String);
-
-                if (supportedType == SupportableValueType.String)
-                {
-                    operand = GenerateNumericOrIntegerConversionNode(operand);
-
-                    int boolCost = operand.CalculateStrategyCost(SupportedValueType.Numeric);
-                    int intCost = operand.CalculateStrategyCost(SupportedValueType.Integer);
-                    this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Numeric) |
-                                              GetSupportableConversions(SupportedValueType.Integer);
-
-                    foreach (var svt in GetSupportedTypeOptions(this.PossibleReturnType))
-                    {
-                        int totalBoolCost = GetStandardConversionStrategyCost(
-                            SupportedValueType.Numeric,
-                            in svt);
-                        if (totalBoolCost != int.MaxValue)
-                        {
-                            totalBoolCost += boolCost;
-                        }
-
-                        int totalIntCost = GetStandardConversionStrategyCost(
-                            SupportedValueType.Integer,
-                            in svt);
-                        if (totalIntCost != int.MaxValue)
-                        {
-                            totalIntCost += intCost;
-                        }
-
-                        if (totalIntCost <= totalBoolCost)
-                        {
-                            this.CalculatedCosts[svt] = (totalIntCost, SupportedValueType.Integer);
-                        }
-                        else
-                        {
-                            this.CalculatedCosts[svt] = (totalBoolCost, SupportedValueType.Numeric);
-                        }
-                    }
-                }
-                else
-                {
-                    throw new ExpressionNotValidLogicallyException();
-                }
+                throw new MathematicsEngineException();
             }
         }
 
