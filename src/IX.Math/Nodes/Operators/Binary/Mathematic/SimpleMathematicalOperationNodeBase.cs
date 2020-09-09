@@ -44,7 +44,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                     llv,
                     rlv);
 
-                return isNumeric ? GenerateConstantNumeric(dv) : (NodeBase)GenerateConstantInteger(lv);
+                return isNumeric ? new NumericNode(dv) : (NodeBase)new IntegerNode(lv);
             }
 
             if (lc.TryGetNumeric(out double ldv) && rc.TryGetNumeric(out double rdv))
@@ -53,7 +53,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                     ldv,
                     rdv);
 
-                return isNumeric ? GenerateConstantNumeric(dv) : (NodeBase)GenerateConstantInteger(lv);
+                return isNumeric ? new NumericNode(dv) : (NodeBase)new IntegerNode(lv);
             }
 
             return this;
@@ -65,7 +65,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>Either a long or a double, depending on the circumstances.</returns>
-        protected abstract (bool, long, double) CalculateConstantValue(
+        protected abstract (bool IsNumeric, long Integer, double Numeric) CalculateConstantValue(
             long left,
             long right);
 
@@ -75,7 +75,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>Either a long or a double, depending on the circumstances.</returns>
-        protected abstract (bool, long, double) CalculateConstantValue(
+        protected abstract (bool IsNumeric, long Integer, double Numeric) CalculateConstantValue(
             double left,
             double right);
 

@@ -105,7 +105,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                 equalityValue = !equalityValue.Value;
             }
 
-            return GenerateConstantBoolean(equalityValue.Value);
+            return new BoolNode(equalityValue.Value);
         }
 
         /// <summary>

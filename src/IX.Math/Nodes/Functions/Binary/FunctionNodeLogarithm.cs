@@ -5,6 +5,7 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Extensibility;
+using IX.Math.Nodes.Constants;
 using JetBrains.Annotations;
 using GlobalSystem = System;
 
@@ -59,7 +60,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 return this;
             }
 
-            return GenerateConstantNumeric(
+            return new NumericNode(
                 GlobalSystem.Math.Log(
                     first,
                     second));

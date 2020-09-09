@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Exceptions;
 using IX.Math.Extensibility;
+using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
@@ -58,7 +59,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 return this;
             }
 
-            return GenerateConstantString(first.Replace(second, string.Empty));
+            return new StringNode(first.Replace(second, string.Empty));
         }
 
         /// <summary>

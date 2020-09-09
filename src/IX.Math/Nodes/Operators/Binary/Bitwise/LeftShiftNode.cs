@@ -58,12 +58,12 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
 
                 if (nLeft.TryGetInteger(out var lvi))
                 {
-                    return GenerateConstantInteger(lvi << intValue);
+                    return new IntegerNode(lvi << intValue);
                 }
 
                 if (nLeft.TryGetByteArray(out var lvb))
                 {
-                    return GenerateConstantByteArray(lvb.LeftShift(intValue));
+                    return new ByteArrayNode(lvb.LeftShift(intValue));
                 }
 
                 return this;

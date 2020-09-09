@@ -48,17 +48,19 @@ namespace IX.Math.Nodes.Functions.Unary
         /// </returns>
         public override NodeBase Simplify()
         {
-            if (this.Parameter is ConstantNodeBase c)
+            if (!(this.Parameter is ConstantNodeBase c))
             {
-                if (c.TryGetInteger(out var i))
-                {
-                    return GenerateConstantInteger(GlobalSystem.Math.Abs(i));
-                }
+                return this;
+            }
 
-                if (c.TryGetNumeric(out var n))
-                {
-                    return GenerateConstantNumeric(GlobalSystem.Math.Abs(n));
-                }
+            if (c.TryGetInteger(out var i))
+            {
+                return new IntegerNode(GlobalSystem.Math.Abs(i));
+            }
+
+            if (c.TryGetNumeric(out var n))
+            {
+                return new NumericNode(GlobalSystem.Math.Abs(n));
             }
 
             return this;

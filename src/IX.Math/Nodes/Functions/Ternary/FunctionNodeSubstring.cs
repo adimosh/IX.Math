@@ -84,7 +84,7 @@ namespace IX.Math.Nodes.Functions.Ternary
                 return this;
             }
 
-            return GenerateConstantString(
+            return new StringNode(
                 stringParam.ValueAsString.Substring(
                     Convert.ToInt32(secondValue),
                     Convert.ToInt32(thirdValue)));

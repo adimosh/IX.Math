@@ -9,7 +9,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Exceptions;
 using IX.Math.Formatters;
-using IX.Math.Nodes.Constants;
 using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
@@ -40,6 +39,7 @@ namespace IX.Math.Nodes
             "StyleCop.CSharp.ReadabilityRules",
             "SA1118:Parameter should not span multiple lines",
             Justification = "This is hardly enforceable.")]
+        [NotNull]
         protected static readonly MethodInfo ConvertToIntMethodInfo = typeof(Convert).GetMethod(
                                                                           nameof(Convert.ToInt32),
                                                                           new[]
@@ -100,6 +100,7 @@ namespace IX.Math.Nodes
         /// <value>
         /// The calculated costs.
         /// </value>
+        [NotNull]
         protected Dictionary<SupportedValueType, (int Cost, SupportedValueType InternalType)> CalculatedCosts { get; }
 
         #endregion
@@ -182,6 +183,7 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <param name="supportableTypes">The supportable types.</param>
         /// <returns>The supported types, as a list.</returns>
+        [NotNull]
         public static List<SupportedValueType> GetSupportedTypeOptions(in SupportableValueType supportableTypes)
         {
             List<SupportedValueType> types = new List<SupportedValueType>(5);
@@ -559,7 +561,7 @@ namespace IX.Math.Nodes
             throw new ArgumentInvalidTypeException(nameof(numeric));
         }
 
-        private static double ConvertToNumeric(byte[] binary)
+        private static double ConvertToNumeric([NotNull] byte[] binary)
         {
             if (binary.Length > 8)
             {
@@ -578,7 +580,7 @@ namespace IX.Math.Nodes
                 0);
         }
 
-        private static long ConvertToInteger(byte[] binary)
+        private static long ConvertToInteger([NotNull] byte[] binary)
         {
             if (binary.Length > 8)
             {
@@ -603,7 +605,8 @@ namespace IX.Math.Nodes
         /// <param name="originalExpression">The original expression.</param>
         /// <returns>A converted expression.</returns>
         /// <exception cref="MathematicsEngineException">An internal exception that cannot be avoided.</exception>
-        protected static Expression ConvertToByteArrayExpression(Expression originalExpression)
+        [NotNull]
+        protected static Expression ConvertToByteArrayExpression([NotNull] Expression originalExpression)
         {
             Requires.NotNull(
                 originalExpression,
@@ -638,7 +641,8 @@ namespace IX.Math.Nodes
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "This is intended.")]
-        protected static Expression ConvertToNumericExpression(Expression originalExpression)
+        [NotNull]
+        protected static Expression ConvertToNumericExpression([NotNull] Expression originalExpression)
         {
             Requires.NotNull(
                 originalExpression,
@@ -695,7 +699,8 @@ namespace IX.Math.Nodes
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "This is intended.")]
-        protected static Expression ConvertToBooleanExpression(Expression originalExpression)
+        [NotNull]
+        protected static Expression ConvertToBooleanExpression([NotNull] Expression originalExpression)
         {
             Requires.NotNull(
                 originalExpression,
@@ -732,7 +737,8 @@ namespace IX.Math.Nodes
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "This is intended.")]
-        protected static Expression ConvertToIntegerExpression(Expression originalExpression)
+        [NotNull]
+        protected static Expression ConvertToIntegerExpression([NotNull] Expression originalExpression)
         {
             Requires.NotNull(
                 originalExpression,
@@ -780,45 +786,6 @@ namespace IX.Math.Nodes
 
             throw new MathematicsEngineException();
         }
-
-        #endregion
-
-        #region Constant nodes
-
-        /// <summary>
-        /// Generates a constant node.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>The constant node.</returns>
-        public static IntegerNode GenerateConstantInteger(long value) => new IntegerNode(value);
-
-        /// <summary>
-        /// Generates a constant node.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>The constant node.</returns>
-        public static NumericNode GenerateConstantNumeric(double value) => new NumericNode(value);
-
-        /// <summary>
-        /// Generates a constant node.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>The constant node.</returns>
-        public static ByteArrayNode GenerateConstantByteArray(byte[] value) => new ByteArrayNode(value);
-
-        /// <summary>
-        /// Generates a constant node.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>The constant node.</returns>
-        public static BoolNode GenerateConstantBoolean(bool value) => new BoolNode(value);
-
-        /// <summary>
-        /// Generates a constant node.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <returns>The constant node.</returns>
-        public static StringNode GenerateConstantString(string value) => new StringNode(value);
 
         #endregion
     }

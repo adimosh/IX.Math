@@ -38,8 +38,8 @@ namespace IX.Math.Nodes.Operators.Unary
         public override NodeBase Simplify() =>
             this.Operand switch
             {
-                IntegerNode integerNode => GenerateConstantInteger(-integerNode.Value),
-                NumericNode numericNode => GenerateConstantNumeric(-numericNode.Value),
+                IntegerNode integerNode => new IntegerNode(-integerNode.Value),
+                NumericNode numericNode => new NumericNode(-numericNode.Value),
                 _ => this
             };
 

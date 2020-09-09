@@ -41,7 +41,7 @@ namespace IX.Math.Nodes.Functions.Unary
         public override NodeBase Simplify() =>
             this.Parameter switch
             {
-                ConstantNodeBase cn when cn.TryGetString(out var s) => GenerateConstantInteger(Convert.ToInt64(s.Length)),
+                ConstantNodeBase cn when cn.TryGetString(out var s) => new IntegerNode(Convert.ToInt64(s.Length)),
                 _ => this
             };
 

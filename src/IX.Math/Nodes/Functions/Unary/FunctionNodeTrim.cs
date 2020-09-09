@@ -2,7 +2,9 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+#if !NET452
 using System;
+#endif
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
@@ -42,7 +44,7 @@ namespace IX.Math.Nodes.Functions.Unary
         public override NodeBase Simplify() =>
             this.Parameter switch
             {
-                ConstantNodeBase cn when cn.TryGetString(out var s) => GenerateConstantString(s.Trim()),
+                ConstantNodeBase cn when cn.TryGetString(out var s) => new StringNode(s.Trim()),
                 _ => this
             };
 

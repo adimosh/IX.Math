@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Exceptions;
 using IX.Math.Extensibility;
+using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
@@ -63,7 +64,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 return this;
             }
 
-            return GenerateConstantString(first.Substring(Convert.ToInt32(second)));
+            return new StringNode(first.Substring(Convert.ToInt32(second)));
         }
 
         /// <summary>

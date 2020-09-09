@@ -48,10 +48,10 @@ namespace IX.Math.Nodes.Functions.Unary
                 if (isInteger)
                 {
                     // Constant integers do not need rounding
-                    return GenerateConstantInteger(iValue);
+                    return new IntegerNode(iValue);
                 }
 
-                return GenerateConstantNumeric(this.RepresentedFunction(value));
+                return new NumericNode(this.RepresentedFunction(value));
             }
 
             if (this.Parameter.PossibleReturnType == SupportableValueType.Integer)
@@ -87,7 +87,7 @@ namespace IX.Math.Nodes.Functions.Unary
         /// Gets the simplification expression.
         /// </summary>
         /// <returns>The success value, along with a constant value if successful.</returns>
-        protected (bool, bool, double, long) GetSimplificationExpression()
+        protected (bool Success, bool IsInteger, double Numeric, long Integer) GetSimplificationExpression()
         {
             if (this.Parameter is ConstantNodeBase fp)
             {

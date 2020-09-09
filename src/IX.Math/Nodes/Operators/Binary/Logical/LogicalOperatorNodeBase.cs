@@ -49,7 +49,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
             if (left.TryGetInteger(out long lint) &&
                 right.TryGetInteger(out long rint))
             {
-                return GenerateConstantInteger(
+                return new IntegerNode(
                     this.GenerateData(
                         lint,
                         rint));
@@ -58,7 +58,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
             if (left.TryGetBoolean(out bool lbool) &&
                 right.TryGetBoolean(out bool rbool))
             {
-                return GenerateConstantBoolean(
+                return new BoolNode(
                     this.GenerateData(
                         lbool,
                         rbool));
@@ -67,7 +67,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
             if (left.TryGetByteArray(out byte[] lbin) &&
                 right.TryGetByteArray(out byte[] rbin))
             {
-                return GenerateConstantByteArray(
+                return new ByteArrayNode(
                     this.GenerateData(
                         lbin,
                         rbin));

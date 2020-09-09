@@ -43,7 +43,7 @@ namespace IX.Math.Nodes.Functions.Unary
 
             if (success)
             {
-                return GenerateConstantInteger(this.RepresentedFunction(value));
+                return new IntegerNode(this.RepresentedFunction(value));
             }
 
             return this;
@@ -75,7 +75,7 @@ namespace IX.Math.Nodes.Functions.Unary
         /// Gets the simplification expression.
         /// </summary>
         /// <returns>The success value, along with a constant value if successful.</returns>
-        protected (bool, long) GetSimplificationExpression()
+        protected (bool Success, long Value) GetSimplificationExpression()
         {
             if (this.Parameter is ConstantNodeBase fp &&
                 fp.TryGetInteger(out var first))

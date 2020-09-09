@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Exceptions;
 using IX.Math.Extensibility;
+using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 using GlobalSystem = System;
@@ -55,7 +56,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 return this;
             }
 
-            return GenerateConstantNumeric(
+            return new NumericNode(
                 GlobalSystem.Math.Round(
                     first,
                     GlobalSystem.Convert.ToInt32(second)));

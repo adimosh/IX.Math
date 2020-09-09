@@ -77,23 +77,23 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 if (left is NumericNode && right is NumericNode)
                 {
                     // We have an addition of two numeric nodes that happen to be integer in value
-                    return GenerateConstantNumeric(Convert.ToDouble(liv + riv));
+                    return new NumericNode(Convert.ToDouble(liv + riv));
                 }
 
                 // Otherwise, we have integer values
-                return GenerateConstantInteger(liv + riv);
+                return new IntegerNode(liv + riv);
             }
 
             // We have two numeric-convertible constants
             if (left.TryGetNumeric(out double lnv) && right.TryGetNumeric(out double rnv))
             {
-                return GenerateConstantNumeric(lnv + rnv);
+                return new NumericNode(lnv + rnv);
             }
 
             // We have two binary-convertible constants
             if (left.TryGetByteArray(out byte[] lbav) && right.TryGetByteArray(out byte[] rbav))
             {
-                return GenerateConstantByteArray(
+                return new ByteArrayNode(
                     Stitch(
                         lbav,
                         rbav));
@@ -102,7 +102,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             // We have string-able constants
             if (left.TryGetString(out string lsv) && right.TryGetString(out string rsv))
             {
-                return GenerateConstantString(lsv + rsv);
+                return new StringNode(lsv + rsv);
             }
 
             // Anything else
@@ -285,7 +285,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
 
             (Expression Left, Expression Right, SupportedValueType InternalType) GenerateParameterExpressions(
                 in SupportedValueType returnType,
-                in ComparisonTolerance comparisonTolerance)
+                in ComparisonTolerance innerComparisonTolerance)
             {
                 Expression left, right;
                 if (this.CalculatedCosts.TryGetValue(
@@ -294,10 +294,10 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 {
                     left = this.Left.GenerateExpression(
                         in tuple.InternalType,
-                        in comparisonTolerance);
+                        in innerComparisonTolerance);
                     right = this.Right.GenerateExpression(
                         in tuple.InternalType,
-                        in comparisonTolerance);
+                        in innerComparisonTolerance);
                 }
                 else
                 {

@@ -59,10 +59,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             {
                 return (this.equals, this.lessThan) switch
                 {
-                    (true, true) => GenerateConstantBoolean(!bvl || bvr),
-                    (false, true) => GenerateConstantBoolean(!bvl || bvr),
-                    (true, false) => GenerateConstantBoolean(bvl || !bvr),
-                    (false, false) => GenerateConstantBoolean(bvl || !bvr)
+                    (true, true) => new BoolNode(!bvl || bvr),
+                    (false, true) => new BoolNode(!bvl || bvr),
+                    (true, false) => new BoolNode(bvl || !bvr),
+                    (false, false) => new BoolNode(bvl || !bvr)
                 };
             }
 
@@ -82,10 +82,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
 
                 return (this.equals, this.lessThan) switch
                 {
-                    (true, true) => GenerateConstantBoolean(bavl.SequenceCompareWithMsb(bavr) >= 0),
-                    (false, true) => GenerateConstantBoolean(bavl.SequenceCompareWithMsb(bavr) > 0),
-                    (true, false) => GenerateConstantBoolean(bavl.SequenceCompareWithMsb(bavr) <= 0),
-                    (false, false) => GenerateConstantBoolean(bavl.SequenceCompareWithMsb(bavr) < 0)
+                    (true, true) => new BoolNode(bavl.SequenceCompareWithMsb(bavr) >= 0),
+                    (false, true) => new BoolNode(bavl.SequenceCompareWithMsb(bavr) > 0),
+                    (true, false) => new BoolNode(bavl.SequenceCompareWithMsb(bavr) <= 0),
+                    (false, false) => new BoolNode(bavl.SequenceCompareWithMsb(bavr) < 0)
                 };
             }
 
@@ -105,10 +105,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
 
                 return (this.equals, this.lessThan) switch
                 {
-                    (true, true) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) <= 0),
-                    (false, true) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) < 0),
-                    (true, false) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) >= 0),
-                    (false, false) => GenerateConstantBoolean(svl.CurrentCultureCompareTo(svr) > 0)
+                    (true, true) => new BoolNode(svl.CurrentCultureCompareTo(svr) <= 0),
+                    (false, true) => new BoolNode(svl.CurrentCultureCompareTo(svr) < 0),
+                    (true, false) => new BoolNode(svl.CurrentCultureCompareTo(svr) >= 0),
+                    (false, false) => new BoolNode(svl.CurrentCultureCompareTo(svr) > 0)
                 };
             }
 

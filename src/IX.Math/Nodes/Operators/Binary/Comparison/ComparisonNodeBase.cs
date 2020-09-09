@@ -42,11 +42,11 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             ref NodeBase left,
             ref NodeBase right)
         {
-            this.CalculatedCosts.Clear();
-
             var commonSupportedTypes = left.PossibleReturnType & right.PossibleReturnType;
 
-            if (commonSupportedTypes == SupportableValueType.None)
+            if (commonSupportedTypes == SupportableValueType.None &&
+                !(left.CheckSupportedType(SupportableValueType.String) ||
+                right.CheckSupportedType(SupportableValueType.String)))
             {
                 throw new ExpressionNotValidLogicallyException();
             }
@@ -68,14 +68,17 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         protected (Expression Left, Expression Right, SupportedValueType ValueType) GetExpressionArguments(
             in ComparisonTolerance comparisonTolerance)
         {
-            var commonSupportedTypes = this.Left.PossibleReturnType & this.Right.PossibleReturnType;
+            var left = this.Left;
+            var right = this.Right;
+
+            var commonSupportedTypes = left.PossibleReturnType & right.PossibleReturnType;
 
             if ((commonSupportedTypes & SupportableValueType.Integer) != SupportableValueType.None)
             {
                 // Integer preferred
-                return (this.Left.GenerateExpression(
+                return (left.GenerateExpression(
                     SupportedValueType.Integer,
-                    in comparisonTolerance), this.Right.GenerateExpression(
+                    in comparisonTolerance), right.GenerateExpression(
                     SupportedValueType.Integer,
                     in comparisonTolerance), SupportedValueType.Integer);
             }
@@ -83,9 +86,9 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             if ((commonSupportedTypes & SupportableValueType.Numeric) != SupportableValueType.None)
             {
                 // Numeric preferred if integer is not available
-                return (this.Left.GenerateExpression(
+                return (left.GenerateExpression(
                     SupportedValueType.Numeric,
-                    in comparisonTolerance), this.Right.GenerateExpression(
+                    in comparisonTolerance), right.GenerateExpression(
                     SupportedValueType.Numeric,
                     in comparisonTolerance), SupportedValueType.Numeric);
             }
@@ -93,9 +96,9 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             if ((commonSupportedTypes & SupportableValueType.ByteArray) != SupportableValueType.None)
             {
                 // Byte array preferred if integer and numeric are not available
-                return (this.Left.GenerateExpression(
+                return (left.GenerateExpression(
                     SupportedValueType.ByteArray,
-                    in comparisonTolerance), this.Right.GenerateExpression(
+                    in comparisonTolerance), right.GenerateExpression(
                     SupportedValueType.ByteArray,
                     in comparisonTolerance), SupportedValueType.ByteArray);
             }
@@ -103,17 +106,37 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             if ((commonSupportedTypes & SupportableValueType.Boolean) != SupportableValueType.None)
             {
                 // Boolean preferred if no multi-bit type is available
-                return (this.Left.GenerateExpression(
+                return (left.GenerateExpression(
                     SupportedValueType.Boolean,
-                    in comparisonTolerance), this.Right.GenerateExpression(
+                    in comparisonTolerance), right.GenerateExpression(
                     SupportedValueType.Boolean,
                     in comparisonTolerance), SupportedValueType.Boolean);
             }
 
+            /*if (left.CheckSupportedType(SupportableValueType.String))
+            {
+                Expression leftExp = left.GenerateExpression(
+                    SupportedValueType.String,
+                    in comparisonTolerance);
+                Expression rightExp = null;
+
+                if (right.CheckSupportedType(SupportableValueType.Integer))
+                {
+                    rightExp = right.GenerateExpression(
+                        SupportedValueType.Integer,
+                        in comparisonTolerance);
+                }
+
+                if (rightExp != null)
+                {
+                    return (leftExp, rightExp, SupportedValueType.Unknown);
+                }
+            }*/
+
             // String is least preferred
-            return (this.Left.GenerateExpression(
+            return (left.GenerateExpression(
                 SupportedValueType.String,
-                in comparisonTolerance), this.Right.GenerateExpression(
+                in comparisonTolerance), right.GenerateExpression(
                 SupportedValueType.String,
                 in comparisonTolerance), SupportedValueType.String);
         }

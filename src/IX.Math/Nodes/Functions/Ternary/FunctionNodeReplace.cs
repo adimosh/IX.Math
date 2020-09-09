@@ -74,7 +74,7 @@ namespace IX.Math.Nodes.Functions.Ternary
                 this.SecondParameter is ConstantNodeBase second &&
                 this.ThirdParameter is ConstantNodeBase third)
             {
-                return GenerateConstantString(
+                return new StringNode(
                     first.ValueAsString.Replace(
                         second.ValueAsString,
                         third.ValueAsString));

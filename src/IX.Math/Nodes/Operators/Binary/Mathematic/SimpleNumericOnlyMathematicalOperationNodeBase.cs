@@ -38,7 +38,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
 
             if (lc.TryGetNumeric(out double ldv) && rc.TryGetNumeric(out double rdv))
             {
-                return GenerateConstantNumeric(this.CalculateConstantValue(
+                return new NumericNode(this.CalculateConstantValue(
                     ldv,
                     rdv));
             }

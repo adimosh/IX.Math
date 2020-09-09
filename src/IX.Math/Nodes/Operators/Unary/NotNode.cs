@@ -43,12 +43,12 @@ namespace IX.Math.Nodes.Operators.Unary
 
             if (c.TryGetBoolean(out var bv))
             {
-                return GenerateConstantBoolean(!bv);
+                return new BoolNode(!bv);
             }
 
             if (c.TryGetInteger(out var iv))
             {
-                return GenerateConstantInteger(~iv);
+                return new IntegerNode(~iv);
             }
 
             return this;

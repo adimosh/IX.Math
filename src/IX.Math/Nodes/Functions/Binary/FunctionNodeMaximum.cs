@@ -5,6 +5,7 @@
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Extensibility;
+using IX.Math.Nodes.Constants;
 using JetBrains.Annotations;
 using GlobalSystem = System;
 
@@ -65,13 +66,13 @@ namespace IX.Math.Nodes.Functions.Binary
 
             if (integer)
             {
-                return GenerateConstantInteger(
+                return new IntegerNode(
                     GlobalSystem.Math.Max(
                         intFirst,
                         intSecond));
             }
 
-            return GenerateConstantNumeric(
+            return new NumericNode(
                 GlobalSystem.Math.Max(
                     doubleFirst,
                     doubleSecond));
