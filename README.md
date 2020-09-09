@@ -102,11 +102,40 @@ This project is primarily available through NuGet.
 
 The current version can be accessed by using NuGet commands:
 
+### Commands {.tabset}
+
+#### .NET CLI
+
+```powershell
+dotnet add package IX.Math
+```
+
+#### PowerShell
+
 ```powershell
 Install-Package IX.Math
 ```
 
-Releases: [![IX.Math NuGet](https://img.shields.io/nuget/v/IX.Math.svg)](https://www.nuget.org/packages/IX.Math/)
+#### Package reference
+
+```xml
+<PackageReference Include="IX.Math" Version="0.5.4" />
+```
+
+#### Paket
+
+```powershell
+paket add IX.Math
+```
+
+### Versions
+
+| Release | Package |
+|:-------:|:-------:|
+| Stable | [![IX.Math NuGet](https://img.shields.io/nuget/v/IX.Math)](https://www.nuget.org/packages/IX.Math/) |
+| Pre-release | [![IX.Math NuGet](https://img.shields.io/nuget/vpre/IX.Math)](https://www.nuget.org/packages/IX.Math/) |
+
+![](https://img.shields.io/nuget/dt/IX.Math)
 
 ## Usage
 
