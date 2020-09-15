@@ -113,7 +113,8 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                     in comparisonTolerance), SupportedValueType.Boolean);
             }
 
-            /*if (left.CheckSupportedType(SupportableValueType.String))
+            // We have a string and an integer or a numeric
+            if (left.CheckSupportedType(SupportableValueType.String))
             {
                 Expression leftExp = left.GenerateExpression(
                     SupportedValueType.String,
@@ -127,11 +128,45 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                         in comparisonTolerance);
                 }
 
+                if (right.CheckSupportedType(SupportableValueType.Numeric))
+                {
+                    rightExp = right.GenerateExpression(
+                        SupportedValueType.Numeric,
+                        in comparisonTolerance);
+                }
+
                 if (rightExp != null)
                 {
                     return (leftExp, rightExp, SupportedValueType.Unknown);
                 }
-            }*/
+            }
+
+            if (right.CheckSupportedType(SupportableValueType.String))
+            {
+                Expression rightExp = right.GenerateExpression(
+                    SupportedValueType.String,
+                    in comparisonTolerance);
+                Expression leftExp = null;
+
+                if (left.CheckSupportedType(SupportableValueType.Integer))
+                {
+                    leftExp = left.GenerateExpression(
+                        SupportedValueType.Integer,
+                        in comparisonTolerance);
+                }
+
+                if (left.CheckSupportedType(SupportableValueType.Numeric))
+                {
+                    leftExp = left.GenerateExpression(
+                        SupportedValueType.Numeric,
+                        in comparisonTolerance);
+                }
+
+                if (leftExp != null)
+                {
+                    return (leftExp, rightExp, SupportedValueType.Unknown);
+                }
+            }
 
             // String is least preferred
             return (left.GenerateExpression(
