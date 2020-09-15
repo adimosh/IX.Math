@@ -69,6 +69,7 @@ namespace IX.UnitTests.ContextStructure
                 {
                     new Func<MathematicPortfolio, string, Dictionary<string, object>, object>(SolveWithFinder),
                 },
+#if !DEBUG
                 new object[]
                 {
                     new Func<MathematicPortfolio, string, Dictionary<string, object>, object>(SolveWithDataFunctions),
@@ -109,6 +110,7 @@ namespace IX.UnitTests.ContextStructure
                 {
                     new Func<MathematicPortfolio, string, Dictionary<string, object>, object>(SolveWithFinderFunctionsThenDataFunctions),
                 }
+#endif
             };
 
         private static object[] Stitch(
