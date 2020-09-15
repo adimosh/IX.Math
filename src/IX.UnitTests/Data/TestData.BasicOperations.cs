@@ -21,14 +21,14 @@ namespace IX.UnitTests.Data
             var tests = new List<object[]>();
 
             // Tests
-            foreach (var item in GenerateThreeFoldTestData(Operators))
+            foreach ((object expectedResult, var expression, Dictionary<string, object> externalParameters) in GenerateThreeFoldTestData(Operators))
             {
                 tests.Add(
                     new[]
                     {
-                        item.Item2,
-                        item.Item3,
-                        item.Item1,
+                        expression,
+                        externalParameters,
+                        expectedResult,
                     });
             }
 
