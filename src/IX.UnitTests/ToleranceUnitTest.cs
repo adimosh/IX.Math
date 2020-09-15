@@ -1005,6 +1005,17 @@ namespace IX.UnitTests
                 true,
                 new ComparisonTolerance(proportionalTolerance: 2D),
             },
+            new object[]
+            {
+                "x=y",
+                new Dictionary<string, object>
+                {
+                    ["x"] = "1",
+                    ["y"] = 2,
+                },
+                true,
+                new ComparisonTolerance(integerToleranceRangeLowerBound: 1, integerToleranceRangeUpperBound: 1),
+            },
         };
 
         /// <summary>
