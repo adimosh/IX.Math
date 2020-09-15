@@ -69,7 +69,7 @@ namespace IX.UnitTests.ContextStructure
                 {
                     new Func<MathematicPortfolio, string, Dictionary<string, object>, object>(SolveWithFinder),
                 },
-/*                new object[]
+                new object[]
                 {
                     new Func<MathematicPortfolio, string, Dictionary<string, object>, object>(SolveWithDataFunctions),
                 },
@@ -108,7 +108,7 @@ namespace IX.UnitTests.ContextStructure
                 new object[]
                 {
                     new Func<MathematicPortfolio, string, Dictionary<string, object>, object>(SolveWithFinderFunctionsThenDataFunctions),
-                },*/
+                }
             };
 
         private static object[] Stitch(
@@ -167,9 +167,9 @@ namespace IX.UnitTests.ContextStructure
             if (parameters != null)
             {
 #if NETCOREAPP3_1
-                            foreach ((var key, object val) in parameters)
-                            {
-                                object value = val;
+                foreach ((var key, object val) in parameters)
+                {
+                    object value = val;
 #else
                 foreach (var kvp in parameters)
                 {
