@@ -1005,6 +1005,8 @@ namespace IX.UnitTests
                 true,
                 new ComparisonTolerance(proportionalTolerance: 2D),
             },
+
+            // String-based tolerance
             new object[]
             {
                 "x=y",
@@ -1015,6 +1017,24 @@ namespace IX.UnitTests
                 },
                 true,
                 new ComparisonTolerance(integerToleranceRangeLowerBound: 1, integerToleranceRangeUpperBound: 1),
+            },
+            new object[]
+            {
+                "\"1\"=2",
+                null,
+                true,
+                new ComparisonTolerance(integerToleranceRangeLowerBound: 1, integerToleranceRangeUpperBound: 1),
+            },
+            new object[]
+            {
+                "y<x",
+                new Dictionary<string, object>
+                {
+                    ["y"] = "1.5",
+                    ["x"] = 1D,
+                },
+                false,
+                new ComparisonTolerance(proportionalTolerance: 0.5D),
             },
         };
 

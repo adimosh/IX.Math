@@ -26,17 +26,11 @@ namespace IX.UnitTests
             {
                 new object[]
                 {
-                    "x=y",
-                    new Dictionary<string, object>
-                    {
-                        ["x"] = "1",
-                        ["y"] = 2
-                    },
+                    "\"1\"=2",
+                    null,
                     true,
-                    new ComparisonTolerance(
-                        integerToleranceRangeLowerBound: 1,
-                        integerToleranceRangeUpperBound: 1)
-                }
+                    new ComparisonTolerance(integerToleranceRangeLowerBound: 1, integerToleranceRangeUpperBound: 1),
+                },
             };
 
         private static object GenerateFuncOutOfParameterValue(object tempParameter) =>

@@ -24,6 +24,8 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
     {
         private readonly bool notEqual;
 
+        private bool isConstant;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EquationNodeBase" /> class.
         /// </summary>
@@ -45,7 +47,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         ///     Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
-        public override bool IsConstant => false;
+        public override bool IsConstant => this.isConstant;
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
@@ -84,13 +86,13 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             }
             else if (left.TryGetString(out string svl) && right.TryGetString(out string svr))
             {
-                // Both string, but not both integer or numeric
+                // Both string, but not either integer or numeric
                 bool bli = left.CheckSupportedType(SupportableValueType.Integer);
                 bool bln = left.CheckSupportedType(SupportableValueType.Numeric);
                 bool bri = right.CheckSupportedType(SupportableValueType.Integer);
                 bool brn = right.CheckSupportedType(SupportableValueType.Numeric);
 
-                if ((bli || bln) && (bri || brn))
+                if (bli || bln || bri || brn)
                 {
                     return this;
                 }
@@ -107,6 +109,8 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             {
                 equalityValue = !equalityValue.Value;
             }
+
+            this.isConstant = true;
 
             return new BoolNode(equalityValue.Value);
         }
