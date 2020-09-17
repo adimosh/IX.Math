@@ -47,7 +47,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         ///     Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
-        public override bool IsConstant => this.isConstant;
+        public sealed override bool IsConstant => this.isConstant;
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.

@@ -26,10 +26,14 @@ namespace IX.UnitTests
             {
                 new object[]
                 {
-                    "\"1\"=2",
-                    null,
-                    true,
-                    new ComparisonTolerance(integerToleranceRangeLowerBound: 1, integerToleranceRangeUpperBound: 1),
+                    "y<x",
+                    new Dictionary<string, object>
+                    {
+                        ["y"] = "1.5",
+                        ["x"] = 1D,
+                    },
+                    false,
+                    new ComparisonTolerance(proportionalTolerance: 0.5D),
                 },
             };
 
