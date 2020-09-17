@@ -102,7 +102,7 @@ This project is primarily available through NuGet.
 
 The current version can be accessed by using NuGet commands:
 
-### Commands {.tabset}
+### Commands
 
 #### .NET CLI
 

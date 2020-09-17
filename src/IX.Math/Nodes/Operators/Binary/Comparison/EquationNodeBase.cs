@@ -5,8 +5,11 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Math.Conversion;
 using IX.Math.Exceptions;
+using IX.Math.Formatters;
 using IX.Math.Nodes.Constants;
+using IX.Math.WorkingSet;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Globalization;
 using DiagCA = System.Diagnostics.CodeAnalysis;
@@ -20,6 +23,8 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
     internal abstract class EquationNodeBase : ComparisonNodeBase
     {
         private readonly bool notEqual;
+
+        private bool isConstant;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EquationNodeBase" /> class.
@@ -42,7 +47,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         ///     Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
-        public override bool IsConstant => false;
+        public sealed override bool IsConstant => this.isConstant;
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
@@ -81,13 +86,13 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             }
             else if (left.TryGetString(out string svl) && right.TryGetString(out string svr))
             {
-                // Both string, but not both integer or numeric
+                // Both string, but not either integer or numeric
                 bool bli = left.CheckSupportedType(SupportableValueType.Integer);
                 bool bln = left.CheckSupportedType(SupportableValueType.Numeric);
                 bool bri = right.CheckSupportedType(SupportableValueType.Integer);
                 bool brn = right.CheckSupportedType(SupportableValueType.Numeric);
 
-                if ((bli || bln) && (bri || brn))
+                if (bli || bln || bri || brn)
                 {
                     return this;
                 }
@@ -104,6 +109,8 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             {
                 equalityValue = !equalityValue.Value;
             }
+
+            this.isConstant = true;
 
             return new BoolNode(equalityValue.Value);
         }
@@ -150,15 +157,9 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                     case SupportedValueType.Integer:
                     {
                         // Tolerance for numeric comparisons
-                        equalExpression = GenerateNumericalToleranceEquateExpression(
-                            leftExpression,
-                            rightExpression,
-                            in comparisonTolerance);
+                        equalExpression = GenerateNumericalToleranceEquateExpression(in comparisonTolerance);
 
-                        static Expression GenerateNumericalToleranceEquateExpression(
-                            Expression leftExpression,
-                            Expression rightExpression,
-                            in ComparisonTolerance tolerance)
+                        Expression GenerateNumericalToleranceEquateExpression(in ComparisonTolerance tolerance)
                         {
                             if (tolerance.IntegerToleranceRangeLowerBound != null ||
                                 tolerance.IntegerToleranceRangeUpperBound != null)
@@ -282,6 +283,442 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                             Expression.Constant(
                                 StringComparison.Ordinal,
                                 typeof(StringComparison)));
+
+                        break;
+                    }
+
+                    case SupportedValueType.Unknown when !comparisonTolerance.IsEmpty:
+                    {
+                        // We check whether we have a string
+                        Expression stringExp, numericExp;
+
+                        if (leftExpression.Type == typeof(string))
+                        {
+                            stringExp = leftExpression;
+                            numericExp = rightExpression;
+                        }
+                        else if (rightExpression.Type == typeof(string))
+                        {
+                            stringExp = rightExpression;
+                            numericExp = leftExpression;
+                        }
+                        else
+                        {
+                            // We don't have a string, this simply means we didn't achieve compatibility
+                            throw new ExpressionNotValidLogicallyException();
+                        }
+
+                        equalExpression = GeneratePossibleToleranceExpression(in comparisonTolerance);
+
+                        Expression GeneratePossibleToleranceExpression(in ComparisonTolerance tolerance)
+                        {
+                            #region Empty tolerance
+                            if (tolerance.IsEmpty)
+                            {
+                                return Expression.Call(
+                                    numericExp.Type == typeof(long) ?
+                                        ((Func<string, long, bool>)EqualizeNoToleranceInteger).Method :
+                                        ((Func<string, double, bool>)EqualizeNoToleranceNumeric).Method,
+                                    stringExp,
+                                    numericExp);
+                            }
+                            #endregion
+
+                            #region Integer range tolerance
+                            if (tolerance.IntegerToleranceRangeLowerBound != null ||
+                                tolerance.IntegerToleranceRangeUpperBound != null)
+                            {
+                                // Integer range tolerance
+                                return Expression.Call(
+                                    numericExp.Type == typeof(long) ?
+                                        ((Func<string, long, long, long, bool>)EqualizeIntegerToleranceRangeInteger).Method :
+                                        ((Func<string, double, long, long, bool>)EqualizeIntegerToleranceRangeNumeric).Method,
+                                    stringExp,
+                                    numericExp,
+                                    Expression.Constant(tolerance.IntegerToleranceRangeLowerBound ?? 0L, typeof(long)),
+                                    Expression.Constant(tolerance.IntegerToleranceRangeUpperBound ?? 0L, typeof(long)));
+
+                                static bool EqualizeIntegerToleranceRangeInteger(
+                                    string stringValue,
+                                    long integerValue,
+                                    long lowerTolerance,
+                                    long upperTolerance)
+                                {
+                                    if (WorkingExpressionSet.TryInterpretStringValue(
+                                        stringValue,
+                                        out object convertedValue))
+                                    {
+                                        switch (convertedValue)
+                                        {
+                                            case long l:
+                                            {
+                                                return ToleranceFunctions.EquateRangeTolerant(
+                                                    integerValue,
+                                                    l,
+                                                    lowerTolerance,
+                                                    upperTolerance);
+                                            }
+
+                                            case double d:
+                                            {
+                                                if (InternalTypeDirectConversions.ToInteger(
+                                                    d,
+                                                    out var l))
+                                                {
+                                                    return ToleranceFunctions.EquateRangeTolerant(
+                                                        integerValue,
+                                                        l,
+                                                        lowerTolerance,
+                                                        upperTolerance);
+                                                }
+
+                                                return ToleranceFunctions.EquateRangeTolerant(
+                                                    Convert.ToDouble(integerValue),
+                                                    l,
+                                                    lowerTolerance,
+                                                    upperTolerance);
+                                            }
+                                        }
+                                    }
+
+                                    return string.Equals(stringValue, StringFormatter.FormatIntoString(integerValue), StringComparison.CurrentCulture);
+                                }
+
+                                static bool EqualizeIntegerToleranceRangeNumeric(
+                                    string stringValue,
+                                    double numericValue,
+                                    long lowerTolerance,
+                                    long upperTolerance)
+                                {
+                                    if (WorkingExpressionSet.TryInterpretStringValue(
+                                        stringValue,
+                                        out object convertedValue))
+                                    {
+                                        switch (convertedValue)
+                                        {
+                                            case long l:
+                                            {
+                                                return ToleranceFunctions.EquateRangeTolerant(
+                                                    numericValue,
+                                                    Convert.ToDouble(l),
+                                                    lowerTolerance,
+                                                    upperTolerance);
+                                            }
+
+                                            case double d:
+                                            {
+                                                return ToleranceFunctions.EquateRangeTolerant(
+                                                    numericValue,
+                                                    d,
+                                                    lowerTolerance,
+                                                    upperTolerance);
+                                            }
+                                        }
+                                    }
+
+                                    return string.Equals(stringValue, StringFormatter.FormatIntoString(numericValue), StringComparison.CurrentCulture);
+                                }
+                            }
+                            #endregion
+
+                            #region Numeric range tolerance
+                            if (tolerance.ToleranceRangeLowerBound != null ||
+                                tolerance.ToleranceRangeUpperBound != null)
+                            {
+                                // Floating-point range tolerance
+                                return Expression.Call(
+                                    numericExp.Type == typeof(long) ?
+                                        ((Func<string, long, double, double, bool>)EqualizeToleranceRangeInteger).Method :
+                                        ((Func<string, double, double, double, bool>)EqualizeToleranceRangeNumeric).Method,
+                                    stringExp,
+                                    numericExp,
+                                    Expression.Constant(tolerance.ToleranceRangeLowerBound ?? 0L, typeof(double)),
+                                    Expression.Constant(tolerance.ToleranceRangeUpperBound ?? 0L, typeof(double)));
+
+                                static bool EqualizeToleranceRangeInteger(
+                                    string stringValue,
+                                    long integerValue,
+                                    double lowerTolerance,
+                                    double upperTolerance)
+                                {
+                                    if (WorkingExpressionSet.TryInterpretStringValue(
+                                        stringValue,
+                                        out object convertedValue))
+                                    {
+                                        switch (convertedValue)
+                                        {
+                                            case long l:
+                                            {
+                                                return ToleranceFunctions.EquateRangeTolerant(
+                                                    integerValue,
+                                                    l,
+                                                    lowerTolerance,
+                                                    upperTolerance);
+                                            }
+
+                                            case double d:
+                                            {
+                                                if (InternalTypeDirectConversions.ToInteger(
+                                                    d,
+                                                    out var l))
+                                                {
+                                                    return ToleranceFunctions.EquateRangeTolerant(
+                                                        integerValue,
+                                                        l,
+                                                        lowerTolerance,
+                                                        upperTolerance);
+                                                }
+
+                                                return ToleranceFunctions.EquateRangeTolerant(
+                                                    Convert.ToDouble(integerValue),
+                                                    l,
+                                                    lowerTolerance,
+                                                    upperTolerance);
+                                            }
+                                        }
+                                    }
+
+                                    return string.Equals(stringValue, StringFormatter.FormatIntoString(integerValue), StringComparison.CurrentCulture);
+                                }
+
+                                static bool EqualizeToleranceRangeNumeric(
+                                    string stringValue,
+                                    double numericValue,
+                                    double lowerTolerance,
+                                    double upperTolerance)
+                                {
+                                    if (WorkingExpressionSet.TryInterpretStringValue(
+                                        stringValue,
+                                        out object convertedValue))
+                                    {
+                                        switch (convertedValue)
+                                        {
+                                            case long l:
+                                            {
+                                                return ToleranceFunctions.EquateRangeTolerant(
+                                                    numericValue,
+                                                    Convert.ToDouble(l),
+                                                    lowerTolerance,
+                                                    upperTolerance);
+                                            }
+
+                                            case double d:
+                                            {
+                                                return ToleranceFunctions.EquateRangeTolerant(
+                                                    numericValue,
+                                                    d,
+                                                    lowerTolerance,
+                                                    upperTolerance);
+                                            }
+                                        }
+                                    }
+
+                                    return string.Equals(stringValue, StringFormatter.FormatIntoString(numericValue), StringComparison.CurrentCulture);
+                                }
+                            }
+                            #endregion
+
+                            #region Proportion and percentage tolerance
+                            if (tolerance.ProportionalTolerance != null)
+                            {
+                                var proportionalOrPercentageTolerance = tolerance.ProportionalTolerance.Value;
+
+                                if (proportionalOrPercentageTolerance > 1D)
+                                {
+                                    // Proportional tolerance
+                                    return Expression.Call(
+                                        numericExp.Type == typeof(long) ?
+                                            ((Func<string, long, double, bool>)EqualizeProportionalRangeInteger).Method :
+                                            ((Func<string, double, double, bool>)EqualizeProportionalRangeNumeric).Method,
+                                        stringExp,
+                                        numericExp,
+                                        Expression.Constant(proportionalOrPercentageTolerance, typeof(double)));
+
+                                    static bool EqualizeProportionalRangeInteger(
+                                        string stringValue,
+                                        long integerValue,
+                                        double proportionalTolerance)
+                                    {
+                                        if (WorkingExpressionSet.TryInterpretStringValue(
+                                            stringValue,
+                                            out object convertedValue))
+                                        {
+                                            switch (convertedValue)
+                                            {
+                                                case long l:
+                                                {
+                                                    return ToleranceFunctions.EquateProportionTolerant(
+                                                        integerValue,
+                                                        l,
+                                                        proportionalTolerance);
+                                                }
+
+                                                case double d:
+                                                {
+                                                    if (InternalTypeDirectConversions.ToInteger(
+                                                        d,
+                                                        out var l))
+                                                    {
+                                                        return ToleranceFunctions.EquateProportionTolerant(
+                                                            integerValue,
+                                                            l,
+                                                            proportionalTolerance);
+                                                    }
+
+                                                    return ToleranceFunctions.EquateProportionTolerant(
+                                                        Convert.ToDouble(integerValue),
+                                                        l,
+                                                        proportionalTolerance);
+                                                }
+                                            }
+                                        }
+
+                                        return string.Equals(stringValue, StringFormatter.FormatIntoString(integerValue), StringComparison.CurrentCulture);
+                                    }
+
+                                    static bool EqualizeProportionalRangeNumeric(
+                                        string stringValue,
+                                        double numericValue,
+                                        double proportionalTolerance)
+                                    {
+                                        if (WorkingExpressionSet.TryInterpretStringValue(
+                                            stringValue,
+                                            out object convertedValue))
+                                        {
+                                            switch (convertedValue)
+                                            {
+                                                case long l:
+                                                {
+                                                    return ToleranceFunctions.EquateProportionTolerant(
+                                                        numericValue,
+                                                        Convert.ToDouble(l),
+                                                        proportionalTolerance);
+                                                }
+
+                                                case double d:
+                                                {
+                                                    return ToleranceFunctions.EquateProportionTolerant(
+                                                        numericValue,
+                                                        d,
+                                                        proportionalTolerance);
+                                                }
+                                            }
+                                        }
+
+                                        return string.Equals(stringValue, StringFormatter.FormatIntoString(numericValue), StringComparison.CurrentCulture);
+                                    }
+                                }
+
+                                if (tolerance.ProportionalTolerance.Value < 1D &&
+                                    tolerance.ProportionalTolerance.Value > 0D)
+                                {
+                                    // Percentage tolerance
+                                    return Expression.Call(
+                                        numericExp.Type == typeof(long) ?
+                                            ((Func<string, long, double, bool>)EqualizePercentageRangeInteger).Method :
+                                            ((Func<string, double, double, bool>)EqualizePercentageRangeNumeric).Method,
+                                        stringExp,
+                                        numericExp,
+                                        Expression.Constant(proportionalOrPercentageTolerance, typeof(double)));
+
+                                    static bool EqualizePercentageRangeInteger(
+                                        string stringValue,
+                                        long integerValue,
+                                        double proportionalTolerance)
+                                    {
+                                        if (WorkingExpressionSet.TryInterpretStringValue(
+                                            stringValue,
+                                            out object convertedValue))
+                                        {
+                                            switch (convertedValue)
+                                            {
+                                                case long l:
+                                                {
+                                                    return ToleranceFunctions.EquatePercentageTolerant(
+                                                        integerValue,
+                                                        l,
+                                                        proportionalTolerance);
+                                                }
+
+                                                case double d:
+                                                {
+                                                    if (InternalTypeDirectConversions.ToInteger(
+                                                        d,
+                                                        out var l))
+                                                    {
+                                                        return ToleranceFunctions.EquatePercentageTolerant(
+                                                            integerValue,
+                                                            l,
+                                                            proportionalTolerance);
+                                                    }
+
+                                                    return ToleranceFunctions.EquatePercentageTolerant(
+                                                        Convert.ToDouble(integerValue),
+                                                        l,
+                                                        proportionalTolerance);
+                                                }
+                                            }
+                                        }
+
+                                        return string.Equals(stringValue, StringFormatter.FormatIntoString(integerValue), StringComparison.CurrentCulture);
+                                    }
+
+                                    static bool EqualizePercentageRangeNumeric(
+                                        string stringValue,
+                                        double numericValue,
+                                        double proportionalTolerance)
+                                    {
+                                        if (WorkingExpressionSet.TryInterpretStringValue(
+                                            stringValue,
+                                            out object convertedValue))
+                                        {
+                                            switch (convertedValue)
+                                            {
+                                                case long l:
+                                                {
+                                                    return ToleranceFunctions.EquatePercentageTolerant(
+                                                        numericValue,
+                                                        Convert.ToDouble(l),
+                                                        proportionalTolerance);
+                                                }
+
+                                                case double d:
+                                                {
+                                                    return ToleranceFunctions.EquatePercentageTolerant(
+                                                        numericValue,
+                                                        d,
+                                                        proportionalTolerance);
+                                                }
+                                            }
+                                        }
+
+                                        return string.Equals(stringValue, StringFormatter.FormatIntoString(numericValue), StringComparison.CurrentCulture);
+                                    }
+                                }
+                            }
+                            #endregion
+
+                            return Expression.Call(
+                                numericExp.Type == typeof(long) ?
+                                    ((Func<string, long, bool>)EqualizeNoToleranceInteger).Method :
+                                    ((Func<string, double, bool>)EqualizeNoToleranceNumeric).Method,
+                                stringExp,
+                                numericExp);
+
+                            static bool EqualizeNoToleranceInteger(
+                                string stringValue,
+                                long integerValue)
+                            {
+                                return string.Equals(stringValue, StringFormatter.FormatIntoString(integerValue), StringComparison.CurrentCulture);
+                            }
+
+                            static bool EqualizeNoToleranceNumeric(
+                                string stringValue,
+                                double numericValue)
+                            {
+                                return string.Equals(stringValue, StringFormatter.FormatIntoString(numericValue), StringComparison.CurrentCulture);
+                            }
+                        }
 
                         break;
                     }

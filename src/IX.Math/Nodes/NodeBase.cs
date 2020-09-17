@@ -470,27 +470,27 @@ namespace IX.Math.Nodes
             {
                 return valueType switch
                 {
-                    SupportedValueType.Integer => this.integerExpression ??
+                    SupportedValueType.Integer => this.integerExpression ??=
                                                   ConvertToIntegerExpression(
                                                       this.GenerateExpressionInternal(
                                                           in valueType,
                                                           in comparisonTolerance)),
-                    SupportedValueType.Numeric => this.numericExpression ??
+                    SupportedValueType.Numeric => this.numericExpression ??=
                                                   ConvertToNumericExpression(
                                                       this.GenerateExpressionInternal(
                                                           in valueType,
                                                           in comparisonTolerance)),
-                    SupportedValueType.ByteArray => this.byteArrayExpression ??
+                    SupportedValueType.ByteArray => this.byteArrayExpression ??=
                                                     ConvertToByteArrayExpression(
                                                         this.GenerateExpressionInternal(
                                                             in valueType,
                                                             in comparisonTolerance)),
-                    SupportedValueType.String => this.stringExpression ??
+                    SupportedValueType.String => this.stringExpression ??=
                                                  StringFormatter.CreateStringConversionExpression(
                                                      this.GenerateExpressionInternal(
                                                          in valueType,
                                                          in comparisonTolerance)),
-                    SupportedValueType.Boolean => this.boolExpression ??
+                    SupportedValueType.Boolean => this.boolExpression ??=
                                                   ConvertToBooleanExpression(
                                                       this.GenerateExpressionInternal(
                                                           in valueType,

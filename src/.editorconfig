@@ -200,19 +200,34 @@ csharp_preserve_single_line_blocks=false:silent
 # IDE0072: Add missing cases
 dotnet_diagnostic.IDE0072.severity = silent
 
+# SA1413: Use trailing comma in multi-line initializers
+dotnet_diagnostic.SA1413.severity = none
+
 [*.vb]
 # Modifier preferences
 visual_basic_preferred_modifier_order=Partial,Default,Private,Protected,Public,Friend,NotOverridable,Overridable,MustOverride,Overloads,Overrides,MustInherit,NotInheritable,Static,Shared,Shadows,ReadOnly,WriteOnly,Dim,Const,WithEvents,Widening,Narrowing,Custom,Async:suggestion
+
+# =====================
+# == PROTOBUF STYLES ==
+# =====================
 
 [*.proto]
 indent_style=tab
 indent_size=tab
 tab_width=4
 
+# =============================
+# == ASP.NET AND HTML STYLES ==
+# =============================
+
 [*.{asax,ascx,aspx,cs,cshtml,css,htm,html,js,jsx,master,razor,skin,ts,tsx,vb,xaml,xamlx,xoml}]
 indent_style=space
 indent_size=4
 tab_width=4
+
+# ====================
+# == PROJECT STYLES ==
+# ====================
 
 [*.{appxmanifest,build,config,csproj,dbml,discomap,dtd,json,jsproj,lsproj,njsproj,nuspec,proj,props,resjson,resw,resx,StyleCop,targets,tasks,vbproj,xml,xsd}]
 indent_style=space

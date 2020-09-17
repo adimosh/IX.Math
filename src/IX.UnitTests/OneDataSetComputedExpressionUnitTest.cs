@@ -21,33 +21,40 @@ namespace IX.UnitTests
         /// </summary>
         /// <returns>Theory data.</returns>
         // ReSharper disable once MemberCanBePrivate.Global - It really cannot
-        public static object[][] ProvideDataForTheory() => new[]
-        {
-            new object[]
+        public static object[][] ProvideDataForTheory() =>
+            new[]
             {
-                "-\"17\"",
-                null,
-                -17L,
-            },
-        };
+                new object[]
+                {
+                    "y<x",
+                    new Dictionary<string, object>
+                    {
+                        ["y"] = "1.5",
+                        ["x"] = 1D,
+                    },
+                    false,
+                    new ComparisonTolerance(proportionalTolerance: 0.5D),
+                },
+            };
 
-        private static object GenerateFuncOutOfParameterValue(object tempParameter) => tempParameter switch
-        {
-            byte convertedValue => new Func<byte>(() => convertedValue),
-            sbyte convertedValue => new Func<sbyte>(() => convertedValue),
-            short convertedValue => new Func<short>(() => convertedValue),
-            ushort convertedValue => new Func<ushort>(() => convertedValue),
-            int convertedValue => new Func<int>(() => convertedValue),
-            uint convertedValue => new Func<uint>(() => convertedValue),
-            long convertedValue => new Func<long>(() => convertedValue),
-            ulong convertedValue => new Func<ulong>(() => convertedValue),
-            float convertedValue => new Func<float>(() => convertedValue),
-            double convertedValue => new Func<double>(() => convertedValue),
-            byte[] convertedValue => new Func<byte[]>(() => convertedValue),
-            string convertedValue => new Func<string>(() => convertedValue),
-            bool convertedValue => new Func<bool>(() => convertedValue),
-            _ => throw new InvalidOperationException(),
-        };
+        private static object GenerateFuncOutOfParameterValue(object tempParameter) =>
+            tempParameter switch
+            {
+                byte convertedValue => new Func<byte>(() => convertedValue),
+                sbyte convertedValue => new Func<sbyte>(() => convertedValue),
+                short convertedValue => new Func<short>(() => convertedValue),
+                ushort convertedValue => new Func<ushort>(() => convertedValue),
+                int convertedValue => new Func<int>(() => convertedValue),
+                uint convertedValue => new Func<uint>(() => convertedValue),
+                long convertedValue => new Func<long>(() => convertedValue),
+                ulong convertedValue => new Func<ulong>(() => convertedValue),
+                float convertedValue => new Func<float>(() => convertedValue),
+                double convertedValue => new Func<double>(() => convertedValue),
+                byte[] convertedValue => new Func<byte[]>(() => convertedValue),
+                string convertedValue => new Func<string>(() => convertedValue),
+                bool convertedValue => new Func<bool>(() => convertedValue),
+                _ => throw new InvalidOperationException()
+            };
 
         /// <summary>
         ///     Tests the computed expression with parameters.
@@ -55,19 +62,24 @@ namespace IX.UnitTests
         /// <param name="expression">The expression.</param>
         /// <param name="parameters">The parameters.</param>
         /// <param name="expectedResult">The expected result.</param>
-        /// <exception cref="InvalidOperationException">
-        ///     No computed expression was generated.
-        /// </exception>
+        /// <param name="tolerance">The tolerance.</param>
+        /// <exception cref="InvalidOperationException">No computed expression was generated.</exception>
         [Theory(DisplayName = "One data set data test")]
         [MemberData(nameof(ProvideDataForTheory))]
         public void ComputedExpressionWithParameters(
             string expression,
             Dictionary<string, object> parameters,
-            object expectedResult)
+            object expectedResult,
+            ComparisonTolerance tolerance = default)
         {
             using var service = new MathematicPortfolio();
 
-            object result = service.Solve(expression, parameters?.Select(p => p.Value).ToArray() ?? new object[0]);
+            object result = service.Solve(
+                expression,
+                in tolerance,
+                parameters?.Select(p => p.Value)
+                    .ToArray() ??
+                    new object[0]);
 
             Assert.Equal(
                 expectedResult,
@@ -80,6 +92,7 @@ namespace IX.UnitTests
         /// <param name="expression">The expression.</param>
         /// <param name="parameters">The parameters.</param>
         /// <param name="expectedResult">The expected result.</param>
+        /// <param name="tolerance">The tolerance.</param>
         /// <exception cref="InvalidOperationException">
         ///     No computed expression was generated.
         /// </exception>
@@ -88,7 +101,8 @@ namespace IX.UnitTests
         public void ComputedExpressionWithFinder(
             string expression,
             Dictionary<string, object> parameters,
-            object expectedResult)
+            object expectedResult,
+            ComparisonTolerance tolerance = default)
         {
             using var service = new MathematicPortfolio();
             var finder = new Mock<IDataFinder>(MockBehavior.Loose);
@@ -100,13 +114,17 @@ namespace IX.UnitTests
                     var key = parameter.Key;
                     object value = parameter.Value;
                     finder.Setup(
-                        p => p.TryGetData(
-                            key,
-                            out value)).Returns(true);
+                            p => p.TryGetData(
+                                key,
+                                out value))
+                        .Returns(true);
                 }
             }
 
-            object result = service.Solve(expression, finder.Object);
+            object result = service.Solve(
+                expression,
+                in tolerance,
+                finder.Object);
 
             Assert.Equal(
                 expectedResult,
@@ -119,6 +137,7 @@ namespace IX.UnitTests
         /// <param name="expression">The expression.</param>
         /// <param name="parameters">The parameters.</param>
         /// <param name="expectedResult">The expected result.</param>
+        /// <param name="tolerance">The tolerance.</param>
         /// <exception cref="InvalidOperationException">
         ///     No computed expression was generated.
         /// </exception>
@@ -127,7 +146,8 @@ namespace IX.UnitTests
         public void ComputedExpressionWithFunctionFinder(
             string expression,
             Dictionary<string, object> parameters,
-            object expectedResult)
+            object expectedResult,
+            ComparisonTolerance tolerance = default)
         {
             using var service = new MathematicPortfolio();
             var finder = new Mock<IDataFinder>(MockBehavior.Loose);
@@ -139,13 +159,17 @@ namespace IX.UnitTests
                     var key = parameter.Key;
                     object value = GenerateFuncOutOfParameterValue(parameter.Value);
                     finder.Setup(
-                        p => p.TryGetData(
-                            key,
-                            out value)).Returns(true);
+                            p => p.TryGetData(
+                                key,
+                                out value))
+                        .Returns(true);
                 }
             }
 
-            object result = service.Solve(expression, finder.Object);
+            object result = service.Solve(
+                expression,
+                in tolerance,
+                finder.Object);
 
             Assert.Equal(
                 expectedResult,
