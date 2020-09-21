@@ -105,7 +105,7 @@ namespace IX.Math.Nodes.Constants
                 SupportedValueType.Numeric when this.TryGetNumeric(out var v) => Expression.Constant(
                     v,
                     typeof(double)),
-                SupportedValueType.ByteArray when this.TryGetByteArray(out var v) => Expression.Constant(
+                SupportedValueType.Binary when this.TryGetBinary(out var v) => Expression.Constant(
                     v,
                     typeof(byte[])),
                 SupportedValueType.Boolean when this.TryGetBoolean(out var v) => Expression.Constant(

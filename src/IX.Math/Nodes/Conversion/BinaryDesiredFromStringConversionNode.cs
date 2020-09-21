@@ -1,4 +1,4 @@
-// <copyright file="ByteArrayDesiredFromStringConversionNode.cs" company="Adrian Mos">
+// <copyright file="BinaryDesiredFromStringConversionNode.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -12,15 +12,15 @@ namespace IX.Math.Nodes.Conversion
     /// A conversion node for when a numeric type is desired.
     /// </summary>
     /// <seealso cref="IX.Math.Nodes.Conversion.ConversionNodeBase" />
-    public class ByteArrayDesiredFromStringConversionNode : ConversionNodeBase
+    public sealed class BinaryDesiredFromStringConversionNode : ConversionNodeBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ByteArrayDesiredFromStringConversionNode"/> class.
+        /// Initializes a new instance of the <see cref="BinaryDesiredFromStringConversionNode"/> class.
         /// </summary>
         /// <param name="sourceNode">The source node.</param>
-        public ByteArrayDesiredFromStringConversionNode(
+        public BinaryDesiredFromStringConversionNode(
             [JetBrains.Annotations.NotNull] NodeBase sourceNode)
-        : base(sourceNode, SupportableValueType.ByteArray)
+        : base(sourceNode, SupportableValueType.Binary)
         {
         }
 
@@ -30,7 +30,7 @@ namespace IX.Math.Nodes.Conversion
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
-            new ByteArrayDesiredFromStringConversionNode(
+            new BinaryDesiredFromStringConversionNode(
                 this.ConvertFromNode.DeepClone(context));
 
         /// <summary>
@@ -44,12 +44,12 @@ namespace IX.Math.Nodes.Conversion
             in ComparisonTolerance comparisonTolerance)
         {
             return Expression.Call(
-                ((Func<string, byte[]>)ParseByteArray).Method,
+                ((Func<string, byte[]>)ParseBinary).Method,
                 this.ConvertFromNode.GenerateExpression(
                     SupportedValueType.String,
                     in comparisonTolerance));
 
-            static byte[] ParseByteArray(string input)
+            static byte[] ParseBinary(string input)
             {
                 if (!WorkingExpressionSet.TryInterpretStringValue(
                     input,

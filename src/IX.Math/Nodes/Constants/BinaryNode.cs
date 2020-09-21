@@ -1,4 +1,4 @@
-// <copyright file="ByteArrayNode.cs" company="Adrian Mos">
+// <copyright file="BinaryNode.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -15,7 +15,7 @@ namespace IX.Math.Nodes.Constants
     /// <seealso cref="ConstantNodeBase" />
     [DebuggerDisplay("{" + nameof(Value) + "}")]
     [PublicAPI]
-    public sealed class ByteArrayNode : ConstantNodeBase<byte[]>
+    public sealed class BinaryNode : ConstantNodeBase<byte[]>
     {
         private long? possibleInteger;
 
@@ -24,10 +24,10 @@ namespace IX.Math.Nodes.Constants
         private SupportableValueType supportableType;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ByteArrayNode" /> class.
+        /// Initializes a new instance of the <see cref="BinaryNode" /> class.
         /// </summary>
-        /// <param name="value">The node's boolean value.</param>
-        internal ByteArrayNode(byte[] value)
+        /// <param name="value">The node's binary value, as an array of bytes.</param>
+        public BinaryNode(byte[] value)
             : base(value)
         {
         }
@@ -37,14 +37,14 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new ByteArrayNode(this.Value);
+        public override NodeBase DeepClone(NodeCloningContext context) => new BinaryNode(this.Value);
 
         /// <summary>
         /// Tries to get a byte array value out of this constant node.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> if the constant can safely be converted to a byte array, <c>false</c> otherwise.</returns>
-        public override bool TryGetByteArray(out byte[] value)
+        public override bool TryGetBinary(out byte[] value)
         {
             value = this.Value;
             return true;
@@ -93,7 +93,7 @@ namespace IX.Math.Nodes.Constants
         /// </returns>
         protected override SupportableValueType GetSupportedTypes(byte[] value)
         {
-            this.supportableType = SupportableValueType.ByteArray | SupportableValueType.String;
+            this.supportableType = SupportableValueType.Binary | SupportableValueType.String;
 
             if (value.Length <= 8)
             {

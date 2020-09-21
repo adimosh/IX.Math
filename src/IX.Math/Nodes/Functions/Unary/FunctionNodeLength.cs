@@ -41,7 +41,7 @@ namespace IX.Math.Nodes.Functions.Unary
         public override NodeBase Simplify() =>
             this.Parameter switch
             {
-                ConstantNodeBase cn when cn.TryGetByteArray(out var ba) => new IntegerNode(ba.LongLength),
+                ConstantNodeBase cn when cn.TryGetBinary(out var ba) => new IntegerNode(ba.LongLength),
                 ConstantNodeBase cn when cn.TryGetString(out var s) => new IntegerNode(Convert.ToInt64(s.Length)),
                 _ => this
             };
@@ -64,7 +64,7 @@ namespace IX.Math.Nodes.Functions.Unary
         /// <param name="parameter">The parameter.</param>
         protected override void EnsureCompatibleParameter(NodeBase parameter)
         {
-            _ = parameter.VerifyPossibleType(SupportableValueType.ByteArray | SupportableValueType.String);
+            _ = parameter.VerifyPossibleType(SupportableValueType.Binary | SupportableValueType.String);
 
             this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer);
             var cost = parameter.CalculateStrategyCost(SupportedValueType.Integer);
@@ -87,11 +87,11 @@ namespace IX.Math.Nodes.Functions.Unary
             in SupportedValueType valueType,
             in ComparisonTolerance comparisonTolerance)
         {
-            if (this.Parameter.CheckSupportedType(SupportableValueType.ByteArray))
+            if (this.Parameter.CheckSupportedType(SupportableValueType.Binary))
             {
                 return Expression.Property(
                     this.Parameter.GenerateExpression(
-                        SupportedValueType.ByteArray,
+                        SupportedValueType.Binary,
                         in comparisonTolerance),
                     typeof(byte[]),
                     nameof(Array.LongLength));

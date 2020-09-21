@@ -52,7 +52,7 @@ namespace IX.Math.Nodes
 
         private Expression integerExpression;
         private Expression numericExpression;
-        private Expression byteArrayExpression;
+        private Expression binaryExpression;
         private Expression stringExpression;
         private Expression boolExpression;
 
@@ -119,12 +119,12 @@ namespace IX.Math.Nodes
             {
                 SupportedValueType.Integer => SupportableValueType.Integer |
                                               SupportableValueType.Numeric |
-                                              SupportableValueType.ByteArray |
+                                              SupportableValueType.Binary |
                                               SupportableValueType.String,
                 SupportedValueType.Numeric => SupportableValueType.Numeric |
-                                              SupportableValueType.ByteArray |
+                                              SupportableValueType.Binary |
                                               SupportableValueType.String,
-                SupportedValueType.ByteArray => SupportableValueType.ByteArray |
+                SupportedValueType.Binary => SupportableValueType.Binary |
                                                 SupportableValueType.String,
                 SupportedValueType.Boolean => SupportableValueType.Boolean |
                                               SupportableValueType.String,
@@ -143,20 +143,20 @@ namespace IX.Math.Nodes
             {
                 return SupportableValueType.Integer |
                        SupportableValueType.Numeric |
-                       SupportableValueType.ByteArray |
+                       SupportableValueType.Binary |
                        SupportableValueType.String;
             }
 
             if (internalValueType == typeof(double))
             {
                 return SupportableValueType.Numeric |
-                       SupportableValueType.ByteArray |
+                       SupportableValueType.Binary |
                        SupportableValueType.String;
             }
 
             if (internalValueType == typeof(byte[]))
             {
-                return SupportableValueType.ByteArray |
+                return SupportableValueType.Binary |
                        SupportableValueType.String;
             }
 
@@ -198,9 +198,9 @@ namespace IX.Math.Nodes
                 types.Add(SupportedValueType.Numeric);
             }
 
-            if ((supportableTypes & SupportableValueType.ByteArray) != SupportableValueType.None)
+            if ((supportableTypes & SupportableValueType.Binary) != SupportableValueType.None)
             {
-                types.Add(SupportedValueType.ByteArray);
+                types.Add(SupportedValueType.Binary);
             }
 
             if ((supportableTypes & SupportableValueType.Boolean) != SupportableValueType.None)
@@ -235,22 +235,22 @@ namespace IX.Math.Nodes
                 {
                     SupportedValueType.Integer => 0,
                     SupportedValueType.Numeric => 1,
-                    SupportedValueType.ByteArray => 2,
+                    SupportedValueType.Binary => 2,
                     SupportedValueType.String => 10,
                     _ => int.MaxValue
                 },
                 SupportedValueType.Numeric => toType switch
                 {
                     SupportedValueType.Numeric => 0,
-                    SupportedValueType.ByteArray => 1,
+                    SupportedValueType.Binary => 1,
                     SupportedValueType.String => 10,
                     _ => int.MaxValue
                 },
-                SupportedValueType.ByteArray => toType switch
+                SupportedValueType.Binary => toType switch
                 {
                     SupportedValueType.Integer => 2,
                     SupportedValueType.Numeric => 2,
-                    SupportedValueType.ByteArray => 0,
+                    SupportedValueType.Binary => 0,
                     SupportedValueType.String => 10,
                     _ => int.MaxValue
                 },
@@ -262,7 +262,7 @@ namespace IX.Math.Nodes
                 SupportedValueType.Boolean => toType switch
                 {
                     SupportedValueType.Boolean => 0,
-                    SupportedValueType.ByteArray => 2,
+                    SupportedValueType.Binary => 2,
                     SupportedValueType.String => 10,
                     _ => int.MaxValue
                 },
@@ -285,7 +285,7 @@ namespace IX.Math.Nodes
                 {
                     SupportedValueType.Integer => 0,
                     SupportedValueType.Numeric => 1,
-                    SupportedValueType.ByteArray => 1,
+                    SupportedValueType.Binary => 1,
                     SupportedValueType.String => 2,
                     _ => int.MaxValue
                 };
@@ -296,7 +296,7 @@ namespace IX.Math.Nodes
                 return toType switch
                 {
                     SupportedValueType.Numeric => 0,
-                    SupportedValueType.ByteArray => 1,
+                    SupportedValueType.Binary => 1,
                     SupportedValueType.String => 2,
                     _ => int.MaxValue
                 };
@@ -308,7 +308,7 @@ namespace IX.Math.Nodes
                 {
                     SupportedValueType.Integer => 1,
                     SupportedValueType.Numeric => 1,
-                    SupportedValueType.ByteArray => 0,
+                    SupportedValueType.Binary => 0,
                     SupportedValueType.String => 2,
                     _ => int.MaxValue
                 };
@@ -328,7 +328,7 @@ namespace IX.Math.Nodes
                 return toType switch
                 {
                     SupportedValueType.Boolean => 0,
-                    SupportedValueType.ByteArray => 1,
+                    SupportedValueType.Binary => 1,
                     SupportedValueType.String => 2,
                     _ => int.MaxValue
                 };
@@ -480,7 +480,7 @@ namespace IX.Math.Nodes
                                                       this.GenerateExpressionInternal(
                                                           in valueType,
                                                           in comparisonTolerance)),
-                    SupportedValueType.ByteArray => this.byteArrayExpression ??=
+                    SupportedValueType.Binary => this.binaryExpression ??=
                                                     ConvertToByteArrayExpression(
                                                         this.GenerateExpressionInternal(
                                                             in valueType,

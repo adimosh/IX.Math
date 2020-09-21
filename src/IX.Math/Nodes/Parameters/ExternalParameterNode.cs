@@ -41,8 +41,8 @@ namespace IX.Math.Nodes.Parameters
                 SupportedValueType.Integer,
                 (0, SupportedValueType.Integer));
             this.CalculatedCosts.Add(
-                SupportedValueType.ByteArray,
-                (0, SupportedValueType.ByteArray));
+                SupportedValueType.Binary,
+                (0, SupportedValueType.Binary));
             this.CalculatedCosts.Add(
                 SupportedValueType.Boolean,
                 (0, SupportedValueType.Boolean));
@@ -150,7 +150,7 @@ namespace IX.Math.Nodes.Parameters
             }
             else if (type == typeof(byte[]))
             {
-                svt = SupportedValueType.ByteArray;
+                svt = SupportedValueType.Binary;
                 this.IsFunction = false;
             }
             else if (type == typeof(bool))
@@ -175,7 +175,7 @@ namespace IX.Math.Nodes.Parameters
             }
             else if (type == typeof(Func<byte[]>))
             {
-                svt = SupportedValueType.ByteArray;
+                svt = SupportedValueType.Binary;
                 this.IsFunction = true;
             }
             else if (type == typeof(Func<bool>))

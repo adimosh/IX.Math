@@ -35,32 +35,32 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
         {
             this.CalculatedCosts.Clear();
 
-            EnsureNode(ref left, SupportableValueType.Integer | SupportableValueType.ByteArray);
+            EnsureNode(ref left, SupportableValueType.Integer | SupportableValueType.Binary);
             EnsureNode(ref right, SupportableValueType.Integer);
 
             _ = right.VerifyPossibleType(SupportableValueType.Integer);
-            var leftType = left.VerifyPossibleType(SupportableValueType.Integer | SupportableValueType.ByteArray);
+            var leftType = left.VerifyPossibleType(SupportableValueType.Integer | SupportableValueType.Binary);
 
             int rightCost = right.CalculateStrategyCost(SupportedValueType.Integer);
 
-            int intCost = int.MaxValue, byteArrayCost = int.MaxValue;
+            int intCost = int.MaxValue, binaryCost = int.MaxValue;
 
             if (leftType == SupportableValueType.Integer)
             {
                 this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer);
                 intCost = left.CalculateStrategyCost(SupportedValueType.Integer) + rightCost;
             }
-            else if (leftType == SupportableValueType.ByteArray)
+            else if (leftType == SupportableValueType.Binary)
             {
-                this.PossibleReturnType = GetSupportableConversions(SupportedValueType.ByteArray);
-                byteArrayCost = left.CalculateStrategyCost(SupportedValueType.ByteArray) + rightCost;
+                this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Binary);
+                binaryCost = left.CalculateStrategyCost(SupportedValueType.Binary) + rightCost;
             }
             else
             {
                 this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer) |
-                                          GetSupportableConversions(SupportedValueType.ByteArray);
+                                          GetSupportableConversions(SupportedValueType.Binary);
                 intCost = left.CalculateStrategyCost(SupportedValueType.Integer) + rightCost;
-                byteArrayCost = left.CalculateStrategyCost(SupportedValueType.ByteArray) + rightCost;
+                binaryCost = left.CalculateStrategyCost(SupportedValueType.Binary) + rightCost;
             }
 
             foreach (var supportedOption in GetSupportedTypeOptions(this.PossibleReturnType))
@@ -87,14 +87,14 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
                 }
 
                 int byteArrayTotalCost;
-                if (byteArrayCost == int.MaxValue)
+                if (binaryCost == int.MaxValue)
                 {
                     byteArrayTotalCost = int.MaxValue;
                 }
                 else
                 {
                     var conversionCost = GetStandardConversionStrategyCost(
-                        SupportedValueType.ByteArray,
+                        SupportedValueType.Binary,
                         in supportedOption);
 
                     if (conversionCost == int.MaxValue)
@@ -103,7 +103,7 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
                     }
                     else
                     {
-                        byteArrayTotalCost = conversionCost + byteArrayCost;
+                        byteArrayTotalCost = conversionCost + binaryCost;
                     }
                 }
 
@@ -113,7 +113,7 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
                     if (byteArrayTotalCost < intTotalCost)
                     {
                         // Byte array is cheapest
-                        this.CalculatedCosts[supportedOption] = (byteArrayTotalCost, SupportedValueType.ByteArray);
+                        this.CalculatedCosts[supportedOption] = (byteArrayTotalCost, SupportedValueType.Binary);
                     }
                     else
                     {
@@ -124,7 +124,7 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
                 else if (byteArrayTotalCost != int.MaxValue)
                 {
                     // Boolean if nothing else is available, but it is
-                    this.CalculatedCosts[supportedOption] = (byteArrayTotalCost, SupportedValueType.ByteArray);
+                    this.CalculatedCosts[supportedOption] = (byteArrayTotalCost, SupportedValueType.Binary);
                 }
                 else
                 {

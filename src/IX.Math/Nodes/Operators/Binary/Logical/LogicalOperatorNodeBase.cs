@@ -64,10 +64,10 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                         rbool));
             }
 
-            if (left.TryGetByteArray(out byte[] lbin) &&
-                right.TryGetByteArray(out byte[] rbin))
+            if (left.TryGetBinary(out byte[] lbin) &&
+                right.TryGetBinary(out byte[] rbin))
             {
-                return new ByteArrayNode(
+                return new BinaryNode(
                     this.GenerateData(
                         lbin,
                         rbin));
@@ -119,14 +119,14 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
             ref NodeBase right)
         {
             const SupportableValueType logicalMaximumSupport =
-                SupportableValueType.Integer | SupportableValueType.Boolean | SupportableValueType.ByteArray;
+                SupportableValueType.Integer | SupportableValueType.Boolean | SupportableValueType.Binary;
 
             this.CalculatedCosts.Clear();
 
             var typeLeft = left.VerifyPossibleType(logicalMaximumSupport);
             var typeRight = right.VerifyPossibleType(logicalMaximumSupport);
 
-            int intCost = int.MaxValue, boolCost = int.MaxValue, byteArrayCost = int.MaxValue;
+            int intCost = int.MaxValue, boolCost = int.MaxValue, binaryCost = int.MaxValue;
 
             #region Ensure compatibility
             switch (typeLeft & typeRight)
@@ -141,10 +141,11 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                     intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
                               right.CalculateStrategyCost(SupportedValueType.Integer);
                     break;
-                case SupportableValueType.ByteArray:
-                    this.PossibleReturnType = GetSupportableConversions(SupportedValueType.ByteArray);
-                    byteArrayCost = left.CalculateStrategyCost(SupportedValueType.ByteArray) +
-                                    right.CalculateStrategyCost(SupportedValueType.ByteArray);
+                case SupportableValueType.Binary:
+                    this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Binary);
+                    binaryCost
+ = left.CalculateStrategyCost(SupportedValueType.Binary) +
+                                    right.CalculateStrategyCost(SupportedValueType.Binary);
                     break;
                 case SupportableValueType.Boolean | SupportableValueType.Integer:
                     this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Boolean) |
@@ -154,32 +155,35 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                     intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
                               right.CalculateStrategyCost(SupportedValueType.Integer);
                     break;
-                case SupportableValueType.Boolean | SupportableValueType.ByteArray:
+                case SupportableValueType.Boolean | SupportableValueType.Binary:
                     this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Boolean) |
-                                              GetSupportableConversions(SupportedValueType.ByteArray);
+                                              GetSupportableConversions(SupportedValueType.Binary);
                     boolCost = left.CalculateStrategyCost(SupportedValueType.Boolean) +
                                right.CalculateStrategyCost(SupportedValueType.Boolean);
-                    byteArrayCost = left.CalculateStrategyCost(SupportedValueType.ByteArray) +
-                                    right.CalculateStrategyCost(SupportedValueType.ByteArray);
+                    binaryCost
+ = left.CalculateStrategyCost(SupportedValueType.Binary) +
+                                    right.CalculateStrategyCost(SupportedValueType.Binary);
                     break;
-                case SupportableValueType.Integer | SupportableValueType.ByteArray:
+                case SupportableValueType.Integer | SupportableValueType.Binary:
                     this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer) |
-                                              GetSupportableConversions(SupportedValueType.ByteArray);
+                                              GetSupportableConversions(SupportedValueType.Binary);
                     intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
                               right.CalculateStrategyCost(SupportedValueType.Integer);
-                    byteArrayCost = left.CalculateStrategyCost(SupportedValueType.ByteArray) +
-                                    right.CalculateStrategyCost(SupportedValueType.ByteArray);
+                    binaryCost
+ = left.CalculateStrategyCost(SupportedValueType.Binary) +
+                                    right.CalculateStrategyCost(SupportedValueType.Binary);
                     break;
                 case logicalMaximumSupport:
                     this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Boolean) |
                                               GetSupportableConversions(SupportedValueType.Integer) |
-                                              GetSupportableConversions(SupportedValueType.ByteArray);
+                                              GetSupportableConversions(SupportedValueType.Binary);
                     boolCost = left.CalculateStrategyCost(SupportedValueType.Boolean) +
                                right.CalculateStrategyCost(SupportedValueType.Boolean);
                     intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
                               right.CalculateStrategyCost(SupportedValueType.Integer);
-                    byteArrayCost = left.CalculateStrategyCost(SupportedValueType.ByteArray) +
-                                    right.CalculateStrategyCost(SupportedValueType.ByteArray);
+                    binaryCost
+ = left.CalculateStrategyCost(SupportedValueType.Binary) +
+                                    right.CalculateStrategyCost(SupportedValueType.Binary);
                     break;
                 default:
                     throw new ExpressionNotValidLogicallyException();
@@ -194,8 +198,9 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                     in supportedOption);
 
                 int byteArrayTotalCost = GetTotalConversionCosts(
-                    in byteArrayCost,
-                    SupportedValueType.ByteArray,
+                    in binaryCost
+,
+                    SupportedValueType.Binary,
                     in supportedOption);
 
                 int boolTotalCost = GetTotalConversionCosts(
@@ -212,7 +217,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                         if (byteArrayTotalCost < boolTotalCost)
                         {
                             // Byte array is cheapest
-                            this.CalculatedCosts[supportedOption] = (byteArrayTotalCost, SupportedValueType.ByteArray);
+                            this.CalculatedCosts[supportedOption] = (byteArrayTotalCost, SupportedValueType.Binary);
                         }
                         else
                         {
@@ -240,7 +245,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                     if (byteArrayTotalCost < boolTotalCost)
                     {
                         // Byte array is cheapest
-                        this.CalculatedCosts[supportedOption] = (byteArrayTotalCost, SupportedValueType.ByteArray);
+                        this.CalculatedCosts[supportedOption] = (byteArrayTotalCost, SupportedValueType.Binary);
                     }
                     else
                     {
@@ -290,7 +295,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                 throw new ExpressionNotValidLogicallyException();
             }
 
-            return (left, right, tuple.InternalType == SupportedValueType.ByteArray);
+            return (left, right, tuple.InternalType == SupportedValueType.Binary);
         }
     }
 }

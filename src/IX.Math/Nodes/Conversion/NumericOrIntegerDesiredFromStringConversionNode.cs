@@ -13,7 +13,7 @@ namespace IX.Math.Nodes.Conversion
     /// A conversion node for when a numeric type is desired.
     /// </summary>
     /// <seealso cref="IX.Math.Nodes.Conversion.ConversionNodeBase" />
-    public class NumericOrIntegerDesiredFromStringConversionNode : ConversionNodeBase
+    public sealed class NumericOrIntegerDesiredFromStringConversionNode : ConversionNodeBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NumericOrIntegerDesiredFromStringConversionNode"/> class.

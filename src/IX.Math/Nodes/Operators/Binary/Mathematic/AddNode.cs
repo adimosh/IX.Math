@@ -91,9 +91,9 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             }
 
             // We have two binary-convertible constants
-            if (left.TryGetByteArray(out byte[] lbav) && right.TryGetByteArray(out byte[] rbav))
+            if (left.TryGetBinary(out byte[] lbav) && right.TryGetBinary(out byte[] rbav))
             {
-                return new ByteArrayNode(
+                return new BinaryNode(
                     Stitch(
                         lbav,
                         rbav));
@@ -131,7 +131,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             const SupportableValueType completeSupport =
                 SupportableValueType.Integer |
                 SupportableValueType.Numeric |
-                SupportableValueType.ByteArray |
+                SupportableValueType.Binary |
                 SupportableValueType.String;
 
             this.CalculatedCosts.Clear();
@@ -164,15 +164,15 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 this.PossibleReturnType |= GetSupportableConversions(SupportedValueType.Numeric);
             }
 
-            if ((commonType & SupportableValueType.ByteArray) != SupportableValueType.None)
+            if ((commonType & SupportableValueType.Binary) != SupportableValueType.None)
             {
                 checked
                 {
-                    binaryCost = left.CalculateStrategyCost(SupportedValueType.ByteArray) +
-                            right.CalculateStrategyCost(SupportedValueType.ByteArray);
+                    binaryCost = left.CalculateStrategyCost(SupportedValueType.Binary) +
+                            right.CalculateStrategyCost(SupportedValueType.Binary);
                 }
 
-                this.PossibleReturnType |= GetSupportableConversions(SupportedValueType.ByteArray);
+                this.PossibleReturnType |= GetSupportableConversions(SupportedValueType.Binary);
             }
 
             if ((commonType & SupportableValueType.String) != SupportableValueType.None)
@@ -191,7 +191,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             {
                 int totalIntCost = GetTotalConversionCosts(in intCost, SupportedValueType.Integer, supportedType);
                 int totalNumericCost = GetTotalConversionCosts(in numericCost, SupportedValueType.Numeric, supportedType);
-                int totalBinaryCost = GetTotalConversionCosts(in binaryCost, SupportedValueType.ByteArray, supportedType);
+                int totalBinaryCost = GetTotalConversionCosts(in binaryCost, SupportedValueType.Binary, supportedType);
                 int totalStringCost = GetTotalConversionCosts(in stringCost, SupportedValueType.String, supportedType);
 
                 int minimalCost = global::System.Math.Min(
@@ -208,7 +208,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 }
                 else if (minimalCost == totalBinaryCost)
                 {
-                    this.CalculatedCosts[supportedType] = (minimalCost, SupportedValueType.ByteArray);
+                    this.CalculatedCosts[supportedType] = (minimalCost, SupportedValueType.Binary);
                 }
                 else if (minimalCost == totalStringCost)
                 {
@@ -248,7 +248,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                         return Expression.Add(
                             left,
                             right);
-                    case SupportedValueType.ByteArray:
+                    case SupportedValueType.Binary:
                         MethodInfo mi2 = typeof(AddNode).GetMethodWithExactParameters(
                             nameof(Stitch),
                             typeof(byte[]),

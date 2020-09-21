@@ -24,7 +24,7 @@ namespace IX.Math.Nodes.Constants
         /// Initializes a new instance of the <see cref="IntegerNode" /> class.
         /// </summary>
         /// <param name="value">The node's boolean value.</param>
-        internal IntegerNode(long value)
+        public IntegerNode(long value)
             : base(value)
         {
             this.numericRepresentation = Convert.ToDouble(value);
@@ -66,7 +66,7 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> if the constant can safely be converted to a byte array, <c>false</c> otherwise.</returns>
-        public override bool TryGetByteArray(out byte[] value)
+        public override bool TryGetBinary(out byte[] value)
         {
             value = this.binaryRepresentation;
             return false;

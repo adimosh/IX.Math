@@ -13,7 +13,7 @@ namespace IX.Math.Nodes.Conversion
     /// A conversion node for when a numeric type is desired.
     /// </summary>
     /// <seealso cref="IX.Math.Nodes.Conversion.ConversionNodeBase" />
-    public class AnythingDesiredFromStringConversionNode : ConversionNodeBase
+    public sealed class AnythingDesiredFromStringConversionNode : ConversionNodeBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AnythingDesiredFromStringConversionNode"/> class.
@@ -21,7 +21,7 @@ namespace IX.Math.Nodes.Conversion
         /// <param name="sourceNode">The source node.</param>
         public AnythingDesiredFromStringConversionNode(
             [JetBrains.Annotations.NotNull] NodeBase sourceNode)
-        : base(sourceNode, SupportableValueType.Numeric | SupportableValueType.Integer | SupportableValueType.ByteArray | SupportableValueType.Boolean)
+        : base(sourceNode, SupportableValueType.Numeric | SupportableValueType.Integer | SupportableValueType.Binary | SupportableValueType.Boolean)
         {
         }
 
@@ -58,9 +58,9 @@ namespace IX.Math.Nodes.Conversion
                         this.ConvertFromNode.GenerateExpression(
                             SupportedValueType.String,
                             in comparisonTolerance));
-                case SupportedValueType.ByteArray:
+                case SupportedValueType.Binary:
                     return Expression.Call(
-                        ((Func<string, byte[]>)InternalTypeDirectConversions.ParseByteArray).Method,
+                        ((Func<string, byte[]>)InternalTypeDirectConversions.ParseBinary).Method,
                         this.ConvertFromNode.GenerateExpression(
                             SupportedValueType.String,
                             in comparisonTolerance));

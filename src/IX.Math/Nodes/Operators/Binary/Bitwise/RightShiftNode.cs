@@ -61,9 +61,9 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
                     return new IntegerNode(lvi >> intValue);
                 }
 
-                if (nLeft.TryGetByteArray(out var lvb))
+                if (nLeft.TryGetBinary(out var lvb))
                 {
-                    return new ByteArrayNode(lvb.RightShift(intValue));
+                    return new BinaryNode(lvb.RightShift(intValue));
                 }
 
                 return this;

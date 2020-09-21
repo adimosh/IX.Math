@@ -40,8 +40,8 @@ namespace IX.Math.Nodes
                     case SupportableValueType.Numeric | SupportableValueType.Integer:
                         node = GenerateNumericOrIntegerConversionNode(node);
                         return;
-                    case SupportableValueType.ByteArray:
-                        node = GenerateByteArrayConversionNode(node);
+                    case SupportableValueType.Binary:
+                        node = GenerateBinaryConversionNode(node);
                         return;
                     default:
                         node = GenerateAnythingConversionNode(node);
@@ -55,49 +55,39 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <param name="derivedNode">The derived node.</param>
         /// <returns>A numeric node, if one is possible.</returns>
-        public static NodeBase GenerateAnythingConversionNode(NodeBase derivedNode)
-        {
-            return new AnythingDesiredFromStringConversionNode(derivedNode);
-        }
+        public static NodeBase GenerateAnythingConversionNode(NodeBase derivedNode) =>
+            new AnythingDesiredFromStringConversionNode(derivedNode);
 
         /// <summary>
         /// Generates a numeric conversion node from the source node.
         /// </summary>
         /// <param name="derivedNode">The derived node.</param>
         /// <returns>A numeric node, if one is possible.</returns>
-        public static NodeBase GenerateNumericConversionNode(NodeBase derivedNode)
-        {
-            return new NumericDesiredFromStringConversionNode(derivedNode);
-        }
+        public static NodeBase GenerateNumericConversionNode(NodeBase derivedNode) =>
+            new NumericDesiredFromStringConversionNode(derivedNode);
 
         /// <summary>
         /// Generates a numeric conversion node from the source node.
         /// </summary>
         /// <param name="derivedNode">The derived node.</param>
         /// <returns>A numeric node, if one is possible.</returns>
-        public static NodeBase GenerateIntegerConversionNode(NodeBase derivedNode)
-        {
-            return new IntegerDesiredFromStringConversionNode(derivedNode);
-        }
+        public static NodeBase GenerateIntegerConversionNode(NodeBase derivedNode) =>
+            new IntegerDesiredFromStringConversionNode(derivedNode);
 
         /// <summary>
         /// Generates a numeric conversion node from the source node.
         /// </summary>
         /// <param name="derivedNode">The derived node.</param>
         /// <returns>A numeric node, if one is possible.</returns>
-        public static NodeBase GenerateNumericOrIntegerConversionNode(NodeBase derivedNode)
-        {
-            return new NumericOrIntegerDesiredFromStringConversionNode(derivedNode);
-        }
+        public static NodeBase GenerateNumericOrIntegerConversionNode(NodeBase derivedNode) =>
+            new NumericOrIntegerDesiredFromStringConversionNode(derivedNode);
 
         /// <summary>
         /// Generates a numeric conversion node from the source node.
         /// </summary>
         /// <param name="derivedNode">The derived node.</param>
         /// <returns>A numeric node, if one is possible.</returns>
-        public static NodeBase GenerateByteArrayConversionNode(NodeBase derivedNode)
-        {
-            return new ByteArrayDesiredFromStringConversionNode(derivedNode);
-        }
+        public static NodeBase GenerateBinaryConversionNode(NodeBase derivedNode) =>
+            new BinaryDesiredFromStringConversionNode(derivedNode);
     }
 }

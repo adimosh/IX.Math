@@ -27,7 +27,7 @@ namespace IX.Math.Nodes.Constants
         /// Initializes a new instance of the <see cref="NumericNode" /> class.
         /// </summary>
         /// <param name="value">The node's boolean value.</param>
-        internal NumericNode(double value)
+        public NumericNode(double value)
             : base(value)
         {
         }
@@ -55,7 +55,7 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> if the constant can safely be converted to a byte array, <c>false</c> otherwise.</returns>
-        public override bool TryGetByteArray(out byte[] value)
+        public override bool TryGetBinary(out byte[] value)
         {
             value = this.binaryRepresentation;
             return true;
@@ -88,7 +88,7 @@ namespace IX.Math.Nodes.Constants
         protected override SupportableValueType GetSupportedTypes(double value)
         {
             this.supportableTypes = SupportableValueType.Numeric |
-                                    SupportableValueType.ByteArray |
+                                    SupportableValueType.Binary |
                                     SupportableValueType.String;
 
             this.binaryRepresentation = BitConverter.GetBytes(value);

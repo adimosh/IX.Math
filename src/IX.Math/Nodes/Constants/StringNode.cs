@@ -19,7 +19,7 @@ namespace IX.Math.Nodes.Constants
         /// Initializes a new instance of the <see cref="StringNode" /> class.
         /// </summary>
         /// <param name="value">The node's boolean value.</param>
-        internal StringNode(string value)
+        public StringNode(string value)
             : base(value)
         {
         }

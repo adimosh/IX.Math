@@ -100,7 +100,7 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> if the constant can safely be converted to a byte array, <c>false</c> otherwise.</returns>
-        public virtual bool TryGetByteArray(out byte[] value)
+        public virtual bool TryGetBinary(out byte[] value)
         {
             value = default;
             return false;

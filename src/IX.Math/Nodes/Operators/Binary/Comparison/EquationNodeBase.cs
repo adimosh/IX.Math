@@ -69,7 +69,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                 // Both boolean
                 equalityValue = bvl == bvr;
             }
-            else if (left.TryGetByteArray(out byte[] bavl) && right.TryGetByteArray(out byte[] bavr))
+            else if (left.TryGetBinary(out byte[] bavl) && right.TryGetBinary(out byte[] bavr))
             {
                 // Both byte array, but not both integer or numeric
                 bool bli = left.CheckSupportedType(SupportableValueType.Integer);
@@ -138,7 +138,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
 
                 switch (innerValueType)
                 {
-                    case SupportedValueType.ByteArray:
+                    case SupportedValueType.Binary:
                     {
                         // Byte array comparison
                         equalExpression = Expression.Call(

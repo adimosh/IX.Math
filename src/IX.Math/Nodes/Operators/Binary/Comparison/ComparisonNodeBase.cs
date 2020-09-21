@@ -87,14 +87,14 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                     in comparisonTolerance), SupportedValueType.Numeric);
             }
 
-            if ((commonSupportedTypes & SupportableValueType.ByteArray) != SupportableValueType.None)
+            if ((commonSupportedTypes & SupportableValueType.Binary) != SupportableValueType.None)
             {
                 // Byte array preferred if integer and numeric are not available
                 return (left.GenerateExpression(
-                    SupportedValueType.ByteArray,
+                    SupportedValueType.Binary,
                     in comparisonTolerance), right.GenerateExpression(
-                    SupportedValueType.ByteArray,
-                    in comparisonTolerance), SupportedValueType.ByteArray);
+                    SupportedValueType.Binary,
+                    in comparisonTolerance), SupportedValueType.Binary);
             }
 
             if ((commonSupportedTypes & SupportableValueType.Boolean) != SupportableValueType.None)

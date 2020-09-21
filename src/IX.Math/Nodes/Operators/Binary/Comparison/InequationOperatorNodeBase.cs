@@ -80,8 +80,8 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             }
 
             // If they are both binary, but not both integer or numeric
-            if (left.TryGetByteArray(out byte[] bavl) &&
-                right.TryGetByteArray(out byte[] bavr))
+            if (left.TryGetBinary(out byte[] bavl) &&
+                right.TryGetBinary(out byte[] bavr))
             {
                 bool bli = left.CheckSupportedType(SupportableValueType.Integer);
                 bool bln = left.CheckSupportedType(SupportableValueType.Numeric);
@@ -270,7 +270,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
 
                     #region Byte arrays
 
-                    case SupportedValueType.ByteArray:
+                    case SupportedValueType.Binary:
                         {
                             var mi = typeof(ArrayExtensions).GetMethodWithExactParameters(
                                          nameof(ArrayExtensions.SequenceCompareWithMsb),

@@ -44,9 +44,9 @@ namespace IX.Math
         String = 4,
 
         /// <summary>
-        ///     Byte array (pass as array of <see cref="byte" />).
+        ///     Binary (pass as array of <see cref="byte" />).
         /// </summary>
-        ByteArray = 8,
+        Binary = 8,
 
         /// <summary>
         ///     Integer (pass as array of <see cref="long" />).

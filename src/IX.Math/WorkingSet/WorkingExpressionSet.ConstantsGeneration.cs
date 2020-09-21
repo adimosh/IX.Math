@@ -111,7 +111,7 @@ namespace IX.Math.WorkingSet
             }
         }
 
-        internal static bool ParseByteArray(
+        internal static bool ParseBinary(
             string expression,
             out byte[] result)
         {
@@ -123,7 +123,7 @@ namespace IX.Math.WorkingSet
             {
                 if (expression.Length > 2)
                 {
-                    return ParseByteArrayLocal(
+                    return ParseBinaryLocal(
                         expression.Substring(2),
                         out result);
                 }
@@ -135,18 +135,18 @@ namespace IX.Math.WorkingSet
             result = null;
             return false;
 
-            static bool ParseByteArrayLocal(
-                string byteArrayExpression,
-                out byte[] byteArrayResult)
+            static bool ParseBinaryLocal(
+                string binaryExpression,
+                out byte[] binaryResult)
             {
                 Requires.NotNull(
-                    byteArrayExpression,
-                    nameof(byteArrayExpression));
+                    binaryExpression,
+                    nameof(binaryExpression));
 
-                byteArrayExpression = byteArrayExpression.Replace(
+                binaryExpression = binaryExpression.Replace(
                     "_",
                     string.Empty);
-                var stringLength = byteArrayExpression.Length;
+                var stringLength = binaryExpression.Length;
                 var byteLength = stringLength / 8;
                 if (byteLength < (double)stringLength / 8)
                 {
@@ -154,9 +154,9 @@ namespace IX.Math.WorkingSet
                 }
 
                 stringLength = byteLength * 8;
-                if (byteArrayExpression.Length < stringLength)
+                if (binaryExpression.Length < stringLength)
                 {
-                    byteArrayExpression = byteArrayExpression.PadLeft(
+                    binaryExpression = binaryExpression.PadLeft(
                         stringLength,
                         '0');
                 }
@@ -167,13 +167,13 @@ namespace IX.Math.WorkingSet
                 {
                     var startingIndex = stringLength - (byteLength - i) * 8;
 
-                    var currentByteExpression = byteArrayExpression.Substring(
+                    var currentByteExpression = binaryExpression.Substring(
                         startingIndex,
                         8);
 
                     if (!BitRepresentationRegex.IsMatch(currentByteExpression))
                     {
-                        byteArrayResult = null;
+                        binaryResult = null;
                         return false;
                     }
 
@@ -183,7 +183,7 @@ namespace IX.Math.WorkingSet
                 }
 
                 Array.Reverse(bytes);
-                byteArrayResult = bytes;
+                binaryResult = bytes;
 
                 return true;
             }
@@ -218,7 +218,7 @@ namespace IX.Math.WorkingSet
                 return true;
             }
 
-            if (ParseByteArray(
+            if (ParseBinary(
                 content,
                 out byte[] ba))
             {
@@ -472,7 +472,7 @@ namespace IX.Math.WorkingSet
                 {
                     OriginalStringValue = originalStringValue
                 },
-                byte[] ba => new ByteArrayNode(
+                byte[] ba => new BinaryNode(
                     ba)
                 {
                     OriginalStringValue = originalStringValue

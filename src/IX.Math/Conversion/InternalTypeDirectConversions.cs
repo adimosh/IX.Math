@@ -26,19 +26,19 @@ namespace IX.Math.Conversion
             return false;
         }
 
-        internal static bool ToInteger(byte[] byteArray, out long integer)
+        internal static bool ToInteger(byte[] binary, out long integer)
         {
-            if (byteArray.Length <= 8)
+            if (binary.Length <= 8)
             {
-                if (byteArray.Length < 8)
+                if (binary.Length < 8)
                 {
                     byte[] bytes = new byte[8];
-                    Array.Copy(byteArray, bytes, byteArray.Length);
-                    byteArray = bytes;
+                    Array.Copy(binary, bytes, binary.Length);
+                    binary = bytes;
                 }
 
                 integer = BitConverter.ToInt64(
-                    byteArray,
+                    binary,
                     0);
 
                 return true;
@@ -61,7 +61,7 @@ namespace IX.Math.Conversion
             {
                 long l => l,
                 double d => NumericConversion(d),
-                byte[] ba => ByteArrayConversion(ba),
+                byte[] ba => BinaryConversion(ba),
                 _ => throw new InvalidCastException()
             };
 
@@ -77,7 +77,7 @@ namespace IX.Math.Conversion
                 return i;
             }
 
-            static long ByteArrayConversion(byte[] ba)
+            static long BinaryConversion(byte[] ba)
             {
                 if (!ToInteger(
                     ba,
@@ -92,19 +92,19 @@ namespace IX.Math.Conversion
         #endregion
 
         #region To numeric
-        internal static bool ToNumeric(byte[] byteArray, out double numeric)
+        internal static bool ToNumeric(byte[] binary, out double numeric)
         {
-            if (byteArray.Length <= 8)
+            if (binary.Length <= 8)
             {
-                if (byteArray.Length < 8)
+                if (binary.Length < 8)
                 {
                     byte[] bytes = new byte[8];
-                    Array.Copy(byteArray, bytes, byteArray.Length);
-                    byteArray = bytes;
+                    Array.Copy(binary, bytes, binary.Length);
+                    binary = bytes;
                 }
 
                 numeric = BitConverter.ToDouble(
-                    byteArray,
+                    binary,
                     0);
 
                 return true;
@@ -127,11 +127,11 @@ namespace IX.Math.Conversion
             {
                 long l => Convert.ToDouble(l),
                 double d => d,
-                byte[] ba => ByteArrayConversion(ba),
+                byte[] ba => BinaryConversion(ba),
                 _ => throw new InvalidCastException()
             };
 
-            static double ByteArrayConversion(byte[] ba)
+            static double BinaryConversion(byte[] ba)
             {
                 if (!ToNumeric(
                     ba,
@@ -146,7 +146,7 @@ namespace IX.Math.Conversion
         #endregion
 
         #region To byte array
-        internal static byte[] ParseByteArray(string input)
+        internal static byte[] ParseBinary(string input)
         {
             if (!WorkingExpressionSet.TryInterpretStringValue(
                 input,

@@ -19,7 +19,7 @@ namespace IX.Math.Nodes.Constants
         /// Initializes a new instance of the <see cref="BoolNode" /> class.
         /// </summary>
         /// <param name="value">The node's boolean value.</param>
-        internal BoolNode(bool value)
+        public BoolNode(bool value)
             : base(value)
         {
         }
