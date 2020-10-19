@@ -12,4 +12,12 @@
     <DefineConstants>$(DefineConstants);STANDARD</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageReleaseNotes>- Modernized for SemVer 2.
+- Updated opt and modernized project.</PackageReleaseNotes>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>../../opt/snk/ix.framework.strongname.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
 </Project>

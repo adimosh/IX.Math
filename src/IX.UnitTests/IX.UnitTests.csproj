@@ -15,8 +15,8 @@
 
   <ItemGroup>
     <PackageReference Include="IX.StandardExtensions.TestUtils" Version="0.5.3" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.0" />
-    <PackageReference Include="Moq" Version="4.14.5" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+    <PackageReference Include="Moq" Version="4.14.6" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="coverlet.collector" Version="1.3.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
