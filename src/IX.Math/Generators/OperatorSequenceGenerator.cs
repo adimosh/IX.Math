@@ -11,10 +11,9 @@ namespace IX.Math.Generators
 {
     internal static class OperatorSequenceGenerator
     {
-        [NotNull]
         internal static List<Tuple<int, int, string>> GetOperatorsInOrderInExpression(
-            [NotNull] string expression,
-            [NotNull] KeyValuePair<int, string[]>[] operators)
+            string expression,
+            KeyValuePair<int, string[]>[] operators)
         {
             Requires.NotNull(
                 expression,

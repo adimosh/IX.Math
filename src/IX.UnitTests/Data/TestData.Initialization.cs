@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using IX.StandardExtensions.TestUtils;
+using IX.DataGeneration;
 
 namespace IX.UnitTests.Data
 {

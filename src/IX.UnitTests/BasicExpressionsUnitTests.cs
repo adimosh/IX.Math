@@ -4,8 +4,8 @@
 
 using System;
 using System.Collections.Generic;
+using IX.DataGeneration;
 using IX.Math;
-using IX.StandardExtensions.TestUtils;
 using Xunit;
 
 namespace IX.UnitTests

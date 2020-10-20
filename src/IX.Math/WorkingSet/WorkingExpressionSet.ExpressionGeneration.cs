@@ -123,7 +123,7 @@ namespace IX.Math.WorkingSet
             "CodeSmell",
             "ERP022:Unobserved exception in generic exception handler",
             Justification = "We want that.")]
-        private NodeBase GenerateExpression([NotNull] string expression)
+        private NodeBase GenerateExpression(string expression)
         {
             Requires.NotNullOrWhiteSpace(
                 expression,
@@ -189,7 +189,7 @@ namespace IX.Math.WorkingSet
             foreach (var (_, operatorPosition, @operator) in OperatorSequenceGenerator
                 .GetOperatorsInOrderInExpression(
                     expression,
-                    this.binaryOperators.KeysByLevel)
+                    this.binaryOperators.KeysByLevel.ToArray())
                 .OrderBy(p => p.Item1)
                 .ThenByDescending(p => p.Item2)
                 .ToArray())
@@ -268,7 +268,7 @@ namespace IX.Math.WorkingSet
             foreach (Tuple<int, int, string> operatorPosition in OperatorSequenceGenerator
                 .GetOperatorsInOrderInExpression(
                     expression,
-                    this.unaryOperators.KeysByLevel)
+                    this.unaryOperators.KeysByLevel.ToArray())
                 .OrderBy(p => p.Item1)
                 .ThenByDescending(p => p.Item2)
                 .ToArray())

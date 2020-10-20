@@ -143,7 +143,7 @@ namespace IX.Math
             IStringFormatter stringFormatter,
             params Assembly[] functionAssemblies)
         {
-            Requires.NotNull(ref this.workingDefinition, mathDefinition, nameof(mathDefinition));
+            Requires.NotNull(out this.workingDefinition, mathDefinition, nameof(mathDefinition));
 
             // Register function assemblies
             this.assembliesToRegister = new List<Assembly>(functionAssemblies.Length + 1)

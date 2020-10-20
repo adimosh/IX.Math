@@ -3,21 +3,4 @@
 
   <Import Project="../opt/msbuild/Standard.Build.props" />
 
-  <!-- Extra debug symbols for target framework type -->
-  <PropertyGroup Condition="'$(TargetFrameworkIsStandard2)'=='true'">
-    <DefineConstants>$(DefineConstants);NETSTANDARD2</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFrameworkIsStandard)'=='true'">
-    <DefineConstants>$(DefineConstants);STANDARD</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <PackageReleaseNotes>- Modernized for SemVer 2.
-- Updated opt and modernized project.</PackageReleaseNotes>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>../../opt/snk/ix.framework.strongname.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-
 </Project>
