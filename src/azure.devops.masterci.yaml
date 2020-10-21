@@ -45,7 +45,7 @@ jobs:
 - job:
   workspace:
     clean: all
-  timeoutInMinutes: 60
+  timeoutInMinutes: 100
   pool:
     name: Azure Pipelines
     vmImage: windows-latest

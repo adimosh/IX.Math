@@ -20,7 +20,7 @@ resources:
 
 jobs:
 - job:
-  timeoutInMinutes: 40
+  timeoutInMinutes: 100
   pool:
     name: Azure Pipelines
     vmImage: windows-latest
