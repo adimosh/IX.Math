@@ -2,15 +2,12 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-#if !NET452
 using System;
-#endif
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
 using IX.Math.Extensibility;
 using IX.Math.Nodes.Constants;
-using IX.Math.Obsolete;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Functions.Unary
@@ -96,11 +93,7 @@ namespace IX.Math.Nodes.Functions.Unary
                         SupportedValueType.String,
                         in comparisonTolerance),
                     nameof(string.Trim),
-#if NET452
-                    DotNet452Mitigation.EmptyTypeArray);
-#else
                     Array.Empty<Type>());
-#endif
             }
 
             throw new ExpressionNotValidLogicallyException();

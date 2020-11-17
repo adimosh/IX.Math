@@ -3,11 +3,13 @@
 // </copyright>
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
 using IX.StandardExtensions.Contracts;
+using IX.StandardExtensions.Efficiency;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Parameters
@@ -20,9 +22,9 @@ namespace IX.Math.Nodes.Parameters
     [DebuggerDisplay("param:{" + nameof(Name) + "}")]
     public sealed class ExternalParameterNode : NodeBase
     {
-        private ParameterExpression compiledParameterExpression;
-        private Expression compiledParameterValueExpression;
-        private Type parameterType;
+        private Dictionary<SupportedValueType, Expression> compiledParameterValueExpressions;
+        private ParameterExpression? compiledParameterExpression;
+        private Type? parameterType;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ExternalParameterNode" /> class.
@@ -52,6 +54,7 @@ namespace IX.Math.Nodes.Parameters
 
             this.IsFunction = true;
             this.ParameterType = SupportedValueType.Unknown;
+            this.compiledParameterValueExpressions = new Dictionary<SupportedValueType, Expression>(5);
         }
 
         /// <summary>
@@ -88,7 +91,7 @@ namespace IX.Math.Nodes.Parameters
             {
                 this.Verify();
 
-                return this.compiledParameterExpression;
+                return this.compiledParameterExpression ?? throw new InvalidOperationException();
             }
         }
 
@@ -125,65 +128,128 @@ namespace IX.Math.Nodes.Parameters
         /// </value>
         public SupportedValueType ParameterType { get; private set; }
 
+        private static long GetIntegerValue(in DynamicVariableValue value)
+        {
+            if (!value.TryGetInteger(out var val))
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+
+            return val;
+        }
+
+        private static double GetNumericValue(in DynamicVariableValue value)
+        {
+            if (!value.TryGetNumeric(out var val))
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+
+            return val;
+        }
+
+        private static byte[] GetBinaryValue(in DynamicVariableValue value)
+        {
+            if (!value.TryGetBinary(out var val))
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+
+            return val;
+        }
+
+        private static bool GetBooleanValue(in DynamicVariableValue value)
+        {
+            if (!value.TryGetBoolean(out var val))
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+
+            return val;
+        }
+
+        private static string GetStringValue(in DynamicVariableValue value)
+        {
+            if (!value.TryGetString(out var val))
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+
+            return val;
+        }
+
         /// <summary>
-        ///     Determines the type of the parameter.
+        ///     Determines the type of the parameter. This method can only be called once.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <exception cref="ExpressionNotValidLogicallyException">Expression is not valid.</exception>
         public void DetermineParameterType(Type type)
         {
-            if (this.ParameterType != SupportedValueType.Unknown)
+            var internalType = Requires.NotNull(type, nameof(type));
+
+            if (this.parameterType != null)
             {
                 throw new MathematicsEngineException();
             }
 
             SupportedValueType svt;
-            if (type == typeof(long))
+
+            if (internalType == typeof(DynamicVariableValue))
+            {
+                svt = SupportedValueType.Unknown;
+                this.IsFunction = false;
+            }
+            else if (internalType == typeof(long))
             {
                 svt = SupportedValueType.Integer;
                 this.IsFunction = false;
             }
-            else if (type == typeof(double))
+            else if (internalType == typeof(double))
             {
                 svt = SupportedValueType.Numeric;
                 this.IsFunction = false;
             }
-            else if (type == typeof(byte[]))
+            else if (internalType == typeof(byte[]))
             {
                 svt = SupportedValueType.Binary;
                 this.IsFunction = false;
             }
-            else if (type == typeof(bool))
+            else if (internalType == typeof(bool))
             {
                 svt = SupportedValueType.Boolean;
                 this.IsFunction = false;
             }
-            else if (type == typeof(string))
+            else if (internalType == typeof(string))
             {
                 svt = SupportedValueType.String;
                 this.IsFunction = false;
             }
-            else if (type == typeof(Func<long>))
+            else if (internalType == typeof(Func<DynamicVariableValue>))
+            {
+                svt = SupportedValueType.Unknown;
+                this.IsFunction = true;
+            }
+            else if (internalType == typeof(Func<long>))
             {
                 svt = SupportedValueType.Integer;
                 this.IsFunction = true;
             }
-            else if (type == typeof(Func<double>))
+            else if (internalType == typeof(Func<double>))
             {
                 svt = SupportedValueType.Numeric;
                 this.IsFunction = true;
             }
-            else if (type == typeof(Func<byte[]>))
+            else if (internalType == typeof(Func<byte[]>))
             {
                 svt = SupportedValueType.Binary;
                 this.IsFunction = true;
             }
-            else if (type == typeof(Func<bool>))
+            else if (internalType == typeof(Func<bool>))
             {
                 svt = SupportedValueType.Boolean;
                 this.IsFunction = true;
             }
-            else if (type == typeof(Func<string>))
+            else if (internalType == typeof(Func<string>))
             {
                 svt = SupportedValueType.String;
                 this.IsFunction = true;
@@ -193,16 +259,25 @@ namespace IX.Math.Nodes.Parameters
                 throw new ExpressionNotValidLogicallyException();
             }
 
+            // Parameter type
             this.ParameterType = svt;
-            this.parameterType = type;
-            this.PossibleReturnType = GetSupportableConversions(in svt);
+            this.parameterType = internalType;
 
+            // Parameter expression
+            this.compiledParameterExpression = Expression.Parameter(
+                internalType,
+                this.Name);
+
+            // Supported conversions
+            this.PossibleReturnType = GetSupportableConversions(in svt, true);
             this.CalculatedCosts.Clear();
             foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
-                this.CalculatedCosts[possibleType] = (GetStandardConversionStrategyCost(
-                    in svt,
-                    in possibleType), svt);
+                this.CalculatedCosts[possibleType] = internalType == typeof(DynamicVariableValue)
+                    ? (0, svt)
+                    : (GetStandardConversionStrategyCost(
+                        in svt,
+                        in possibleType), svt);
             }
         }
 
@@ -218,7 +293,9 @@ namespace IX.Math.Nodes.Parameters
                 out ExternalParameterNode result))
             {
                 // We might have a indexed variable with a discovered indexer
-                ExternalParameterNode par = context.ParameterRegistry.FirstOrDefault(p => p.Value.Name == this.Name)
+                ExternalParameterNode par = context
+                    .ParameterRegistry
+                    .FirstOrDefault(p => p.Value.Name == this.Name)
                     .Value;
                 if (par == null)
                 {
@@ -245,7 +322,7 @@ namespace IX.Math.Nodes.Parameters
         /// </remarks>
         public override void Verify()
         {
-            if (this.ParameterType == SupportedValueType.Unknown)
+            if (this.parameterType == null)
             {
                 throw new ExpressionNotValidLogicallyException();
             }
@@ -262,25 +339,49 @@ namespace IX.Math.Nodes.Parameters
             in ComparisonTolerance comparisonTolerance)
         {
             // We get from cache first
-            if (this.compiledParameterValueExpression != null)
+            if (this.compiledParameterValueExpressions.TryGetValue(
+                valueType,
+                out var value))
             {
-                return this.compiledParameterValueExpression;
+                return value;
             }
 
             // We verify next
             this.Verify();
 
-            // Then we create the parameter expression and return it
-            this.compiledParameterExpression = Expression.Parameter(
-                this.parameterType,
-                this.Name);
-
+            Type parameterTypeInternal = this.parameterType!; // Comes after verify, cannot be null
+            Expression resultingExpression = this.compiledParameterExpression!;
             if (this.IsFunction)
             {
-                return this.compiledParameterValueExpression = Expression.Invoke(this.compiledParameterExpression);
+                // If this is a function, let's invoke it to get the value
+                resultingExpression = Expression.Invoke(resultingExpression);
             }
 
-            return this.compiledParameterValueExpression = this.compiledParameterExpression;
+            if (parameterTypeInternal == typeof(DynamicVariableValue))
+            {
+                // The type is a dynamic variable, further processing is needed
+                resultingExpression = valueType switch
+                {
+                    SupportedValueType.Integer => Expression.Call(
+                        ((InFunc<DynamicVariableValue, long>)GetIntegerValue).Method,
+                        resultingExpression),
+                    SupportedValueType.Numeric => Expression.Call(
+                        ((InFunc<DynamicVariableValue, double>)GetNumericValue).Method,
+                        resultingExpression),
+                    SupportedValueType.Boolean => Expression.Call(
+                        ((InFunc<DynamicVariableValue, bool>)GetBooleanValue).Method,
+                        resultingExpression),
+                    SupportedValueType.Binary => Expression.Call(
+                        ((InFunc<DynamicVariableValue, byte[]>)GetBinaryValue).Method,
+                        resultingExpression),
+                    SupportedValueType.String => Expression.Call(
+                        ((InFunc<DynamicVariableValue, string>)GetStringValue).Method,
+                        resultingExpression),
+                    _ => throw new MathematicsEngineException()
+                };
+            }
+
+            return this.compiledParameterValueExpressions[valueType] = resultingExpression;
         }
     }
 }

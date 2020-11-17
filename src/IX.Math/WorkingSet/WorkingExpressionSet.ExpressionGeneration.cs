@@ -17,7 +17,6 @@ using IX.Math.Nodes.Functions.Ternary;
 using IX.Math.Nodes.Functions.Unary;
 using IX.Math.Nodes.Operators.Binary;
 using IX.Math.Nodes.Operators.Unary;
-using IX.Math.Obsolete;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Globalization;
 using JetBrains.Annotations;
@@ -339,11 +338,7 @@ namespace IX.Math.WorkingSet
 
                         if (string.IsNullOrWhiteSpace(expressionValue))
                         {
-#if NET452
-                            parameterExpressions = DotNet452Mitigation.EmptyStringArray;
-#else
                             parameterExpressions = Array.Empty<string>();
-#endif
                         }
                         else
                         {

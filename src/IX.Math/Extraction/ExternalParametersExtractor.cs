@@ -5,7 +5,6 @@
 using System;
 using System.Collections;
 using System.Text;
-using IX.Math.Obsolete;
 using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
 
@@ -27,7 +26,7 @@ namespace IX.Math.Extraction
                 existingParameters,
                 nameof(existingParameters));
 
-            object[] newParameters = null;
+            object[]? newParameters = null;
             var length = existingParameters.Length;
             for (int i = 0; i < length; i++)
             {
@@ -35,6 +34,16 @@ namespace IX.Math.Extraction
                 switch (par)
                 {
 #region Values
+
+                    case DynamicVariableValue dvv:
+                    {
+                        if (newParameters != null)
+                        {
+                            newParameters[i] = dvv;
+                        }
+
+                        break;
+                    }
 
                     case string s:
                     {
@@ -89,6 +98,16 @@ namespace IX.Math.Extraction
 #endregion
 
 #region Functions
+
+                    case Func<DynamicVariableValue> dvv:
+                    {
+                        if (newParameters != null)
+                        {
+                            newParameters[i] = dvv;
+                        }
+
+                        break;
+                    }
 
                     case Func<string> s:
                     {
@@ -298,11 +317,7 @@ namespace IX.Math.Extraction
                                         BitArray ba = b();
                                         if (ba == null)
                                         {
-#if NET452
-                                            return DotNet452Mitigation.EmptyByteAttay;
-#else
                                             return Array.Empty<byte>();
-#endif
                                         }
 
                                         int bLength = ba.Length / 8;

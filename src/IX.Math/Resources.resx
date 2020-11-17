@@ -156,4 +156,28 @@
   <data name="MathematicsEngineException" xml:space="preserve">
     <value>An exception in the internal engine has caused the current operation to be aborted. Please report the circumstances of this error, along with the input data, to the development team.</value>
   </data>
+  <data name="BinaryValueTag" xml:space="preserve">
+    <value>BIN</value>
+  </data>
+  <data name="BooleanValueTag" xml:space="preserve">
+    <value>BOL</value>
+  </data>
+  <data name="ErrorMathematicPortfolioNotAvailable" xml:space="preserve">
+    <value>A mathematic portfolio is not available in this context.</value>
+  </data>
+  <data name="IntegerValueTag" xml:space="preserve">
+    <value>INT</value>
+  </data>
+  <data name="MissingValueTag" xml:space="preserve">
+    <value>NULL</value>
+  </data>
+  <data name="NumericValueTag" xml:space="preserve">
+    <value>NUM</value>
+  </data>
+  <data name="OriginalValueMarker" xml:space="preserve">
+    <value>(O)</value>
+  </data>
+  <data name="StringValueTag" xml:space="preserve">
+    <value>STR</value>
+  </data>
 </root>

@@ -113,8 +113,15 @@ namespace IX.Math.Nodes
         /// Gets the supportable conversions from an internal value type.
         /// </summary>
         /// <param name="internalValueType">Type of the internal value.</param>
-        /// <returns>The value types supported for conversion.</returns>
-        public static SupportableValueType GetSupportableConversions(in SupportedValueType internalValueType) =>
+        /// <param name="noneMeansAll">if set to <c>true</c>, a value of None means all are supported.</param>
+        /// <returns>
+        /// The value types supported for conversion.
+        /// </returns>
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "EPS02:A non-readonly struct used as in-parameter",
+            Justification = "This is a primitive type, the compiler can handle it.")]
+        public static SupportableValueType GetSupportableConversions(in SupportedValueType internalValueType, in bool noneMeansAll = false) =>
             internalValueType switch
             {
                 SupportedValueType.Integer => SupportableValueType.Integer |
@@ -129,7 +136,7 @@ namespace IX.Math.Nodes
                 SupportedValueType.Boolean => SupportableValueType.Boolean |
                                               SupportableValueType.String,
                 SupportedValueType.String => SupportableValueType.String,
-                _ => SupportableValueType.None
+                _ => noneMeansAll ? SupportableValueType.All : SupportableValueType.None
             };
 
         /// <summary>

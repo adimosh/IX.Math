@@ -13,7 +13,6 @@ using IX.Math.Extensibility;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
-using IX.Math.Obsolete;
 using IX.StandardExtensions;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Contracts;
@@ -28,21 +27,17 @@ namespace IX.Math
     [PublicAPI]
     public sealed class ComputedExpression : DisposableBase, IDeepCloneable<ComputedExpression>
     {
-#if NET452
-        private static readonly ReadOnlyCollection<Type> EmptyTypeCollection = new ReadOnlyCollection<Type>(DotNet452Mitigation.EmptyTypeArray);
-#else
         private static readonly ReadOnlyCollection<Type> EmptyTypeCollection = new ReadOnlyCollection<Type>(Array.Empty<Type>());
-#endif
 
         private readonly ConcurrentDictionary<string, ExternalParameterNode> parametersRegistry;
         private readonly List<IStringFormatter> stringFormatters;
 
         private readonly string initialExpression;
-        private NodeBase body;
+        private NodeBase? body;
 
         internal ComputedExpression(
             string initialExpression,
-            NodeBase body,
+            NodeBase? body,
             bool isRecognized,
             ConcurrentDictionary<string, ExternalParameterNode> parameterRegistry,
             List<IStringFormatter> stringFormatters)
@@ -55,6 +50,9 @@ namespace IX.Math
             this.RecognizedCorrectly = isRecognized;
             this.IsConstant = body?.IsConstant ?? false;
             this.IsTolerant = body?.IsTolerant ?? false;
+            this.IsImmutable = (body?.IsConstant ?? false) ||
+                               parameterRegistry.Count == 0 ||
+                               parameterRegistry.Values.All(p => p.ParameterType != SupportedValueType.Unknown);
         }
 
         /// <summary>
@@ -62,6 +60,17 @@ namespace IX.Math
         /// </summary>
         /// <value><see langword="true"/> if the expression is recognized correctly, <see langword="false"/> otherwise.</value>
         public bool RecognizedCorrectly { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is immutable.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is immutable; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsImmutable
+        {
+            get;
+        }
 
         /// <summary>
         /// Gets a value indicating whether or not the expression is constant.
@@ -128,19 +137,19 @@ namespace IX.Math
 
             return new ComputedExpression(
                 this.initialExpression,
-                this.body.DeepClone(context),
+                this.body?.DeepClone(context),
                 this.RecognizedCorrectly,
                 registry,
                 this.stringFormatters);
         }
 
-        internal (bool Success, bool IsObject, Delegate Function, object ConstantValue) CompileDelegate(
+        internal (bool Success, bool IsObject, Delegate? Function, object? ConstantValue) CompileDelegate(
             in ComparisonTolerance tolerance) =>
             this.CompileDelegate(
                 in tolerance,
                 EmptyTypeCollection);
 
-        internal (bool Success, bool IsObject, Delegate Function, object ConstantValue) CompileDelegate(
+        internal (bool Success, bool IsObject, Delegate? Function, object? ConstantValue) CompileDelegate(
             in ComparisonTolerance tolerance,
             ReadOnlyCollection<Type> parameterTypes)
         {
@@ -149,6 +158,12 @@ namespace IX.Math
             if (!this.RecognizedCorrectly)
             {
                 // Expression was not recognized correctly.
+                return (false, default, default, default);
+            }
+
+            if (this.body == null)
+            {
+                // Delegate body could not be generated.
                 return (false, default, default, default);
             }
 

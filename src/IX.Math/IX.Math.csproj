@@ -3,15 +3,16 @@
 
   <!-- Build configuration -->
   <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
-    <TargetFrameworks Condition="'$(IxDevOpsBuild)'=='true'">net452;net46;net47;net472;netstandard2.0;netstandard2.1</TargetFrameworks>
-    <TargetFrameworks Condition="'$(IxDevOpsBuild)'!='true'">net452;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(IxDevOpsBuild)'=='true'">net46;net47;net472;netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(IxDevOpsBuild)'!='true'">net46;netstandard2.1;net5.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
     <FailObsoleteTargetFrameworks>true</FailObsoleteTargetFrameworks>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <!-- Package metadata -->
@@ -21,7 +22,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageReleaseNotes>- Newest unified framework included.</PackageReleaseNotes>
+    <PackageReleaseNotes>- Upgraded package versions to newest.
+- Ditched .NET 4.5.2 and code.
+- Used mitigations for null-attributes.
+- Made IX.Math nullable.
+- Added support for .NET 5.0</PackageReleaseNotes>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>../../opt/snk/ix.framework.strongname.snk</AssemblyOriginatorKeyFile>
@@ -33,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.StandardExtensions" Version="[0.7.1,0.8)" />
+    <PackageReference Include="IX.StandardExtensions" Version="[0.7.3,0.8)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">
@@ -93,6 +98,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Obsolete\" />
   </ItemGroup>
 
 </Project>

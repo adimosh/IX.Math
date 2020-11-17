@@ -56,7 +56,7 @@ namespace IX.Math
         /// <value>
         /// The compiled expression, or <see langword="null" /> (<see langword="Nothing" /> in Visual Basic).
         /// </value>
-        public Delegate CompiledExpression { get; }
+        public Delegate? CompiledExpression { get; }
 
         /// <summary>
         /// Gets a value indicating whether this instance is constant.
@@ -72,7 +72,7 @@ namespace IX.Math
         /// <value>
         /// The constant value.
         /// </value>
-        public object ConstantValue { get; }
+        public object? ConstantValue { get; }
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="CompiledExpressionResult"/> is uncomputable.
@@ -108,7 +108,7 @@ namespace IX.Math
         /// <see langword="true" /> if <paramref name="obj" /> and this instance are the same type and represent the same value; otherwise, <see langword="false" />.</returns>
         public override bool Equals(object obj)
         {
-            if (!(obj is CompiledExpressionResult other))
+            if (obj is not CompiledExpressionResult other)
             {
                 return false;
             }

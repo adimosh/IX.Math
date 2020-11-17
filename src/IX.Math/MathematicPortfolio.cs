@@ -14,7 +14,6 @@ using IX.Math.Extraction;
 using IX.Math.Generators;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Parameters;
-using IX.Math.Obsolete;
 using IX.Math.WorkingSet;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Contracts;
@@ -34,16 +33,14 @@ namespace IX.Math
     {
         private static readonly ConcurrentDictionary<string, ExternalParameterNode> EmptyParameterRegistry = new ConcurrentDictionary<string, ExternalParameterNode>();
 
-        #if NET452
-        /// <summary>
-        /// Gets the current context of the mathematic portfolio.
-        /// </summary>
-        /// <value>
-        /// The current context.
-        /// </value>
-        [field: ThreadStatic]
-        public static ThreadStatic<MathematicPortfolio> CurrentContext { get; private set; }
-        #else
+        private readonly MulticastDictionary<(Type Source, Type Destination), Delegate> conversionsDictionary;
+        private readonly MulticastDictionary<Type, Delegate> displayDictionary;
+        private readonly ConcurrentDictionary<ExpressionTypedKey, CompiledExpressionResult> compiledDelegate =
+            new ConcurrentDictionary<ExpressionTypedKey, CompiledExpressionResult>();
+
+        private readonly ConcurrentDictionary<string, ComputedExpression> computedExpressions =
+            new ConcurrentDictionary<string, ComputedExpression>();
+
         /// <summary>
         /// Gets the current context of the mathematic portfolio.
         /// </summary>
@@ -51,13 +48,6 @@ namespace IX.Math
         /// The current context.
         /// </value>
         public static AsyncLocal<MathematicPortfolio> CurrentContext { get; } = new AsyncLocal<MathematicPortfolio>();
-        #endif
-
-        private readonly ConcurrentDictionary<ExpressionTypedKey, CompiledExpressionResult> compiledDelegate =
-            new ConcurrentDictionary<ExpressionTypedKey, CompiledExpressionResult>();
-
-        private readonly ConcurrentDictionary<string, ComputedExpression> computedExpressions =
-            new ConcurrentDictionary<string, ComputedExpression>();
 
         private readonly List<Assembly> assembliesToRegister;
 
@@ -140,10 +130,14 @@ namespace IX.Math
             Justification = "It does not matter at this point.")]
         public MathematicPortfolio(
             MathDefinition mathDefinition,
-            IStringFormatter stringFormatter,
+            IStringFormatter? stringFormatter,
             params Assembly[] functionAssemblies)
         {
             Requires.NotNull(out this.workingDefinition, mathDefinition, nameof(mathDefinition));
+
+            // Convertors
+            this.conversionsDictionary = new MulticastDictionary<(Type Source, Type Destination), Delegate>();
+            this.displayDictionary = new MulticastDictionary<Type, Delegate>();
 
             // Register function assemblies
             this.assembliesToRegister = new List<Assembly>(functionAssemblies.Length + 1)
@@ -155,7 +149,7 @@ namespace IX.Math
             {
                 if (assembly == null || this.assembliesToRegister.Contains(assembly))
                 {
-                    return;
+                    continue;
                 }
 
                 this.assembliesToRegister.Add(assembly);
@@ -300,6 +294,107 @@ namespace IX.Math
         public IDictionary<Type, IConstantInterpreter> ConstantInterpreters => this.constantInterpreters;
 
         /// <summary>
+        /// Registers a value conversion function in the current mathematic portfolio.
+        /// </summary>
+        /// <typeparam name="TSource">The type to convert from.</typeparam>
+        /// <typeparam name="TDestination">The type to convert to.</typeparam>
+        /// <param name="conversionFunction">The conversion function.</param>
+        public void RegisterConversion<TSource, TDestination>(
+            Func<TSource, (bool Success, TDestination Result)> conversionFunction) =>
+            this.conversionsDictionary.Add(
+                (typeof(TSource), typeof(TDestination)),
+                Requires.NotNull(
+                    conversionFunction,
+                    nameof(conversionFunction)));
+
+        /// <summary>
+        /// Registers a value conversion function in the current mathematic portfolio for the purposes of displaying a value.
+        /// </summary>
+        /// <typeparam name="TSource">The type to create a display from.</typeparam>
+        /// <param name="displayFunction">The display function.</param>
+        public void RegisterDisplay<TSource>(Func<TSource, (bool Success, string DisplayString)> displayFunction) =>
+            this.displayDictionary.Add(
+                typeof(TSource),
+                Requires.NotNull(
+                    displayFunction,
+                    nameof(displayFunction)));
+
+        /// <summary>
+        /// Converts the specified source value to the destination type.
+        /// </summary>
+        /// <typeparam name="TSource">The type to convert from.</typeparam>
+        /// <typeparam name="TDestination">The type to convert to.</typeparam>
+        /// <param name="source">The value to convert.</param>
+        /// <returns>A tuple indicating whether or not the conversion was a success, and, if true, what the conversion result was.</returns>
+        public (bool Success, TDestination Result) Convert<TSource, TDestination>(TSource source)
+        {
+            TDestination finalResult = default!;
+            bool success = this.conversionsDictionary.TryAct(
+                (typeof(TSource), typeof(TDestination)),
+                argument =>
+                {
+                    if (!(argument.Value is Func<TSource, (bool, TDestination)> conversionFunction))
+                    {
+                        return false;
+                    }
+
+                    var (s, result) = conversionFunction(source);
+
+                    if (s)
+                    {
+                        finalResult = result;
+                        return true;
+                    }
+
+                    return false;
+                });
+
+            return (success, finalResult);
+        }
+
+        /// <summary>
+        /// Creates a display string out of the specified value.
+        /// </summary>
+        /// <typeparam name="TSource">The type to create a display string from.</typeparam>
+        /// <param name="source">The value to display.</param>
+        /// <returns>The display string representing the value.</returns>
+        public string Display<TSource>(TSource source)
+        {
+            if (source == null)
+            {
+                return string.Empty;
+            }
+
+            string finalResult = string.Empty;
+            bool success = this.displayDictionary.TryAct(
+                typeof(TSource),
+                argument =>
+                {
+                    if (!(argument.Value is Func<TSource, (bool, string)> conversionFunction))
+                    {
+                        return false;
+                    }
+
+                    var (s, result) = conversionFunction(source);
+
+                    if (s)
+                    {
+                        finalResult = result;
+                        return true;
+                    }
+
+                    return false;
+                });
+
+            if (success)
+            {
+                return finalResult;
+            }
+
+            return source!.ToString();
+        }
+
+        /// <summary>
         ///     Returns the prototypes of all registered functions.
         /// </summary>
         /// <returns>All function names, with all possible combinations of input and output data.</returns>
@@ -430,7 +525,7 @@ namespace IX.Math
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "The methods that we're dealing with use delegate instances, and it is unavoidable.")]
-        public string[] GetRequiredParameters(string expression)
+        public string[]? GetRequiredParameters(string expression)
         {
             Requires.NotNullOrWhiteSpace(
                 expression,
@@ -622,17 +717,8 @@ namespace IX.Math
             base.DisposeManagedContext();
         }
 
-        private void SetThreadPortfolio()
-        {
-#if NET452
-            if (CurrentContext?.Value != this)
-            {
-                CurrentContext = new ThreadStatic<MathematicPortfolio>(this);
-            }
-#else
+        private void SetThreadPortfolio() =>
             CurrentContext.Value = this;
-#endif
-        }
 
         private ComputedExpression ValueFactory(string expression)
         {

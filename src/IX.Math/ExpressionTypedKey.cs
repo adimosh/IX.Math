@@ -5,7 +5,6 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using IX.Math.Obsolete;
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -22,17 +21,10 @@ namespace IX.Math
         /// </summary>
         /// <param name="expression">The expression.</param>
         public ExpressionTypedKey(string expression)
-#if NET452
-            : this(
-                expression,
-                default,
-                DotNet452Mitigation.EmptyTypeArray)
-#else
             : this(
                 expression,
                 default,
                 Array.Empty<Type>())
-#endif
         {
         }
 
@@ -59,17 +51,10 @@ namespace IX.Math
         public ExpressionTypedKey(
             string expression,
             ComparisonTolerance tolerance)
-#if NET452
-            : this(
-                expression,
-                tolerance,
-                DotNet452Mitigation.EmptyTypeArray)
-#else
             : this(
                 expression,
                 tolerance,
                 Array.Empty<Type>())
-#endif
         {
         }
 

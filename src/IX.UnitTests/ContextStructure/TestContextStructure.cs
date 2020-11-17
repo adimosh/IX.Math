@@ -168,7 +168,7 @@ namespace IX.UnitTests.ContextStructure
 
             if (parameters != null)
             {
-#if NETCOREAPP3_1
+#if NETCOREAPP3_1 || NET5_0
                 foreach ((var key, object val) in parameters)
                 {
                     object value = val;
@@ -200,7 +200,7 @@ namespace IX.UnitTests.ContextStructure
 
             if (parameters != null)
             {
-#if NETCOREAPP3_1
+#if NETCOREAPP3_1 || NET5_0
                 foreach ((var key, object val) in parameters)
                 {
                     object value = GenerateFuncOutOfParameterValue(val);

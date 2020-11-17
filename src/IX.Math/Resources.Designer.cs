@@ -61,6 +61,33 @@ namespace IX.Math {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BIN.
+        /// </summary>
+        internal static string BinaryValueTag {
+            get {
+                return ResourceManager.GetString("BinaryValueTag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BOL.
+        /// </summary>
+        internal static string BooleanValueTag {
+            get {
+                return ResourceManager.GetString("BooleanValueTag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A mathematic portfolio is not available in this context..
+        /// </summary>
+        internal static string ErrorMathematicPortfolioNotAvailable {
+            get {
+                return ResourceManager.GetString("ErrorMathematicPortfolioNotAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The function &quot;{0}&quot; cannot be found..
         /// </summary>
         internal static string FunctionCouldNotBeFound {
@@ -70,11 +97,29 @@ namespace IX.Math {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to INT.
+        /// </summary>
+        internal static string IntegerValueTag {
+            get {
+                return ResourceManager.GetString("IntegerValueTag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An exception in the internal engine has caused the current operation to be aborted. Please report the circumstances of this error, along with the input data, to the development team..
         /// </summary>
         internal static string MathematicsEngineException {
             get {
                 return ResourceManager.GetString("MathematicsEngineException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NULL.
+        /// </summary>
+        internal static string MissingValueTag {
+            get {
+                return ResourceManager.GetString("MissingValueTag", resourceCulture);
             }
         }
         
@@ -93,6 +138,24 @@ namespace IX.Math {
         internal static string NumericTypeInvalid {
             get {
                 return ResourceManager.GetString("NumericTypeInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to NUM.
+        /// </summary>
+        internal static string NumericValueTag {
+            get {
+                return ResourceManager.GetString("NumericValueTag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (O).
+        /// </summary>
+        internal static string OriginalValueMarker {
+            get {
+                return ResourceManager.GetString("OriginalValueMarker", resourceCulture);
             }
         }
         
@@ -165,6 +228,15 @@ namespace IX.Math {
         internal static string ParameterTypeNotRecognized {
             get {
                 return ResourceManager.GetString("ParameterTypeNotRecognized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to STR.
+        /// </summary>
+        internal static string StringValueTag {
+            get {
+                return ResourceManager.GetString("StringValueTag", resourceCulture);
             }
         }
         

@@ -29,7 +29,7 @@ namespace IX.Math
         /// <param name="definition">The definition to use.</param>
         public MathDefinition(MathDefinition definition)
         {
-            Requires.NotNull(definition, nameof(definition));
+            definition = Requires.NotNull(definition, nameof(definition));
 
             this.Parentheses = definition.Parentheses;
             this.SpecialSymbolIndicators = definition.SpecialSymbolIndicators;
@@ -289,7 +289,7 @@ namespace IX.Math
         /// The pass-through state container.
         /// </value>
         [DataMember]
-        public PassThroughStateContainerBase PassThroughStateContainer { get; set; }
+        public PassThroughStateContainerBase? PassThroughStateContainer { get; set; }
 
         /// <summary>
         /// Gets or sets the diagnostics logger.
@@ -299,7 +299,7 @@ namespace IX.Math
         /// </value>
         /// <remarks>The logger does not serialize, and cannot be cloned. It should be used for diagnostics only.</remarks>
         [IgnoreDataMember]
-        public ILog Logger { get; set; }
+        public ILog? Logger { get; set; }
 
         /// <summary>
         /// Creates a deep clone of the source object.
