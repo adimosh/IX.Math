@@ -276,6 +276,8 @@ namespace IX.Math
                     },
                     ref incrementer,
                     this);
+
+            this.SetThreadPortfolio();
         }
 
         /// <summary>
@@ -360,7 +362,7 @@ namespace IX.Math
                     return false;
                 });
 
-            if (success || finalResult == null)
+            if (!success || finalResult == null)
             {
                 result = default;
                 return false;
