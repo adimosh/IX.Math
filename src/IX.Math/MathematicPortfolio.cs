@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -55,17 +56,17 @@ namespace IX.Math
 
         private readonly List<IStringFormatter> stringFormatters;
 
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "We have it correctly implemented, but the analyzer can't tell.")]
         private readonly LevelDictionary<Type, IConstantsExtractor> constantExtractors;
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "We have it correctly implemented, but the analyzer can't tell.")]
         private readonly LevelDictionary<Type, IConstantInterpreter> constantInterpreters;
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "We have it correctly implemented, but the analyzer can't tell.")]
@@ -124,7 +125,7 @@ namespace IX.Math
         /// <param name="mathDefinition">The math definition.</param>
         /// <param name="stringFormatter">The string formatter.</param>
         /// <param name="functionAssemblies">The function assemblies.</param>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "It does not matter at this point.")]
@@ -325,8 +326,18 @@ namespace IX.Math
         /// <typeparam name="TSource">The type to convert from.</typeparam>
         /// <typeparam name="TDestination">The type to convert to.</typeparam>
         /// <param name="source">The value to convert.</param>
-        /// <returns>A tuple indicating whether or not the conversion was a success, and, if true, what the conversion result was.</returns>
-        public (bool Success, TDestination Result) Convert<TSource, TDestination>(TSource source)
+        /// <param name="result">The result, if any.</param>
+        /// <returns>
+        /// A tuple indicating whether or not the conversion was a success, and, if true, what the conversion result was.
+        /// </returns>
+        [SuppressMessage(
+            "Performance",
+            "HAA0302:Display class allocation to capture closure",
+            Justification = "Conversions on acting dictionary are like that.")]
+        public bool Convert<TSource, TDestination>(
+            TSource source,
+            [MaybeNullWhen(false)]
+            out TDestination result)
         {
             TDestination finalResult = default!;
             bool success = this.conversionsDictionary.TryAct(
@@ -338,18 +349,25 @@ namespace IX.Math
                         return false;
                     }
 
-                    var (s, result) = conversionFunction(source);
+                    var (s, r) = conversionFunction(source);
 
                     if (s)
                     {
-                        finalResult = result;
+                        finalResult = r;
                         return true;
                     }
 
                     return false;
                 });
 
-            return (success, finalResult);
+            if (success || finalResult == null)
+            {
+                result = default;
+                return false;
+            }
+
+            result = finalResult;
+            return true;
         }
 
         /// <summary>
@@ -472,7 +490,7 @@ namespace IX.Math
         /// Loads the expressions into context.
         /// </summary>
         /// <param name="expressions">The expressions to load.</param>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "We're using PLINQ, this is unavoidable.")]
@@ -521,7 +539,7 @@ namespace IX.Math
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns>An array with the required parameter names and order.</returns>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "The methods that we're dealing with use delegate instances, and it is unavoidable.")]
@@ -559,7 +577,7 @@ namespace IX.Math
         /// <param name="tolerance">The tolerance.</param>
         /// <param name="dataFinder">The data finder.</param>
         /// <returns>A computed object.</returns>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "The methods that we're dealing with use delegate instances, and it is unavoidable.")]
@@ -627,7 +645,7 @@ namespace IX.Math
         /// <param name="tolerance">The tolerance.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns>A computed object.</returns>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "The methods that we're dealing with use delegate instances, and it is unavoidable.")]

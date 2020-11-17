@@ -59,43 +59,47 @@ namespace IX.Math
                 value,
                 nameof(value));
 
-            (success, this.integerEquivalentValue) = registry.Convert<string, long>(value);
+            success = registry.Convert<string, long>(value, out var lv);
             if (success)
             {
+                this.integerEquivalentValue = lv;
                 displayStrings.Add(
-                    $"{Resources.IntegerValueTag}: {registry.Display(this.integerEquivalentValue.Value)}");
+                    $"{Resources.IntegerValueTag}: {registry.Display(lv)}");
             }
             else
             {
                 this.integerEquivalentValue = null;
             }
 
-            (success, this.numericEquivalentValue) = registry.Convert<string, double>(value);
+            success = registry.Convert<string, double>(value, out var dv);
             if (success)
             {
+                this.numericEquivalentValue = dv;
                 displayStrings.Add(
-                    $"{Resources.NumericValueTag}: {registry.Display(this.numericEquivalentValue.Value)}");
+                    $"{Resources.NumericValueTag}: {registry.Display(dv)}");
             }
             else
             {
                 this.numericEquivalentValue = null;
             }
 
-            (success, this.binaryEquivalentValue) = registry.Convert<string, byte[]>(value);
+            success = registry.Convert<string, byte[]>(value, out var bav);
             if (success)
             {
-                displayStrings.Add($"{Resources.BinaryValueTag}: {registry.Display(this.binaryEquivalentValue)}");
+                this.binaryEquivalentValue = bav;
+                displayStrings.Add($"{Resources.BinaryValueTag}: {registry.Display(bav)}");
             }
             else
             {
                 this.binaryEquivalentValue = null;
             }
 
-            (success, this.booleanEquivalentValue) = registry.Convert<string, bool>(value);
+            success = registry.Convert<string, bool>(value, out var bv);
             if (success)
             {
+                this.booleanEquivalentValue = bv;
                 displayStrings.Add(
-                    $"{Resources.BooleanValueTag}: {registry.Display(this.booleanEquivalentValue.Value)}");
+                    $"{Resources.BooleanValueTag}: {registry.Display(bv)}");
             }
             else
             {
@@ -126,42 +130,46 @@ namespace IX.Math
             displayStrings.Add(
                 $"{Resources.IntegerValueTag} {Resources.OriginalValueMarker}: {registry.Display(this.integerEquivalentValue.Value)}");
 
-            (success, this.numericEquivalentValue) = registry.Convert<long, double>(value);
+            success = registry.Convert<long, double>(value, out var dv);
             if (success)
             {
+                this.numericEquivalentValue = dv;
                 displayStrings.Add(
-                    $"{Resources.NumericValueTag}: {registry.Display(this.numericEquivalentValue.Value)}");
+                    $"{Resources.NumericValueTag}: {registry.Display(dv)}");
             }
             else
             {
                 this.numericEquivalentValue = null;
             }
 
-            (success, this.binaryEquivalentValue) = registry.Convert<long, byte[]>(value);
+            success = registry.Convert<long, byte[]>(value, out var bav);
             if (success)
             {
-                displayStrings.Add($"{Resources.BinaryValueTag}: {registry.Display(this.binaryEquivalentValue)}");
+                this.binaryEquivalentValue = bav;
+                displayStrings.Add($"{Resources.BinaryValueTag}: {registry.Display(bav)}");
             }
             else
             {
                 this.binaryEquivalentValue = null;
             }
 
-            (success, this.booleanEquivalentValue) = registry.Convert<long, bool>(value);
+            success = registry.Convert<long, bool>(value, out var bv);
             if (success)
             {
+                this.booleanEquivalentValue = bv;
                 displayStrings.Add(
-                    $"{Resources.BooleanValueTag}: {registry.Display(this.booleanEquivalentValue.Value)}");
+                    $"{Resources.BooleanValueTag}: {registry.Display(bv)}");
             }
             else
             {
                 this.booleanEquivalentValue = null;
             }
 
-            (success, this.stringEquivalentValue) = registry.Convert<long, string>(value);
+            success = registry.Convert<long, string>(value, out var sv);
             if (success)
             {
-                displayStrings.Add($"{Resources.StringValueTag}: {registry.Display(this.stringEquivalentValue)}");
+                this.stringEquivalentValue = sv;
+                displayStrings.Add($"{Resources.StringValueTag}: {registry.Display(sv)}");
             }
             else
             {
@@ -186,11 +194,12 @@ namespace IX.Math
             DisplayList displayStrings = new DisplayList();
             bool success;
 
-            (success, this.integerEquivalentValue) = registry.Convert<double, long>(value);
+            success = registry.Convert<double, long>(value, out var lv);
             if (success)
             {
+                this.integerEquivalentValue = lv;
                 displayStrings.Add(
-                    $"{Resources.IntegerValueTag}: {registry.Display(this.integerEquivalentValue.Value)}");
+                    $"{Resources.IntegerValueTag}: {registry.Display(lv)}");
             }
             else
             {
@@ -201,31 +210,34 @@ namespace IX.Math
             displayStrings.Add(
                 $"{Resources.NumericValueTag} {Resources.OriginalValueMarker}: {registry.Display(value)}");
 
-            (success, this.binaryEquivalentValue) = registry.Convert<double, byte[]>(value);
+            success = registry.Convert<double, byte[]>(value, out var bav);
             if (success)
             {
-                displayStrings.Add($"{Resources.BinaryValueTag}: {registry.Display(this.binaryEquivalentValue)}");
+                this.binaryEquivalentValue = bav;
+                displayStrings.Add($"{Resources.BinaryValueTag}: {registry.Display(bav)}");
             }
             else
             {
                 this.binaryEquivalentValue = null;
             }
 
-            (success, this.booleanEquivalentValue) = registry.Convert<double, bool>(value);
+            success = registry.Convert<double, bool>(value, out var bv);
             if (success)
             {
+                this.booleanEquivalentValue = bv;
                 displayStrings.Add(
-                    $"{Resources.BooleanValueTag}: {registry.Display(this.booleanEquivalentValue.Value)}");
+                    $"{Resources.BooleanValueTag}: {registry.Display(bv)}");
             }
             else
             {
                 this.booleanEquivalentValue = null;
             }
 
-            (success, this.stringEquivalentValue) = registry.Convert<double, string>(value);
+            success = registry.Convert<double, string>(value, out var sv);
             if (success)
             {
-                displayStrings.Add($"{Resources.StringValueTag}: {registry.Display(this.stringEquivalentValue)}");
+                this.stringEquivalentValue = sv;
+                displayStrings.Add($"{Resources.StringValueTag}: {registry.Display(sv)}");
             }
             else
             {
@@ -254,22 +266,24 @@ namespace IX.Math
                 value,
                 nameof(value));
 
-            (success, this.integerEquivalentValue) = registry.Convert<byte[], long>(value);
+            success = registry.Convert<byte[], long>(value, out var lv);
             if (success)
             {
+                this.integerEquivalentValue = lv;
                 displayStrings.Add(
-                    $"{Resources.IntegerValueTag}: {registry.Display(this.integerEquivalentValue.Value)}");
+                    $"{Resources.IntegerValueTag}: {registry.Display(lv)}");
             }
             else
             {
                 this.integerEquivalentValue = null;
             }
 
-            (success, this.numericEquivalentValue) = registry.Convert<byte[], double>(value);
+            success = registry.Convert<byte[], double>(value, out var dv);
             if (success)
             {
+                this.numericEquivalentValue = dv;
                 displayStrings.Add(
-                    $"{Resources.NumericValueTag}: {registry.Display(this.numericEquivalentValue.Value)}");
+                    $"{Resources.NumericValueTag}: {registry.Display(dv)}");
             }
             else
             {
@@ -279,21 +293,23 @@ namespace IX.Math
             displayStrings.Add(
                 $"{Resources.BinaryValueTag} {Resources.OriginalValueMarker}: {registry.Display(this.binaryEquivalentValue)}");
 
-            (success, this.booleanEquivalentValue) = registry.Convert<byte[], bool>(value);
+            success = registry.Convert<byte[], bool>(value, out var bv);
             if (success)
             {
+                this.booleanEquivalentValue = bv;
                 displayStrings.Add(
-                    $"{Resources.BooleanValueTag}: {registry.Display(this.booleanEquivalentValue.Value)}");
+                    $"{Resources.BooleanValueTag}: {registry.Display(bv)}");
             }
             else
             {
                 this.booleanEquivalentValue = null;
             }
 
-            (success, this.stringEquivalentValue) = registry.Convert<byte[], string>(value);
+            success = registry.Convert<byte[], string>(value, out var sv);
             if (success)
             {
-                displayStrings.Add($"{Resources.StringValueTag}: {registry.Display(this.stringEquivalentValue)}");
+                this.stringEquivalentValue = sv;
+                displayStrings.Add($"{Resources.StringValueTag}: {registry.Display(sv)}");
             }
             else
             {
@@ -318,32 +334,35 @@ namespace IX.Math
             DisplayList displayStrings = new DisplayList();
             bool success;
 
-            (success, this.integerEquivalentValue) = registry.Convert<bool, long>(value);
+            success = registry.Convert<bool, long>(value, out var lv);
             if (success)
             {
+                this.integerEquivalentValue = lv;
                 displayStrings.Add(
-                    $"{Resources.IntegerValueTag}: {registry.Display(this.integerEquivalentValue.Value)}");
+                    $"{Resources.IntegerValueTag}: {registry.Display(lv)}");
             }
             else
             {
                 this.integerEquivalentValue = null;
             }
 
-            (success, this.numericEquivalentValue) = registry.Convert<bool, double>(value);
+            success = registry.Convert<bool, double>(value, out var dv);
             if (success)
             {
+                this.numericEquivalentValue = dv;
                 displayStrings.Add(
-                    $"{Resources.NumericValueTag}: {registry.Display(this.numericEquivalentValue.Value)}");
+                    $"{Resources.NumericValueTag}: {registry.Display(dv)}");
             }
             else
             {
                 this.numericEquivalentValue = null;
             }
 
-            (success, this.binaryEquivalentValue) = registry.Convert<bool, byte[]>(value);
+            success = registry.Convert<bool, byte[]>(value, out var bav);
             if (success)
             {
-                displayStrings.Add($"{Resources.BinaryValueTag}: {registry.Display(this.binaryEquivalentValue)}");
+                this.binaryEquivalentValue = bav;
+                displayStrings.Add($"{Resources.BinaryValueTag}: {registry.Display(bav)}");
             }
             else
             {
@@ -354,10 +373,11 @@ namespace IX.Math
             displayStrings.Add(
                 $"{Resources.BooleanValueTag} {Resources.OriginalValueMarker}: {registry.Display(this.booleanEquivalentValue.Value)}");
 
-            (success, this.stringEquivalentValue) = registry.Convert<bool, string>(value);
+            success = registry.Convert<bool, string>(value, out var sv);
             if (success)
             {
-                displayStrings.Add($"{Resources.StringValueTag}: {registry.Display(this.stringEquivalentValue)}");
+                this.stringEquivalentValue = sv;
+                displayStrings.Add($"{Resources.StringValueTag}: {registry.Display(sv)}");
             }
             else
             {
