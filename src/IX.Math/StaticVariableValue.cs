@@ -1,4 +1,4 @@
-// <copyright file="DynamicVariableValue.cs" company="Adrian Mos">
+// <copyright file="StaticVariableValue.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -17,7 +17,7 @@ namespace IX.Math
     ///     A value in the variable system that accepts conversions to everything.
     /// </summary>
     [PublicAPI]
-    public readonly struct DynamicVariableValue : IEquatable<DynamicVariableValue>
+    public readonly struct StaticVariableValue : IEquatable<StaticVariableValue>
     {
         private readonly string? stringEquivalentValue;
 
@@ -43,10 +43,10 @@ namespace IX.Math
          */
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="DynamicVariableValue" /> struct.
+        ///     Initializes a new instance of the <see cref="StaticVariableValue" /> struct.
         /// </summary>
         /// <param name="value">The value.</param>
-        public DynamicVariableValue(string value)
+        public StaticVariableValue(string value)
         {
             MathematicPortfolio registry = MathematicPortfolio.CurrentContext?.Value ??
                                            throw new InvalidOperationException(
@@ -115,10 +115,10 @@ namespace IX.Math
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="DynamicVariableValue" /> struct.
+        ///     Initializes a new instance of the <see cref="StaticVariableValue" /> struct.
         /// </summary>
         /// <param name="value">The value.</param>
-        public DynamicVariableValue(long value)
+        public StaticVariableValue(long value)
         {
             MathematicPortfolio registry = MathematicPortfolio.CurrentContext?.Value ??
                                            throw new InvalidOperationException(
@@ -183,10 +183,10 @@ namespace IX.Math
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="DynamicVariableValue" /> struct.
+        ///     Initializes a new instance of the <see cref="StaticVariableValue" /> struct.
         /// </summary>
         /// <param name="value">The value.</param>
-        public DynamicVariableValue(double value)
+        public StaticVariableValue(double value)
         {
             MathematicPortfolio registry = MathematicPortfolio.CurrentContext?.Value ??
                                            throw new InvalidOperationException(
@@ -251,10 +251,10 @@ namespace IX.Math
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="DynamicVariableValue" /> struct.
+        ///     Initializes a new instance of the <see cref="StaticVariableValue" /> struct.
         /// </summary>
         /// <param name="value">The value.</param>
-        public DynamicVariableValue(byte[] value)
+        public StaticVariableValue(byte[] value)
         {
             MathematicPortfolio registry = MathematicPortfolio.CurrentContext?.Value ??
                                            throw new InvalidOperationException(
@@ -323,10 +323,10 @@ namespace IX.Math
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="DynamicVariableValue" /> struct.
+        ///     Initializes a new instance of the <see cref="StaticVariableValue" /> struct.
         /// </summary>
         /// <param name="value">The boolean value.</param>
-        public DynamicVariableValue(bool value)
+        public StaticVariableValue(bool value)
         {
             MathematicPortfolio registry = MathematicPortfolio.CurrentContext?.Value ??
                                            throw new InvalidOperationException(
@@ -391,54 +391,54 @@ namespace IX.Math
         }
 
         /// <summary>
-        ///     Performs an implicit conversion from <see cref="string" /> to <see cref="DynamicVariableValue" />.
+        ///     Performs an implicit conversion from <see cref="string" /> to <see cref="StaticVariableValue" />.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>
         ///     The result of the conversion.
         /// </returns>
-        public static implicit operator DynamicVariableValue(string value) =>
-            new DynamicVariableValue(value);
+        public static implicit operator StaticVariableValue(string value) =>
+            new StaticVariableValue(value);
 
         /// <summary>
-        ///     Performs an implicit conversion from <see cref="long" /> to <see cref="DynamicVariableValue" />.
+        ///     Performs an implicit conversion from <see cref="long" /> to <see cref="StaticVariableValue" />.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>
         ///     The result of the conversion.
         /// </returns>
-        public static implicit operator DynamicVariableValue(long value) =>
-            new DynamicVariableValue(value);
+        public static implicit operator StaticVariableValue(long value) =>
+            new StaticVariableValue(value);
 
         /// <summary>
-        ///     Performs an implicit conversion from <see cref="double" /> to <see cref="DynamicVariableValue" />.
+        ///     Performs an implicit conversion from <see cref="double" /> to <see cref="StaticVariableValue" />.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>
         ///     The result of the conversion.
         /// </returns>
-        public static implicit operator DynamicVariableValue(double value) =>
-            new DynamicVariableValue(value);
+        public static implicit operator StaticVariableValue(double value) =>
+            new StaticVariableValue(value);
 
         /// <summary>
-        ///     Performs an implicit conversion from an array of <see cref="byte" />s to <see cref="DynamicVariableValue" />.
+        ///     Performs an implicit conversion from an array of <see cref="byte" />s to <see cref="StaticVariableValue" />.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>
         ///     The result of the conversion.
         /// </returns>
-        public static implicit operator DynamicVariableValue(byte[] value) =>
-            new DynamicVariableValue(value);
+        public static implicit operator StaticVariableValue(byte[] value) =>
+            new StaticVariableValue(value);
 
         /// <summary>
-        ///     Performs an implicit conversion from <see cref="bool" /> to <see cref="DynamicVariableValue" />.
+        ///     Performs an implicit conversion from <see cref="bool" /> to <see cref="StaticVariableValue" />.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>
         ///     The result of the conversion.
         /// </returns>
-        public static implicit operator DynamicVariableValue(bool value) =>
-            new DynamicVariableValue(value);
+        public static implicit operator StaticVariableValue(bool value) =>
+            new StaticVariableValue(value);
 
         /// <summary>
         ///     Implements the operator ==.
@@ -449,8 +449,8 @@ namespace IX.Math
         ///     The result of the operator.
         /// </returns>
         public static bool operator ==(
-            DynamicVariableValue left,
-            DynamicVariableValue right) =>
+            StaticVariableValue left,
+            StaticVariableValue right) =>
             left.Equals(right);
 
         /// <summary>
@@ -462,8 +462,8 @@ namespace IX.Math
         ///     The result of the operator.
         /// </returns>
         public static bool operator !=(
-            DynamicVariableValue left,
-            DynamicVariableValue right) =>
+            StaticVariableValue left,
+            StaticVariableValue right) =>
             !(left == right);
 
         /// <summary>
@@ -475,8 +475,8 @@ namespace IX.Math
         ///     The result of the operator.
         /// </returns>
         public static bool operator ==(
-            DynamicVariableValue? left,
-            DynamicVariableValue? right) =>
+            StaticVariableValue? left,
+            StaticVariableValue? right) =>
             right.HasValue ? (left?.Equals(right.Value) ?? false) : left.HasValue;
 
         /// <summary>
@@ -488,8 +488,8 @@ namespace IX.Math
         ///     The result of the operator.
         /// </returns>
         public static bool operator !=(
-            DynamicVariableValue? left,
-            DynamicVariableValue? right) =>
+            StaticVariableValue? left,
+            StaticVariableValue? right) =>
             !(left == right);
 
         /// <summary>
@@ -637,7 +637,7 @@ namespace IX.Math
         /// </returns>
         public override bool Equals(object? obj)
         {
-            if (!(obj is DynamicVariableValue other) || this.hashCode == other.hashCode)
+            if (!(obj is StaticVariableValue other) || this.hashCode == other.hashCode)
             {
                 return false;
             }
@@ -656,7 +656,7 @@ namespace IX.Math
         /// <returns>
         ///   <see langword="true" /> if the current object is equal to the <paramref name="other" /> parameter; otherwise, <see langword="false" />.
         /// </returns>
-        public bool Equals(DynamicVariableValue other) =>
+        public bool Equals(StaticVariableValue other) =>
             this.binaryEquivalentValue.SequenceEquals(other.binaryEquivalentValue) &&
             this.booleanEquivalentValue == other.booleanEquivalentValue &&
             this.integerEquivalentValue == other.integerEquivalentValue &&

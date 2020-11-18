@@ -35,7 +35,7 @@ namespace IX.Math.Extraction
                 {
 #region Values
 
-                    case DynamicVariableValue dvv:
+                    case StaticVariableValue dvv:
                     {
                         if (newParameters != null)
                         {
@@ -99,7 +99,7 @@ namespace IX.Math.Extraction
 
 #region Functions
 
-                    case Func<DynamicVariableValue> dvv:
+                    case Func<StaticVariableValue> dvv:
                     {
                         if (newParameters != null)
                         {

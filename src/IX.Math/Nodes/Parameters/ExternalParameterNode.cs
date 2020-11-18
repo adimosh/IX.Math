@@ -128,7 +128,7 @@ namespace IX.Math.Nodes.Parameters
         /// </value>
         public SupportedValueType ParameterType { get; private set; }
 
-        private static long GetIntegerValue(in DynamicVariableValue value)
+        private static long GetIntegerValue(in StaticVariableValue value)
         {
             if (!value.TryGetInteger(out var val))
             {
@@ -138,7 +138,7 @@ namespace IX.Math.Nodes.Parameters
             return val;
         }
 
-        private static double GetNumericValue(in DynamicVariableValue value)
+        private static double GetNumericValue(in StaticVariableValue value)
         {
             if (!value.TryGetNumeric(out var val))
             {
@@ -148,7 +148,7 @@ namespace IX.Math.Nodes.Parameters
             return val;
         }
 
-        private static byte[] GetBinaryValue(in DynamicVariableValue value)
+        private static byte[] GetBinaryValue(in StaticVariableValue value)
         {
             if (!value.TryGetBinary(out var val))
             {
@@ -158,7 +158,7 @@ namespace IX.Math.Nodes.Parameters
             return val;
         }
 
-        private static bool GetBooleanValue(in DynamicVariableValue value)
+        private static bool GetBooleanValue(in StaticVariableValue value)
         {
             if (!value.TryGetBoolean(out var val))
             {
@@ -168,7 +168,7 @@ namespace IX.Math.Nodes.Parameters
             return val;
         }
 
-        private static string GetStringValue(in DynamicVariableValue value)
+        private static string GetStringValue(in StaticVariableValue value)
         {
             if (!value.TryGetString(out var val))
             {
@@ -194,7 +194,7 @@ namespace IX.Math.Nodes.Parameters
 
             SupportedValueType svt;
 
-            if (internalType == typeof(DynamicVariableValue))
+            if (internalType == typeof(StaticVariableValue))
             {
                 svt = SupportedValueType.Unknown;
                 this.IsFunction = false;
@@ -224,7 +224,7 @@ namespace IX.Math.Nodes.Parameters
                 svt = SupportedValueType.String;
                 this.IsFunction = false;
             }
-            else if (internalType == typeof(Func<DynamicVariableValue>))
+            else if (internalType == typeof(Func<StaticVariableValue>))
             {
                 svt = SupportedValueType.Unknown;
                 this.IsFunction = true;
@@ -273,7 +273,7 @@ namespace IX.Math.Nodes.Parameters
             this.CalculatedCosts.Clear();
             foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
-                this.CalculatedCosts[possibleType] = internalType == typeof(DynamicVariableValue)
+                this.CalculatedCosts[possibleType] = internalType == typeof(StaticVariableValue)
                     ? (0, svt)
                     : (GetStandardConversionStrategyCost(
                         in svt,
@@ -357,25 +357,25 @@ namespace IX.Math.Nodes.Parameters
                 resultingExpression = Expression.Invoke(resultingExpression);
             }
 
-            if (parameterTypeInternal == typeof(DynamicVariableValue))
+            if (parameterTypeInternal == typeof(StaticVariableValue))
             {
                 // The type is a dynamic variable, further processing is needed
                 resultingExpression = valueType switch
                 {
                     SupportedValueType.Integer => Expression.Call(
-                        ((InFunc<DynamicVariableValue, long>)GetIntegerValue).Method,
+                        ((InFunc<StaticVariableValue, long>)GetIntegerValue).Method,
                         resultingExpression),
                     SupportedValueType.Numeric => Expression.Call(
-                        ((InFunc<DynamicVariableValue, double>)GetNumericValue).Method,
+                        ((InFunc<StaticVariableValue, double>)GetNumericValue).Method,
                         resultingExpression),
                     SupportedValueType.Boolean => Expression.Call(
-                        ((InFunc<DynamicVariableValue, bool>)GetBooleanValue).Method,
+                        ((InFunc<StaticVariableValue, bool>)GetBooleanValue).Method,
                         resultingExpression),
                     SupportedValueType.Binary => Expression.Call(
-                        ((InFunc<DynamicVariableValue, byte[]>)GetBinaryValue).Method,
+                        ((InFunc<StaticVariableValue, byte[]>)GetBinaryValue).Method,
                         resultingExpression),
                     SupportedValueType.String => Expression.Call(
-                        ((InFunc<DynamicVariableValue, string>)GetStringValue).Method,
+                        ((InFunc<StaticVariableValue, string>)GetStringValue).Method,
                         resultingExpression),
                     _ => throw new MathematicsEngineException()
                 };

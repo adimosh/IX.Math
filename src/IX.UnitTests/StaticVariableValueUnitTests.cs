@@ -1,4 +1,4 @@
-// <copyright file="DynamicVariableValueUnitTests.cs" company="Adrian Mos">
+// <copyright file="StaticVariableValueUnitTests.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -8,9 +8,9 @@ using Xunit;
 namespace IX.UnitTests
 {
     /// <summary>
-    /// Unit tests for <see cref="DynamicVariableValue"/>.
+    /// Unit tests for <see cref="StaticVariableValue"/>.
     /// </summary>
-    public class DynamicVariableValueUnitTests
+    public class StaticVariableValueUnitTests
     {
         /// <summary>
         /// DynamicVariableValue initialization forward.
@@ -24,7 +24,7 @@ namespace IX.UnitTests
             p.RegisterConversion<long, string>(source => (true, source.ToString()));
 
             // ACT
-            DynamicVariableValue dv = DataGeneration.DataGenerator.RandomInteger();
+            StaticVariableValue dv = DataGeneration.DataGenerator.RandomInteger();
 
             // ASSERT
             Assert.True(dv.TryGetInteger(out var l));
@@ -48,7 +48,7 @@ namespace IX.UnitTests
             p.RegisterConversion<string, long>(source => (true, long.Parse(source)));
 
             // ACT
-            DynamicVariableValue dv = DataGeneration.DataGenerator.RandomInteger().ToString();
+            StaticVariableValue dv = DataGeneration.DataGenerator.RandomInteger().ToString();
 
             // ASSERT
             Assert.True(dv.TryGetInteger(out var l));
@@ -73,7 +73,7 @@ namespace IX.UnitTests
 
             long value1 = DataGeneration.DataGenerator.RandomInteger();
             long value2 = DataGeneration.DataGenerator.RandomInteger();
-            DynamicVariableValue dv = value1.ToString();
+            StaticVariableValue dv = value1.ToString();
 
             // ACT
             var result = p.Solve(
