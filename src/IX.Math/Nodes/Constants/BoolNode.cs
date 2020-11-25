@@ -8,15 +8,17 @@ using JetBrains.Annotations;
 namespace IX.Math.Nodes.Constants
 {
     /// <summary>
-    /// A boolean node. This class cannot be inherited.
+    ///     A boolean node. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="ConstantNodeBase" />
     [DebuggerDisplay("{" + nameof(Value) + "}")]
     [PublicAPI]
     public sealed class BoolNode : ConstantNodeBase<bool>
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="BoolNode" /> class.
+        ///     Initializes a new instance of the <see cref="BoolNode" /> class.
         /// </summary>
         /// <param name="value">The node's boolean value.</param>
         public BoolNode(bool value)
@@ -24,22 +26,30 @@ namespace IX.Math.Nodes.Constants
         {
         }
 
+#endregion
+
+#region Methods
+
         /// <summary>
         ///     Creates a deep clone of the source object.
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new BoolNode(this.Value);
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new BoolNode(this.Value);
 
         /// <summary>
-        /// Tries to get a boolean value out of this constant node.
+        ///     Tries to get a boolean value out of this constant node.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> if the constant can safely be converted to a boolean, <c>false</c> otherwise.</returns>
         public override bool TryGetBoolean(out bool value)
         {
             value = this.Value;
+
             return true;
         }
+
+#endregion
     }
 }

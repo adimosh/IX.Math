@@ -24,6 +24,8 @@ namespace IX.Math.Nodes.Functions.Binary
     [UsedImplicitly]
     internal sealed class FunctionNodeTrim : StringBinaryFunctionNodeBase
     {
+#region Constructors
+
         public FunctionNodeTrim(
             NodeBase stringParameter,
             NodeBase numericParameter)
@@ -33,22 +35,27 @@ namespace IX.Math.Nodes.Functions.Binary
         {
         }
 
+#endregion
+
+#region Methods
+
         /// <summary>
-        /// Creates a deep clone of the source object.
+        ///     Creates a deep clone of the source object.
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>
-        /// A deep clone.
+        ///     A deep clone.
         /// </returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeTrim(
-            this.FirstParameter.DeepClone(context),
-            this.SecondParameter.DeepClone(context));
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new FunctionNodeTrim(
+                this.FirstParameter.DeepClone(context),
+                this.SecondParameter.DeepClone(context));
 
         /// <summary>
-        /// Simplifies this node, if possible, reflexively returns otherwise.
+        ///     Simplifies this node, if possible, reflexively returns otherwise.
         /// </summary>
         /// <returns>
-        /// A simplified node, or this instance.
+        ///     A simplified node, or this instance.
         /// </returns>
         public override NodeBase Simplify()
         {
@@ -63,7 +70,7 @@ namespace IX.Math.Nodes.Functions.Binary
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -107,5 +114,7 @@ namespace IX.Math.Nodes.Functions.Binary
                     second,
                     mia));
         }
+
+#endregion
     }
 }

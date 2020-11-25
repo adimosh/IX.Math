@@ -21,16 +21,20 @@ namespace IX.Math.Nodes.Functions.Unary
     [UsedImplicitly]
     internal sealed class FunctionNodeLength : UnaryFunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionNodeLength"/> class.
+        ///     Initializes a new instance of the <see cref="FunctionNodeLength" /> class.
         /// </summary>
         /// <param name="parameter">The parameter.</param>
-        public FunctionNodeLength(
-            NodeBase parameter)
-            : base(
-                parameter)
+        public FunctionNodeLength(NodeBase parameter)
+            : base(parameter)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
@@ -54,8 +58,7 @@ namespace IX.Math.Nodes.Functions.Unary
         ///     A deep clone.
         /// </returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
-            new FunctionNodeLength(
-                this.Parameter.DeepClone(context));
+            new FunctionNodeLength(this.Parameter.DeepClone(context));
 
         /// <summary>
         ///     Ensures that the parameter that is received is compatible with the function, optionally allowing the parameter
@@ -69,16 +72,17 @@ namespace IX.Math.Nodes.Functions.Unary
             this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer);
             var cost = parameter.CalculateStrategyCost(SupportedValueType.Integer);
 
-            foreach (var possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
                 this.CalculatedCosts[possibleType] = (GetStandardConversionStrategyCost(
-                    SupportedValueType.Integer,
-                    in possibleType) + cost, possibleType);
+                                                          SupportedValueType.Integer,
+                                                          in possibleType) +
+                                                      cost, possibleType);
             }
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -111,5 +115,7 @@ namespace IX.Math.Nodes.Functions.Unary
 
             throw new ExpressionNotValidLogicallyException();
         }
+
+#endregion
     }
 }

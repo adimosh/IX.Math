@@ -16,29 +16,42 @@ namespace IX.Math.Nodes.Functions.Nonary
     /// </summary>
     /// <seealso cref="NonaryFunctionNodeBase" />
     [DebuggerDisplay("random()")]
-    [CallableMathematicsFunction("rand", "random")]
+    [CallableMathematicsFunction(
+        "rand",
+        "random")]
     [UsedImplicitly]
     internal sealed class FunctionNodeRandom : NonaryFunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionNodeRandom"/> class.
+        ///     Initializes a new instance of the <see cref="FunctionNodeRandom" /> class.
         /// </summary>
         public FunctionNodeRandom()
         {
             this.PossibleReturnType = SupportableValueType.Numeric;
 
-            foreach (var possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
                 this.CalculatedCosts[possibleType] = (0, SupportedValueType.Unknown);
             }
         }
+
+#endregion
+
+#region Methods
+
+#region Static methods
 
         /// <summary>
         ///     Generates a random number.
         /// </summary>
         /// <returns>A randomly-generated number.</returns>
         [UsedImplicitly]
-        public static double GenerateRandom() => RandomNumberGenerator.Generate();
+        public static double GenerateRandom() =>
+            RandomNumberGenerator.Generate();
+
+#endregion
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -47,10 +60,11 @@ namespace IX.Math.Nodes.Functions.Nonary
         /// <returns>
         ///     A deep clone.
         /// </returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeRandom();
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new FunctionNodeRandom();
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -59,5 +73,7 @@ namespace IX.Math.Nodes.Functions.Nonary
             in SupportedValueType valueType,
             in ComparisonTolerance comparisonTolerance) =>
             Expression.Call(((Func<double>)GenerateRandom).Method);
+
+#endregion
     }
 }

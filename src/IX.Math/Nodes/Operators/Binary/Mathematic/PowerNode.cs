@@ -14,8 +14,10 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
     [DebuggerDisplay("{" + nameof(Left) + "} # {" + nameof(Right) + "}")]
     internal sealed class PowerNode : SimpleNumericOnlyMathematicalOperationNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="IX.Math.Nodes.Operators.Binary.Mathematic.PowerNode" /> class.
+        ///     Initializes a new instance of the <see cref="IX.Math.Nodes.Operators.Binary.Mathematic.PowerNode" /> class.
         /// </summary>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
@@ -28,6 +30,10 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         {
         }
 
+#endregion
+
+#region Methods
+
         /// <summary>
         ///     Creates a deep clone of the source object.
         /// </summary>
@@ -39,7 +45,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 this.Right.DeepClone(context));
 
         /// <summary>
-        /// Calculates the constant value.
+        ///     Calculates the constant value.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -52,7 +58,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 right);
 
         /// <summary>
-        /// Generates the expression.
+        ///     Generates the expression.
         /// </summary>
         /// <param name="leftOperandExpression">The left operand expression.</param>
         /// <param name="rightOperandExpression">The right operand expression.</param>
@@ -63,5 +69,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             Expression.Power(
                 leftOperandExpression,
                 rightOperandExpression);
+
+#endregion
     }
 }

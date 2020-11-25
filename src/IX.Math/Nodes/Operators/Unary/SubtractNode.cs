@@ -18,16 +18,20 @@ namespace IX.Math.Nodes.Operators.Unary
     [DebuggerDisplay("-{" + nameof(Operand) + "}")]
     internal sealed class SubtractNode : UnaryOperatorNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="SubtractNode" /> class.
+        ///     Initializes a new instance of the <see cref="SubtractNode" /> class.
         /// </summary>
         /// <param name="operand">The operand.</param>
-        public SubtractNode(
-            [NotNull] NodeBase operand)
-            : base(
-                operand)
+        public SubtractNode([NotNull] NodeBase operand)
+            : base(operand)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
@@ -59,16 +63,19 @@ namespace IX.Math.Nodes.Operators.Unary
         {
             this.CalculatedCosts.Clear();
 
-            EnsureNode(ref operand, SupportableValueType.Numeric | SupportableValueType.Integer);
+            EnsureNode(
+                ref operand,
+                SupportableValueType.Numeric | SupportableValueType.Integer);
 
-            SupportableValueType supportedType = operand.VerifyPossibleType(SupportableValueType.Numeric | SupportableValueType.Integer);
+            SupportableValueType supportedType =
+                operand.VerifyPossibleType(SupportableValueType.Numeric | SupportableValueType.Integer);
 
             if (supportedType == SupportableValueType.Numeric)
             {
-                int cost = operand.CalculateStrategyCost(SupportedValueType.Numeric);
+                var cost = operand.CalculateStrategyCost(SupportedValueType.Numeric);
                 this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Numeric);
 
-                foreach (var svt in GetSupportedTypeOptions(this.PossibleReturnType))
+                foreach (SupportedValueType svt in GetSupportedTypeOptions(this.PossibleReturnType))
                 {
                     this.CalculatedCosts[svt] = (GetStandardConversionStrategyCost(
                                                      SupportedValueType.Numeric,
@@ -78,10 +85,10 @@ namespace IX.Math.Nodes.Operators.Unary
             }
             else if (supportedType == SupportableValueType.Integer)
             {
-                int cost = operand.CalculateStrategyCost(SupportedValueType.Integer);
+                var cost = operand.CalculateStrategyCost(SupportedValueType.Integer);
                 this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer);
 
-                foreach (var svt in GetSupportedTypeOptions(this.PossibleReturnType))
+                foreach (SupportedValueType svt in GetSupportedTypeOptions(this.PossibleReturnType))
                 {
                     this.CalculatedCosts[svt] = (GetStandardConversionStrategyCost(
                                                      SupportedValueType.Integer,
@@ -91,14 +98,14 @@ namespace IX.Math.Nodes.Operators.Unary
             }
             else if (supportedType == (SupportableValueType.Numeric | SupportableValueType.Integer))
             {
-                int boolCost = operand.CalculateStrategyCost(SupportedValueType.Numeric);
-                int intCost = operand.CalculateStrategyCost(SupportedValueType.Integer);
+                var boolCost = operand.CalculateStrategyCost(SupportedValueType.Numeric);
+                var intCost = operand.CalculateStrategyCost(SupportedValueType.Integer);
                 this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Numeric) |
                                           GetSupportableConversions(SupportedValueType.Integer);
 
-                foreach (var svt in GetSupportedTypeOptions(this.PossibleReturnType))
+                foreach (SupportedValueType svt in GetSupportedTypeOptions(this.PossibleReturnType))
                 {
-                    int totalBoolCost = GetStandardConversionStrategyCost(
+                    var totalBoolCost = GetStandardConversionStrategyCost(
                         SupportedValueType.Numeric,
                         in svt);
                     if (totalBoolCost != int.MaxValue)
@@ -106,7 +113,7 @@ namespace IX.Math.Nodes.Operators.Unary
                         totalBoolCost += boolCost;
                     }
 
-                    int totalIntCost = GetStandardConversionStrategyCost(
+                    var totalIntCost = GetStandardConversionStrategyCost(
                         SupportedValueType.Integer,
                         in svt);
                     if (totalIntCost != int.MaxValue)
@@ -131,12 +138,12 @@ namespace IX.Math.Nodes.Operators.Unary
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
         /// <returns>A compiled expression, if one is possible.</returns>
-        [DiagCA.SuppressMessage(
+        [DiagCA.SuppressMessageAttribute(
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "We want this to happen.")]
@@ -146,7 +153,7 @@ namespace IX.Math.Nodes.Operators.Unary
         {
             if (!this.CalculatedCosts.TryGetValue(
                 valueType,
-                out var tuple))
+                out (int Cost, SupportedValueType InternalType) tuple))
             {
                 throw new ExpressionNotValidLogicallyException();
             }
@@ -157,9 +164,11 @@ namespace IX.Math.Nodes.Operators.Unary
 
             return Expression.Subtract(
                 Expression.Constant(
-                    tuple.InternalType == SupportedValueType.Integer ? (object)0L : (object)0D,
+                    tuple.InternalType == SupportedValueType.Integer ? 0L : (object)0D,
                     tuple.InternalType == SupportedValueType.Integer ? typeof(long) : typeof(double)),
                 operandExpression);
         }
+
+#endregion
     }
 }

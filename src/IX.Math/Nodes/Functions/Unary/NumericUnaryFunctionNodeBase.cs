@@ -14,24 +14,35 @@ namespace IX.Math.Nodes.Functions.Unary
     /// <seealso cref="UnaryFunctionNodeBase" />
     public abstract class NumericUnaryFunctionNodeBase : UnaryFunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="NumericUnaryFunctionNodeBase" /> class.
+        ///     Initializes a new instance of the <see cref="NumericUnaryFunctionNodeBase" /> class.
         /// </summary>
         /// <param name="parameter">The parameter.</param>
-        protected NumericUnaryFunctionNodeBase(
-            NodeBase parameter)
-            : base(
-                parameter)
+        protected NumericUnaryFunctionNodeBase(NodeBase parameter)
+            : base(parameter)
         {
         }
 
+#endregion
+
+#region Properties and indexers
+
         /// <summary>
-        /// Gets the function represented by this node.
+        ///     Gets the function represented by this node.
         /// </summary>
         /// <value>
-        /// The represented function.
+        ///     The represented function.
         /// </value>
-        protected abstract Func<double, double> RepresentedFunction { get; }
+        protected abstract Func<double, double> RepresentedFunction
+        {
+            get;
+        }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
@@ -61,22 +72,22 @@ namespace IX.Math.Nodes.Functions.Unary
             this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Numeric);
             var cost = parameter.CalculateStrategyCost(SupportedValueType.Numeric);
 
-            foreach (var possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
                 this.CalculatedCosts[possibleType] = (GetStandardConversionStrategyCost(
-                    SupportedValueType.Numeric,
-                    in possibleType) + cost, possibleType);
+                                                          SupportedValueType.Numeric,
+                                                          in possibleType) +
+                                                      cost, possibleType);
             }
         }
 
         /// <summary>
-        /// Gets the simplification expression.
+        ///     Gets the simplification expression.
         /// </summary>
         /// <returns>The success value, along with a constant value if successful.</returns>
         protected (bool Success, double Value) GetSimplificationExpression()
         {
-            if (this.Parameter is ConstantNodeBase fp &&
-                fp.TryGetNumeric(out var first))
+            if (this.Parameter is ConstantNodeBase fp && fp.TryGetNumeric(out var first))
             {
                 return (true, first);
             }
@@ -85,7 +96,7 @@ namespace IX.Math.Nodes.Functions.Unary
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -98,5 +109,7 @@ namespace IX.Math.Nodes.Functions.Unary
                 this.Parameter.GenerateExpression(
                     SupportedValueType.Numeric,
                     in comparisonTolerance));
+
+#endregion
     }
 }

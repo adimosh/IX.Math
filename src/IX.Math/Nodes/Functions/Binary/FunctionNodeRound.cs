@@ -24,6 +24,8 @@ namespace IX.Math.Nodes.Functions.Binary
     [UsedImplicitly]
     internal sealed class FunctionNodeRound : NumericOperationBinaryFunctionNodeBase
     {
+#region Constructors
+
         public FunctionNodeRound(
             NodeBase floatNode,
             NodeBase intNode)
@@ -32,6 +34,10 @@ namespace IX.Math.Nodes.Functions.Binary
                 intNode)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -63,7 +69,7 @@ namespace IX.Math.Nodes.Functions.Binary
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -99,5 +105,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 first,
                 second);
         }
+
+#endregion
     }
 }

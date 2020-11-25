@@ -14,8 +14,10 @@ namespace IX.Math.Nodes.Functions.Binary
     /// <seealso cref="BinaryFunctionNodeBase" />
     internal abstract class IntegerOrNumericBinaryFunctionNodeBase : BinaryFunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="IntegerOrNumericBinaryFunctionNodeBase" /> class.
+        ///     Initializes a new instance of the <see cref="IntegerOrNumericBinaryFunctionNodeBase" /> class.
         /// </summary>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
@@ -27,6 +29,10 @@ namespace IX.Math.Nodes.Functions.Binary
                 secondParameter)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Ensures that the parameters that are received are compatible with the function, optionally allowing the parameter
@@ -43,85 +49,91 @@ namespace IX.Math.Nodes.Functions.Binary
         {
             this.CalculatedCosts.Clear();
 
-            var firstSupportedType = firstParameter.VerifyPossibleType(SupportableValueType.Integer | SupportableValueType.Numeric);
-            var secondSupportedType = secondParameter.VerifyPossibleType(SupportableValueType.Integer | SupportableValueType.Numeric);
+            SupportableValueType firstSupportedType =
+                firstParameter.VerifyPossibleType(SupportableValueType.Integer | SupportableValueType.Numeric);
+            SupportableValueType secondSupportedType =
+                secondParameter.VerifyPossibleType(SupportableValueType.Integer | SupportableValueType.Numeric);
 
             switch (firstSupportedType & secondSupportedType)
             {
                 case SupportableValueType.Numeric:
+                {
+                    var cost = firstParameter.CalculateStrategyCost(SupportedValueType.Numeric) +
+                               secondParameter.CalculateStrategyCost(SupportedValueType.Numeric);
+
+                    this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Numeric);
+                    foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
                     {
-                        int cost = firstParameter.CalculateStrategyCost(SupportedValueType.Numeric) +
-                                   secondParameter.CalculateStrategyCost(SupportedValueType.Numeric);
-
-                        this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Numeric);
-                        foreach (var possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
-                        {
-                            this.CalculatedCosts[possibleType] = (GetStandardConversionStrategyCost(
+                        this.CalculatedCosts[possibleType] = (
+                            GetStandardConversionStrategyCost(
                                 SupportedValueType.Numeric,
-                                in possibleType) + cost, SupportedValueType.Numeric);
-                        }
-
-                        break;
+                                in possibleType) +
+                            cost, SupportedValueType.Numeric);
                     }
+
+                    break;
+                }
 
                 case SupportableValueType.Integer:
+                {
+                    var cost = firstParameter.CalculateStrategyCost(SupportedValueType.Integer) +
+                               secondParameter.CalculateStrategyCost(SupportedValueType.Integer);
+
+                    this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer);
+                    foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
                     {
-                        int cost = firstParameter.CalculateStrategyCost(SupportedValueType.Integer) +
-                                   secondParameter.CalculateStrategyCost(SupportedValueType.Integer);
-
-                        this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer);
-                        foreach (var possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
-                        {
-                            this.CalculatedCosts[possibleType] = (GetStandardConversionStrategyCost(
+                        this.CalculatedCosts[possibleType] = (
+                            GetStandardConversionStrategyCost(
                                 SupportedValueType.Integer,
-                                in possibleType) + cost, SupportedValueType.Integer);
-                        }
-
-                        break;
+                                in possibleType) +
+                            cost, SupportedValueType.Integer);
                     }
+
+                    break;
+                }
 
                 case SupportableValueType.Integer | SupportableValueType.Numeric:
+                {
+                    var numericCost = firstParameter.CalculateStrategyCost(SupportedValueType.Numeric) +
+                                      secondParameter.CalculateStrategyCost(SupportedValueType.Numeric);
+                    var integerCost = firstParameter.CalculateStrategyCost(SupportedValueType.Integer) +
+                                      secondParameter.CalculateStrategyCost(SupportedValueType.Integer);
+
+                    this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer) |
+                                              GetSupportableConversions(SupportedValueType.Numeric);
+
+                    foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
                     {
-                        int numericCost = firstParameter.CalculateStrategyCost(SupportedValueType.Numeric) +
-                                   secondParameter.CalculateStrategyCost(SupportedValueType.Numeric);
-                        int integerCost = firstParameter.CalculateStrategyCost(SupportedValueType.Integer) +
-                                   secondParameter.CalculateStrategyCost(SupportedValueType.Integer);
+                        var totalIntegerCost = GetStandardConversionStrategyCost(
+                            SupportedValueType.Integer,
+                            in possibleType);
 
-                        this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer) |
-                                                  GetSupportableConversions(SupportedValueType.Numeric);
-
-                        foreach (var possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
+                        if (totalIntegerCost != int.MaxValue)
                         {
-                            int totalIntegerCost = GetStandardConversionStrategyCost(
-                                SupportedValueType.Integer,
-                                in possibleType);
-
-                            if (totalIntegerCost != int.MaxValue)
-                            {
-                                totalIntegerCost += integerCost;
-                            }
-
-                            int totalNumericCost = GetStandardConversionStrategyCost(
-                                SupportedValueType.Numeric,
-                                in possibleType);
-
-                            if (totalNumericCost != int.MaxValue)
-                            {
-                                totalNumericCost += numericCost;
-                            }
-
-                            if (totalIntegerCost <= totalNumericCost)
-                            {
-                                this.CalculatedCosts[possibleType] = (totalIntegerCost, SupportedValueType.Integer);
-                            }
-                            else
-                            {
-                                this.CalculatedCosts[possibleType] = (totalNumericCost, SupportedValueType.Numeric);
-                            }
+                            totalIntegerCost += integerCost;
                         }
 
-                        break;
+                        var totalNumericCost = GetStandardConversionStrategyCost(
+                            SupportedValueType.Numeric,
+                            in possibleType);
+
+                        if (totalNumericCost != int.MaxValue)
+                        {
+                            totalNumericCost += numericCost;
+                        }
+
+                        if (totalIntegerCost <= totalNumericCost)
+                        {
+                            this.CalculatedCosts[possibleType] = (totalIntegerCost, SupportedValueType.Integer);
+                        }
+                        else
+                        {
+                            this.CalculatedCosts[possibleType] = (totalNumericCost, SupportedValueType.Numeric);
+                        }
                     }
+
+                    break;
+                }
 
                 default:
                     throw new ExpressionNotValidLogicallyException();
@@ -129,12 +141,12 @@ namespace IX.Math.Nodes.Functions.Binary
         }
 
         /// <summary>
-        /// Gets the parameters.
+        ///     Gets the parameters.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>
-        /// The properly-converted numeric parameters.
+        ///     The properly-converted numeric parameters.
         /// </returns>
         /// <exception cref="ExpressionNotValidLogicallyException">The expression is not valid logically.</exception>
         protected (SupportedValueType ValueType, Expression First, Expression Second) GetParameters(
@@ -143,12 +155,12 @@ namespace IX.Math.Nodes.Functions.Binary
         {
             if (!this.CalculatedCosts.TryGetValue(
                 valueType,
-                out var tuple))
+                out (int Cost, SupportedValueType InternalType) tuple))
             {
                 throw new ExpressionNotValidLogicallyException();
             }
 
-            var internalType = tuple.InternalType;
+            SupportedValueType internalType = tuple.InternalType;
 
             return (internalType, this.FirstParameter.GenerateExpression(
                 in internalType,
@@ -158,7 +170,7 @@ namespace IX.Math.Nodes.Functions.Binary
         }
 
         /// <summary>
-        /// Gets the simplification expressions, if available.
+        ///     Gets the simplification expressions, if available.
         /// </summary>
         /// <returns>A success state, and the expressions.</returns>
         protected (bool Success, bool Integer, double FirstValue, double SecondValue, long FirstIntValue, long
@@ -179,5 +191,7 @@ namespace IX.Math.Nodes.Functions.Binary
 
             return (false, default, default, default, default, default);
         }
+
+#endregion
     }
 }

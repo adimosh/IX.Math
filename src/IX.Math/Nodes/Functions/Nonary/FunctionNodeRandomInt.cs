@@ -20,6 +20,8 @@ namespace IX.Math.Nodes.Functions.Nonary
     [UsedImplicitly]
     internal sealed class FunctionNodeRandomInt : NonaryFunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
         ///     Initializes a new instance of the <see cref="FunctionNodeRandomInt" /> class.
         /// </summary>
@@ -33,12 +35,21 @@ namespace IX.Math.Nodes.Functions.Nonary
             }
         }
 
+#endregion
+
+#region Methods
+
+#region Static methods
+
         /// <summary>
         ///     Generates a random number.
         /// </summary>
         /// <returns>A random number.</returns>
         [UsedImplicitly]
-        public static long GenerateRandom() => RandomNumberGenerator.GenerateInt();
+        public static long GenerateRandom() =>
+            RandomNumberGenerator.GenerateInt();
+
+#endregion
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -47,7 +58,8 @@ namespace IX.Math.Nodes.Functions.Nonary
         /// <returns>
         ///     A deep clone.
         /// </returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeRandomInt();
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new FunctionNodeRandomInt();
 
         /// <summary>
         ///     Generates the expression that this node represents.
@@ -59,5 +71,7 @@ namespace IX.Math.Nodes.Functions.Nonary
             in SupportedValueType valueType,
             in ComparisonTolerance comparisonTolerance) =>
             Expression.Call(((Func<long>)GenerateRandom).Method);
+
+#endregion
     }
 }

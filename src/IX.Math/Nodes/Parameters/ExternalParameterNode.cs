@@ -22,9 +22,15 @@ namespace IX.Math.Nodes.Parameters
     [DebuggerDisplay("param:{" + nameof(Name) + "}")]
     public sealed class ExternalParameterNode : NodeBase
     {
-        private Dictionary<SupportedValueType, Expression> compiledParameterValueExpressions;
+#region Internal state
+
         private ParameterExpression? compiledParameterExpression;
+        private Dictionary<SupportedValueType, Expression> compiledParameterValueExpressions;
         private Type? parameterType;
+
+#endregion
+
+#region Constructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ExternalParameterNode" /> class.
@@ -57,11 +63,16 @@ namespace IX.Math.Nodes.Parameters
             this.compiledParameterValueExpressions = new Dictionary<SupportedValueType, Expression>(5);
         }
 
+#endregion
+
+#region Properties and indexers
+
         /// <summary>
         ///     Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
-        public override bool IsConstant => false;
+        public override bool IsConstant =>
+            false;
 
         /// <summary>
         ///     Gets a value indicating whether this node supports tolerance.
@@ -69,7 +80,8 @@ namespace IX.Math.Nodes.Parameters
         /// <value>
         ///     <see langword="true" /> if the node is tolerant, <see langword="false" /> otherwise.
         /// </value>
-        public override bool IsTolerant => false;
+        public override bool IsTolerant =>
+            false;
 
         /// <summary>
         ///     Gets the name.
@@ -77,7 +89,10 @@ namespace IX.Math.Nodes.Parameters
         /// <value>
         ///     The name.
         /// </value>
-        public string Name { get; }
+        public string Name
+        {
+            get;
+        }
 
         /// <summary>
         ///     Gets the parameter definition expression.
@@ -102,7 +117,8 @@ namespace IX.Math.Nodes.Parameters
         ///     <see langword="true" /> if the node requires original expression preservation, or <see langword="false" />
         ///     if it can be polynomially-reduced.
         /// </value>
-        public override bool RequiresPreservedExpression => this.IsFunction;
+        public override bool RequiresPreservedExpression =>
+            this.IsFunction;
 
         /// <summary>
         ///     Gets a value indicating whether this parameter node is a function.
@@ -110,7 +126,11 @@ namespace IX.Math.Nodes.Parameters
         /// <value>
         ///     <c>true</c> if this parameter node is a function; otherwise, <c>false</c>.
         /// </value>
-        public bool IsFunction { get; private set; }
+        public bool IsFunction
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         ///     Gets or sets the order.
@@ -118,7 +138,11 @@ namespace IX.Math.Nodes.Parameters
         /// <value>
         ///     The order.
         /// </value>
-        public int Order { get; set; }
+        public int Order
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         ///     Gets the type of the parameter.
@@ -126,27 +150,17 @@ namespace IX.Math.Nodes.Parameters
         /// <value>
         ///     The type of the parameter.
         /// </value>
-        public SupportedValueType ParameterType { get; private set; }
-
-        private static long GetIntegerValue(in StaticVariableValue value)
+        public SupportedValueType ParameterType
         {
-            if (!value.TryGetInteger(out var val))
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
-
-            return val;
+            get;
+            private set;
         }
 
-        private static double GetNumericValue(in StaticVariableValue value)
-        {
-            if (!value.TryGetNumeric(out var val))
-            {
-                throw new ExpressionNotValidLogicallyException();
-            }
+#endregion
 
-            return val;
-        }
+#region Methods
+
+#region Static methods
 
         private static byte[] GetBinaryValue(in StaticVariableValue value)
         {
@@ -168,6 +182,26 @@ namespace IX.Math.Nodes.Parameters
             return val;
         }
 
+        private static long GetIntegerValue(in StaticVariableValue value)
+        {
+            if (!value.TryGetInteger(out var val))
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+
+            return val;
+        }
+
+        private static double GetNumericValue(in StaticVariableValue value)
+        {
+            if (!value.TryGetNumeric(out var val))
+            {
+                throw new ExpressionNotValidLogicallyException();
+            }
+
+            return val;
+        }
+
         private static string GetStringValue(in StaticVariableValue value)
         {
             if (!value.TryGetString(out var val))
@@ -178,6 +212,8 @@ namespace IX.Math.Nodes.Parameters
             return val;
         }
 
+#endregion
+
         /// <summary>
         ///     Determines the type of the parameter. This method can only be called once.
         /// </summary>
@@ -185,7 +221,9 @@ namespace IX.Math.Nodes.Parameters
         /// <exception cref="ExpressionNotValidLogicallyException">Expression is not valid.</exception>
         public void DetermineParameterType(Type type)
         {
-            var internalType = Requires.NotNull(type, nameof(type));
+            Type? internalType = Requires.NotNull(
+                type,
+                nameof(type));
 
             if (this.parameterType != null)
             {
@@ -269,7 +307,9 @@ namespace IX.Math.Nodes.Parameters
                 this.Name);
 
             // Supported conversions
-            this.PossibleReturnType = GetSupportableConversions(in svt, true);
+            this.PossibleReturnType = GetSupportableConversions(
+                in svt,
+                true);
             this.CalculatedCosts.Clear();
             foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
@@ -293,9 +333,7 @@ namespace IX.Math.Nodes.Parameters
                 out ExternalParameterNode result))
             {
                 // We might have a indexed variable with a discovered indexer
-                ExternalParameterNode par = context
-                    .ParameterRegistry
-                    .FirstOrDefault(p => p.Value.Name == this.Name)
+                ExternalParameterNode par = context.ParameterRegistry.FirstOrDefault(p => p.Value.Name == this.Name)
                     .Value;
                 if (par == null)
                 {
@@ -312,7 +350,8 @@ namespace IX.Math.Nodes.Parameters
         ///     Simplifies this node, if possible, reflexively returns otherwise.
         /// </summary>
         /// <returns>A simplified node, or this instance.</returns>
-        public override NodeBase Simplify() => this;
+        public override NodeBase Simplify() =>
+            this;
 
         /// <summary>
         ///     Verifies this node and all nodes above it for logical validity.
@@ -383,5 +422,7 @@ namespace IX.Math.Nodes.Parameters
 
             return this.compiledParameterValueExpressions[valueType] = resultingExpression;
         }
+
+#endregion
     }
 }

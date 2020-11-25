@@ -32,8 +32,10 @@ namespace IX.Math.Nodes.Functions.Ternary
     [UsedImplicitly]
     internal sealed class FunctionNodeReplace : TernaryFunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionNodeReplace" /> class.
+        ///     Initializes a new instance of the <see cref="FunctionNodeReplace" /> class.
         /// </summary>
         /// <param name="stringParameter">The string parameter.</param>
         /// <param name="numericParameter">The numeric parameter.</param>
@@ -48,6 +50,10 @@ namespace IX.Math.Nodes.Functions.Ternary
                 secondNumericParameter)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -100,13 +106,13 @@ namespace IX.Math.Nodes.Functions.Ternary
             _ = second.VerifyPossibleType(SupportableValueType.String);
             _ = third.VerifyPossibleType(SupportableValueType.String);
 
-            int cost = first.CalculateStrategyCost(SupportedValueType.String) +
+            var cost = first.CalculateStrategyCost(SupportedValueType.String) +
                        second.CalculateStrategyCost(SupportedValueType.String) +
                        third.CalculateStrategyCost(SupportedValueType.String);
 
             this.PossibleReturnType = GetSupportableConversions(SupportedValueType.String);
 
-            foreach (var possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
                 this.CalculatedCosts[possibleType] = (GetStandardConversionStrategyCost(
                                                           SupportedValueType.String,
@@ -116,7 +122,7 @@ namespace IX.Math.Nodes.Functions.Ternary
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -139,9 +145,15 @@ namespace IX.Math.Nodes.Functions.Ternary
                         nameof(string.Replace)));
             }
 
-            var e1 = this.FirstParameter.GenerateExpression(SupportedValueType.String, in comparisonTolerance);
-            var e2 = this.SecondParameter.GenerateExpression(SupportedValueType.String, in comparisonTolerance);
-            var e3 = this.ThirdParameter.GenerateExpression(SupportedValueType.String, in comparisonTolerance);
+            Expression? e1 = this.FirstParameter.GenerateExpression(
+                SupportedValueType.String,
+                in comparisonTolerance);
+            Expression? e2 = this.SecondParameter.GenerateExpression(
+                SupportedValueType.String,
+                in comparisonTolerance);
+            Expression? e3 = this.ThirdParameter.GenerateExpression(
+                SupportedValueType.String,
+                in comparisonTolerance);
 
             return Expression.Call(
                 e1,
@@ -149,5 +161,7 @@ namespace IX.Math.Nodes.Functions.Ternary
                 e2,
                 e3);
         }
+
+#endregion
     }
 }

@@ -7,19 +7,22 @@ using JetBrains.Annotations;
 namespace IX.Math.Nodes.Functions.Nonary
 {
     /// <summary>
-    /// A base class for functions that take no parameters.
+    ///     A base class for functions that take no parameters.
     /// </summary>
     /// <seealso cref="FunctionNodeBase" />
     [PublicAPI]
     public abstract class NonaryFunctionNodeBase : FunctionNodeBase
     {
+#region Properties and indexers
+
         /// <summary>
         ///     Gets a value indicating whether this node supports tolerance.
         /// </summary>
         /// <value>
         ///     Always <see langword="false" />.
         /// </value>
-        public sealed override bool IsTolerant => false;
+        public sealed override bool IsTolerant =>
+            false;
 
         /// <summary>
         ///     Gets a value indicating whether this node requires preservation of the original expression.
@@ -27,12 +30,20 @@ namespace IX.Math.Nodes.Functions.Nonary
         /// <value>
         ///     Always <see langword="false" />.
         /// </value>
-        public sealed override bool RequiresPreservedExpression => false;
+        public sealed override bool RequiresPreservedExpression =>
+            false;
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
         /// </summary>
         /// <returns>Always this instance.</returns>
-        public sealed override NodeBase Simplify() => this;
+        public sealed override NodeBase Simplify() =>
+            this;
+
+#endregion
     }
 }

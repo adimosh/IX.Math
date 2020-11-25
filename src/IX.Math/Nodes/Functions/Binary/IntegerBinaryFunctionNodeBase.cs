@@ -13,8 +13,10 @@ namespace IX.Math.Nodes.Functions.Binary
     /// <seealso cref="BinaryFunctionNodeBase" />
     internal abstract class IntegerBinaryFunctionNodeBase : BinaryFunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="IntegerBinaryFunctionNodeBase" /> class.
+        ///     Initializes a new instance of the <see cref="IntegerBinaryFunctionNodeBase" /> class.
         /// </summary>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
@@ -26,6 +28,10 @@ namespace IX.Math.Nodes.Functions.Binary
                 secondParameter)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Ensures that the parameters that are received are compatible with the function, optionally allowing the parameter
@@ -45,31 +51,33 @@ namespace IX.Math.Nodes.Functions.Binary
             _ = firstParameter.VerifyPossibleType(SupportableValueType.Integer);
             _ = secondParameter.VerifyPossibleType(SupportableValueType.Integer);
 
-            int cost = firstParameter.CalculateStrategyCost(SupportedValueType.Integer) +
+            var cost = firstParameter.CalculateStrategyCost(SupportedValueType.Integer) +
                        secondParameter.CalculateStrategyCost(SupportedValueType.Integer);
 
             this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer);
-            foreach (var possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
                 this.CalculatedCosts[possibleType] = (GetStandardConversionStrategyCost(
-                    SupportedValueType.Integer,
-                    in possibleType) + cost, SupportedValueType.Integer);
+                                                          SupportedValueType.Integer,
+                                                          in possibleType) +
+                                                      cost, SupportedValueType.Integer);
             }
         }
 
         /// <summary>
-        /// Gets the parameters.
+        ///     Gets the parameters.
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The properly-converted numeric parameters.</returns>
-        protected (Expression First, Expression Second) GetParameters(in ComparisonTolerance tolerance) => (this.FirstParameter.GenerateExpression(
+        protected (Expression First, Expression Second) GetParameters(in ComparisonTolerance tolerance) =>
+            (this.FirstParameter.GenerateExpression(
                 SupportedValueType.Integer,
                 in tolerance), this.SecondParameter.GenerateExpression(
                 SupportedValueType.Integer,
                 in tolerance));
 
         /// <summary>
-        /// Gets the simplification expressions, if available.
+        ///     Gets the simplification expressions, if available.
         /// </summary>
         /// <returns>A success state, and the expressions.</returns>
         protected (bool Success, long FirstValue, long SecondValue) GetSimplificationExpressions()
@@ -84,5 +92,7 @@ namespace IX.Math.Nodes.Functions.Binary
 
             return (false, default, default);
         }
+
+#endregion
     }
 }

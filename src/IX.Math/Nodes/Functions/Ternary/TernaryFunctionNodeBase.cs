@@ -9,23 +9,27 @@ using IX.StandardExtensions.Contracts;
 namespace IX.Math.Nodes.Functions.Ternary
 {
     /// <summary>
-    /// A base class for a function that takes three parameters.
+    ///     A base class for a function that takes three parameters.
     /// </summary>
     /// <seealso cref="FunctionNodeBase" />
     public abstract class TernaryFunctionNodeBase : FunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="TernaryFunctionNodeBase" /> class.
+        ///     Initializes a new instance of the <see cref="TernaryFunctionNodeBase" /> class.
         /// </summary>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
         /// <param name="thirdParameter">The third parameter.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="firstParameter" />
-        /// or
-        /// <paramref name="secondParameter" />
-        /// or
-        /// <paramref name="thirdParameter" />
-        /// is <see langword="null" /> (<see langword="Nothing" /> in Visual Basic).</exception>
+        /// <exception cref="ArgumentNullException">
+        ///     <paramref name="firstParameter" />
+        ///     or
+        ///     <paramref name="secondParameter" />
+        ///     or
+        ///     <paramref name="thirdParameter" />
+        ///     is <see langword="null" /> (<see langword="Nothing" /> in Visual Basic).
+        /// </exception>
         [SuppressMessage(
             "Usage",
             "CA2214:Do not call overridable methods in constructors",
@@ -39,34 +43,41 @@ namespace IX.Math.Nodes.Functions.Ternary
             NodeBase secondParameter,
             NodeBase thirdParameter)
         {
-            NodeBase firstParameterTemp = Requires.NotNull(firstParameter, nameof(firstParameter)).Simplify();
-            NodeBase secondParameterTemp = Requires.NotNull(secondParameter, nameof(secondParameter)).Simplify();
-            NodeBase thirdParameterTemp = Requires.NotNull(thirdParameter, nameof(thirdParameter)).Simplify();
+            NodeBase firstParameterTemp = Requires.NotNull(
+                    firstParameter,
+                    nameof(firstParameter))
+                .Simplify();
+            NodeBase secondParameterTemp = Requires.NotNull(
+                    secondParameter,
+                    nameof(secondParameter))
+                .Simplify();
+            NodeBase thirdParameterTemp = Requires.NotNull(
+                    thirdParameter,
+                    nameof(thirdParameter))
+                .Simplify();
 
-            this.EnsureCompatibleParameters(firstParameterTemp, secondParameterTemp, thirdParameterTemp);
+            this.EnsureCompatibleParameters(
+                firstParameterTemp,
+                secondParameterTemp,
+                thirdParameterTemp);
 
             this.FirstParameter = firstParameterTemp;
             this.SecondParameter = secondParameterTemp;
             this.ThirdParameter = thirdParameterTemp;
         }
 
+#endregion
+
+#region Properties and indexers
+
         /// <summary>
-        /// Gets the first parameter.
+        ///     Gets the first parameter.
         /// </summary>
         /// <value>The first parameter.</value>
-        public NodeBase FirstParameter { get; }
-
-        /// <summary>
-        /// Gets the second parameter.
-        /// </summary>
-        /// <value>The second parameter.</value>
-        public NodeBase SecondParameter { get; }
-
-        /// <summary>
-        /// Gets the third parameter.
-        /// </summary>
-        /// <value>The third parameter.</value>
-        public NodeBase ThirdParameter { get; }
+        public NodeBase FirstParameter
+        {
+            get;
+        }
 
         /// <summary>
         ///     Gets a value indicating whether this node supports tolerance.
@@ -90,10 +101,32 @@ namespace IX.Math.Nodes.Functions.Ternary
             this.ThirdParameter.RequiresPreservedExpression;
 
         /// <summary>
-        /// Verifies this node and all nodes above it for logical validity.
+        ///     Gets the second parameter.
+        /// </summary>
+        /// <value>The second parameter.</value>
+        public NodeBase SecondParameter
+        {
+            get;
+        }
+
+        /// <summary>
+        ///     Gets the third parameter.
+        /// </summary>
+        /// <value>The third parameter.</value>
+        public NodeBase ThirdParameter
+        {
+            get;
+        }
+
+#endregion
+
+#region Methods
+
+        /// <summary>
+        ///     Verifies this node and all nodes above it for logical validity.
         /// </summary>
         /// <remarks>
-        /// <para>This method is expected to be overridden, and is a good place to do type restriction verification.</para>
+        ///     <para>This method is expected to be overridden, and is a good place to do type restriction verification.</para>
         /// </remarks>
         public sealed override void Verify()
         {
@@ -110,7 +143,7 @@ namespace IX.Math.Nodes.Functions.Ternary
         }
 
         /// <summary>
-        /// Ensures the parameters are compatible for this node.
+        ///     Ensures the parameters are compatible for this node.
         /// </summary>
         /// <param name="first">The first.</param>
         /// <param name="second">The second.</param>
@@ -119,5 +152,7 @@ namespace IX.Math.Nodes.Functions.Ternary
             NodeBase first,
             NodeBase second,
             NodeBase third);
+
+#endregion
     }
 }

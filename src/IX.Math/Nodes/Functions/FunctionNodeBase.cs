@@ -7,24 +7,33 @@ using JetBrains.Annotations;
 namespace IX.Math.Nodes.Functions
 {
     /// <summary>
-    /// A base class for a function node.
+    ///     A base class for a function node.
     /// </summary>
     /// <seealso cref="NodeBase" />
     [PublicAPI]
     public abstract class FunctionNodeBase : NodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Prevents a default instance of the <see cref="FunctionNodeBase" /> class from being created.
+        ///     Prevents a default instance of the <see cref="FunctionNodeBase" /> class from being created.
         /// </summary>
         protected private FunctionNodeBase()
         {
         }
+
+#endregion
+
+#region Properties and indexers
 
         /// <summary>
         ///     Gets a value indicating whether or not this node is actually a constant. Since functions
         ///     can never be considered constant, this always returns false.
         /// </summary>
         /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
-        public sealed override bool IsConstant => false;
+        public sealed override bool IsConstant =>
+            false;
+
+#endregion
     }
 }

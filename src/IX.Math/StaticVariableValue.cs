@@ -48,42 +48,46 @@ namespace IX.Math
         /// <param name="value">The value.</param>
         public StaticVariableValue(string value)
         {
-            MathematicPortfolio registry = MathematicPortfolio.CurrentContext?.Value ??
+            MathematicPortfolio registry = MathematicPortfolio.CurrentContext.Value ??
                                            throw new InvalidOperationException(
                                                Resources.ErrorMathematicPortfolioNotAvailable);
             DisplayList displayStrings = new DisplayList();
             bool success;
 
-            Requires.NotNull(
+            Requires.NotNull<string>(
                 out this.stringEquivalentValue,
                 value,
                 nameof(value));
 
-            success = registry.Convert<string, long>(value, out var lv);
+            success = registry.Convert<string, long>(
+                value,
+                out var lv);
             if (success)
             {
                 this.integerEquivalentValue = lv;
-                displayStrings.Add(
-                    $"{Resources.IntegerValueTag}: {registry.Display(lv)}");
+                displayStrings.Add($"{Resources.IntegerValueTag}: {registry.Display(lv)}");
             }
             else
             {
                 this.integerEquivalentValue = null;
             }
 
-            success = registry.Convert<string, double>(value, out var dv);
+            success = registry.Convert<string, double>(
+                value,
+                out var dv);
             if (success)
             {
                 this.numericEquivalentValue = dv;
-                displayStrings.Add(
-                    $"{Resources.NumericValueTag}: {registry.Display(dv)}");
+                displayStrings.Add($"{Resources.NumericValueTag}: {registry.Display(dv)}");
             }
             else
             {
                 this.numericEquivalentValue = null;
             }
 
-            success = registry.Convert<string, byte[]>(value, out var bav);
+            success = registry.Convert<string, byte[]>(
+                value,
+                out var bav);
             if (success)
             {
                 this.binaryEquivalentValue = bav;
@@ -94,12 +98,13 @@ namespace IX.Math
                 this.binaryEquivalentValue = null;
             }
 
-            success = registry.Convert<string, bool>(value, out var bv);
+            success = registry.Convert<string, bool>(
+                value,
+                out var bv);
             if (success)
             {
                 this.booleanEquivalentValue = bv;
-                displayStrings.Add(
-                    $"{Resources.BooleanValueTag}: {registry.Display(bv)}");
+                displayStrings.Add($"{Resources.BooleanValueTag}: {registry.Display(bv)}");
             }
             else
             {
@@ -120,7 +125,7 @@ namespace IX.Math
         /// <param name="value">The value.</param>
         public StaticVariableValue(long value)
         {
-            MathematicPortfolio registry = MathematicPortfolio.CurrentContext?.Value ??
+            MathematicPortfolio registry = MathematicPortfolio.CurrentContext.Value ??
                                            throw new InvalidOperationException(
                                                Resources.ErrorMathematicPortfolioNotAvailable);
             DisplayList displayStrings = new DisplayList();
@@ -130,19 +135,22 @@ namespace IX.Math
             displayStrings.Add(
                 $"{Resources.IntegerValueTag} {Resources.OriginalValueMarker}: {registry.Display(this.integerEquivalentValue.Value)}");
 
-            success = registry.Convert<long, double>(value, out var dv);
+            success = registry.Convert<long, double>(
+                value,
+                out var dv);
             if (success)
             {
                 this.numericEquivalentValue = dv;
-                displayStrings.Add(
-                    $"{Resources.NumericValueTag}: {registry.Display(dv)}");
+                displayStrings.Add($"{Resources.NumericValueTag}: {registry.Display(dv)}");
             }
             else
             {
                 this.numericEquivalentValue = null;
             }
 
-            success = registry.Convert<long, byte[]>(value, out var bav);
+            success = registry.Convert<long, byte[]>(
+                value,
+                out var bav);
             if (success)
             {
                 this.binaryEquivalentValue = bav;
@@ -153,19 +161,22 @@ namespace IX.Math
                 this.binaryEquivalentValue = null;
             }
 
-            success = registry.Convert<long, bool>(value, out var bv);
+            success = registry.Convert<long, bool>(
+                value,
+                out var bv);
             if (success)
             {
                 this.booleanEquivalentValue = bv;
-                displayStrings.Add(
-                    $"{Resources.BooleanValueTag}: {registry.Display(bv)}");
+                displayStrings.Add($"{Resources.BooleanValueTag}: {registry.Display(bv)}");
             }
             else
             {
                 this.booleanEquivalentValue = null;
             }
 
-            success = registry.Convert<long, string>(value, out var sv);
+            success = registry.Convert<long, string>(
+                value,
+                out var sv);
             if (success)
             {
                 this.stringEquivalentValue = sv;
@@ -188,18 +199,19 @@ namespace IX.Math
         /// <param name="value">The value.</param>
         public StaticVariableValue(double value)
         {
-            MathematicPortfolio registry = MathematicPortfolio.CurrentContext?.Value ??
+            MathematicPortfolio registry = MathematicPortfolio.CurrentContext.Value ??
                                            throw new InvalidOperationException(
                                                Resources.ErrorMathematicPortfolioNotAvailable);
             DisplayList displayStrings = new DisplayList();
             bool success;
 
-            success = registry.Convert<double, long>(value, out var lv);
+            success = registry.Convert<double, long>(
+                value,
+                out var lv);
             if (success)
             {
                 this.integerEquivalentValue = lv;
-                displayStrings.Add(
-                    $"{Resources.IntegerValueTag}: {registry.Display(lv)}");
+                displayStrings.Add($"{Resources.IntegerValueTag}: {registry.Display(lv)}");
             }
             else
             {
@@ -210,7 +222,9 @@ namespace IX.Math
             displayStrings.Add(
                 $"{Resources.NumericValueTag} {Resources.OriginalValueMarker}: {registry.Display(value)}");
 
-            success = registry.Convert<double, byte[]>(value, out var bav);
+            success = registry.Convert<double, byte[]>(
+                value,
+                out var bav);
             if (success)
             {
                 this.binaryEquivalentValue = bav;
@@ -221,19 +235,22 @@ namespace IX.Math
                 this.binaryEquivalentValue = null;
             }
 
-            success = registry.Convert<double, bool>(value, out var bv);
+            success = registry.Convert<double, bool>(
+                value,
+                out var bv);
             if (success)
             {
                 this.booleanEquivalentValue = bv;
-                displayStrings.Add(
-                    $"{Resources.BooleanValueTag}: {registry.Display(bv)}");
+                displayStrings.Add($"{Resources.BooleanValueTag}: {registry.Display(bv)}");
             }
             else
             {
                 this.booleanEquivalentValue = null;
             }
 
-            success = registry.Convert<double, string>(value, out var sv);
+            success = registry.Convert<double, string>(
+                value,
+                out var sv);
             if (success)
             {
                 this.stringEquivalentValue = sv;
@@ -256,7 +273,7 @@ namespace IX.Math
         /// <param name="value">The value.</param>
         public StaticVariableValue(byte[] value)
         {
-            MathematicPortfolio registry = MathematicPortfolio.CurrentContext?.Value ??
+            MathematicPortfolio registry = MathematicPortfolio.CurrentContext.Value ??
                                            throw new InvalidOperationException(
                                                Resources.ErrorMathematicPortfolioNotAvailable);
             DisplayList displayStrings = new DisplayList();
@@ -266,24 +283,26 @@ namespace IX.Math
                 value,
                 nameof(value));
 
-            success = registry.Convert<byte[], long>(value, out var lv);
+            success = registry.Convert<byte[], long>(
+                value,
+                out var lv);
             if (success)
             {
                 this.integerEquivalentValue = lv;
-                displayStrings.Add(
-                    $"{Resources.IntegerValueTag}: {registry.Display(lv)}");
+                displayStrings.Add($"{Resources.IntegerValueTag}: {registry.Display(lv)}");
             }
             else
             {
                 this.integerEquivalentValue = null;
             }
 
-            success = registry.Convert<byte[], double>(value, out var dv);
+            success = registry.Convert<byte[], double>(
+                value,
+                out var dv);
             if (success)
             {
                 this.numericEquivalentValue = dv;
-                displayStrings.Add(
-                    $"{Resources.NumericValueTag}: {registry.Display(dv)}");
+                displayStrings.Add($"{Resources.NumericValueTag}: {registry.Display(dv)}");
             }
             else
             {
@@ -293,19 +312,22 @@ namespace IX.Math
             displayStrings.Add(
                 $"{Resources.BinaryValueTag} {Resources.OriginalValueMarker}: {registry.Display(this.binaryEquivalentValue)}");
 
-            success = registry.Convert<byte[], bool>(value, out var bv);
+            success = registry.Convert<byte[], bool>(
+                value,
+                out var bv);
             if (success)
             {
                 this.booleanEquivalentValue = bv;
-                displayStrings.Add(
-                    $"{Resources.BooleanValueTag}: {registry.Display(bv)}");
+                displayStrings.Add($"{Resources.BooleanValueTag}: {registry.Display(bv)}");
             }
             else
             {
                 this.booleanEquivalentValue = null;
             }
 
-            success = registry.Convert<byte[], string>(value, out var sv);
+            success = registry.Convert<byte[], string>(
+                value,
+                out var sv);
             if (success)
             {
                 this.stringEquivalentValue = sv;
@@ -328,37 +350,41 @@ namespace IX.Math
         /// <param name="value">The boolean value.</param>
         public StaticVariableValue(bool value)
         {
-            MathematicPortfolio registry = MathematicPortfolio.CurrentContext?.Value ??
+            MathematicPortfolio registry = MathematicPortfolio.CurrentContext.Value ??
                                            throw new InvalidOperationException(
                                                Resources.ErrorMathematicPortfolioNotAvailable);
             DisplayList displayStrings = new DisplayList();
             bool success;
 
-            success = registry.Convert<bool, long>(value, out var lv);
+            success = registry.Convert<bool, long>(
+                value,
+                out var lv);
             if (success)
             {
                 this.integerEquivalentValue = lv;
-                displayStrings.Add(
-                    $"{Resources.IntegerValueTag}: {registry.Display(lv)}");
+                displayStrings.Add($"{Resources.IntegerValueTag}: {registry.Display(lv)}");
             }
             else
             {
                 this.integerEquivalentValue = null;
             }
 
-            success = registry.Convert<bool, double>(value, out var dv);
+            success = registry.Convert<bool, double>(
+                value,
+                out var dv);
             if (success)
             {
                 this.numericEquivalentValue = dv;
-                displayStrings.Add(
-                    $"{Resources.NumericValueTag}: {registry.Display(dv)}");
+                displayStrings.Add($"{Resources.NumericValueTag}: {registry.Display(dv)}");
             }
             else
             {
                 this.numericEquivalentValue = null;
             }
 
-            success = registry.Convert<bool, byte[]>(value, out var bav);
+            success = registry.Convert<bool, byte[]>(
+                value,
+                out var bav);
             if (success)
             {
                 this.binaryEquivalentValue = bav;
@@ -373,7 +399,9 @@ namespace IX.Math
             displayStrings.Add(
                 $"{Resources.BooleanValueTag} {Resources.OriginalValueMarker}: {registry.Display(this.booleanEquivalentValue.Value)}");
 
-            success = registry.Convert<bool, string>(value, out var sv);
+            success = registry.Convert<bool, string>(
+                value,
+                out var sv);
             if (success)
             {
                 this.stringEquivalentValue = sv;
@@ -389,6 +417,51 @@ namespace IX.Math
                 displayStrings.Where(p => p != null));
             this.hashCode = this.stringDisplay.GetHashCode();
         }
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has an integer value.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance has an integer value; otherwise, <c>false</c>.
+        /// </value>
+        public bool HasIntegerValue =>
+            this.integerEquivalentValue != null;
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has an numeric value.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance has an numeric value; otherwise, <c>false</c>.
+        /// </value>
+        public bool HasNumericValue =>
+            this.numericEquivalentValue != null;
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has a binary value.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance has a binary value; otherwise, <c>false</c>.
+        /// </value>
+        public bool HasBinaryValue =>
+            this.binaryEquivalentValue != null;
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has a boolean value.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance has a boolean value; otherwise, <c>false</c>.
+        /// </value>
+        public bool HasBooleanValue =>
+            this.booleanEquivalentValue != null;
+
+        /// <summary>
+        /// Gets a value indicating whether this instance has a string value.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance has a string value; otherwise, <c>false</c>.
+        /// </value>
+        public bool HasStringValue =>
+            this.stringEquivalentValue != null;
 
         /// <summary>
         ///     Performs an implicit conversion from <see cref="string" /> to <see cref="StaticVariableValue" />.
@@ -477,7 +550,7 @@ namespace IX.Math
         public static bool operator ==(
             StaticVariableValue? left,
             StaticVariableValue? right) =>
-            right.HasValue ? (left?.Equals(right.Value) ?? false) : left.HasValue;
+            right.HasValue ? left?.Equals(right.Value) ?? false : left.HasValue;
 
         /// <summary>
         ///     Implements the operator !=.
@@ -497,6 +570,10 @@ namespace IX.Math
         /// </summary>
         /// <param name="integer">The integer value, if one exists.</param>
         /// <returns><c>true</c> if the value has an integer representation, <c>false</c> otherwise.</returns>
+        [DiagCA.SuppressMessage(
+            "Naming",
+            "CA1720:Identifier contains type name",
+            Justification = "This is an identifier for use in IX.Math, coincidence will not hamper us.")]
         public bool TryGetInteger(out long integer)
         {
             if (this.integerEquivalentValue.HasValue)
@@ -516,13 +593,11 @@ namespace IX.Math
         /// </summary>
         /// <param name="integerExpression">The integer expression of value, if one exists.</param>
         /// <returns><c>true</c> if the value has an integer representation, <c>false</c> otherwise.</returns>
-        [DiagCA.SuppressMessage(
+        [DiagCA.SuppressMessageAttribute(
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "Expressions cannot work in any other way.")]
-        public bool TryGetIntegerExpression(
-            [DiagCA.MaybeNullWhen(false)]
-            out Expression integerExpression)
+        public bool TryGetIntegerExpression([DiagCA.MaybeNullWhenAttribute(false)] out Expression integerExpression)
         {
             if (this.integerEquivalentValue.HasValue)
             {
@@ -562,9 +637,7 @@ namespace IX.Math
         /// </summary>
         /// <param name="binary">The binary value, if one exists.</param>
         /// <returns><c>true</c> if the value has a binary representation, <c>false</c> otherwise.</returns>
-        public bool TryGetBinary(
-            [DiagCA.MaybeNullWhen(false)]
-            out byte[] binary)
+        public bool TryGetBinary([DiagCA.MaybeNullWhenAttribute(false)] out byte[] binary)
         {
             if (this.binaryEquivalentValue != null)
             {
@@ -602,9 +675,7 @@ namespace IX.Math
         /// </summary>
         /// <param name="str">The string value, if one exists.</param>
         /// <returns><c>true</c> if the value has a string representation, <c>false</c> otherwise.</returns>
-        public bool TryGetString(
-            [DiagCA.MaybeNullWhen(false)]
-            out string str)
+        public bool TryGetString([DiagCA.MaybeNullWhenAttribute(false)] out string str)
         {
             if (this.stringEquivalentValue != null)
             {
@@ -650,11 +721,12 @@ namespace IX.Math
         }
 
         /// <summary>
-        /// Indicates whether the current object is equal to another object of the same type.
+        ///     Indicates whether the current object is equal to another object of the same type.
         /// </summary>
         /// <param name="other">An object to compare with this object.</param>
         /// <returns>
-        ///   <see langword="true" /> if the current object is equal to the <paramref name="other" /> parameter; otherwise, <see langword="false" />.
+        ///     <see langword="true" /> if the current object is equal to the <paramref name="other" /> parameter; otherwise,
+        ///     <see langword="false" />.
         /// </returns>
         public bool Equals(StaticVariableValue other) =>
             this.binaryEquivalentValue.SequenceEquals(other.binaryEquivalentValue) &&

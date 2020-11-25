@@ -22,12 +22,18 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
     /// <seealso cref="ComparisonNodeBase" />
     internal abstract class EquationNodeBase : ComparisonNodeBase
     {
+#region Internal state
+
         private readonly bool notEqual;
 
         private bool isConstant;
 
+#endregion
+
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="EquationNodeBase" /> class.
+        ///     Initializes a new instance of the <see cref="EquationNodeBase" /> class.
         /// </summary>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
@@ -43,11 +49,20 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             this.notEqual = notEqual;
         }
 
+#endregion
+
+#region Properties and indexers
+
         /// <summary>
         ///     Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
-        public sealed override bool IsConstant => this.isConstant;
+        public sealed override bool IsConstant =>
+            this.isConstant;
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
@@ -64,7 +79,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
 
             bool? equalityValue = null;
 
-            if (left.TryGetBoolean(out bool bvl) && right.TryGetBoolean(out bool bvr))
+            if (left.TryGetBoolean(out var bvl) && right.TryGetBoolean(out var bvr))
             {
                 // Both boolean
                 equalityValue = bvl == bvr;
@@ -72,10 +87,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             else if (left.TryGetBinary(out byte[] bavl) && right.TryGetBinary(out byte[] bavr))
             {
                 // Both byte array, but not both integer or numeric
-                bool bli = left.CheckSupportedType(SupportableValueType.Integer);
-                bool bln = left.CheckSupportedType(SupportableValueType.Numeric);
-                bool bri = right.CheckSupportedType(SupportableValueType.Integer);
-                bool brn = right.CheckSupportedType(SupportableValueType.Numeric);
+                var bli = left.CheckSupportedType(SupportableValueType.Integer);
+                var bln = left.CheckSupportedType(SupportableValueType.Numeric);
+                var bri = right.CheckSupportedType(SupportableValueType.Integer);
+                var brn = right.CheckSupportedType(SupportableValueType.Numeric);
 
                 if ((bli || bln) && (bri || brn))
                 {
@@ -87,10 +102,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             else if (left.TryGetString(out string svl) && right.TryGetString(out string svr))
             {
                 // Both string, but not either integer or numeric
-                bool bli = left.CheckSupportedType(SupportableValueType.Integer);
-                bool bln = left.CheckSupportedType(SupportableValueType.Numeric);
-                bool bri = right.CheckSupportedType(SupportableValueType.Integer);
-                bool brn = right.CheckSupportedType(SupportableValueType.Numeric);
+                var bli = left.CheckSupportedType(SupportableValueType.Integer);
+                var bln = left.CheckSupportedType(SupportableValueType.Numeric);
+                var bri = right.CheckSupportedType(SupportableValueType.Integer);
+                var brn = right.CheckSupportedType(SupportableValueType.Numeric);
 
                 if (bli || bln || bri || brn)
                 {
@@ -116,12 +131,12 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
         /// <returns>A compiled expression, if one is possible.</returns>
-        [DiagCA.SuppressMessage(
+        [DiagCA.SuppressMessageAttribute(
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "We want it this way.")]
@@ -131,7 +146,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         {
             try
             {
-                var (leftExpression, rightExpression, innerValueType) =
+                (var leftExpression, var rightExpression, SupportedValueType innerValueType) =
                     this.GetExpressionArguments(in comparisonTolerance);
 
                 Expression equalExpression;
@@ -265,6 +280,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                         equalExpression = Expression.Equal(
                             leftExpression,
                             rightExpression);
+
                         break;
                     }
 
@@ -312,31 +328,40 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
 
                         Expression GeneratePossibleToleranceExpression(in ComparisonTolerance tolerance)
                         {
-                            #region Empty tolerance
+#region Empty tolerance
+
                             if (tolerance.IsEmpty)
                             {
                                 return Expression.Call(
-                                    numericExp.Type == typeof(long) ?
-                                        ((Func<string, long, bool>)EqualizeNoToleranceInteger).Method :
-                                        ((Func<string, double, bool>)EqualizeNoToleranceNumeric).Method,
+                                    numericExp.Type == typeof(long)
+                                        ? ((Func<string, long, bool>)EqualizeNoToleranceInteger).Method
+                                        : ((Func<string, double, bool>)EqualizeNoToleranceNumeric).Method,
                                     stringExp,
                                     numericExp);
                             }
-                            #endregion
 
-                            #region Integer range tolerance
+#endregion
+
+#region Integer range tolerance
+
                             if (tolerance.IntegerToleranceRangeLowerBound != null ||
                                 tolerance.IntegerToleranceRangeUpperBound != null)
                             {
                                 // Integer range tolerance
                                 return Expression.Call(
-                                    numericExp.Type == typeof(long) ?
-                                        ((Func<string, long, long, long, bool>)EqualizeIntegerToleranceRangeInteger).Method :
-                                        ((Func<string, double, long, long, bool>)EqualizeIntegerToleranceRangeNumeric).Method,
+                                    numericExp.Type == typeof(long)
+                                        ? ((Func<string, long, long, long, bool>)EqualizeIntegerToleranceRangeInteger)
+                                        .Method
+                                        : ((Func<string, double, long, long, bool>)EqualizeIntegerToleranceRangeNumeric)
+                                        .Method,
                                     stringExp,
                                     numericExp,
-                                    Expression.Constant(tolerance.IntegerToleranceRangeLowerBound ?? 0L, typeof(long)),
-                                    Expression.Constant(tolerance.IntegerToleranceRangeUpperBound ?? 0L, typeof(long)));
+                                    Expression.Constant(
+                                        tolerance.IntegerToleranceRangeLowerBound ?? 0L,
+                                        typeof(long)),
+                                    Expression.Constant(
+                                        tolerance.IntegerToleranceRangeUpperBound ?? 0L,
+                                        typeof(long)));
 
                                 static bool EqualizeIntegerToleranceRangeInteger(
                                     string stringValue,
@@ -381,7 +406,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                                         }
                                     }
 
-                                    return string.Equals(stringValue, StringFormatter.FormatIntoString(integerValue), StringComparison.CurrentCulture);
+                                    return string.Equals(
+                                        stringValue,
+                                        StringFormatter.FormatIntoString(integerValue),
+                                        StringComparison.CurrentCulture);
                                 }
 
                                 static bool EqualizeIntegerToleranceRangeNumeric(
@@ -416,24 +444,35 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                                         }
                                     }
 
-                                    return string.Equals(stringValue, StringFormatter.FormatIntoString(numericValue), StringComparison.CurrentCulture);
+                                    return string.Equals(
+                                        stringValue,
+                                        StringFormatter.FormatIntoString(numericValue),
+                                        StringComparison.CurrentCulture);
                                 }
                             }
-                            #endregion
 
-                            #region Numeric range tolerance
+#endregion
+
+#region Numeric range tolerance
+
                             if (tolerance.ToleranceRangeLowerBound != null ||
                                 tolerance.ToleranceRangeUpperBound != null)
                             {
                                 // Floating-point range tolerance
                                 return Expression.Call(
-                                    numericExp.Type == typeof(long) ?
-                                        ((Func<string, long, double, double, bool>)EqualizeToleranceRangeInteger).Method :
-                                        ((Func<string, double, double, double, bool>)EqualizeToleranceRangeNumeric).Method,
+                                    numericExp.Type == typeof(long)
+                                        ? ((Func<string, long, double, double, bool>)EqualizeToleranceRangeInteger)
+                                        .Method
+                                        : ((Func<string, double, double, double, bool>)EqualizeToleranceRangeNumeric)
+                                        .Method,
                                     stringExp,
                                     numericExp,
-                                    Expression.Constant(tolerance.ToleranceRangeLowerBound ?? 0L, typeof(double)),
-                                    Expression.Constant(tolerance.ToleranceRangeUpperBound ?? 0L, typeof(double)));
+                                    Expression.Constant(
+                                        tolerance.ToleranceRangeLowerBound ?? 0L,
+                                        typeof(double)),
+                                    Expression.Constant(
+                                        tolerance.ToleranceRangeUpperBound ?? 0L,
+                                        typeof(double)));
 
                                 static bool EqualizeToleranceRangeInteger(
                                     string stringValue,
@@ -478,7 +517,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                                         }
                                     }
 
-                                    return string.Equals(stringValue, StringFormatter.FormatIntoString(integerValue), StringComparison.CurrentCulture);
+                                    return string.Equals(
+                                        stringValue,
+                                        StringFormatter.FormatIntoString(integerValue),
+                                        StringComparison.CurrentCulture);
                                 }
 
                                 static bool EqualizeToleranceRangeNumeric(
@@ -513,12 +555,17 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                                         }
                                     }
 
-                                    return string.Equals(stringValue, StringFormatter.FormatIntoString(numericValue), StringComparison.CurrentCulture);
+                                    return string.Equals(
+                                        stringValue,
+                                        StringFormatter.FormatIntoString(numericValue),
+                                        StringComparison.CurrentCulture);
                                 }
                             }
-                            #endregion
 
-                            #region Proportion and percentage tolerance
+#endregion
+
+#region Proportion and percentage tolerance
+
                             if (tolerance.ProportionalTolerance != null)
                             {
                                 var proportionalOrPercentageTolerance = tolerance.ProportionalTolerance.Value;
@@ -527,12 +574,16 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                                 {
                                     // Proportional tolerance
                                     return Expression.Call(
-                                        numericExp.Type == typeof(long) ?
-                                            ((Func<string, long, double, bool>)EqualizeProportionalRangeInteger).Method :
-                                            ((Func<string, double, double, bool>)EqualizeProportionalRangeNumeric).Method,
+                                        numericExp.Type == typeof(long)
+                                            ? ((Func<string, long, double, bool>)EqualizeProportionalRangeInteger)
+                                            .Method
+                                            : ((Func<string, double, double, bool>)EqualizeProportionalRangeNumeric)
+                                            .Method,
                                         stringExp,
                                         numericExp,
-                                        Expression.Constant(proportionalOrPercentageTolerance, typeof(double)));
+                                        Expression.Constant(
+                                            proportionalOrPercentageTolerance,
+                                            typeof(double)));
 
                                     static bool EqualizeProportionalRangeInteger(
                                         string stringValue,
@@ -573,7 +624,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                                             }
                                         }
 
-                                        return string.Equals(stringValue, StringFormatter.FormatIntoString(integerValue), StringComparison.CurrentCulture);
+                                        return string.Equals(
+                                            stringValue,
+                                            StringFormatter.FormatIntoString(integerValue),
+                                            StringComparison.CurrentCulture);
                                     }
 
                                     static bool EqualizeProportionalRangeNumeric(
@@ -605,7 +659,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                                             }
                                         }
 
-                                        return string.Equals(stringValue, StringFormatter.FormatIntoString(numericValue), StringComparison.CurrentCulture);
+                                        return string.Equals(
+                                            stringValue,
+                                            StringFormatter.FormatIntoString(numericValue),
+                                            StringComparison.CurrentCulture);
                                     }
                                 }
 
@@ -614,12 +671,15 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                                 {
                                     // Percentage tolerance
                                     return Expression.Call(
-                                        numericExp.Type == typeof(long) ?
-                                            ((Func<string, long, double, bool>)EqualizePercentageRangeInteger).Method :
-                                            ((Func<string, double, double, bool>)EqualizePercentageRangeNumeric).Method,
+                                        numericExp.Type == typeof(long)
+                                            ? ((Func<string, long, double, bool>)EqualizePercentageRangeInteger).Method
+                                            : ((Func<string, double, double, bool>)EqualizePercentageRangeNumeric)
+                                            .Method,
                                         stringExp,
                                         numericExp,
-                                        Expression.Constant(proportionalOrPercentageTolerance, typeof(double)));
+                                        Expression.Constant(
+                                            proportionalOrPercentageTolerance,
+                                            typeof(double)));
 
                                     static bool EqualizePercentageRangeInteger(
                                         string stringValue,
@@ -660,7 +720,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                                             }
                                         }
 
-                                        return string.Equals(stringValue, StringFormatter.FormatIntoString(integerValue), StringComparison.CurrentCulture);
+                                        return string.Equals(
+                                            stringValue,
+                                            StringFormatter.FormatIntoString(integerValue),
+                                            StringComparison.CurrentCulture);
                                     }
 
                                     static bool EqualizePercentageRangeNumeric(
@@ -692,16 +755,20 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                                             }
                                         }
 
-                                        return string.Equals(stringValue, StringFormatter.FormatIntoString(numericValue), StringComparison.CurrentCulture);
+                                        return string.Equals(
+                                            stringValue,
+                                            StringFormatter.FormatIntoString(numericValue),
+                                            StringComparison.CurrentCulture);
                                     }
                                 }
                             }
-                            #endregion
+
+#endregion
 
                             return Expression.Call(
-                                numericExp.Type == typeof(long) ?
-                                    ((Func<string, long, bool>)EqualizeNoToleranceInteger).Method :
-                                    ((Func<string, double, bool>)EqualizeNoToleranceNumeric).Method,
+                                numericExp.Type == typeof(long)
+                                    ? ((Func<string, long, bool>)EqualizeNoToleranceInteger).Method
+                                    : ((Func<string, double, bool>)EqualizeNoToleranceNumeric).Method,
                                 stringExp,
                                 numericExp);
 
@@ -709,14 +776,20 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                                 string stringValue,
                                 long integerValue)
                             {
-                                return string.Equals(stringValue, StringFormatter.FormatIntoString(integerValue), StringComparison.CurrentCulture);
+                                return string.Equals(
+                                    stringValue,
+                                    StringFormatter.FormatIntoString(integerValue),
+                                    StringComparison.CurrentCulture);
                             }
 
                             static bool EqualizeNoToleranceNumeric(
                                 string stringValue,
                                 double numericValue)
                             {
-                                return string.Equals(stringValue, StringFormatter.FormatIntoString(numericValue), StringComparison.CurrentCulture);
+                                return string.Equals(
+                                    stringValue,
+                                    StringFormatter.FormatIntoString(numericValue),
+                                    StringComparison.CurrentCulture);
                             }
                         }
 
@@ -748,5 +821,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                 throw new ExpressionNotValidLogicallyException(ex);
             }
         }
+
+#endregion
     }
 }

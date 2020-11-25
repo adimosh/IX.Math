@@ -10,14 +10,16 @@ using JetBrains.Annotations;
 namespace IX.Math.Nodes.Conversion
 {
     /// <summary>
-    /// A base class for an automatic conversion node.
+    ///     A base class for an automatic conversion node.
     /// </summary>
     /// <seealso cref="IX.Math.Nodes.NodeBase" />
     [PublicAPI]
     public abstract class ConversionNodeBase : NodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConversionNodeBase"/> class.
+        ///     Initializes a new instance of the <see cref="ConversionNodeBase" /> class.
         /// </summary>
         /// <param name="sourceNode">The source node.</param>
         /// <param name="destinationType">Type of the destination.</param>
@@ -30,37 +32,48 @@ namespace IX.Math.Nodes.Conversion
             "VirtualMemberCallInConstructor",
             Justification = "This is the whole point of the method.")]
         protected ConversionNodeBase(
-            [JetBrains.Annotations.NotNull] NodeBase sourceNode,
+            [NotNull] NodeBase sourceNode,
             SupportableValueType destinationType)
         {
-            Requires.NotNull(sourceNode, nameof(sourceNode));
+            Requires.NotNull(
+                sourceNode,
+                nameof(sourceNode));
 
-            var possibleReturns = GetSupportedTypeOptions(destinationType)
+            SupportedValueType[]? possibleReturns = GetSupportedTypeOptions(destinationType)
                 .SelectMany(p => GetSupportedTypeOptions(GetSupportableConversions(in p)))
                 .Distinct()
                 .ToArray();
 
-            foreach (var possibleReturn in possibleReturns)
+            foreach (SupportedValueType possibleReturn in possibleReturns)
             {
-                this.CalculatedCosts[possibleReturn] = (10 + sourceNode.CalculateStrategyCost(SupportedValueType.String), possibleReturn);
+                this.CalculatedCosts[possibleReturn] = (
+                    10 + sourceNode.CalculateStrategyCost(SupportedValueType.String), possibleReturn);
             }
 
             this.ConvertFromNode = sourceNode;
         }
 
+#endregion
+
+#region Properties and indexers
+
         /// <summary>
-        /// Gets the node to convert from.
+        ///     Gets the node to convert from.
         /// </summary>
         /// <value>
-        /// The node to convert from.
+        ///     The node to convert from.
         /// </value>
-        public NodeBase ConvertFromNode { get; }
+        public NodeBase ConvertFromNode
+        {
+            get;
+        }
 
         /// <summary>
         ///     Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
-        public sealed override bool IsConstant => false;
+        public sealed override bool IsConstant =>
+            false;
 
         /// <summary>
         ///     Gets a value indicating whether this node supports tolerance.
@@ -68,7 +81,8 @@ namespace IX.Math.Nodes.Conversion
         /// <value>
         ///     <see langword="true" /> if the node is tolerant, <see langword="false" /> otherwise.
         /// </value>
-        public sealed override bool IsTolerant => this.ConvertFromNode.IsTolerant;
+        public sealed override bool IsTolerant =>
+            this.ConvertFromNode.IsTolerant;
 
         /// <summary>
         ///     Gets a value indicating whether this node requires preservation of the original expression.
@@ -77,20 +91,29 @@ namespace IX.Math.Nodes.Conversion
         ///     <see langword="true" /> if the node requires original expression preservation, or <see langword="false" />
         ///     if it can be polynomially-reduced.
         /// </value>
-        public sealed override bool RequiresPreservedExpression => this.ConvertFromNode.RequiresPreservedExpression;
+        public sealed override bool RequiresPreservedExpression =>
+            this.ConvertFromNode.RequiresPreservedExpression;
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
         /// </summary>
         /// <returns>A simplified node, or this instance.</returns>
-        public override NodeBase Simplify() => this;
+        public override NodeBase Simplify() =>
+            this;
 
         /// <summary>
-        /// Verifies this node and all nodes above it for logical validity.
+        ///     Verifies this node and all nodes above it for logical validity.
         /// </summary>
         /// <remarks>
-        /// <para>This method is expected to be overridden, and is a good place to do type restriction verification.</para>
+        ///     <para>This method is expected to be overridden, and is a good place to do type restriction verification.</para>
         /// </remarks>
-        public sealed override void Verify() => this.ConvertFromNode.Verify();
+        public sealed override void Verify() =>
+            this.ConvertFromNode.Verify();
+
+#endregion
     }
 }

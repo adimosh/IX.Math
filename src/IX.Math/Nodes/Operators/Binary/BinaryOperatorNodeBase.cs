@@ -13,8 +13,10 @@ namespace IX.Math.Nodes.Operators.Binary
     /// <seealso cref="NodeBase" />
     internal abstract class BinaryOperatorNodeBase : NodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="BinaryOperatorNodeBase" /> class.
+        ///     Initializes a new instance of the <see cref="BinaryOperatorNodeBase" /> class.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -30,12 +32,14 @@ namespace IX.Math.Nodes.Operators.Binary
             NodeBase left,
             NodeBase right)
         {
-            var leftProcessed = Requires.NotNull(
-                left,
-                nameof(left)).Simplify();
-            var rightProcessed = Requires.NotNull(
-                right,
-                nameof(right)).Simplify();
+            NodeBase? leftProcessed = Requires.NotNull(
+                    left,
+                    nameof(left))
+                .Simplify();
+            NodeBase? rightProcessed = Requires.NotNull(
+                    right,
+                    nameof(right))
+                .Simplify();
 
             this.EnsureCompatibleOperandsAndRefineReturnType(
                 ref leftProcessed,
@@ -45,19 +49,25 @@ namespace IX.Math.Nodes.Operators.Binary
             this.Right = rightProcessed;
         }
 
+#endregion
+
+#region Properties and indexers
+
         /// <summary>
         ///     Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
-        public override bool IsConstant => this.Left.IsConstant & this.Right.IsConstant;
+        public override bool IsConstant =>
+            this.Left.IsConstant & this.Right.IsConstant;
 
         /// <summary>
-        /// Gets a value indicating whether this node supports tolerance.
+        ///     Gets a value indicating whether this node supports tolerance.
         /// </summary>
         /// <value>
-        ///   <see langword="true" /> if the node is tolerant, <see langword="false" /> otherwise.
+        ///     <see langword="true" /> if the node is tolerant, <see langword="false" /> otherwise.
         /// </value>
-        public sealed override bool IsTolerant => this.Left.IsTolerant | this.Right.IsTolerant;
+        public sealed override bool IsTolerant =>
+            this.Left.IsTolerant | this.Right.IsTolerant;
 
         /// <summary>
         ///     Gets a value indicating whether this node requires preservation of the original expression.
@@ -75,7 +85,11 @@ namespace IX.Math.Nodes.Operators.Binary
         /// <value>
         ///     The left operand.
         /// </value>
-        protected NodeBase Left { get; private set; }
+        protected NodeBase Left
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         ///     Gets the right operand.
@@ -83,13 +97,21 @@ namespace IX.Math.Nodes.Operators.Binary
         /// <value>
         ///     The right operand.
         /// </value>
-        protected NodeBase Right { get; private set; }
+        protected NodeBase Right
+        {
+            get;
+            private set;
+        }
+
+#endregion
+
+#region Methods
 
         /// <summary>
-        /// Verifies this node and all nodes above it for logical validity.
+        ///     Verifies this node and all nodes above it for logical validity.
         /// </summary>
         /// <remarks>
-        /// <para>This method is expected to be overridden, and is a good place to do type restriction verification.</para>
+        ///     <para>This method is expected to be overridden, and is a good place to do type restriction verification.</para>
         /// </remarks>
         public sealed override void Verify()
         {
@@ -98,8 +120,8 @@ namespace IX.Math.Nodes.Operators.Binary
             this.Left.Verify();
             this.Right.Verify();
 
-            var leftProcessed = this.Left;
-            var rightProcessed = this.Right;
+            NodeBase? leftProcessed = this.Left;
+            NodeBase? rightProcessed = this.Right;
 
             this.EnsureCompatibleOperandsAndRefineReturnType(
                 ref leftProcessed,
@@ -117,5 +139,7 @@ namespace IX.Math.Nodes.Operators.Binary
         protected abstract void EnsureCompatibleOperandsAndRefineReturnType(
             ref NodeBase left,
             ref NodeBase right);
+
+#endregion
     }
 }

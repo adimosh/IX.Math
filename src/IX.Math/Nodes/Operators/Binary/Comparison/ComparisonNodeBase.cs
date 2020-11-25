@@ -13,8 +13,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
     /// <seealso cref="BinaryOperatorNodeBase" />
     internal abstract class ComparisonNodeBase : BinaryOperatorNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="ComparisonNodeBase" /> class.
+        ///     Initializes a new instance of the <see cref="ComparisonNodeBase" /> class.
         /// </summary>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
@@ -27,6 +29,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         {
         }
 
+#endregion
+
+#region Methods
+
         /// <summary>
         ///     Ensures that the operands are compatible, and refines the return type of this expression based on them.
         /// </summary>
@@ -36,17 +42,17 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             ref NodeBase left,
             ref NodeBase right)
         {
-            var commonSupportedTypes = left.PossibleReturnType & right.PossibleReturnType;
+            SupportableValueType commonSupportedTypes = left.PossibleReturnType & right.PossibleReturnType;
 
             if (commonSupportedTypes == SupportableValueType.None &&
                 !(left.CheckSupportedType(SupportableValueType.String) ||
-                right.CheckSupportedType(SupportableValueType.String)))
+                  right.CheckSupportedType(SupportableValueType.String)))
             {
                 throw new ExpressionNotValidLogicallyException();
             }
 
             this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Boolean);
-            foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
                 this.CalculatedCosts[supportedType] = (GetStandardConversionStrategyCost(
                     SupportedValueType.Boolean,
@@ -55,17 +61,17 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         }
 
         /// <summary>
-        /// Gets the expression arguments.
+        ///     Gets the expression arguments.
         /// </summary>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
         /// <returns>The expression arguments, depending on what those arguments actually are.</returns>
         protected (Expression Left, Expression Right, SupportedValueType ValueType) GetExpressionArguments(
             in ComparisonTolerance comparisonTolerance)
         {
-            var left = this.Left;
-            var right = this.Right;
+            NodeBase? left = this.Left;
+            NodeBase? right = this.Right;
 
-            var commonSupportedTypes = left.PossibleReturnType & right.PossibleReturnType;
+            SupportableValueType commonSupportedTypes = left.PossibleReturnType & right.PossibleReturnType;
 
             if ((commonSupportedTypes & SupportableValueType.Integer) != SupportableValueType.None)
             {
@@ -169,5 +175,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                 SupportedValueType.String,
                 in comparisonTolerance), SupportedValueType.String);
         }
+
+#endregion
     }
 }

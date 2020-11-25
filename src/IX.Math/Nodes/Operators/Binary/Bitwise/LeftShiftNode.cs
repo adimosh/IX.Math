@@ -19,11 +19,17 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
     [DebuggerDisplay("{" + nameof(Left) + "} << {" + nameof(Right) + "}")]
     internal sealed class LeftShiftNode : ByteShiftOperatorNodeBase
     {
+#region Internal state
+
         private static readonly MethodInfo ShiftMethod = typeof(BitwiseExtensions).GetMethodWithExactParameters(
                                                              nameof(BitwiseExtensions.LeftShift),
                                                              typeof(byte[]),
                                                              typeof(int)) ??
                                                          throw new MathematicsEngineException();
+
+#endregion
+
+#region Constructors
 
         public LeftShiftNode(
             NodeBase left,
@@ -33,6 +39,10 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
                 right)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
@@ -92,7 +102,7 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
                 this.Right.DeepClone(context));
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -103,13 +113,15 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
         {
             try
             {
-                var leftExpression = this.Left.GenerateExpression(
+                Expression? leftExpression = this.Left.GenerateExpression(
                     in valueType,
                     in comparisonTolerance);
 
-                var rightExpression = Expression.Call(ConvertToIntMethodInfo, this.Right.GenerateExpression(
-                    SupportedValueType.Integer,
-                    in comparisonTolerance));
+                MethodCallExpression? rightExpression = Expression.Call(
+                    ConvertToIntMethodInfo,
+                    this.Right.GenerateExpression(
+                        SupportedValueType.Integer,
+                        in comparisonTolerance));
 
                 if (leftExpression.Type == typeof(long))
                 {
@@ -141,5 +153,7 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
                 throw new ExpressionNotValidLogicallyException(ex);
             }
         }
+
+#endregion
     }
 }

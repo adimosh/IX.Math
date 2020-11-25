@@ -9,8 +9,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
     [DebuggerDisplay("{" + nameof(Left) + "} = {" + nameof(Right) + "}")]
     internal sealed class EqualsNode : EquationNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="EqualsNode"/> class.
+        ///     Initializes a new instance of the <see cref="EqualsNode" /> class.
         /// </summary>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
@@ -24,6 +26,10 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         {
         }
 
+#endregion
+
+#region Methods
+
         /// <summary>
         ///     Creates a deep clone of the source object.
         /// </summary>
@@ -33,5 +39,7 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             new EqualsNode(
                 this.Left.DeepClone(context),
                 this.Right.DeepClone(context));
+
+#endregion
     }
 }

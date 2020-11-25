@@ -22,8 +22,10 @@ namespace IX.Math.Nodes.Functions.Binary
     [UsedImplicitly]
     internal sealed class FunctionNodeRandom : NumericBinaryFunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionNodeRandom" /> class.
+        ///     Initializes a new instance of the <see cref="FunctionNodeRandom" /> class.
         /// </summary>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
@@ -35,6 +37,12 @@ namespace IX.Math.Nodes.Functions.Binary
                 secondParameter)
         {
         }
+
+#endregion
+
+#region Methods
+
+#region Static methods
 
         /// <summary>
         ///     Generates a random value.
@@ -50,13 +58,16 @@ namespace IX.Math.Nodes.Functions.Binary
                 min,
                 max);
 
+#endregion
+
         /// <summary>
         ///     This method always returns reflexively, as it should never be simplified.
         /// </summary>
         /// <returns>
         ///     A simplified node, or this instance.
         /// </returns>
-        public override NodeBase Simplify() => this;
+        public override NodeBase Simplify() =>
+            this;
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -71,7 +82,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 this.SecondParameter.DeepClone(context));
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -87,5 +98,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 first,
                 second);
         }
+
+#endregion
     }
 }

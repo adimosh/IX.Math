@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using IX.Math.Exceptions;
 
@@ -17,8 +18,10 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
     [DebuggerDisplay("{" + nameof(Left) + "} & {" + nameof(Right) + "}")]
     internal sealed class XorNode : LogicalOperatorNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="XorNode" /> class.
+        ///     Initializes a new instance of the <see cref="XorNode" /> class.
         /// </summary>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
@@ -31,8 +34,14 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
         {
         }
 
+#endregion
+
+#region Methods
+
+#region Static methods
+
         /// <summary>
-        /// Performs the binary operation.
+        ///     Performs the binary operation.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -44,9 +53,15 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
             byte[] result = new byte[global::System.Math.Max(
                 left.Length,
                 right.Length)];
-            new BitArray(left).Xor(new BitArray(right)).CopyTo(result, 0);
+            new BitArray(left).Xor(new BitArray(right))
+                .CopyTo(
+                    result,
+                    0);
+
             return result;
         }
+
+#endregion
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -59,7 +74,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                 this.Right.DeepClone(context));
 
         /// <summary>
-        /// Generates simplified data.
+        ///     Generates simplified data.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -70,7 +85,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
             left ^ right;
 
         /// <summary>
-        /// Generates simplified data.
+        ///     Generates simplified data.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -81,7 +96,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
             left ^ right;
 
         /// <summary>
-        /// Generates simplified data.
+        ///     Generates simplified data.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -94,12 +109,12 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                 right);
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
         /// <returns>A compiled expression, if one is possible.</returns>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "This is desirable.")]
@@ -109,10 +124,9 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
         {
             try
             {
-                var (
-                    left,
-                    right,
-                    isBinary) = this.GenerateParameterExpressions(in valueType, in comparisonTolerance);
+                var (left, right, isBinary) = this.GenerateParameterExpressions(
+                    in valueType,
+                    in comparisonTolerance);
 
                 if (!isBinary)
                 {
@@ -122,6 +136,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                 }
 
                 Func<byte[], byte[], byte[]> del = PerformBinaryOperation;
+
                 return Expression.Call(
                     del.Method,
                     left,
@@ -140,5 +155,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                 throw new ExpressionNotValidLogicallyException(ex);
             }
         }
+
+#endregion
     }
 }

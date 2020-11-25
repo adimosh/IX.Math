@@ -16,8 +16,10 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
     [DebuggerDisplay("{" + nameof(Left) + "} - {" + nameof(Right) + "}")]
     internal sealed class SubtractNode : SimpleMathematicalOperationNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="SubtractNode" /> class.
+        ///     Initializes a new instance of the <see cref="SubtractNode" /> class.
         /// </summary>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
@@ -30,27 +32,9 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         {
         }
 
-        /// <summary>
-        /// Calculates the constant value.
-        /// </summary>
-        /// <param name="left">The left operand.</param>
-        /// <param name="right">The right operand.</param>
-        /// <returns>Either a long or a double, depending on the circumstances.</returns>
-        protected override (bool, long, double) CalculateConstantValue(
-            long left,
-            long right) =>
-            (false, left - right, default);
+#endregion
 
-        /// <summary>
-        /// Calculates the constant value.
-        /// </summary>
-        /// <param name="left">The left operand.</param>
-        /// <param name="right">The right operand.</param>
-        /// <returns>Either a long or a double, depending on the circumstances.</returns>
-        protected override (bool, long, double) CalculateConstantValue(
-            double left,
-            double right) =>
-            (true, default, left - right);
+#region Methods
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -63,7 +47,29 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 this.Right.DeepClone(context));
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Calculates the constant value.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>Either a long or a double, depending on the circumstances.</returns>
+        protected override (bool, long, double) CalculateConstantValue(
+            long left,
+            long right) =>
+            (false, left - right, default);
+
+        /// <summary>
+        ///     Calculates the constant value.
+        /// </summary>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>Either a long or a double, depending on the circumstances.</returns>
+        protected override (bool, long, double) CalculateConstantValue(
+            double left,
+            double right) =>
+            (true, default, left - right);
+
+        /// <summary>
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -107,5 +113,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 throw new ExpressionNotValidLogicallyException(ex);
             }
         }
+
+#endregion
     }
 }

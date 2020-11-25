@@ -7,13 +7,15 @@ using IX.Math.Exceptions;
 namespace IX.Math.Nodes.Operators.Binary.Bitwise
 {
     /// <summary>
-    /// A node base for byte shift operations.
+    ///     A node base for byte shift operations.
     /// </summary>
     /// <seealso cref="BinaryOperatorNodeBase" />
     internal abstract class ByteShiftOperatorNodeBase : BinaryOperatorNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="ByteShiftOperatorNodeBase" /> class.
+        ///     Initializes a new instance of the <see cref="ByteShiftOperatorNodeBase" /> class.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -26,22 +28,33 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
         {
         }
 
+#endregion
+
+#region Methods
+
         /// <summary>
-        /// Ensures that the operands are compatible, and refines the return type of this expression based on them.
+        ///     Ensures that the operands are compatible, and refines the return type of this expression based on them.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
-        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(ref NodeBase left, ref NodeBase right)
+        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(
+            ref NodeBase left,
+            ref NodeBase right)
         {
             this.CalculatedCosts.Clear();
 
-            EnsureNode(ref left, SupportableValueType.Integer | SupportableValueType.Binary);
-            EnsureNode(ref right, SupportableValueType.Integer);
+            EnsureNode(
+                ref left,
+                SupportableValueType.Integer | SupportableValueType.Binary);
+            EnsureNode(
+                ref right,
+                SupportableValueType.Integer);
 
             _ = right.VerifyPossibleType(SupportableValueType.Integer);
-            var leftType = left.VerifyPossibleType(SupportableValueType.Integer | SupportableValueType.Binary);
+            SupportableValueType leftType =
+                left.VerifyPossibleType(SupportableValueType.Integer | SupportableValueType.Binary);
 
-            int rightCost = right.CalculateStrategyCost(SupportedValueType.Integer);
+            var rightCost = right.CalculateStrategyCost(SupportedValueType.Integer);
 
             int intCost = int.MaxValue, binaryCost = int.MaxValue;
 
@@ -63,7 +76,7 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
                 binaryCost = left.CalculateStrategyCost(SupportedValueType.Binary) + rightCost;
             }
 
-            foreach (var supportedOption in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType supportedOption in GetSupportedTypeOptions(this.PossibleReturnType))
             {
                 int intTotalCost;
                 if (intCost == int.MaxValue)
@@ -133,5 +146,7 @@ namespace IX.Math.Nodes.Operators.Binary.Bitwise
                 }
             }
         }
+
+#endregion
     }
 }

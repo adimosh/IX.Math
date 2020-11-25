@@ -33,8 +33,10 @@ namespace IX.Math.Nodes.Functions.Ternary
     [UsedImplicitly]
     internal sealed class FunctionNodeSubstring : TernaryFunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionNodeSubstring" /> class.
+        ///     Initializes a new instance of the <see cref="FunctionNodeSubstring" /> class.
         /// </summary>
         /// <param name="stringParameter">The string parameter.</param>
         /// <param name="numericParameter">The numeric parameter.</param>
@@ -49,6 +51,10 @@ namespace IX.Math.Nodes.Functions.Ternary
                 secondNumericParameter)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -77,9 +83,9 @@ namespace IX.Math.Nodes.Functions.Ternary
             }
 
             if (!(this.SecondParameter is ConstantNodeBase fp &&
-                this.ThirdParameter is ConstantNodeBase sp &&
-                fp.TryGetInteger(out var secondValue) &&
-                sp.TryGetInteger(out var thirdValue)))
+                  this.ThirdParameter is ConstantNodeBase sp &&
+                  fp.TryGetInteger(out var secondValue) &&
+                  sp.TryGetInteger(out var thirdValue)))
             {
                 return this;
             }
@@ -107,13 +113,13 @@ namespace IX.Math.Nodes.Functions.Ternary
             _ = second.VerifyPossibleType(SupportableValueType.Integer);
             _ = third.VerifyPossibleType(SupportableValueType.Integer);
 
-            int cost = first.CalculateStrategyCost(SupportedValueType.String) +
+            var cost = first.CalculateStrategyCost(SupportedValueType.String) +
                        second.CalculateStrategyCost(SupportedValueType.Integer) +
                        third.CalculateStrategyCost(SupportedValueType.Integer);
 
             this.PossibleReturnType = GetSupportableConversions(SupportedValueType.String);
 
-            foreach (var possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType possibleType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
                 this.CalculatedCosts[possibleType] = (GetStandardConversionStrategyCost(
                                                           SupportedValueType.String,
@@ -123,7 +129,7 @@ namespace IX.Math.Nodes.Functions.Ternary
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -146,13 +152,19 @@ namespace IX.Math.Nodes.Functions.Ternary
                         nameof(string.Replace)));
             }
 
-            var e1 = this.FirstParameter.GenerateExpression(SupportedValueType.String, in comparisonTolerance);
-            var e2 = Expression.Call(
+            Expression? e1 = this.FirstParameter.GenerateExpression(
+                SupportedValueType.String,
+                in comparisonTolerance);
+            MethodCallExpression? e2 = Expression.Call(
                 ((Func<long, int>)Convert.ToInt32).Method,
-                this.SecondParameter.GenerateExpression(SupportedValueType.Integer, in comparisonTolerance));
-            var e3 = Expression.Call(
+                this.SecondParameter.GenerateExpression(
+                    SupportedValueType.Integer,
+                    in comparisonTolerance));
+            MethodCallExpression? e3 = Expression.Call(
                 ((Func<long, int>)Convert.ToInt32).Method,
-                this.ThirdParameter.GenerateExpression(SupportedValueType.Integer, in comparisonTolerance));
+                this.ThirdParameter.GenerateExpression(
+                    SupportedValueType.Integer,
+                    in comparisonTolerance));
 
             return Expression.Call(
                 e1,
@@ -160,5 +172,7 @@ namespace IX.Math.Nodes.Functions.Ternary
                 e2,
                 e3);
         }
+
+#endregion
     }
 }

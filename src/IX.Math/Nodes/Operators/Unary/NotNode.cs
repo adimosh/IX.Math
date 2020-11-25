@@ -17,16 +17,20 @@ namespace IX.Math.Nodes.Operators.Unary
     [DebuggerDisplay("!{" + nameof(Operand) + "}")]
     internal sealed class NotNode : UnaryOperatorNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="NotNode" /> class.
+        ///     Initializes a new instance of the <see cref="NotNode" /> class.
         /// </summary>
         /// <param name="operand">The operand.</param>
-        public NotNode(
-            [NotNull] NodeBase operand)
-            : base(
-                operand)
+        public NotNode([NotNull] NodeBase operand)
+            : base(operand)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
@@ -59,7 +63,8 @@ namespace IX.Math.Nodes.Operators.Unary
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new NotNode(this.Operand.DeepClone(context));
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new NotNode(this.Operand.DeepClone(context));
 
         /// <summary>
         ///     Ensures that the operands are compatible, and refines the return type of this expression based on them.
@@ -69,15 +74,18 @@ namespace IX.Math.Nodes.Operators.Unary
         {
             this.CalculatedCosts.Clear();
 
-            EnsureNode(ref operand, SupportableValueType.Boolean | SupportableValueType.Integer);
-            var supportedType = operand.VerifyPossibleType(SupportableValueType.Boolean | SupportableValueType.Integer);
+            EnsureNode(
+                ref operand,
+                SupportableValueType.Boolean | SupportableValueType.Integer);
+            SupportableValueType supportedType =
+                operand.VerifyPossibleType(SupportableValueType.Boolean | SupportableValueType.Integer);
 
             if (supportedType == SupportableValueType.Boolean)
             {
-                int cost = operand.CalculateStrategyCost(SupportedValueType.Boolean);
+                var cost = operand.CalculateStrategyCost(SupportedValueType.Boolean);
                 this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Boolean);
 
-                foreach (var svt in GetSupportedTypeOptions(this.PossibleReturnType))
+                foreach (SupportedValueType svt in GetSupportedTypeOptions(this.PossibleReturnType))
                 {
                     this.CalculatedCosts[svt] = (GetStandardConversionStrategyCost(
                                                      SupportedValueType.Boolean,
@@ -87,10 +95,10 @@ namespace IX.Math.Nodes.Operators.Unary
             }
             else if (supportedType == SupportableValueType.Integer)
             {
-                int cost = operand.CalculateStrategyCost(SupportedValueType.Integer);
+                var cost = operand.CalculateStrategyCost(SupportedValueType.Integer);
                 this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer);
 
-                foreach (var svt in GetSupportedTypeOptions(this.PossibleReturnType))
+                foreach (SupportedValueType svt in GetSupportedTypeOptions(this.PossibleReturnType))
                 {
                     this.CalculatedCosts[svt] = (GetStandardConversionStrategyCost(
                                                      SupportedValueType.Integer,
@@ -100,14 +108,14 @@ namespace IX.Math.Nodes.Operators.Unary
             }
             else if (supportedType == (SupportableValueType.Boolean | SupportableValueType.Integer))
             {
-                int boolCost = operand.CalculateStrategyCost(SupportedValueType.Boolean);
-                int intCost = operand.CalculateStrategyCost(SupportedValueType.Boolean);
+                var boolCost = operand.CalculateStrategyCost(SupportedValueType.Boolean);
+                var intCost = operand.CalculateStrategyCost(SupportedValueType.Boolean);
                 this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Boolean) |
                                           GetSupportableConversions(SupportedValueType.Integer);
 
-                foreach (var svt in GetSupportedTypeOptions(this.PossibleReturnType))
+                foreach (SupportedValueType svt in GetSupportedTypeOptions(this.PossibleReturnType))
                 {
-                    int totalBoolCost = GetStandardConversionStrategyCost(
+                    var totalBoolCost = GetStandardConversionStrategyCost(
                         SupportedValueType.Boolean,
                         in svt);
                     if (totalBoolCost != int.MaxValue)
@@ -115,7 +123,7 @@ namespace IX.Math.Nodes.Operators.Unary
                         totalBoolCost += boolCost;
                     }
 
-                    int totalIntCost = GetStandardConversionStrategyCost(
+                    var totalIntCost = GetStandardConversionStrategyCost(
                         SupportedValueType.Integer,
                         in svt);
                     if (totalIntCost != int.MaxValue)
@@ -140,7 +148,7 @@ namespace IX.Math.Nodes.Operators.Unary
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -151,7 +159,7 @@ namespace IX.Math.Nodes.Operators.Unary
         {
             if (!this.CalculatedCosts.TryGetValue(
                 valueType,
-                out var tuple))
+                out (int Cost, SupportedValueType InternalType) tuple))
             {
                 throw new ExpressionNotValidLogicallyException();
             }
@@ -162,5 +170,7 @@ namespace IX.Math.Nodes.Operators.Unary
 
             return Expression.Not(operandExpression);
         }
+
+#endregion
     }
 }

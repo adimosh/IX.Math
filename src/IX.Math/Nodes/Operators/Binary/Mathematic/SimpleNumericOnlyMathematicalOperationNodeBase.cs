@@ -11,8 +11,10 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
 {
     internal abstract class SimpleNumericOnlyMathematicalOperationNodeBase : BinaryOperatorNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleNumericOnlyMathematicalOperationNodeBase" /> class.
+        ///     Initializes a new instance of the <see cref="SimpleNumericOnlyMathematicalOperationNodeBase" /> class.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -25,6 +27,10 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         {
         }
 
+#endregion
+
+#region Methods
+
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
         /// </summary>
@@ -36,18 +42,19 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 return this;
             }
 
-            if (lc.TryGetNumeric(out double ldv) && rc.TryGetNumeric(out double rdv))
+            if (lc.TryGetNumeric(out var ldv) && rc.TryGetNumeric(out var rdv))
             {
-                return new NumericNode(this.CalculateConstantValue(
-                    ldv,
-                    rdv));
+                return new NumericNode(
+                    this.CalculateConstantValue(
+                        ldv,
+                        rdv));
             }
 
             return this;
         }
 
         /// <summary>
-        /// Calculates the constant value.
+        ///     Calculates the constant value.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -57,7 +64,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             double right);
 
         /// <summary>
-        /// Generates the expression.
+        ///     Generates the expression.
         /// </summary>
         /// <param name="leftOperandExpression">The left operand expression.</param>
         /// <param name="rightOperandExpression">The right operand expression.</param>
@@ -67,18 +74,24 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             Expression rightOperandExpression);
 
         /// <summary>
-        /// Ensures that the operands are compatible, and refines the return type of this expression based on them.
+        ///     Ensures that the operands are compatible, and refines the return type of this expression based on them.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <exception cref="ExpressionNotValidLogicallyException">There is no way to calculate this expression.</exception>
-        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(ref NodeBase left, ref NodeBase right)
+        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(
+            ref NodeBase left,
+            ref NodeBase right)
         {
-            EnsureNode(ref left, SupportableValueType.Numeric);
-            EnsureNode(ref right, SupportableValueType.Numeric);
+            EnsureNode(
+                ref left,
+                SupportableValueType.Numeric);
+            EnsureNode(
+                ref right,
+                SupportableValueType.Numeric);
 
-            var leftType = left.VerifyPossibleType(SupportableValueType.Numeric);
-            var rightType = right.VerifyPossibleType(SupportableValueType.Numeric);
+            SupportableValueType leftType = left.VerifyPossibleType(SupportableValueType.Numeric);
+            SupportableValueType rightType = right.VerifyPossibleType(SupportableValueType.Numeric);
 
             int cost;
             SupportedValueType svt;
@@ -95,7 +108,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 throw new ExpressionNotValidLogicallyException();
             }
 
-            foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
                 this.CalculatedCosts[supportedType] = (GetStandardConversionStrategyCost(
                                                            in svt,
@@ -105,7 +118,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -137,5 +150,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 throw new ExpressionNotValidLogicallyException(ex);
             }
         }
+
+#endregion
     }
 }

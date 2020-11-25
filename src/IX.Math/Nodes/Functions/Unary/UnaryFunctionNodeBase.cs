@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
@@ -15,19 +16,22 @@ namespace IX.Math.Nodes.Functions.Unary
     [PublicAPI]
     public abstract class UnaryFunctionNodeBase : FunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="UnaryFunctionNodeBase" /> class.
+        ///     Initializes a new instance of the <see cref="UnaryFunctionNodeBase" /> class.
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <exception cref="ArgumentNullException">parameter is <c>null</c> (<c>Nothing</c> in ).</exception>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "Usage",
             "CA2214:Do not call overridable methods in constructors",
             Justification = "This is OK and expected at this point.")]
-        protected UnaryFunctionNodeBase(
-            [NotNull] NodeBase parameter)
+        protected UnaryFunctionNodeBase([NotNull] NodeBase parameter)
         {
-            NodeBase parameterTemp = Requires.NotNull(parameter, nameof(parameter));
+            NodeBase parameterTemp = Requires.NotNull(
+                parameter,
+                nameof(parameter));
 
             // ReSharper disable once VirtualMemberCallInConstructor - We want this to happen
             this.EnsureCompatibleParameter(parameterTemp);
@@ -35,12 +39,9 @@ namespace IX.Math.Nodes.Functions.Unary
             this.Parameter = parameterTemp.Simplify();
         }
 
-        /// <summary>
-        ///     Gets the parameter.
-        /// </summary>
-        /// <value>The parameter.</value>
-        [NotNull]
-        public NodeBase Parameter { get; private set; }
+#endregion
+
+#region Properties and indexers
 
         /// <summary>
         ///     Gets a value indicating whether this node supports tolerance.
@@ -48,7 +49,8 @@ namespace IX.Math.Nodes.Functions.Unary
         /// <value>
         ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
         /// </value>
-        public sealed override bool IsTolerant => this.Parameter.IsTolerant;
+        public sealed override bool IsTolerant =>
+            this.Parameter.IsTolerant;
 
         /// <summary>
         ///     Gets a value indicating whether this node requires preservation of the original expression.
@@ -57,13 +59,29 @@ namespace IX.Math.Nodes.Functions.Unary
         ///     <see langword="true" /> if the node requires original expression preservation, or <see langword="false" />
         ///     if it can be polynomially-reduced.
         /// </value>
-        public sealed override bool RequiresPreservedExpression => this.Parameter.RequiresPreservedExpression;
+        public sealed override bool RequiresPreservedExpression =>
+            this.Parameter.RequiresPreservedExpression;
 
         /// <summary>
-        /// Verifies this node and all nodes above it for logical validity.
+        ///     Gets the parameter.
+        /// </summary>
+        /// <value>The parameter.</value>
+        [NotNull]
+        public NodeBase Parameter
+        {
+            get;
+            private set;
+        }
+
+#endregion
+
+#region Methods
+
+        /// <summary>
+        ///     Verifies this node and all nodes above it for logical validity.
         /// </summary>
         /// <remarks>
-        /// <para>This method is expected to be overridden, and is a good place to do type restriction verification.</para>
+        ///     <para>This method is expected to be overridden, and is a good place to do type restriction verification.</para>
         /// </remarks>
         public sealed override void Verify()
         {
@@ -80,5 +98,7 @@ namespace IX.Math.Nodes.Functions.Unary
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         protected abstract void EnsureCompatibleParameter([NotNull] NodeBase parameter);
+
+#endregion
     }
 }

@@ -6,24 +6,35 @@ using System;
 using System.Linq.Expressions;
 using IX.Math.Conversion;
 using IX.Math.Exceptions;
+using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Conversion
 {
     /// <summary>
-    /// A conversion node for when a numeric type is desired.
+    ///     A conversion node for when a numeric type is desired.
     /// </summary>
     /// <seealso cref="IX.Math.Nodes.Conversion.ConversionNodeBase" />
     public sealed class AnythingDesiredFromStringConversionNode : ConversionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="AnythingDesiredFromStringConversionNode"/> class.
+        ///     Initializes a new instance of the <see cref="AnythingDesiredFromStringConversionNode" /> class.
         /// </summary>
         /// <param name="sourceNode">The source node.</param>
-        public AnythingDesiredFromStringConversionNode(
-            [JetBrains.Annotations.NotNull] NodeBase sourceNode)
-        : base(sourceNode, SupportableValueType.Numeric | SupportableValueType.Integer | SupportableValueType.Binary | SupportableValueType.Boolean)
+        public AnythingDesiredFromStringConversionNode([NotNull] NodeBase sourceNode)
+            : base(
+                sourceNode,
+                SupportableValueType.Numeric |
+                SupportableValueType.Integer |
+                SupportableValueType.Binary |
+                SupportableValueType.Boolean)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -31,11 +42,10 @@ namespace IX.Math.Nodes.Conversion
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) =>
-            new AnythingDesiredFromStringConversionNode(
-                this.ConvertFromNode.DeepClone(context));
+            new AnythingDesiredFromStringConversionNode(this.ConvertFromNode.DeepClone(context));
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -74,5 +84,7 @@ namespace IX.Math.Nodes.Conversion
                     throw new ExpressionNotValidLogicallyException();
             }
         }
+
+#endregion
     }
 }

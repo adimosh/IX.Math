@@ -10,21 +10,27 @@ using JetBrains.Annotations;
 namespace IX.Math.Nodes.Constants
 {
     /// <summary>
-    /// A binary value node. This class cannot be inherited.
+    ///     A binary value node. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="ConstantNodeBase" />
     [DebuggerDisplay("{" + nameof(Value) + "}")]
     [PublicAPI]
     public sealed class BinaryNode : ConstantNodeBase<byte[]>
     {
+#region Internal state
+
         private long? possibleInteger;
 
         private double? possibleNumeric;
 
         private SupportableValueType supportableType;
 
+#endregion
+
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="BinaryNode" /> class.
+        ///     Initializes a new instance of the <see cref="BinaryNode" /> class.
         /// </summary>
         /// <param name="value">The node's binary value, as an array of bytes.</param>
         public BinaryNode(byte[] value)
@@ -32,26 +38,32 @@ namespace IX.Math.Nodes.Constants
         {
         }
 
+#endregion
+
+#region Methods
+
         /// <summary>
         ///     Creates a deep clone of the source object.
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new BinaryNode(this.Value);
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new BinaryNode(this.Value);
 
         /// <summary>
-        /// Tries to get a byte array value out of this constant node.
+        ///     Tries to get a byte array value out of this constant node.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> if the constant can safely be converted to a byte array, <c>false</c> otherwise.</returns>
         public override bool TryGetBinary(out byte[] value)
         {
             value = this.Value;
+
             return true;
         }
 
         /// <summary>
-        /// Tries to get an integer value out of this constant node.
+        ///     Tries to get an integer value out of this constant node.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> if the constant can safely be converted to an integer, <c>false</c> otherwise.</returns>
@@ -60,15 +72,17 @@ namespace IX.Math.Nodes.Constants
             if (this.possibleInteger.HasValue)
             {
                 value = this.possibleInteger.Value;
+
                 return true;
             }
 
             value = default;
+
             return false;
         }
 
         /// <summary>
-        /// Tries to get a numeric value out of this constant node.
+        ///     Tries to get a numeric value out of this constant node.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns><c>true</c> if the constant can safely be converted to a numeric value, <c>false</c> otherwise.</returns>
@@ -77,19 +91,21 @@ namespace IX.Math.Nodes.Constants
             if (this.possibleNumeric.HasValue)
             {
                 value = this.possibleNumeric.Value;
+
                 return true;
             }
 
             value = default;
+
             return false;
         }
 
         /// <summary>
-        /// Gets the supported types.
+        ///     Gets the supported types.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <returns>
-        /// The types supported by this constant.
+        ///     The types supported by this constant.
         /// </returns>
         protected override SupportableValueType GetSupportedTypes(byte[] value)
         {
@@ -100,22 +116,31 @@ namespace IX.Math.Nodes.Constants
                 if (value.Length < 8)
                 {
                     byte[] bytes = new byte[8];
-                    Array.Copy(value, bytes, value.Length);
+                    Array.Copy(
+                        value,
+                        bytes,
+                        value.Length);
                     value = bytes;
                 }
 
                 // Integer-compatible
-                _ = InternalTypeDirectConversions.ToInteger(value, out var i);
+                _ = InternalTypeDirectConversions.ToInteger(
+                    value,
+                    out var i);
                 this.possibleInteger = i;
                 this.supportableType |= SupportableValueType.Integer;
 
                 // Numeric-compatible
-                _ = InternalTypeDirectConversions.ToNumeric(value, out var n);
+                _ = InternalTypeDirectConversions.ToNumeric(
+                    value,
+                    out var n);
                 this.possibleNumeric = n;
                 this.supportableType |= SupportableValueType.Numeric;
             }
 
             return this.supportableType;
         }
+
+#endregion
     }
 }

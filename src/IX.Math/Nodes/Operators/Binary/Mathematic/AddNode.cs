@@ -19,8 +19,10 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
     [DebuggerDisplay("{" + nameof(Left) + "} + {" + nameof(Right) + "}")]
     internal sealed class AddNode : BinaryOperatorNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="AddNode" /> class.
+        ///     Initializes a new instance of the <see cref="AddNode" /> class.
         /// </summary>
         /// <param name="left">The left.</param>
         /// <param name="right">The right.</param>
@@ -32,6 +34,12 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 right)
         {
         }
+
+#endregion
+
+#region Methods
+
+#region Static methods
 
         /// <summary>
         ///     Stitches the specified byte arrays.
@@ -54,8 +62,11 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 r,
                 left.Length,
                 right.Length);
+
             return r;
         }
+
+#endregion
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
@@ -72,7 +83,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             }
 
             // We have two integer-convertible constants
-            if (left.TryGetInteger(out long liv) && right.TryGetInteger(out long riv))
+            if (left.TryGetInteger(out var liv) && right.TryGetInteger(out var riv))
             {
                 if (left is NumericNode && right is NumericNode)
                 {
@@ -85,7 +96,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             }
 
             // We have two numeric-convertible constants
-            if (left.TryGetNumeric(out double lnv) && right.TryGetNumeric(out double rnv))
+            if (left.TryGetNumeric(out var lnv) && right.TryGetNumeric(out var rnv))
             {
                 return new NumericNode(lnv + rnv);
             }
@@ -128,26 +139,29 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             ref NodeBase left,
             ref NodeBase right)
         {
-            const SupportableValueType completeSupport =
-                SupportableValueType.Integer |
-                SupportableValueType.Numeric |
-                SupportableValueType.Binary |
-                SupportableValueType.String;
+            const SupportableValueType completeSupport = SupportableValueType.Integer |
+                                                         SupportableValueType.Numeric |
+                                                         SupportableValueType.Binary |
+                                                         SupportableValueType.String;
 
             this.CalculatedCosts.Clear();
             this.PossibleReturnType = SupportableValueType.None;
 
-            var commonType = right.VerifyPossibleType(right.VerifyPossibleType(left.VerifyPossibleType(completeSupport)));
+            SupportableValueType commonType =
+                right.VerifyPossibleType(right.VerifyPossibleType(left.VerifyPossibleType(completeSupport)));
 
             // Cost calculation
-            int intCost = int.MaxValue, numericCost = int.MaxValue, binaryCost = int.MaxValue, stringCost = int.MaxValue;
+            int intCost = int.MaxValue,
+                numericCost = int.MaxValue,
+                binaryCost = int.MaxValue,
+                stringCost = int.MaxValue;
 
             if ((commonType & SupportableValueType.Integer) != SupportableValueType.None)
             {
                 checked
                 {
                     intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
-                            right.CalculateStrategyCost(SupportedValueType.Integer);
+                              right.CalculateStrategyCost(SupportedValueType.Integer);
                 }
 
                 this.PossibleReturnType |= GetSupportableConversions(SupportedValueType.Integer);
@@ -158,7 +172,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 checked
                 {
                     numericCost = left.CalculateStrategyCost(SupportedValueType.Numeric) +
-                            right.CalculateStrategyCost(SupportedValueType.Numeric);
+                                  right.CalculateStrategyCost(SupportedValueType.Numeric);
                 }
 
                 this.PossibleReturnType |= GetSupportableConversions(SupportedValueType.Numeric);
@@ -169,7 +183,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 checked
                 {
                     binaryCost = left.CalculateStrategyCost(SupportedValueType.Binary) +
-                            right.CalculateStrategyCost(SupportedValueType.Binary);
+                                 right.CalculateStrategyCost(SupportedValueType.Binary);
                 }
 
                 this.PossibleReturnType |= GetSupportableConversions(SupportedValueType.Binary);
@@ -180,23 +194,39 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 checked
                 {
                     stringCost = left.CalculateStrategyCost(SupportedValueType.String) +
-                            right.CalculateStrategyCost(SupportedValueType.String);
+                                 right.CalculateStrategyCost(SupportedValueType.String);
                 }
 
                 this.PossibleReturnType |= GetSupportableConversions(SupportedValueType.String);
             }
 
             // Let's populate the cost tables
-            foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
-                int totalIntCost = GetTotalConversionCosts(in intCost, SupportedValueType.Integer, supportedType);
-                int totalNumericCost = GetTotalConversionCosts(in numericCost, SupportedValueType.Numeric, supportedType);
-                int totalBinaryCost = GetTotalConversionCosts(in binaryCost, SupportedValueType.Binary, supportedType);
-                int totalStringCost = GetTotalConversionCosts(in stringCost, SupportedValueType.String, supportedType);
+                var totalIntCost = GetTotalConversionCosts(
+                    in intCost,
+                    SupportedValueType.Integer,
+                    supportedType);
+                var totalNumericCost = GetTotalConversionCosts(
+                    in numericCost,
+                    SupportedValueType.Numeric,
+                    supportedType);
+                var totalBinaryCost = GetTotalConversionCosts(
+                    in binaryCost,
+                    SupportedValueType.Binary,
+                    supportedType);
+                var totalStringCost = GetTotalConversionCosts(
+                    in stringCost,
+                    SupportedValueType.String,
+                    supportedType);
 
-                int minimalCost = global::System.Math.Min(
-                    global::System.Math.Min(totalIntCost, totalNumericCost),
-                    global::System.Math.Min(totalBinaryCost, totalStringCost));
+                var minimalCost = global::System.Math.Min(
+                    global::System.Math.Min(
+                        totalIntCost,
+                        totalNumericCost),
+                    global::System.Math.Min(
+                        totalBinaryCost,
+                        totalStringCost));
 
                 if (minimalCost == totalIntCost)
                 {
@@ -222,7 +252,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -233,10 +263,9 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         {
             try
             {
-                var (
-                    left,
-                    right,
-                    internalType) = GenerateParameterExpressions(in valueType, in comparisonTolerance);
+                (var left, var right, SupportedValueType internalType) = GenerateParameterExpressions(
+                    in valueType,
+                    in comparisonTolerance);
 
                 switch (internalType)
                 {
@@ -250,18 +279,22 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                             right);
                     case SupportedValueType.Binary:
                         MethodInfo mi2 = typeof(AddNode).GetMethodWithExactParameters(
-                            nameof(Stitch),
-                            typeof(byte[]),
-                            typeof(byte[])) ?? throw new MathematicsEngineException();
+                                             nameof(Stitch),
+                                             typeof(byte[]),
+                                             typeof(byte[])) ??
+                                         throw new MathematicsEngineException();
+
                         return Expression.Call(
                             mi2,
                             left,
                             right);
                     case SupportedValueType.String:
                         MethodInfo mi1 = typeof(string).GetMethodWithExactParameters(
-                            nameof(string.Concat),
-                            typeof(string),
-                            typeof(string)) ?? throw new MathematicsEngineException();
+                                             nameof(string.Concat),
+                                             typeof(string),
+                                             typeof(string)) ??
+                                         throw new MathematicsEngineException();
+
                         return Expression.Call(
                             mi1,
                             left,
@@ -290,7 +323,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 Expression left, right;
                 if (this.CalculatedCosts.TryGetValue(
                     returnType,
-                    out var tuple))
+                    out (int Cost, SupportedValueType InternalType) tuple))
                 {
                     left = this.Left.GenerateExpression(
                         in tuple.InternalType,
@@ -307,5 +340,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 return (left, right, tuple.InternalType);
             }
         }
+
+#endregion
     }
 }

@@ -12,7 +12,8 @@ using GlobalSystem = System;
 namespace IX.Math.Nodes.Functions.Binary
 {
     /// <summary>
-    ///     A node representing the <see cref="GlobalSystem.Math.Min(long, long)" /> or the <see cref="GlobalSystem.Math.Min(double, double)" /> function.
+    ///     A node representing the <see cref="GlobalSystem.Math.Min(long, long)" /> or the
+    ///     <see cref="GlobalSystem.Math.Min(double, double)" /> function.
     /// </summary>
     /// <seealso cref="NumericBinaryFunctionNodeBase" />
     [DebuggerDisplay("min({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
@@ -22,8 +23,10 @@ namespace IX.Math.Nodes.Functions.Binary
     [UsedImplicitly]
     internal sealed class FunctionNodeMinimum : IntegerOrNumericBinaryFunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionNodeMinimum" /> class.
+        ///     Initializes a new instance of the <see cref="FunctionNodeMinimum" /> class.
         /// </summary>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
@@ -35,6 +38,10 @@ namespace IX.Math.Nodes.Functions.Binary
                 secondParameter)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -79,7 +86,7 @@ namespace IX.Math.Nodes.Functions.Binary
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -88,7 +95,9 @@ namespace IX.Math.Nodes.Functions.Binary
             in SupportedValueType valueType,
             in ComparisonTolerance comparisonTolerance)
         {
-            var (type, first, second) = this.GetParameters(in valueType, in comparisonTolerance);
+            (SupportedValueType type, var first, var second) = this.GetParameters(
+                in valueType,
+                in comparisonTolerance);
 
             return Expression.Call(
                 type == SupportedValueType.Integer
@@ -97,5 +106,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 first,
                 second);
         }
+
+#endregion
     }
 }

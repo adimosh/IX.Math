@@ -23,6 +23,8 @@ namespace IX.Math.Nodes.Functions.Binary
     [UsedImplicitly]
     internal sealed class FunctionNodeTrimBody : StringBinaryFunctionNodeBase
     {
+#region Constructors
+
         public FunctionNodeTrimBody(
             NodeBase stringParameter,
             NodeBase numericParameter)
@@ -31,6 +33,10 @@ namespace IX.Math.Nodes.Functions.Binary
                 numericParameter)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -59,11 +65,14 @@ namespace IX.Math.Nodes.Functions.Binary
                 return this;
             }
 
-            return new StringNode(first.Replace(second, string.Empty));
+            return new StringNode(
+                first.Replace(
+                    second,
+                    string.Empty));
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -96,5 +105,7 @@ namespace IX.Math.Nodes.Functions.Binary
                     string.Empty,
                     typeof(string)));
         }
+
+#endregion
     }
 }

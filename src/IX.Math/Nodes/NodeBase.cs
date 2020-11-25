@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -20,22 +21,24 @@ namespace IX.Math.Nodes
     /// </summary>
     /// <seealso cref="IDeepCloneable{T}" />
     [PublicAPI]
-    [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+    [SuppressMessage(
         "StyleCop.CSharp.OrderingRules",
         "SA1202:Elements should be ordered by access",
         Justification = "It works better to just have methods properly grouped.")]
-    [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+    [SuppressMessage(
         "StyleCop.CSharp.OrderingRules",
         "SA1204:Static elements should appear before instance elements",
         Justification = "It works better to just have methods properly grouped.")]
     public abstract partial class NodeBase : IContextAwareDeepCloneable<NodeCloningContext, NodeBase>
     {
-        #region Cached MethodInfo objects
+#region Internal state
+
+#region Cached MethodInfo objects
 
         /// <summary>
-        /// The convert to int method information.
+        ///     The convert to int method information.
         /// </summary>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "StyleCop.CSharp.ReadabilityRules",
             "SA1118:Parameter should not span multiple lines",
             Justification = "This is hardly enforceable.")]
@@ -48,13 +51,18 @@ namespace IX.Math.Nodes
                                                                           }) ??
                                                                       throw new MathematicsEngineException();
 
-        #endregion
+#endregion
+
+        private Expression binaryExpression;
+        private Expression boolExpression;
 
         private Expression integerExpression;
         private Expression numericExpression;
-        private Expression binaryExpression;
         private Expression stringExpression;
-        private Expression boolExpression;
+
+#endregion
+
+#region Constructors
 
         protected private NodeBase()
         {
@@ -63,13 +71,18 @@ namespace IX.Math.Nodes
             this.CalculatedCosts = new Dictionary<SupportedValueType, (int, SupportedValueType)>();
         }
 
-        #region Properties
+#endregion
+
+#region Properties
 
         /// <summary>
         ///     Gets a value indicating whether or not this node is actually a constant.
         /// </summary>
         /// <value><see langword="true" /> if the node is a constant, <see langword="false" /> otherwise.</value>
-        public abstract bool IsConstant { get; }
+        public abstract bool IsConstant
+        {
+            get;
+        }
 
         /// <summary>
         ///     Gets a value indicating whether this node supports tolerance.
@@ -77,7 +90,10 @@ namespace IX.Math.Nodes
         /// <value>
         ///     <see langword="true" /> if the node is tolerant, <see langword="false" /> otherwise.
         /// </value>
-        public abstract bool IsTolerant { get; }
+        public abstract bool IsTolerant
+        {
+            get;
+        }
 
         /// <summary>
         ///     Gets a value indicating whether this node requires preservation of the original expression.
@@ -86,42 +102,54 @@ namespace IX.Math.Nodes
         ///     <see langword="true" /> if the node requires original expression preservation, or <see langword="false" />
         ///     if it can be polynomially-reduced.
         /// </value>
-        public abstract bool RequiresPreservedExpression { get; }
+        public abstract bool RequiresPreservedExpression
+        {
+            get;
+        }
 
         /// <summary>
         ///     Gets or sets the possible return type of this node, if one is not certain at this point.
         /// </summary>
         /// <value>The node return type.</value>
-        public SupportableValueType PossibleReturnType { get; protected set; }
+        public SupportableValueType PossibleReturnType
+        {
+            get;
+            protected set;
+        }
 
         /// <summary>
-        /// Gets the calculated costs.
+        ///     Gets the calculated costs.
         /// </summary>
         /// <value>
-        /// The calculated costs.
+        ///     The calculated costs.
         /// </value>
         [NotNull]
-        protected Dictionary<SupportedValueType, (int Cost, SupportedValueType InternalType)> CalculatedCosts { get; }
+        protected Dictionary<SupportedValueType, (int Cost, SupportedValueType InternalType)> CalculatedCosts
+        {
+            get;
+        }
 
-        #endregion
+#endregion
 
-        #region Phase 1 - Construction
+#region Phase 1 - Construction
 
-        #region Supportable type conversions
+#region Supportable type conversions
 
         /// <summary>
-        /// Gets the supportable conversions from an internal value type.
+        ///     Gets the supportable conversions from an internal value type.
         /// </summary>
         /// <param name="internalValueType">Type of the internal value.</param>
         /// <param name="noneMeansAll">if set to <c>true</c>, a value of None means all are supported.</param>
         /// <returns>
-        /// The value types supported for conversion.
+        ///     The value types supported for conversion.
         /// </returns>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "Performance",
             "EPS02:A non-readonly struct used as in-parameter",
             Justification = "This is a primitive type, the compiler can handle it.")]
-        public static SupportableValueType GetSupportableConversions(in SupportedValueType internalValueType, in bool noneMeansAll = false) =>
+        public static SupportableValueType GetSupportableConversions(
+            in SupportedValueType internalValueType,
+            in bool noneMeansAll = false) =>
             internalValueType switch
             {
                 SupportedValueType.Integer => SupportableValueType.Integer |
@@ -131,16 +159,14 @@ namespace IX.Math.Nodes
                 SupportedValueType.Numeric => SupportableValueType.Numeric |
                                               SupportableValueType.Binary |
                                               SupportableValueType.String,
-                SupportedValueType.Binary => SupportableValueType.Binary |
-                                                SupportableValueType.String,
-                SupportedValueType.Boolean => SupportableValueType.Boolean |
-                                              SupportableValueType.String,
+                SupportedValueType.Binary => SupportableValueType.Binary | SupportableValueType.String,
+                SupportedValueType.Boolean => SupportableValueType.Boolean | SupportableValueType.String,
                 SupportedValueType.String => SupportableValueType.String,
                 _ => noneMeansAll ? SupportableValueType.All : SupportableValueType.None
             };
 
         /// <summary>
-        /// Gets the supportable conversions from an internal value type.
+        ///     Gets the supportable conversions from an internal value type.
         /// </summary>
         /// <param name="internalValueType">Type of the internal value.</param>
         /// <returns>The value types supported for conversion.</returns>
@@ -156,21 +182,17 @@ namespace IX.Math.Nodes
 
             if (internalValueType == typeof(double))
             {
-                return SupportableValueType.Numeric |
-                       SupportableValueType.Binary |
-                       SupportableValueType.String;
+                return SupportableValueType.Numeric | SupportableValueType.Binary | SupportableValueType.String;
             }
 
             if (internalValueType == typeof(byte[]))
             {
-                return SupportableValueType.Binary |
-                       SupportableValueType.String;
+                return SupportableValueType.Binary | SupportableValueType.String;
             }
 
             if (internalValueType == typeof(bool))
             {
-                return SupportableValueType.Boolean |
-                       SupportableValueType.String;
+                return SupportableValueType.Boolean | SupportableValueType.String;
             }
 
             if (internalValueType == typeof(string))
@@ -181,12 +203,12 @@ namespace IX.Math.Nodes
             return SupportableValueType.None;
         }
 
-        #endregion
+#endregion
 
-        #region Supported type conversions
+#region Supported type conversions
 
         /// <summary>
-        /// Gets the supported type options from a flagged list of supportable types.
+        ///     Gets the supported type options from a flagged list of supportable types.
         /// </summary>
         /// <param name="supportableTypes">The supportable types.</param>
         /// <returns>The supported types, as a list.</returns>
@@ -223,19 +245,21 @@ namespace IX.Math.Nodes
             return types;
         }
 
-        #endregion
+#endregion
 
-        #region Strategy costs
+#region Strategy costs
 
         /// <summary>
-        /// Gets the standard strategy cost for converting between two supported types.
+        ///     Gets the standard strategy cost for converting between two supported types.
         /// </summary>
         /// <param name="internalValueType">Type of the internal value.</param>
         /// <param name="toType">The type to convert to.</param>
         /// <returns>
-        /// The standard strategy cost.
+        ///     The standard strategy cost.
         /// </returns>
-        public static int GetStandardConversionStrategyCost(in SupportedValueType internalValueType, in SupportedValueType toType) =>
+        public static int GetStandardConversionStrategyCost(
+            in SupportedValueType internalValueType,
+            in SupportedValueType toType) =>
             internalValueType switch
             {
                 SupportedValueType.Integer => toType switch
@@ -277,14 +301,16 @@ namespace IX.Math.Nodes
             };
 
         /// <summary>
-        /// Gets the standard strategy cost for converting between two supported types.
+        ///     Gets the standard strategy cost for converting between two supported types.
         /// </summary>
         /// <param name="internalValueType">Type of the internal value.</param>
         /// <param name="toType">The type to convert to.</param>
         /// <returns>
-        /// The standard strategy cost.
+        ///     The standard strategy cost.
         /// </returns>
-        public static int GetStandardStrategyCost(Type internalValueType, in SupportedValueType toType)
+        public static int GetStandardStrategyCost(
+            Type internalValueType,
+            in SupportedValueType toType)
         {
             if (internalValueType == typeof(long))
             {
@@ -344,22 +370,25 @@ namespace IX.Math.Nodes
             return int.MaxValue;
         }
 
-        #endregion
+#endregion
 
-        #region Utility methods
+#region Utility methods
 
         /// <summary>
-        /// Gets the total conversion costs.
+        ///     Gets the total conversion costs.
         /// </summary>
         /// <param name="initialCost">The initial cost.</param>
         /// <param name="fromType">From type.</param>
         /// <param name="toType">To type.</param>
         /// <returns>The total conversion cost.</returns>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "Performance",
             "EPS02:Non-readonly struct used as in-parameter",
             Justification = "It's a primitive type, the compiler can handle it.")]
-        protected static int GetTotalConversionCosts(in int initialCost, in SupportedValueType fromType, in SupportedValueType toType)
+        protected static int GetTotalConversionCosts(
+            in int initialCost,
+            in SupportedValueType fromType,
+            in SupportedValueType toType)
         {
             int intTotalCost;
             if (initialCost == int.MaxValue)
@@ -385,21 +414,21 @@ namespace IX.Math.Nodes
             return intTotalCost;
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Phase 2 - Verification
+#region Phase 2 - Verification
 
         /// <summary>
-        /// Verifies the type of this node against a mask of desired types, and returns what is possible.
+        ///     Verifies the type of this node against a mask of desired types, and returns what is possible.
         /// </summary>
         /// <param name="typeMask">The type mask to check agains.</param>
         /// <returns>A filtered type mask of supported types.</returns>
         /// <exception cref="ExpressionNotValidLogicallyException">None of the types in the mask are supported.</exception>
         public SupportableValueType VerifyPossibleType(in SupportableValueType typeMask)
         {
-            var supportedType = this.PossibleReturnType & typeMask;
+            SupportableValueType supportedType = this.PossibleReturnType & typeMask;
             if (supportedType == SupportableValueType.None)
             {
                 throw new ExpressionNotValidLogicallyException();
@@ -409,35 +438,38 @@ namespace IX.Math.Nodes
         }
 
         /// <summary>
-        /// Verifies this node and all nodes above it for logical validity.
+        ///     Verifies this node and all nodes above it for logical validity.
         /// </summary>
         /// <remarks>
-        /// <para>This method is expected to be overridden, and is a good place to do type restriction verification.</para>
+        ///     <para>This method is expected to be overridden, and is a good place to do type restriction verification.</para>
         /// </remarks>
         public virtual void Verify()
         {
         }
 
         /// <summary>
-        /// Checks whether or not a supportable type is actually supported.
+        ///     Checks whether or not a supportable type is actually supported.
         /// </summary>
         /// <param name="supportableType">Type of the supportable.</param>
         /// <returns>Whether or not the type is supported.</returns>
         public bool CheckSupportedType(in SupportableValueType supportableType) =>
             (this.PossibleReturnType & supportableType) != SupportableValueType.None;
 
-        #endregion
+#endregion
 
-        #region Phase 3 - Expression generation
+#region Phase 3 - Expression generation
 
         /// <summary>
-        /// Calculates a value indicating the cost of an execution strategy for a specific value type. Higher values are more costly.
+        ///     Calculates a value indicating the cost of an execution strategy for a specific value type. Higher values are more
+        ///     costly.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <returns>An execution strategy cost.</returns>
         public int CalculateStrategyCost(in SupportedValueType valueType)
         {
-            if (this.CalculatedCosts.TryGetValue(valueType, out var tuple))
+            if (this.CalculatedCosts.TryGetValue(
+                valueType,
+                out (int Cost, SupportedValueType InternalType) tuple))
             {
                 return tuple.Cost;
             }
@@ -446,7 +478,7 @@ namespace IX.Math.Nodes
         }
 
         /// <summary>
-        /// Calculates the least costly execution strategy.
+        ///     Calculates the least costly execution strategy.
         /// </summary>
         /// <returns>The preferred type for which the exdcution strategy is least costly.</returns>
         public SupportedValueType CalculateLeastCostlyStrategy() =>
@@ -458,7 +490,7 @@ namespace IX.Math.Nodes
             SupportedValueType.Unknown;
 
         /// <summary>
-        /// Generates an expression for a supported value type.
+        ///     Generates an expression for a supported value type.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -478,31 +510,29 @@ namespace IX.Math.Nodes
                 return valueType switch
                 {
                     SupportedValueType.Integer => this.integerExpression ??=
-                                                  ConvertToIntegerExpression(
-                                                      this.GenerateExpressionInternal(
-                                                          in valueType,
-                                                          in comparisonTolerance)),
+                        ConvertToIntegerExpression(
+                            this.GenerateExpressionInternal(
+                                in valueType,
+                                in comparisonTolerance)),
                     SupportedValueType.Numeric => this.numericExpression ??=
-                                                  ConvertToNumericExpression(
-                                                      this.GenerateExpressionInternal(
-                                                          in valueType,
-                                                          in comparisonTolerance)),
-                    SupportedValueType.Binary => this.binaryExpression ??=
-                                                    ConvertToByteArrayExpression(
-                                                        this.GenerateExpressionInternal(
-                                                            in valueType,
-                                                            in comparisonTolerance)),
+                        ConvertToNumericExpression(
+                            this.GenerateExpressionInternal(
+                                in valueType,
+                                in comparisonTolerance)),
+                    SupportedValueType.Binary => this.binaryExpression ??= ConvertToByteArrayExpression(
+                        this.GenerateExpressionInternal(
+                            in valueType,
+                            in comparisonTolerance)),
                     SupportedValueType.String => this.stringExpression ??=
-                                                 StringFormatter.CreateStringConversionExpression(
-                                                     this.GenerateExpressionInternal(
-                                                         in valueType,
-                                                         in comparisonTolerance)),
-                    SupportedValueType.Boolean => this.boolExpression ??=
-                                                  ConvertToBooleanExpression(
-                                                      this.GenerateExpressionInternal(
-                                                          in valueType,
-                                                          in comparisonTolerance)),
-                    _ => throw new MathematicsEngineException(),
+                        StringFormatter.CreateStringConversionExpression(
+                            this.GenerateExpressionInternal(
+                                in valueType,
+                                in comparisonTolerance)),
+                    SupportedValueType.Boolean => this.boolExpression ??= ConvertToBooleanExpression(
+                        this.GenerateExpressionInternal(
+                            in valueType,
+                            in comparisonTolerance)),
+                    _ => throw new MathematicsEngineException()
                 };
             }
             catch (ExpressionNotValidLogicallyException)
@@ -519,9 +549,9 @@ namespace IX.Math.Nodes
             }
         }
 
-        #endregion
+#endregion
 
-        #region Abstract methods
+#region Abstract methods
 
         /// <summary>
         ///     Creates a deep clone of the source object.
@@ -538,7 +568,7 @@ namespace IX.Math.Nodes
         public abstract NodeBase Simplify();
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -548,9 +578,9 @@ namespace IX.Math.Nodes
             in SupportedValueType valueType,
             in ComparisonTolerance comparisonTolerance);
 
-        #endregion
+#endregion
 
-        #region Conversion methods
+#region Conversion methods
 
         private static long ConvertToIntegerFromNumeric(double numeric)
         {
@@ -578,7 +608,10 @@ namespace IX.Math.Nodes
             if (binary.Length < 8)
             {
                 byte[] bytes = new byte[8];
-                Array.Copy(binary, bytes, binary.Length);
+                Array.Copy(
+                    binary,
+                    bytes,
+                    binary.Length);
                 binary = bytes;
             }
 
@@ -597,7 +630,10 @@ namespace IX.Math.Nodes
             if (binary.Length < 8)
             {
                 byte[] bytes = new byte[8];
-                Array.Copy(binary, bytes, binary.Length);
+                Array.Copy(
+                    binary,
+                    bytes,
+                    binary.Length);
                 binary = bytes;
             }
 
@@ -607,7 +643,7 @@ namespace IX.Math.Nodes
         }
 
         /// <summary>
-        /// Converts an expression to byte array expression.
+        ///     Converts an expression to byte array expression.
         /// </summary>
         /// <param name="originalExpression">The original expression.</param>
         /// <returns>A converted expression.</returns>
@@ -629,22 +665,26 @@ namespace IX.Math.Nodes
                 throw new ExpressionNotValidLogicallyException();
             }
 
-            var mi = typeof(BitConverter).GetMethod(
-                         nameof(BitConverter.GetBytes),
-                         new[] { originalExpression.Type }) ??
-                     throw new MathematicsEngineException();
+            MethodInfo? mi = typeof(BitConverter).GetMethod(
+                                 nameof(BitConverter.GetBytes),
+                                 new[]
+                                 {
+                                     originalExpression.Type
+                                 }) ??
+                             throw new MathematicsEngineException();
+
             return Expression.Call(
                 mi,
                 originalExpression);
         }
 
         /// <summary>
-        /// Converts an expression to byte array expression.
+        ///     Converts an expression to byte array expression.
         /// </summary>
         /// <param name="originalExpression">The original expression.</param>
         /// <returns>A converted expression.</returns>
         /// <exception cref="MathematicsEngineException">An internal exception that cannot be avoided.</exception>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "This is intended.")]
@@ -669,40 +709,55 @@ namespace IX.Math.Nodes
             {
                 MethodInfo mi = typeof(Convert).GetMethod(
                                     nameof(Convert.ToDouble),
-                                    new[] { typeof(long) }) ??
+                                    new[]
+                                    {
+                                        typeof(long)
+                                    }) ??
                                 throw new MathematicsEngineException();
-                return Expression.Call(mi, originalExpression);
+
+                return Expression.Call(
+                    mi,
+                    originalExpression);
             }
 
             if (originalExpression.Type == typeof(int))
             {
                 MethodInfo mi = typeof(Convert).GetMethod(
                                     nameof(Convert.ToDouble),
-                                    new[] { typeof(int) }) ??
+                                    new[]
+                                    {
+                                        typeof(int)
+                                    }) ??
                                 throw new MathematicsEngineException();
-                return Expression.Call(mi, originalExpression);
+
+                return Expression.Call(
+                    mi,
+                    originalExpression);
             }
 
             if (originalExpression.Type == typeof(byte[]))
             {
                 Func<byte[], double> bf = ConvertToNumeric;
-                return Expression.Call(bf.Method, originalExpression);
+
+                return Expression.Call(
+                    bf.Method,
+                    originalExpression);
             }
 
             throw new MathematicsEngineException();
         }
 
         /// <summary>
-        /// Converts an expression to byte array expression.
+        ///     Converts an expression to byte array expression.
         /// </summary>
         /// <param name="originalExpression">The original expression.</param>
         /// <returns>A converted expression.</returns>
         /// <exception cref="MathematicsEngineException">An internal exception that cannot be avoided.</exception>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "StyleCop.CSharp.ReadabilityRules",
             "SA1118:Parameter should not span multiple lines",
             Justification = "It should when it's an array.")]
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "This is intended.")]
@@ -721,26 +776,32 @@ namespace IX.Math.Nodes
             if (originalExpression.Type == typeof(byte[]))
             {
                 MethodInfo mi = typeof(BitConverter).GetMethod(
-                    nameof(BitConverter.ToBoolean),
-                    new[]
-                    {
-                        typeof(byte[]),
-                        typeof(int)
-                    }) ?? throw new MathematicsEngineException();
+                                    nameof(BitConverter.ToBoolean),
+                                    new[]
+                                    {
+                                        typeof(byte[]),
+                                        typeof(int)
+                                    }) ??
+                                throw new MathematicsEngineException();
 
-                return Expression.Call(mi, originalExpression, Expression.Constant(0, typeof(int)));
+                return Expression.Call(
+                    mi,
+                    originalExpression,
+                    Expression.Constant(
+                        0,
+                        typeof(int)));
             }
 
             throw new MathematicsEngineException();
         }
 
         /// <summary>
-        /// Converts an expression to byte array expression.
+        ///     Converts an expression to byte array expression.
         /// </summary>
         /// <param name="originalExpression">The original expression.</param>
         /// <returns>A converted expression.</returns>
         /// <exception cref="MathematicsEngineException">An internal exception that cannot be avoided.</exception>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        [SuppressMessage(
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "This is intended.")]
@@ -764,36 +825,54 @@ namespace IX.Math.Nodes
             if (originalExpression.Type == typeof(double))
             {
                 Func<double, long> bf = ConvertToIntegerFromNumeric;
-                return Expression.Call(bf.Method, originalExpression);
+
+                return Expression.Call(
+                    bf.Method,
+                    originalExpression);
             }
 
             if (originalExpression.Type == typeof(int))
             {
                 MethodInfo mi = typeof(Convert).GetMethod(
                                     nameof(Convert.ToInt64),
-                                    new[] { typeof(int) }) ??
+                                    new[]
+                                    {
+                                        typeof(int)
+                                    }) ??
                                 throw new MathematicsEngineException();
-                return Expression.Call(mi, originalExpression);
+
+                return Expression.Call(
+                    mi,
+                    originalExpression);
             }
 
             if (originalExpression.Type == typeof(int))
             {
                 MethodInfo mi = typeof(Convert).GetMethod(
                                     nameof(Convert.ToDouble),
-                                    new[] { typeof(int) }) ??
+                                    new[]
+                                    {
+                                        typeof(int)
+                                    }) ??
                                 throw new MathematicsEngineException();
-                return Expression.Call(mi, originalExpression);
+
+                return Expression.Call(
+                    mi,
+                    originalExpression);
             }
 
             if (originalExpression.Type == typeof(byte[]))
             {
                 Func<byte[], long> bf = ConvertToInteger;
-                return Expression.Call(bf.Method, originalExpression);
+
+                return Expression.Call(
+                    bf.Method,
+                    originalExpression);
             }
 
             throw new MathematicsEngineException();
         }
 
-        #endregion
+#endregion
     }
 }

@@ -8,13 +8,15 @@ using IX.Math.Nodes.Constants;
 namespace IX.Math.Nodes.Operators.Binary.Mathematic
 {
     /// <summary>
-    /// A node base for simple mathematical operations.
+    ///     A node base for simple mathematical operations.
     /// </summary>
     /// <seealso cref="BinaryOperatorNodeBase" />
     internal abstract class SimpleMathematicalOperationNodeBase : BinaryOperatorNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleMathematicalOperationNodeBase" /> class.
+        ///     Initializes a new instance of the <see cref="SimpleMathematicalOperationNodeBase" /> class.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -27,6 +29,10 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         {
         }
 
+#endregion
+
+#region Methods
+
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
         /// </summary>
@@ -38,7 +44,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 return this;
             }
 
-            if (lc.TryGetInteger(out long llv) && rc.TryGetInteger(out long rlv))
+            if (lc.TryGetInteger(out var llv) && rc.TryGetInteger(out var rlv))
             {
                 var (isNumeric, lv, dv) = this.CalculateConstantValue(
                     llv,
@@ -47,7 +53,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 return isNumeric ? new NumericNode(dv) : (NodeBase)new IntegerNode(lv);
             }
 
-            if (lc.TryGetNumeric(out double ldv) && rc.TryGetNumeric(out double rdv))
+            if (lc.TryGetNumeric(out var ldv) && rc.TryGetNumeric(out var rdv))
             {
                 var (isNumeric, lv, dv) = this.CalculateConstantValue(
                     ldv,
@@ -60,7 +66,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
         }
 
         /// <summary>
-        /// Calculates the constant value.
+        ///     Calculates the constant value.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -70,7 +76,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             long right);
 
         /// <summary>
-        /// Calculates the constant value.
+        ///     Calculates the constant value.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -80,20 +86,27 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
             double right);
 
         /// <summary>
-        /// Ensures that the operands are compatible, and refines the return type of this expression based on them.
+        ///     Ensures that the operands are compatible, and refines the return type of this expression based on them.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <exception cref="ExpressionNotValidLogicallyException">Calculation on unsupported types.</exception>
-        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(ref NodeBase left, ref NodeBase right)
+        protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(
+            ref NodeBase left,
+            ref NodeBase right)
         {
-            EnsureNode(ref left, SupportableValueType.Numeric | SupportableValueType.Integer);
-            EnsureNode(ref right, SupportableValueType.Numeric | SupportableValueType.Integer);
+            EnsureNode(
+                ref left,
+                SupportableValueType.Numeric | SupportableValueType.Integer);
+            EnsureNode(
+                ref right,
+                SupportableValueType.Numeric | SupportableValueType.Integer);
 
             const SupportableValueType logicalMaximumSupport =
                 SupportableValueType.Integer | SupportableValueType.Numeric;
 
-            var commonType = left.VerifyPossibleType(right.VerifyPossibleType(left.VerifyPossibleType(logicalMaximumSupport)));
+            SupportableValueType commonType = left.VerifyPossibleType(
+                right.VerifyPossibleType(left.VerifyPossibleType(logicalMaximumSupport)));
 
             int intCost = int.MaxValue, numericCost = int.MaxValue;
 
@@ -104,7 +117,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                     checked
                     {
                         intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
-                           right.CalculateStrategyCost(SupportedValueType.Integer);
+                                  right.CalculateStrategyCost(SupportedValueType.Integer);
                     }
 
                     break;
@@ -113,7 +126,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                     checked
                     {
                         numericCost = left.CalculateStrategyCost(SupportedValueType.Numeric) +
-                           right.CalculateStrategyCost(SupportedValueType.Numeric);
+                                      right.CalculateStrategyCost(SupportedValueType.Numeric);
                     }
 
                     break;
@@ -123,9 +136,9 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                     checked
                     {
                         intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
-                           right.CalculateStrategyCost(SupportedValueType.Integer);
+                                  right.CalculateStrategyCost(SupportedValueType.Integer);
                         numericCost = left.CalculateStrategyCost(SupportedValueType.Numeric) +
-                           right.CalculateStrategyCost(SupportedValueType.Numeric);
+                                      right.CalculateStrategyCost(SupportedValueType.Numeric);
                     }
 
                     break;
@@ -133,14 +146,20 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                     throw new ExpressionNotValidLogicallyException();
             }
 
-            foreach (var supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
+            foreach (SupportedValueType supportedType in GetSupportedTypeOptions(this.PossibleReturnType))
             {
                 int totalIntCost, totalNumericCost;
 
                 checked
                 {
-                    totalIntCost = GetTotalConversionCosts(in intCost, SupportedValueType.Integer, in supportedType);
-                    totalNumericCost = GetTotalConversionCosts(in numericCost, SupportedValueType.Numeric, in supportedType);
+                    totalIntCost = GetTotalConversionCosts(
+                        in intCost,
+                        SupportedValueType.Integer,
+                        in supportedType);
+                    totalNumericCost = GetTotalConversionCosts(
+                        in numericCost,
+                        SupportedValueType.Numeric,
+                        in supportedType);
                 }
 
                 if (totalNumericCost < totalIntCost)
@@ -155,5 +174,7 @@ namespace IX.Math.Nodes.Operators.Binary.Mathematic
                 }
             }
         }
+
+#endregion
     }
 }

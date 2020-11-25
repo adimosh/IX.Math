@@ -20,12 +20,16 @@ namespace IX.Math.Nodes.Functions.Binary
     /// </summary>
     /// <seealso cref="BinaryFunctionNodeBase" />
     [DebuggerDisplay("substring({" + nameof(FirstParameter) + "}, {" + nameof(SecondParameter) + "})")]
-    [CallableMathematicsFunction("substr", "substring")]
+    [CallableMathematicsFunction(
+        "substr",
+        "substring")]
     [UsedImplicitly]
     internal sealed class FunctionNodeSubstring : StringOperationBinaryFunctionNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionNodeSubstring" /> class.
+        ///     Initializes a new instance of the <see cref="FunctionNodeSubstring" /> class.
         /// </summary>
         /// <param name="stringParameter">The string parameter.</param>
         /// <param name="numericParameter">The numeric parameter.</param>
@@ -38,22 +42,27 @@ namespace IX.Math.Nodes.Functions.Binary
         {
         }
 
+#endregion
+
+#region Methods
+
         /// <summary>
-        /// Creates a deep clone of the source object.
+        ///     Creates a deep clone of the source object.
         /// </summary>
         /// <param name="context">The deep cloning context.</param>
         /// <returns>
-        /// A deep clone.
+        ///     A deep clone.
         /// </returns>
-        public override NodeBase DeepClone(NodeCloningContext context) => new FunctionNodeSubstring(
-            this.FirstParameter.DeepClone(context),
-            this.SecondParameter.DeepClone(context));
+        public override NodeBase DeepClone(NodeCloningContext context) =>
+            new FunctionNodeSubstring(
+                this.FirstParameter.DeepClone(context),
+                this.SecondParameter.DeepClone(context));
 
         /// <summary>
-        /// Simplifies this node, if possible, reflexively returns otherwise.
+        ///     Simplifies this node, if possible, reflexively returns otherwise.
         /// </summary>
         /// <returns>
-        /// A simplified node, or this instance.
+        ///     A simplified node, or this instance.
         /// </returns>
         public override NodeBase Simplify()
         {
@@ -68,7 +77,7 @@ namespace IX.Math.Nodes.Functions.Binary
         }
 
         /// <summary>
-        /// Generates the expression that this node represents.
+        ///     Generates the expression that this node represents.
         /// </summary>
         /// <param name="valueType">Type of the value.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
@@ -103,5 +112,7 @@ namespace IX.Math.Nodes.Functions.Binary
                 mi,
                 second);
         }
+
+#endregion
     }
 }

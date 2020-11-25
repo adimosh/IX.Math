@@ -14,8 +14,10 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
     /// <seealso cref="BinaryOperatorNodeBase" />
     internal abstract class LogicalOperatorNodeBase : BinaryOperatorNodeBase
     {
+#region Constructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="LogicalOperatorNodeBase" /> class.
+        ///     Initializes a new instance of the <see cref="LogicalOperatorNodeBase" /> class.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -27,6 +29,10 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                 right)
         {
         }
+
+#endregion
+
+#region Methods
 
         /// <summary>
         ///     Simplifies this node, if possible, reflexively returns otherwise.
@@ -46,8 +52,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                 return this;
             }
 
-            if (left.TryGetInteger(out long lint) &&
-                right.TryGetInteger(out long rint))
+            if (left.TryGetInteger(out var lint) && right.TryGetInteger(out var rint))
             {
                 return new IntegerNode(
                     this.GenerateData(
@@ -55,8 +60,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                         rint));
             }
 
-            if (left.TryGetBoolean(out bool lbool) &&
-                right.TryGetBoolean(out bool rbool))
+            if (left.TryGetBoolean(out var lbool) && right.TryGetBoolean(out var rbool))
             {
                 return new BoolNode(
                     this.GenerateData(
@@ -64,8 +68,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                         rbool));
             }
 
-            if (left.TryGetBinary(out byte[] lbin) &&
-                right.TryGetBinary(out byte[] rbin))
+            if (left.TryGetBinary(out byte[] lbin) && right.TryGetBinary(out byte[] rbin))
             {
                 return new BinaryNode(
                     this.GenerateData(
@@ -77,17 +80,17 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
         }
 
         /// <summary>
-        /// Generates simplified data.
+        ///     Generates simplified data.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting simplified data.</returns>
         protected abstract long GenerateData(
-                    long left,
-                    long right);
+            long left,
+            long right);
 
         /// <summary>
-        /// Generates simplified data.
+        ///     Generates simplified data.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -97,7 +100,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
             bool right);
 
         /// <summary>
-        /// Generates simplified data.
+        ///     Generates simplified data.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
@@ -107,12 +110,12 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
             byte[] right);
 
         /// <summary>
-        /// Ensures that the operands are compatible, and refines the return type of this expression based on them.
+        ///     Ensures that the operands are compatible, and refines the return type of this expression based on them.
         /// </summary>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <exception cref="MathematicsEngineException">
-        /// The verification methods of the operands did not behave properly.
+        ///     The verification methods of the operands did not behave properly.
         /// </exception>
         protected sealed override void EnsureCompatibleOperandsAndRefineReturnType(
             ref NodeBase left,
@@ -123,29 +126,32 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
 
             this.CalculatedCosts.Clear();
 
-            var typeLeft = left.VerifyPossibleType(logicalMaximumSupport);
-            var typeRight = right.VerifyPossibleType(logicalMaximumSupport);
+            SupportableValueType typeLeft = left.VerifyPossibleType(logicalMaximumSupport);
+            SupportableValueType typeRight = right.VerifyPossibleType(logicalMaximumSupport);
 
             int intCost = int.MaxValue, boolCost = int.MaxValue, binaryCost = int.MaxValue;
 
-            #region Ensure compatibility
+#region Ensure compatibility
+
             switch (typeLeft & typeRight)
             {
                 case SupportableValueType.Boolean:
                     this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Boolean);
                     boolCost = left.CalculateStrategyCost(SupportedValueType.Boolean) +
                                right.CalculateStrategyCost(SupportedValueType.Boolean);
+
                     break;
                 case SupportableValueType.Integer:
                     this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer);
                     intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
                               right.CalculateStrategyCost(SupportedValueType.Integer);
+
                     break;
                 case SupportableValueType.Binary:
                     this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Binary);
-                    binaryCost
- = left.CalculateStrategyCost(SupportedValueType.Binary) +
-                                    right.CalculateStrategyCost(SupportedValueType.Binary);
+                    binaryCost = left.CalculateStrategyCost(SupportedValueType.Binary) +
+                                 right.CalculateStrategyCost(SupportedValueType.Binary);
+
                     break;
                 case SupportableValueType.Boolean | SupportableValueType.Integer:
                     this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Boolean) |
@@ -154,24 +160,25 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                                right.CalculateStrategyCost(SupportedValueType.Boolean);
                     intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
                               right.CalculateStrategyCost(SupportedValueType.Integer);
+
                     break;
                 case SupportableValueType.Boolean | SupportableValueType.Binary:
                     this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Boolean) |
                                               GetSupportableConversions(SupportedValueType.Binary);
                     boolCost = left.CalculateStrategyCost(SupportedValueType.Boolean) +
                                right.CalculateStrategyCost(SupportedValueType.Boolean);
-                    binaryCost
- = left.CalculateStrategyCost(SupportedValueType.Binary) +
-                                    right.CalculateStrategyCost(SupportedValueType.Binary);
+                    binaryCost = left.CalculateStrategyCost(SupportedValueType.Binary) +
+                                 right.CalculateStrategyCost(SupportedValueType.Binary);
+
                     break;
                 case SupportableValueType.Integer | SupportableValueType.Binary:
                     this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Integer) |
                                               GetSupportableConversions(SupportedValueType.Binary);
                     intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
                               right.CalculateStrategyCost(SupportedValueType.Integer);
-                    binaryCost
- = left.CalculateStrategyCost(SupportedValueType.Binary) +
-                                    right.CalculateStrategyCost(SupportedValueType.Binary);
+                    binaryCost = left.CalculateStrategyCost(SupportedValueType.Binary) +
+                                 right.CalculateStrategyCost(SupportedValueType.Binary);
+
                     break;
                 case logicalMaximumSupport:
                     this.PossibleReturnType = GetSupportableConversions(SupportedValueType.Boolean) |
@@ -181,34 +188,35 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                                right.CalculateStrategyCost(SupportedValueType.Boolean);
                     intCost = left.CalculateStrategyCost(SupportedValueType.Integer) +
                               right.CalculateStrategyCost(SupportedValueType.Integer);
-                    binaryCost
- = left.CalculateStrategyCost(SupportedValueType.Binary) +
-                                    right.CalculateStrategyCost(SupportedValueType.Binary);
+                    binaryCost = left.CalculateStrategyCost(SupportedValueType.Binary) +
+                                 right.CalculateStrategyCost(SupportedValueType.Binary);
+
                     break;
                 default:
                     throw new ExpressionNotValidLogicallyException();
             }
-            #endregion
 
-            foreach (var supportedOption in GetSupportedTypeOptions(this.PossibleReturnType))
+#endregion
+
+            foreach (SupportedValueType supportedOption in GetSupportedTypeOptions(this.PossibleReturnType))
             {
-                int intTotalCost = GetTotalConversionCosts(
+                var intTotalCost = GetTotalConversionCosts(
                     in intCost,
                     SupportedValueType.Integer,
                     in supportedOption);
 
-                int byteArrayTotalCost = GetTotalConversionCosts(
-                    in binaryCost
-,
+                var byteArrayTotalCost = GetTotalConversionCosts(
+                    in binaryCost,
                     SupportedValueType.Binary,
                     in supportedOption);
 
-                int boolTotalCost = GetTotalConversionCosts(
+                var boolTotalCost = GetTotalConversionCosts(
                     in boolCost,
                     SupportedValueType.Boolean,
                     in supportedOption);
 
-                #region Set smallest cost for this return type
+#region Set smallest cost for this return type
+
                 if (intTotalCost != int.MaxValue)
                 {
                     // Integer preferred
@@ -263,25 +271,28 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
                     // Nothing else matters
                     throw new MathematicsEngineException();
                 }
-                #endregion
+
+#endregion
             }
         }
 
         /// <summary>
-        /// Generates the parameter expressions based on the best execution strategy.
+        ///     Generates the parameter expressions based on the best execution strategy.
         /// </summary>
         /// <param name="returnType">Type of the return.</param>
         /// <param name="comparisonTolerance">The comparison tolerance.</param>
         /// <returns>
-        /// The parameter expressions.
+        ///     The parameter expressions.
         /// </returns>
         /// <exception cref="ExpressionNotValidLogicallyException">The expression is not valid logically.</exception>
-        protected (Expression Left, Expression Right, bool IsBinary) GenerateParameterExpressions(in SupportedValueType returnType, in ComparisonTolerance comparisonTolerance)
+        protected (Expression Left, Expression Right, bool IsBinary) GenerateParameterExpressions(
+            in SupportedValueType returnType,
+            in ComparisonTolerance comparisonTolerance)
         {
             Expression left, right;
             if (this.CalculatedCosts.TryGetValue(
                 returnType,
-                out var tuple))
+                out (int Cost, SupportedValueType InternalType) tuple))
             {
                 left = this.Left.GenerateExpression(
                     in tuple.InternalType,
@@ -297,5 +308,7 @@ namespace IX.Math.Nodes.Operators.Binary.Logical
 
             return (left, right, tuple.InternalType == SupportedValueType.Binary);
         }
+
+#endregion
     }
 }
