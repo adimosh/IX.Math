@@ -489,6 +489,66 @@ namespace IX.Math
         }
 
         /// <summary>
+        /// Creates a new static variable value tied to this mathematics engine.
+        /// </summary>
+        /// <param name="stringValue">The value.</param>
+        /// <returns>A new static variable value based on the given value.</returns>
+        public StaticVariableValue CreateStaticVariableValue(string stringValue)
+        {
+            this.SetThreadPortfolio();
+
+            return new StaticVariableValue(stringValue);
+        }
+
+        /// <summary>
+        /// Creates a new static variable value tied to this mathematics engine.
+        /// </summary>
+        /// <param name="integerValue">The value.</param>
+        /// <returns>A new static variable value based on the given value.</returns>
+        public StaticVariableValue CreateStaticVariableValue(long integerValue)
+        {
+            this.SetThreadPortfolio();
+
+            return new StaticVariableValue(integerValue);
+        }
+
+        /// <summary>
+        /// Creates a new static variable value tied to this mathematics engine.
+        /// </summary>
+        /// <param name="numericValue">The value.</param>
+        /// <returns>A new static variable value based on the given value.</returns>
+        public StaticVariableValue CreateStaticVariableValue(double numericValue)
+        {
+            this.SetThreadPortfolio();
+
+            return new StaticVariableValue(numericValue);
+        }
+
+        /// <summary>
+        /// Creates a new static variable value tied to this mathematics engine.
+        /// </summary>
+        /// <param name="booleanValue">The value.</param>
+        /// <returns>A new static variable value based on the given value.</returns>
+        public StaticVariableValue CreateStaticVariableValue(bool booleanValue)
+        {
+            this.SetThreadPortfolio();
+
+            return new StaticVariableValue(booleanValue);
+        }
+
+        /// <summary>
+        /// Creates a new static variable value tied to this mathematics engine.
+        /// </summary>
+        /// <param name="binaryValue">The value.</param>
+        /// <returns>A new static variable value based on the given value.</returns>
+        public StaticVariableValue CreateStaticVariableValue(byte[] binaryValue)
+        {
+            this.SetThreadPortfolio();
+
+            return new StaticVariableValue(binaryValue);
+        }
+
+        /// <summary>
         /// Loads the expressions into context.
         /// </summary>
         /// <param name="expressions">The expressions to load.</param>
