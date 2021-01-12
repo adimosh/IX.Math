@@ -16,7 +16,7 @@ namespace IX.Math
         /// <summary>
         /// The uncomputable result.
         /// </summary>
-        public static readonly CompiledExpressionResult UncomputableResult = new CompiledExpressionResult(true);
+        public static readonly CompiledExpressionResult UncomputableResult = new(true);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CompiledExpressionResult"/> struct.
@@ -106,7 +106,7 @@ namespace IX.Math
         /// <param name="obj">The object to compare with the current instance.</param>
         /// <returns>
         /// <see langword="true" /> if <paramref name="obj" /> and this instance are the same type and represent the same value; otherwise, <see langword="false" />.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is not CompiledExpressionResult other)
             {

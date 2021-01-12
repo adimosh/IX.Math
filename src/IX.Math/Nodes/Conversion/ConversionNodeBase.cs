@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
@@ -23,23 +22,15 @@ namespace IX.Math.Nodes.Conversion
         /// </summary>
         /// <param name="sourceNode">The source node.</param>
         /// <param name="destinationType">Type of the destination.</param>
-        [SuppressMessage(
-            "Usage",
-            "CA2214:Do not call overridable methods in constructors",
-            Justification = "This is the whole point of the method.")]
-        [SuppressMessage(
-            "ReSharper",
-            "VirtualMemberCallInConstructor",
-            Justification = "This is the whole point of the method.")]
         protected ConversionNodeBase(
-            [NotNull] NodeBase sourceNode,
+            NodeBase sourceNode,
             SupportableValueType destinationType)
         {
-            Requires.NotNull(
+            var localSourceNode = Requires.NotNull(
                 sourceNode,
                 nameof(sourceNode));
 
-            SupportedValueType[]? possibleReturns = GetSupportedTypeOptions(destinationType)
+            SupportedValueType[] possibleReturns = GetSupportedTypeOptions(in destinationType)
                 .SelectMany(p => GetSupportedTypeOptions(GetSupportableConversions(in p)))
                 .Distinct()
                 .ToArray();
@@ -47,7 +38,7 @@ namespace IX.Math.Nodes.Conversion
             foreach (SupportedValueType possibleReturn in possibleReturns)
             {
                 this.CalculatedCosts[possibleReturn] = (
-                    10 + sourceNode.CalculateStrategyCost(SupportedValueType.String), possibleReturn);
+                    10 + localSourceNode.CalculateStrategyCost(SupportedValueType.String), possibleReturn);
             }
 
             this.ConvertFromNode = sourceNode;

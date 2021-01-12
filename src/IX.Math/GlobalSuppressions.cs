@@ -4,8 +4,9 @@
 
 using System.Diagnostics.CodeAnalysis;
 
+// TODO: Re-evaluate this rule on the next version of the analyzer
 [assembly: SuppressMessage(
-    "StyleCop.CSharp.ReadabilityRules",
-    "SA1124:Do not use regions",
-    Justification = "Leave my regions alone!",
+    "CodeQuality",
+    "IDE0079:Remove unnecessary suppression",
+    Justification = "There seems to be some analyzer error with this rule.",
     Scope = "module")]

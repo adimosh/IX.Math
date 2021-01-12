@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -13,6 +12,7 @@ using IX.Math.Formatters;
 using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
+using DiagCA = System.Diagnostics.CodeAnalysis;
 
 namespace IX.Math.Nodes
 {
@@ -21,11 +21,11 @@ namespace IX.Math.Nodes
     /// </summary>
     /// <seealso cref="IDeepCloneable{T}" />
     [PublicAPI]
-    [SuppressMessage(
+    [DiagCA.SuppressMessage(
         "StyleCop.CSharp.OrderingRules",
         "SA1202:Elements should be ordered by access",
         Justification = "It works better to just have methods properly grouped.")]
-    [SuppressMessage(
+    [DiagCA.SuppressMessage(
         "StyleCop.CSharp.OrderingRules",
         "SA1204:Static elements should appear before instance elements",
         Justification = "It works better to just have methods properly grouped.")]
@@ -38,7 +38,7 @@ namespace IX.Math.Nodes
         /// <summary>
         ///     The convert to int method information.
         /// </summary>
-        [SuppressMessage(
+        [DiagCA.SuppressMessage(
             "StyleCop.CSharp.ReadabilityRules",
             "SA1118:Parameter should not span multiple lines",
             Justification = "This is hardly enforceable.")]
@@ -53,12 +53,11 @@ namespace IX.Math.Nodes
 
 #endregion
 
-        private Expression binaryExpression;
-        private Expression boolExpression;
-
-        private Expression integerExpression;
-        private Expression numericExpression;
-        private Expression stringExpression;
+        private Expression? binaryExpression;
+        private Expression? boolExpression;
+        private Expression? integerExpression;
+        private Expression? numericExpression;
+        private Expression? stringExpression;
 
 #endregion
 
@@ -143,7 +142,7 @@ namespace IX.Math.Nodes
         /// <returns>
         ///     The value types supported for conversion.
         /// </returns>
-        [SuppressMessage(
+        [DiagCA.SuppressMessage(
             "Performance",
             "EPS02:A non-readonly struct used as in-parameter",
             Justification = "This is a primitive type, the compiler can handle it.")]
@@ -381,7 +380,7 @@ namespace IX.Math.Nodes
         /// <param name="fromType">From type.</param>
         /// <param name="toType">To type.</param>
         /// <returns>The total conversion cost.</returns>
-        [SuppressMessage(
+        [DiagCA.SuppressMessage(
             "Performance",
             "EPS02:Non-readonly struct used as in-parameter",
             Justification = "It's a primitive type, the compiler can handle it.")]
@@ -649,33 +648,33 @@ namespace IX.Math.Nodes
         /// <returns>A converted expression.</returns>
         /// <exception cref="MathematicsEngineException">An internal exception that cannot be avoided.</exception>
         [NotNull]
-        protected static Expression ConvertToByteArrayExpression([NotNull] Expression originalExpression)
+        protected static Expression ConvertToByteArrayExpression(Expression originalExpression)
         {
-            Requires.NotNull(
+            var localOriginalExpression = Requires.NotNull(
                 originalExpression,
                 nameof(originalExpression));
 
-            if (originalExpression.Type == typeof(byte[]))
+            if (localOriginalExpression.Type == typeof(byte[]))
             {
-                return originalExpression;
+                return localOriginalExpression;
             }
 
-            if (originalExpression.Type == typeof(string))
+            if (localOriginalExpression.Type == typeof(string))
             {
                 throw new ExpressionNotValidLogicallyException();
             }
 
-            MethodInfo? mi = typeof(BitConverter).GetMethod(
-                                 nameof(BitConverter.GetBytes),
-                                 new[]
-                                 {
-                                     originalExpression.Type
-                                 }) ??
-                             throw new MathematicsEngineException();
+            MethodInfo mi = typeof(BitConverter).GetMethod(
+                                nameof(BitConverter.GetBytes),
+                                new[]
+                                {
+                                    localOriginalExpression.Type
+                                }) ??
+                            throw new MathematicsEngineException();
 
             return Expression.Call(
                 mi,
-                originalExpression);
+                localOriginalExpression);
         }
 
         /// <summary>
@@ -684,28 +683,28 @@ namespace IX.Math.Nodes
         /// <param name="originalExpression">The original expression.</param>
         /// <returns>A converted expression.</returns>
         /// <exception cref="MathematicsEngineException">An internal exception that cannot be avoided.</exception>
-        [SuppressMessage(
+        [DiagCA.SuppressMessage(
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "This is intended.")]
         [NotNull]
         protected static Expression ConvertToNumericExpression([NotNull] Expression originalExpression)
         {
-            Requires.NotNull(
+            var localOriginalExpression = Requires.NotNull(
                 originalExpression,
                 nameof(originalExpression));
 
-            if (originalExpression.Type == typeof(string) || originalExpression.Type == typeof(bool))
+            if (localOriginalExpression.Type == typeof(string) || localOriginalExpression.Type == typeof(bool))
             {
                 throw new MathematicsEngineException();
             }
 
-            if (originalExpression.Type == typeof(double))
+            if (localOriginalExpression.Type == typeof(double))
             {
-                return originalExpression;
+                return localOriginalExpression;
             }
 
-            if (originalExpression.Type == typeof(long))
+            if (localOriginalExpression.Type == typeof(long))
             {
                 MethodInfo mi = typeof(Convert).GetMethod(
                                     nameof(Convert.ToDouble),
@@ -717,10 +716,10 @@ namespace IX.Math.Nodes
 
                 return Expression.Call(
                     mi,
-                    originalExpression);
+                    localOriginalExpression);
             }
 
-            if (originalExpression.Type == typeof(int))
+            if (localOriginalExpression.Type == typeof(int))
             {
                 MethodInfo mi = typeof(Convert).GetMethod(
                                     nameof(Convert.ToDouble),
@@ -732,16 +731,16 @@ namespace IX.Math.Nodes
 
                 return Expression.Call(
                     mi,
-                    originalExpression);
+                    localOriginalExpression);
             }
 
-            if (originalExpression.Type == typeof(byte[]))
+            if (localOriginalExpression.Type == typeof(byte[]))
             {
                 Func<byte[], double> bf = ConvertToNumeric;
 
                 return Expression.Call(
                     bf.Method,
-                    originalExpression);
+                    localOriginalExpression);
             }
 
             throw new MathematicsEngineException();
@@ -753,27 +752,27 @@ namespace IX.Math.Nodes
         /// <param name="originalExpression">The original expression.</param>
         /// <returns>A converted expression.</returns>
         /// <exception cref="MathematicsEngineException">An internal exception that cannot be avoided.</exception>
-        [SuppressMessage(
+        [DiagCA.SuppressMessage(
             "StyleCop.CSharp.ReadabilityRules",
             "SA1118:Parameter should not span multiple lines",
             Justification = "It should when it's an array.")]
-        [SuppressMessage(
+        [DiagCA.SuppressMessage(
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "This is intended.")]
         [NotNull]
         protected static Expression ConvertToBooleanExpression([NotNull] Expression originalExpression)
         {
-            Requires.NotNull(
+            var localOriginalExpression = Requires.NotNull(
                 originalExpression,
                 nameof(originalExpression));
 
-            if (originalExpression.Type == typeof(bool))
+            if (localOriginalExpression.Type == typeof(bool))
             {
-                return originalExpression;
+                return localOriginalExpression;
             }
 
-            if (originalExpression.Type == typeof(byte[]))
+            if (localOriginalExpression.Type == typeof(byte[]))
             {
                 MethodInfo mi = typeof(BitConverter).GetMethod(
                                     nameof(BitConverter.ToBoolean),
@@ -786,7 +785,7 @@ namespace IX.Math.Nodes
 
                 return Expression.Call(
                     mi,
-                    originalExpression,
+                    localOriginalExpression,
                     Expression.Constant(
                         0,
                         typeof(int)));
@@ -801,37 +800,37 @@ namespace IX.Math.Nodes
         /// <param name="originalExpression">The original expression.</param>
         /// <returns>A converted expression.</returns>
         /// <exception cref="MathematicsEngineException">An internal exception that cannot be avoided.</exception>
-        [SuppressMessage(
+        [DiagCA.SuppressMessage(
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "This is intended.")]
         [NotNull]
         protected static Expression ConvertToIntegerExpression([NotNull] Expression originalExpression)
         {
-            Requires.NotNull(
+            var localOriginalExpression = Requires.NotNull(
                 originalExpression,
                 nameof(originalExpression));
 
-            if (originalExpression.Type == typeof(string) || originalExpression.Type == typeof(bool))
+            if (localOriginalExpression.Type == typeof(string) || localOriginalExpression.Type == typeof(bool))
             {
                 throw new MathematicsEngineException();
             }
 
-            if (originalExpression.Type == typeof(long))
+            if (localOriginalExpression.Type == typeof(long))
             {
-                return originalExpression;
+                return localOriginalExpression;
             }
 
-            if (originalExpression.Type == typeof(double))
+            if (localOriginalExpression.Type == typeof(double))
             {
                 Func<double, long> bf = ConvertToIntegerFromNumeric;
 
                 return Expression.Call(
                     bf.Method,
-                    originalExpression);
+                    localOriginalExpression);
             }
 
-            if (originalExpression.Type == typeof(int))
+            if (localOriginalExpression.Type == typeof(int))
             {
                 MethodInfo mi = typeof(Convert).GetMethod(
                                     nameof(Convert.ToInt64),
@@ -843,10 +842,10 @@ namespace IX.Math.Nodes
 
                 return Expression.Call(
                     mi,
-                    originalExpression);
+                    localOriginalExpression);
             }
 
-            if (originalExpression.Type == typeof(int))
+            if (localOriginalExpression.Type == typeof(int))
             {
                 MethodInfo mi = typeof(Convert).GetMethod(
                                     nameof(Convert.ToDouble),
@@ -858,16 +857,16 @@ namespace IX.Math.Nodes
 
                 return Expression.Call(
                     mi,
-                    originalExpression);
+                    localOriginalExpression);
             }
 
-            if (originalExpression.Type == typeof(byte[]))
+            if (localOriginalExpression.Type == typeof(byte[]))
             {
                 Func<byte[], long> bf = ConvertToInteger;
 
                 return Expression.Call(
                     bf.Method,
-                    originalExpression);
+                    localOriginalExpression);
             }
 
             throw new MathematicsEngineException();

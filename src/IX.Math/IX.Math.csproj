@@ -22,23 +22,20 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageReleaseNotes>- Upgraded package versions to newest.
-- Ditched .NET 4.5.2 and code.
-- Used mitigations for null-attributes.
-- Made IX.Math nullable.
-- Added support for .NET 5.0</PackageReleaseNotes>
+    <PackageReleaseNotes>- Extended some methods dealing with static variable values
+- Prepared for Sandbox</PackageReleaseNotes>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>../../opt/snk/ix.framework.strongname.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <!-- References -->
-  <ItemGroup Condition="'$(TargetFramework)'=='net452' OR '$(TargetFramework)'=='net46'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net46'">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.StandardExtensions" Version="[0.7.3,0.8)" />
+    <PackageReference Include="IX.StandardExtensions" Version="[0.7.4,0.8)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">

@@ -5,7 +5,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using IX.StandardExtensions.Contracts;
-using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operators.Unary
 {
@@ -33,7 +32,7 @@ namespace IX.Math.Nodes.Operators.Unary
             "Usage",
             "CA2214:Do not call overridable methods in constructors",
             Justification = "We want this here.")]
-        protected private UnaryOperatorNodeBase([NotNull] NodeBase operand)
+        protected private UnaryOperatorNodeBase(NodeBase operand)
         {
             NodeBase tempOperand = Requires.NotNull(
                 operand,
@@ -80,7 +79,6 @@ namespace IX.Math.Nodes.Operators.Unary
         /// <value>
         ///     The operand.
         /// </value>
-        [NotNull]
         protected NodeBase Operand
         {
             get;
@@ -103,7 +101,7 @@ namespace IX.Math.Nodes.Operators.Unary
 
             this.Operand.Verify();
 
-            NodeBase? tempOperand = this.Operand;
+            NodeBase tempOperand = this.Operand;
             this.EnsureCompatibleOperandsAndRefineReturnType(ref tempOperand);
             this.Operand = tempOperand;
         }

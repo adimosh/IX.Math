@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Documentation", "Git
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{FB2F5864-DF6D-455C-8E79-3721590BF98E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IX.Sandbox", "IX.Sandbox\IX.Sandbox.csproj", "{EFA7DD3E-DD13-412D-A665-AD9B8CEFB51A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{EE8BE730-7219-4FE1-B975-248FB6255DB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE8BE730-7219-4FE1-B975-248FB6255DB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE8BE730-7219-4FE1-B975-248FB6255DB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFA7DD3E-DD13-412D-A665-AD9B8CEFB51A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFA7DD3E-DD13-412D-A665-AD9B8CEFB51A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFA7DD3E-DD13-412D-A665-AD9B8CEFB51A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFA7DD3E-DD13-412D-A665-AD9B8CEFB51A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

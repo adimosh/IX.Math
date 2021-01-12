@@ -3,9 +3,9 @@
 // </copyright>
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
+using DiagCA = System.Diagnostics.CodeAnalysis;
 
 namespace IX.Math.Nodes.Functions.Unary
 {
@@ -23,11 +23,11 @@ namespace IX.Math.Nodes.Functions.Unary
         /// </summary>
         /// <param name="parameter">The parameter.</param>
         /// <exception cref="ArgumentNullException">parameter is <c>null</c> (<c>Nothing</c> in ).</exception>
-        [SuppressMessage(
+        [DiagCA.SuppressMessage(
             "Usage",
             "CA2214:Do not call overridable methods in constructors",
             Justification = "This is OK and expected at this point.")]
-        protected UnaryFunctionNodeBase([NotNull] NodeBase parameter)
+        protected UnaryFunctionNodeBase(NodeBase parameter)
         {
             NodeBase parameterTemp = Requires.NotNull(
                 parameter,
@@ -66,7 +66,6 @@ namespace IX.Math.Nodes.Functions.Unary
         ///     Gets the parameter.
         /// </summary>
         /// <value>The parameter.</value>
-        [NotNull]
         public NodeBase Parameter
         {
             get;
