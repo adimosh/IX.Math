@@ -27,8 +27,8 @@ namespace IX.UnitTests.Helpers
             Func<CachedExpressionProviderFixture, IExpressionParsingService> create,
             Action<IExpressionParsingService> dispose)
         {
-            Contract.RequiresNotNull(in fixture, nameof(fixture));
-            Contract.RequiresNotNull(in create, nameof(create));
+            Requires.NotNull(fixture, nameof(fixture));
+            Requires.NotNull(create, nameof(create));
 
             this.Service = create(fixture);
 
