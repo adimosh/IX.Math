@@ -21,7 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\CodeGenerator\Test\TestData.BasicOperatorsWithRandomNumbers.cs" Link="TestData.BasicOperatorsWithRandomNumbers.cs" />
+    <None Remove="TestData.BasicOperatorsWithRandomNumbers.tt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,9 +37,27 @@
   <ItemGroup>
     <Compile Include="..\Common\HeapAllocationAnalyzerSuppressions.cs" Link="HeapAllocationAnalyzerSuppressions.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="TestData.BasicOperatorsWithRandomNumbers.tt">
+      <LastGenOutput>TestData.BasicOperatorsWithRandomNumbers.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\IX.Math\IX.Math.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="TestData.BasicOperatorsWithRandomNumbers.cs">
+      <DependentUpon>TestData.BasicOperatorsWithRandomNumbers.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
   </ItemGroup>
 
 </Project>

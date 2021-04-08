@@ -123,9 +123,9 @@ namespace IX.Math.Nodes.Operations.Binary
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "We want it this way.")]
         protected Expression GenerateNumericalToleranceEquateExpression(
-            [NotNull] Expression leftExpression,
-            [NotNull] Expression rightExpression,
-            [NotNull] Tolerance tolerance)
+             Expression leftExpression,
+             Expression rightExpression,
+             Tolerance tolerance)
         {
             if (tolerance.IntegerToleranceRangeLowerBound != null || tolerance.IntegerToleranceRangeUpperBound != null)
             {

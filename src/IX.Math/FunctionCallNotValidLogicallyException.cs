@@ -3,9 +3,7 @@
 // </copyright>
 
 using System;
-#if !STANDARD
 using System.Runtime.Serialization;
-#endif
 using JetBrains.Annotations;
 
 namespace IX.Math
@@ -14,9 +12,7 @@ namespace IX.Math
     /// Thrown when a function call is not internally logical or consistent.
     /// </summary>
     /// <seealso cref="Exception" />
-#if !STANDARD
     [Serializable]
-#endif
     [PublicAPI]
     public class FunctionCallNotValidLogicallyException : Exception
     {
@@ -56,7 +52,6 @@ namespace IX.Math
         {
         }
 
-#if !STANDARD
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionCallNotValidLogicallyException"/> class.
         /// </summary>
@@ -66,6 +61,5 @@ namespace IX.Math
             : base(info, context)
         {
         }
-#endif
     }
 }

@@ -155,7 +155,6 @@ namespace IX.Math.Nodes
         /// Generates the expression that will be compiled into code.
         /// </summary>
         /// <returns>The expression.</returns>
-        [NotNull]
         protected abstract Expression GenerateExpressionInternal();
 
         /// <summary>
@@ -163,7 +162,6 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        [NotNull]
         protected virtual Expression GenerateExpressionInternal(Tolerance tolerance) => this.GenerateExpressionInternal();
     }
 }

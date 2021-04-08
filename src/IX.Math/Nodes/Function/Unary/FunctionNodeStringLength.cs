@@ -24,7 +24,7 @@ namespace IX.Math.Nodes.Function.Unary
         ///     Initializes a new instance of the <see cref="FunctionNodeStringLength" /> class.
         /// </summary>
         /// <param name="parameter">The parameter.</param>
-        public FunctionNodeStringLength([NotNull] NodeBase parameter)
+        public FunctionNodeStringLength(NodeBase parameter)
             : base(parameter)
         {
         }

@@ -27,7 +27,7 @@ namespace IX.Math.Nodes.Constants
         ///     Initializes a new instance of the <see cref="ByteArrayNode" /> class.
         /// </summary>
         /// <param name="value">The value of the constant.</param>
-        public ByteArrayNode([NotNull] byte[] value)
+        public ByteArrayNode(byte[] value)
         {
             this.Value = value ?? throw new ArgumentNullException(nameof(value));
         }
@@ -35,7 +35,6 @@ namespace IX.Math.Nodes.Constants
         /// <summary>
         ///     Gets the display value.
         /// </summary>
-        [NotNull]
         public string DisplayValue => this.GetString();
 
         /// <summary>

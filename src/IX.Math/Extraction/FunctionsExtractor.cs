@@ -39,17 +39,17 @@ namespace IX.Math.Extraction
         /// <param name="expression">The expression before processing.</param>
         /// <param name="allSymbols">All symbols.</param>
         internal static void ReplaceFunctions(
-            [NotNull] string openParenthesis,
-            [NotNull] string closeParenthesis,
-            [NotNull] string parameterSeparator,
-            [NotNull] Dictionary<string, ConstantNodeBase> constantsTable,
-            [NotNull] Dictionary<string, string> reverseConstantsTable,
-            [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
-            [NotNull] Dictionary<string, string> reverseSymbolTable,
-            [NotNull] LevelDictionary<Type, IConstantInterpreter> interpreters,
-            [NotNull] IParameterRegistry parametersTable,
-            [NotNull] string expression,
-            [NotNull] string[] allSymbols)
+             string openParenthesis,
+             string closeParenthesis,
+             string parameterSeparator,
+             Dictionary<string, ConstantNodeBase> constantsTable,
+             Dictionary<string, string> reverseConstantsTable,
+             Dictionary<string, ExpressionSymbol> symbolTable,
+             Dictionary<string, string> reverseSymbolTable,
+             LevelDictionary<Type, IConstantInterpreter> interpreters,
+             IParameterRegistry parametersTable,
+             string expression,
+             string[] allSymbols)
         {
             // Replace the main expression
             ReplaceOneFunction(

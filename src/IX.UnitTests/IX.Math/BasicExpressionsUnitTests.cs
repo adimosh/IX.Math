@@ -25,7 +25,7 @@ namespace IX.UnitTests.IX.Math
 
 #pragma warning disable SA1123 // Do not place regions within elements
 
-#region STAGE 1: Positive integers
+            #region STAGE 1: Positive integers
 
             // +
             {
@@ -173,9 +173,9 @@ namespace IX.UnitTests.IX.Math
                     });
             }
 
-#endregion
+            #endregion
 
-#region STAGE 1: Negative integers
+            #region STAGE 1: Negative integers
 
             // +
             {
@@ -339,7 +339,7 @@ namespace IX.UnitTests.IX.Math
                     });
             }
 
-#endregion
+            #endregion
 
 #pragma warning restore SA1123 // Do not place regions within elements
 

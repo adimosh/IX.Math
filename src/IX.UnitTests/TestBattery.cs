@@ -157,16 +157,10 @@ namespace IX.UnitTests
                     {
                         if (parameters != null)
                         {
-#if NETCOREAPP3_0
-                            foreach ((var key, object val) in parameters)
-                            {
-                                object value = val;
-#else
                             foreach (var kvp in parameters)
                             {
                                 var key = kvp.Key;
                                 object value = kvp.Value;
-#endif
                                 finder.Setup(
                                     p => p.TryGetData(
                                         key,
@@ -242,16 +236,10 @@ namespace IX.UnitTests
 
                 if (parameters != null)
                 {
-#if NETCOREAPP3_0
-                    foreach ((var key, object val) in parameters)
-                    {
-                        object value = val;
-#else
                     foreach (var kvp in parameters)
                     {
                         var key = kvp.Key;
                         object value = kvp.Value;
-#endif
                         finder.Setup(
                             p => p.TryGetData(
                                 key,
@@ -296,15 +284,10 @@ namespace IX.UnitTests
                     {
                         if (parameters != null)
                         {
-#if NETCOREAPP3_0
-                            foreach ((var key, object val) in parameters)
-                            {
-#else
                             foreach (var kvp in parameters)
                             {
                                 var key = kvp.Key;
                                 object val = kvp.Value;
-#endif
                                 object value = GenerateFuncOutOfParameterValue(val);
                                 finder.Setup(
                                     p => p.TryGetData(
@@ -348,15 +331,10 @@ namespace IX.UnitTests
 
                 if (parameters != null)
                 {
-#if NETCOREAPP3_0
-                    foreach ((var key, object val) in parameters)
-                    {
-#else
                     foreach (var kvp in parameters)
                     {
                         var key = kvp.Key;
                         object val = kvp.Value;
-#endif
                         object value = GenerateFuncOutOfParameterValue(val);
                         finder.Setup(
                             p => p.TryGetData(
@@ -403,15 +381,10 @@ namespace IX.UnitTests
 
                     if (parameters != null)
                     {
-#if NETCOREAPP3_0
-                        foreach ((var key, object val) in parameters)
-                        {
-#else
                         foreach (var kvp in parameters)
                         {
                             var key = kvp.Key;
                             object val = kvp.Value;
-#endif
                             object value = GenerateFuncOutOfParameterValue(val);
                             finder.Setup(
                                 p => p.TryGetData(

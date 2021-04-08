@@ -38,7 +38,7 @@ namespace IX.Math
         ///     Initializes a new instance of the <see cref="CachedExpressionParsingService" /> class.
         /// </summary>
         /// <param name="definition">The math definition to use.</param>
-        public CachedExpressionParsingService([NotNull] MathDefinition definition)
+        public CachedExpressionParsingService(MathDefinition definition)
             : base(definition)
         {
             this.cachedComputedExpressions = new ConcurrentDictionary<string, ComputedExpression>();

@@ -783,7 +783,7 @@ namespace IX.Math
         /// <returns>
         /// The computed result, or, if the expression is not recognized correctly, the expression as a <see cref="string" />.
         /// </returns>
-        public object Compute([CanBeNull] Tolerance tolerance, IDataFinder dataFinder)
+        public object Compute( Tolerance tolerance, IDataFinder dataFinder)
         {
             this.RequiresNotDisposed();
 
@@ -818,7 +818,7 @@ namespace IX.Math
         public ComputedExpression DeepClone()
         {
             var registry = new StandardParameterRegistry(this.stringFormatters);
-            var context = new NodeCloningContext { ParameterRegistry = registry, SpecialRequestFunction = this.specialObjectRequestFunc};
+            var context = new NodeCloningContext { ParameterRegistry = registry, SpecialRequestFunction = this.specialObjectRequestFunc };
 
             return new ComputedExpression(this.initialExpression, this.body.DeepClone(context), this.RecognizedCorrectly, registry, this.stringFormatters, this.specialObjectRequestFunc);
         }

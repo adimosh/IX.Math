@@ -3,18 +3,14 @@
 // </copyright>
 
 using System;
-#if !STANDARD
 using System.Runtime.Serialization;
-#endif
 
 namespace IX.Math
 {
     /// <summary>
     /// Thrown when an expression is not internally logical or consistent.
     /// </summary>
-#if !STANDARD
     [Serializable]
-#endif
     public class ExpressionNotValidLogicallyException : Exception
     {
         /// <summary>
@@ -53,7 +49,6 @@ namespace IX.Math
         {
         }
 
-#if !STANDARD
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionNotValidLogicallyException"/> class.
         /// </summary>
@@ -63,6 +58,5 @@ namespace IX.Math
             : base(info, context)
         {
         }
-#endif
     }
 }

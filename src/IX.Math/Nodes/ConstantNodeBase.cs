@@ -38,7 +38,6 @@ namespace IX.Math.Nodes
         /// Distills the value into a usable constant.
         /// </summary>
         /// <returns>A usable constant.</returns>
-        [NotNull]
         public abstract object DistillValue();
 
         /// <summary>

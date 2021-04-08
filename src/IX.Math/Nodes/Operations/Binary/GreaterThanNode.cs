@@ -214,7 +214,7 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         [SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "We want it this way.")]
-        private Expression PossibleToleranceExpression([NotNull] Expression leftExpression, [NotNull] Expression rightExpression, [NotNull] Tolerance tolerance)
+        private Expression PossibleToleranceExpression(Expression leftExpression, Expression rightExpression, Tolerance tolerance)
         {
             if (tolerance.IntegerToleranceRangeLowerBound != null)
             {

@@ -20,7 +20,7 @@ namespace IX.Math.Nodes.Operations.Unary
         /// <param name="operand">The operand.</param>
         /// <exception cref="ArgumentNullException">operand
         /// is <c>null</c> (<c>Nothing</c> in Visual Basic).</exception>
-        protected private UnaryOperatorNodeBase([NotNull] NodeBase operand)
+        protected private UnaryOperatorNodeBase(NodeBase operand)
         {
             this.Operand = operand ?? throw new ArgumentNullException(nameof(operand));
         }
@@ -39,7 +39,6 @@ namespace IX.Math.Nodes.Operations.Unary
         /// <value>
         /// The operand.
         /// </value>
-        [NotNull]
         protected NodeBase Operand { get; }
 
         /// <summary>

@@ -10,10 +10,10 @@ namespace IX.Math.Generators
 {
     internal static class OperatorSequenceGenerator
     {
-        [NotNull]
+
         internal static List<Tuple<int, int, string>> GetOperatorsInOrderInExpression(
-            [NotNull] string expression,
-            [NotNull] IEnumerable<KeyValuePair<int, string[]>> operators)
+             string expression,
+             IEnumerable<KeyValuePair<int, string[]>> operators)
         {
             var indexes = new List<Tuple<int, int, string>>();
 

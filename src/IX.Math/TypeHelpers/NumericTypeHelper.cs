@@ -60,14 +60,14 @@ namespace IX.Math.TypeHelpers
                 case long l:
                     return l;
                 case double d:
-                {
-                    if (global::System.Math.Floor(d) != d || d > long.MaxValue || d < long.MinValue)
                     {
-                        return d;
-                    }
+                        if (global::System.Math.Floor(d) != d || d > long.MaxValue || d < long.MinValue)
+                        {
+                            return d;
+                        }
 
-                    return Convert.ToInt64(value, CultureInfo.CurrentCulture);
-                }
+                        return Convert.ToInt64(value, CultureInfo.CurrentCulture);
+                    }
 
                 default:
                     throw new InvalidCastException();
@@ -88,24 +88,24 @@ namespace IX.Math.TypeHelpers
         internal static (object LeftOperand, object RightOperand, bool IsInteger) DistillLowestCommonType(
             object left,
             object right) => left switch
-        {
-            double leftFloat => right switch
             {
-                // DO NOT remove these casts! If you do, some compiler logic will automatically default to returning
-                // (double, double, bool) and will completely mess up the case where the return is long
-                double rightFloat => ((object)leftFloat, (object)rightFloat, false),
-                long rightInteger => ((object)leftFloat, (object)Convert.ToDouble(rightInteger), false),
+                double leftFloat => right switch
+                {
+                    // DO NOT remove these casts! If you do, some compiler logic will automatically default to returning
+                    // (double, double, bool) and will completely mess up the case where the return is long
+                    double rightFloat => ((object)leftFloat, (object)rightFloat, false),
+                    long rightInteger => ((object)leftFloat, (object)Convert.ToDouble(rightInteger), false),
+                    _ => throw new InvalidCastException(),
+                },
+                long leftInteger => right switch
+                {
+                    // DO NOT remove these casts! If you do, some compiler logic will automatically default to returning
+                    // (double, double, bool) and will completely mess up the case where the return is long
+                    double rightFloat => ((object)Convert.ToDouble(leftInteger), (object)rightFloat, false),
+                    long rightInteger => ((object)leftInteger, (object)rightInteger, true),
+                    _ => throw new InvalidCastException(),
+                },
                 _ => throw new InvalidCastException(),
-            },
-            long leftInteger => right switch
-            {
-                // DO NOT remove these casts! If you do, some compiler logic will automatically default to returning
-                // (double, double, bool) and will completely mess up the case where the return is long
-                double rightFloat => ((object)Convert.ToDouble(leftInteger), (object)rightFloat, false),
-                long rightInteger => ((object)leftInteger, (object)rightInteger, true),
-                _ => throw new InvalidCastException(),
-            },
-            _ => throw new InvalidCastException(),
-        };
+            };
     }
 }

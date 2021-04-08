@@ -35,11 +35,11 @@ namespace IX.Math.Generators
         /// The name of the new constant.
         /// </returns>
         public static string GenerateStringConstant(
-            [NotNull] IDictionary<string, ConstantNodeBase> constantsTable,
-            [NotNull] IDictionary<string, string> reverseConstantsTable,
-            [NotNull] string originalExpression,
-            [NotNull] string stringIndicator,
-            [NotNull] string content)
+             IDictionary<string, ConstantNodeBase> constantsTable,
+             IDictionary<string, string> reverseConstantsTable,
+             string originalExpression,
+             string stringIndicator,
+             string content)
         {
             Requires.NotNullOrWhiteSpace(
                 originalExpression,
@@ -90,10 +90,10 @@ namespace IX.Math.Generators
         /// <param name="content">The content.</param>
         /// <returns>The name of the new constant.</returns>
         public static string GenerateNumericConstant(
-            [NotNull] IDictionary<string, ConstantNodeBase> constantsTable,
-            [NotNull] IDictionary<string, string> reverseConstantsTable,
-            [NotNull] string originalExpression,
-            [NotNull] string content)
+             IDictionary<string, ConstantNodeBase> constantsTable,
+             IDictionary<string, string> reverseConstantsTable,
+             string originalExpression,
+             string content)
         {
             Requires.NotNullOrWhiteSpace(
                 originalExpression,
@@ -143,8 +143,8 @@ namespace IX.Math.Generators
         /// <param name="value">The value.</param>
         /// <param name="alternateNames">The alternate names.</param>
         public static void GenerateNamedNumericSymbol(
-            [NotNull] IDictionary<string, ConstantNodeBase> constantsTable,
-            [NotNull] IDictionary<string, string> reverseConstantsTable,
+             IDictionary<string, ConstantNodeBase> constantsTable,
+             IDictionary<string, string> reverseConstantsTable,
             string name,
             double value,
             params string[] alternateNames)
@@ -199,11 +199,11 @@ namespace IX.Math.Generators
             "HAA0401:Possible allocation of reference type enumerator",
             Justification = "We're cool with this.")]
         internal static string CheckAndAdd(
-            [NotNull] IDictionary<string, ConstantNodeBase> constantsTable,
-            [NotNull] IDictionary<string, string> reverseConstantsTable,
-            [NotNull] LevelDictionary<Type, IConstantInterpreter> interpreters,
-            [NotNull] string originalExpression,
-            [CanBeNull] string content)
+             IDictionary<string, ConstantNodeBase> constantsTable,
+             IDictionary<string, string> reverseConstantsTable,
+             LevelDictionary<Type, IConstantInterpreter> interpreters,
+             string originalExpression,
+             string content)
         {
             // No content
             if (string.IsNullOrWhiteSpace(content))
@@ -279,7 +279,7 @@ namespace IX.Math.Generators
         }
 
         private static string GenerateName(
-            [NotNull] IEnumerable<string> keys,
+             IEnumerable<string> keys,
             string originalExpression)
         {
             var index = int.Parse(

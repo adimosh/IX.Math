@@ -32,16 +32,16 @@ namespace IX.Math.Generators
         /// <param name="openParenthesis">The symbol of an open parenthesis.</param>
         /// <param name="allSymbols">All symbols on which to split, in order.</param>
         internal static void PopulateTables(
-            [NotNull] string processedExpression,
-            [NotNull] Dictionary<string, ConstantNodeBase> constantsTable,
-            [NotNull] Dictionary<string, string> reverseConstantsTable,
-            [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
-            [NotNull] Dictionary<string, string> reverseSymbolTable,
-            [NotNull] IParameterRegistry parameterRegistry,
-            [NotNull] LevelDictionary<Type, IConstantInterpreter> interpreters,
-            [NotNull] string originalExpression,
-            [NotNull] string openParenthesis,
-            [NotNull] string[] allSymbols)
+             string processedExpression,
+             Dictionary<string, ConstantNodeBase> constantsTable,
+             Dictionary<string, string> reverseConstantsTable,
+             Dictionary<string, ExpressionSymbol> symbolTable,
+             Dictionary<string, string> reverseSymbolTable,
+             IParameterRegistry parameterRegistry,
+             LevelDictionary<Type, IConstantInterpreter> interpreters,
+             string originalExpression,
+             string openParenthesis,
+             string[] allSymbols)
         {
             // Split expression by all symbols
             string[] expressions = processedExpression.Split(

@@ -32,7 +32,7 @@ namespace IX.Math.Generators
             "CodeSmell",
             "ERP022:Unobserved exception in generic exception handler",
             Justification = "We want this to happen.")]
-        internal static ComputationBody CreateBody([NotNull] WorkingExpressionSet workingSet)
+        internal static ComputationBody CreateBody(WorkingExpressionSet workingSet)
         {
             if (workingSet.CancellationToken.IsCancellationRequested)
             {
@@ -144,7 +144,7 @@ namespace IX.Math.Generators
             }
 
             // Generate expressions
-            NodeBase body;
+            NodeBase? body;
             try
             {
                 body = GenerateExpression(
@@ -173,14 +173,13 @@ namespace IX.Math.Generators
                 workingSet.ParameterRegistry);
         }
 
-        [CanBeNull]
         [DiagCA.SuppressMessage(
             "CodeSmell",
             "ERP022:Unobserved exception in generic exception handler",
             Justification = "We want that.")]
-        private static NodeBase GenerateExpression(
-            [NotNull] string expression,
-            [NotNull] WorkingExpressionSet workingSet)
+        private static NodeBase? GenerateExpression(
+             string expression,
+             WorkingExpressionSet workingSet)
         {
             if (workingSet.CancellationToken.IsCancellationRequested)
             {
@@ -258,13 +257,13 @@ namespace IX.Math.Generators
                     expression,
                     workingSet.BinaryOperators.KeysByLevel).OrderBy(p => p.Item1).ThenByDescending(p => p.Item2).ToArray())
             {
-                NodeBase exp = ExpressionByBinaryOperator(
+                NodeBase? exp = ExpressionByBinaryOperator(
                     workingSet,
                     expression,
                     operatorPosition,
                     @operator);
 
-                static NodeBase ExpressionByBinaryOperator(
+                static NodeBase? ExpressionByBinaryOperator(
                     WorkingExpressionSet innerWorkingSet,
                     string s,
                     int position,
@@ -300,7 +299,7 @@ namespace IX.Math.Generators
                         return null;
                     }
 
-                    NodeBase left = GenerateExpression(
+                    NodeBase? left = GenerateExpression(
                         eee,
                         innerWorkingSet);
                     if (left == null)
@@ -316,7 +315,7 @@ namespace IX.Math.Generators
                         return null;
                     }
 
-                    NodeBase right = GenerateExpression(
+                    NodeBase? right = GenerateExpression(
                         eee,
                         innerWorkingSet);
                     if (right == null)
@@ -346,12 +345,12 @@ namespace IX.Math.Generators
                     expression,
                     workingSet.UnaryOperators.KeysByLevel).OrderBy(p => p.Item1).ThenByDescending(p => p.Item2).ToArray())
             {
-                NodeBase exp = ExpressionByUnaryOperator(
+                NodeBase? exp = ExpressionByUnaryOperator(
                     workingSet,
                     expression,
                     operatorPosition.Item3);
 
-                static NodeBase ExpressionByUnaryOperator(
+                static NodeBase? ExpressionByUnaryOperator(
                     WorkingExpressionSet innerWorkingSet,
                     string s,
                     string op)
@@ -378,7 +377,7 @@ namespace IX.Math.Generators
                     }
 
                     // We have a valid unary operator and the expression starts with it.
-                    NodeBase expr = GenerateExpression(
+                    NodeBase? expr = GenerateExpression(
                         eee,
                         innerWorkingSet);
                     if (expr == null)
@@ -403,7 +402,7 @@ namespace IX.Math.Generators
 
             return null;
 
-            static NodeBase GenerateFunctionCallExpression(
+            static NodeBase? GenerateFunctionCallExpression(
                 string possibleFunctionCallExpression,
                 WorkingExpressionSet innerWorkingSet)
             {
@@ -426,11 +425,7 @@ namespace IX.Math.Generators
 
                         if (string.IsNullOrWhiteSpace(expressionValue))
                         {
-#if NET452
-                            parameterExpressions = new string[0];
-#else
                             parameterExpressions = Array.Empty<string>();
-#endif
                         }
                         else
                         {
@@ -441,7 +436,7 @@ namespace IX.Math.Generators
                                 .ToArray();
                         }
 
-                        NodeBase returnValue;
+                        NodeBase? returnValue;
                         switch (parameterExpressions.Length)
                         {
                             case 0:

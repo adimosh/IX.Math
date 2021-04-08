@@ -45,10 +45,10 @@ namespace IX.Math.ExpressionState
         internal static ExpressionSymbol GenerateSymbol(
             string name,
             string expression) => new ExpressionSymbol
-        {
-            Name = name,
-            Expression = expression
-        };
+            {
+                Name = name,
+                Expression = expression
+            };
 
         internal static ExpressionSymbol GenerateFunctionCall(
             string name,

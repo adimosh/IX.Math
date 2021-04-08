@@ -22,20 +22,18 @@ namespace IX.Math
         /// <param name="expression">The expression to interpret.</param>
         /// <param name="cancellationToken">The cancellation token for this operation.</param>
         /// <returns>A <see cref="ComputedExpression"/> that represents the interpreted expression.</returns>
-        [NotNull]
-        ComputedExpression Interpret([NotNull] string expression, CancellationToken cancellationToken = default);
+        ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Registers an assembly to extract compatible functions from.
         /// </summary>
         /// <param name="assembly">The assembly to register.</param>
-        void RegisterFunctionsAssembly([NotNull] Assembly assembly);
+        void RegisterFunctionsAssembly(Assembly assembly);
 
         /// <summary>
         /// Returns the prototypes of all registered functions.
         /// </summary>
         /// <returns>All function names, with all possible combinations of input and output data.</returns>
-        [NotNull]
         string[] GetRegisteredFunctions();
     }
 }

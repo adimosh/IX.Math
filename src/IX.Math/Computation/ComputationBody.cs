@@ -14,10 +14,8 @@ namespace IX.Math.Computation
             null,
             null);
 
-        [CanBeNull]
         internal readonly NodeBase BodyNode;
 
-        [CanBeNull]
         internal readonly IParameterRegistry ParameterRegistry;
 
         internal ComputationBody(

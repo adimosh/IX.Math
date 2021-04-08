@@ -139,64 +139,64 @@ namespace IX.Math.Nodes.Operations.Binary
                 case StringNode sn1Left when this.Right is StringNode sn1Right:
                     return new StringNode(sn1Left.Value + sn1Right.Value);
                 case NumericNode nn2Left when this.Right is StringNode sn2Right:
-                {
-                    string stringValue;
-                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
                     {
-                        stringValue = nn2Left.Value.ToString();
-                    }
-                    else
-                    {
-                        stringValue = StringFormatter.FormatIntoString(nn2Left.Value, formatters);
-                    }
+                        string stringValue;
+                        if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                        {
+                            stringValue = nn2Left.Value.ToString();
+                        }
+                        else
+                        {
+                            stringValue = StringFormatter.FormatIntoString(nn2Left.Value, formatters);
+                        }
 
-                    return new StringNode($"{stringValue}{sn2Right.Value}");
-                }
+                        return new StringNode($"{stringValue}{sn2Right.Value}");
+                    }
 
                 case StringNode sn3Left when this.Right is NumericNode nn3Right:
-                {
-                    string stringValue;
-                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
                     {
-                        stringValue = nn3Right.Value.ToString();
-                    }
-                    else
-                    {
-                        stringValue = StringFormatter.FormatIntoString(nn3Right.Value, formatters);
-                    }
+                        string stringValue;
+                        if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                        {
+                            stringValue = nn3Right.Value.ToString();
+                        }
+                        else
+                        {
+                            stringValue = StringFormatter.FormatIntoString(nn3Right.Value, formatters);
+                        }
 
-                    return new StringNode($"{sn3Left.Value}{stringValue}");
-                }
+                        return new StringNode($"{sn3Left.Value}{stringValue}");
+                    }
 
                 case BoolNode bn4Left when this.Right is StringNode sn4Right:
-                {
-                    string stringValue;
-                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
                     {
-                        stringValue = bn4Left.Value.ToString(CultureInfo.CurrentCulture);
-                    }
-                    else
-                    {
-                        stringValue = StringFormatter.FormatIntoString(bn4Left.Value, formatters);
-                    }
+                        string stringValue;
+                        if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                        {
+                            stringValue = bn4Left.Value.ToString(CultureInfo.CurrentCulture);
+                        }
+                        else
+                        {
+                            stringValue = StringFormatter.FormatIntoString(bn4Left.Value, formatters);
+                        }
 
-                    return new StringNode($"{stringValue}{sn4Right.Value}");
-                }
+                        return new StringNode($"{stringValue}{sn4Right.Value}");
+                    }
 
                 case StringNode sn5Left when this.Right is BoolNode bn5Right:
-                {
-                    string stringValue;
-                    if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
                     {
-                        stringValue = bn5Right.Value.ToString(CultureInfo.CurrentCulture);
-                    }
-                    else
-                    {
-                        stringValue = StringFormatter.FormatIntoString(bn5Right.Value, formatters);
-                    }
+                        string stringValue;
+                        if (!(this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) is List<IStringFormatter> formatters))
+                        {
+                            stringValue = bn5Right.Value.ToString(CultureInfo.CurrentCulture);
+                        }
+                        else
+                        {
+                            stringValue = StringFormatter.FormatIntoString(bn5Right.Value, formatters);
+                        }
 
-                    return new StringNode($"{sn5Left.Value}{stringValue}");
-                }
+                        return new StringNode($"{sn5Left.Value}{stringValue}");
+                    }
 
                 case ByteArrayNode ban5Left when this.Right is ByteArrayNode ban5Right:
                     return new ByteArrayNode(

@@ -12,9 +12,9 @@ namespace IX.Math.Generators
     internal static class SymbolExpressionGenerator
     {
         internal static string GenerateSymbolExpression(
-            [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
-            [NotNull] Dictionary<string, string> reverseSymbolTable,
-            [NotNull] string expression,
+             Dictionary<string, ExpressionSymbol> symbolTable,
+             Dictionary<string, string> reverseSymbolTable,
+             string expression,
             bool isFunction)
         {
             if (reverseSymbolTable.TryGetValue(

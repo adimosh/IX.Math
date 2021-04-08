@@ -19,12 +19,12 @@ namespace IX.Math.Computation.InitialExpressionParsers
     {
 #pragma warning disable HAA0603 // Delegate allocation from a method group - unavoidable
         internal static void FormatParentheses(
-            [NotNull] string openParenthesis,
-            [NotNull] string closeParenthesis,
-            [NotNull] string parameterSeparator,
-            [NotNull] string[] allOperatorsInOrder,
-            [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
-            [NotNull] Dictionary<string, string> reverseSymbolTable)
+             string openParenthesis,
+             string closeParenthesis,
+             string parameterSeparator,
+             string[] allOperatorsInOrder,
+             Dictionary<string, ExpressionSymbol> symbolTable,
+             Dictionary<string, string> reverseSymbolTable)
         {
             var itemsToProcess = new List<string>();
 

@@ -20,7 +20,7 @@ namespace IX.Math.Nodes.Operations.Unary
         ///     Initializes a new instance of the <see cref="NotNode" /> class.
         /// </summary>
         /// <param name="operand">The operand.</param>
-        public NotNode([NotNull] NodeBase operand)
+        public NotNode(NodeBase operand)
             : base(operand.Simplify())
         {
             operand.DetermineWeakly(SupportableValueType.Boolean | SupportableValueType.Numeric);

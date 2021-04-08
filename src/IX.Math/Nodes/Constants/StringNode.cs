@@ -20,7 +20,7 @@ namespace IX.Math.Nodes.Constants
         /// Initializes a new instance of the <see cref="StringNode"/> class.
         /// </summary>
         /// <param name="value">The value.</param>
-        public StringNode([NotNull] string value)
+        public StringNode(string value)
         {
             this.Value = value;
         }

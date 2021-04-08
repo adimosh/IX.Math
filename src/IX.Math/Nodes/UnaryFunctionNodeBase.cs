@@ -28,7 +28,7 @@ namespace IX.Math.Nodes
             "Usage",
             "CA2214:Do not call overridable methods in constructors",
             Justification = "This is OK and expected at this point.")]
-        protected UnaryFunctionNodeBase([NotNull] NodeBase parameter)
+        protected UnaryFunctionNodeBase(NodeBase parameter)
         {
             NodeBase parameterTemp = parameter ?? throw new ArgumentNullException(nameof(parameter));
 
@@ -42,7 +42,6 @@ namespace IX.Math.Nodes
         ///     Gets the parameter.
         /// </summary>
         /// <value>The parameter.</value>
-        [NotNull]
         public NodeBase Parameter { get; private set; }
 
         /// <summary>
@@ -70,7 +69,7 @@ namespace IX.Math.Nodes
         ///     reference to change.
         /// </summary>
         /// <param name="parameter">The parameter.</param>
-        protected abstract void EnsureCompatibleParameter([NotNull] NodeBase parameter);
+        protected abstract void EnsureCompatibleParameter(NodeBase parameter);
 
         /// <summary>
         ///     Generates a static unary function call.
@@ -79,8 +78,7 @@ namespace IX.Math.Nodes
         /// <param name="functionName">Name of the function.</param>
         /// <returns>An expression representing the static function call.</returns>
         /// <exception cref="ArgumentException"><paramref name="functionName" /> represents a function that cannot be found.</exception>
-        [NotNull]
-        protected Expression GenerateStaticUnaryFunctionCall<T>([NotNull] string functionName) =>
+        protected Expression GenerateStaticUnaryFunctionCall<T>(string functionName) =>
             this.GenerateStaticUnaryFunctionCall(
                 typeof(T),
                 functionName,
@@ -94,9 +92,8 @@ namespace IX.Math.Nodes
         /// <param name="tolerance">The tolerance for this expression. Can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
         /// <returns>An expression representing the static function call.</returns>
         /// <exception cref="ArgumentException"><paramref name="functionName" /> represents a function that cannot be found.</exception>
-        [NotNull]
         protected Expression GenerateStaticUnaryFunctionCall<T>(
-            [NotNull] string functionName,
+             string functionName,
             Tolerance tolerance) =>
             this.GenerateStaticUnaryFunctionCall(
                 typeof(T),
@@ -110,10 +107,9 @@ namespace IX.Math.Nodes
         /// <param name="functionName">Name of the function.</param>
         /// <returns>An expression representing the static function call.</returns>
         /// <exception cref="ArgumentException"><paramref name="functionName" /> represents a function that cannot be found.</exception>
-        [NotNull]
         protected Expression GenerateStaticUnaryFunctionCall(
-            [NotNull] Type t,
-            [NotNull] string functionName) =>
+             Type t,
+             string functionName) =>
             this.GenerateStaticUnaryFunctionCall(
                 t,
                 functionName,
@@ -129,11 +125,10 @@ namespace IX.Math.Nodes
         ///     An expression representing the static function call.
         /// </returns>
         /// <exception cref="ArgumentException"><paramref name="functionName" /> represents a function that cannot be found.</exception>
-        [NotNull]
         protected Expression GenerateStaticUnaryFunctionCall(
-            [NotNull] Type t,
-            [NotNull] string functionName,
-            [CanBeNull] Tolerance tolerance)
+             Type t,
+             string functionName,
+             Tolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
@@ -207,8 +202,7 @@ namespace IX.Math.Nodes
         /// <param name="propertyName">Name of the parameter.</param>
         /// <returns>An expression representing a property call.</returns>
         /// <exception cref="ArgumentException"><paramref name="propertyName" /> represents a property that cannot be found.</exception>
-        [NotNull]
-        protected Expression GenerateParameterPropertyCall<T>([NotNull] string propertyName) =>
+        protected Expression GenerateParameterPropertyCall<T>(string propertyName) =>
             this.GenerateParameterPropertyCall<T>(
                 propertyName,
                 null);
@@ -221,10 +215,9 @@ namespace IX.Math.Nodes
         /// <param name="tolerance">The tolerance for this expression. Can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
         /// <returns>An expression representing a property call.</returns>
         /// <exception cref="ArgumentException"><paramref name="propertyName" /> represents a property that cannot be found.</exception>
-        [NotNull]
         protected Expression GenerateParameterPropertyCall<T>(
-            [NotNull] string propertyName,
-            [CanBeNull] Tolerance tolerance)
+             string propertyName,
+             Tolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
             {
@@ -256,8 +249,7 @@ namespace IX.Math.Nodes
         /// <param name="methodName">Name of the parameter.</param>
         /// <returns>An expression representing a property call.</returns>
         /// <exception cref="ArgumentException"><paramref name="methodName" /> represents a property that cannot be found.</exception>
-        [NotNull]
-        protected Expression GenerateParameterMethodCall<T>([NotNull] string methodName) =>
+        protected Expression GenerateParameterMethodCall<T>(string methodName) =>
             this.GenerateParameterMethodCall<T>(
                 methodName,
                 null);
@@ -270,10 +262,9 @@ namespace IX.Math.Nodes
         /// <param name="tolerance">The tolerance for this expression. Can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
         /// <returns>An expression representing a property call.</returns>
         /// <exception cref="ArgumentException"><paramref name="methodName" /> represents a property that cannot be found.</exception>
-        [NotNull]
         protected Expression GenerateParameterMethodCall<T>(
-            [NotNull] string methodName,
-            [CanBeNull] Tolerance tolerance)
+             string methodName,
+              Tolerance tolerance)
         {
             if (string.IsNullOrWhiteSpace(methodName))
             {
@@ -285,17 +276,6 @@ namespace IX.Math.Nodes
                     nameof(methodName));
             }
 
-#if NET452
-            MethodInfo mi = typeof(T).GetRuntimeMethod(
-                                methodName,
-                                new Type[0]) ??
-                            throw new ArgumentException(
-                                string.Format(
-                                    CultureInfo.CurrentCulture,
-                                    Resources.FunctionCouldNotBeFound,
-                                    methodName),
-                                nameof(methodName));
-#else
             MethodInfo mi = typeof(T).GetRuntimeMethod(
                                 methodName,
                                 Array.Empty<Type>()) ??
@@ -305,7 +285,6 @@ namespace IX.Math.Nodes
                                     Resources.FunctionCouldNotBeFound,
                                     methodName),
                                 nameof(methodName));
-#endif
 
             return tolerance == null
                 ? Expression.Call(

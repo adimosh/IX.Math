@@ -687,7 +687,7 @@ namespace IX.Math.Nodes
             long rightOperand,
             double proportion)
         {
-            Requires.True(proportion > 1, nameof(proportion));
+            Requires.True(proportion > 1L, nameof(proportion));
 
             double directProportion = ((double)rightOperand) * proportion;
             double inverseProportion = ((double)rightOperand) * (1D / proportion);
@@ -710,7 +710,7 @@ namespace IX.Math.Nodes
             double rightOperand,
             double proportion)
         {
-            Requires.GreaterThan(in proportion, 1D, nameof(proportion));
+            Requires.True(proportion > 1D, nameof(proportion));
 
             double directProportion = rightOperand * proportion;
             double inverseProportion = rightOperand * (1D / proportion);

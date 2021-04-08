@@ -29,7 +29,6 @@ namespace IX.Math.Registration
         ///     Dumps all parameters.
         /// </summary>
         /// <returns>The existing parameters.</returns>
-        [NotNull]
         ParameterContext[] Dump();
 
         /// <summary>
@@ -37,7 +36,6 @@ namespace IX.Math.Registration
         /// </summary>
         /// <param name="name">The name of the parameter.</param>
         /// <returns>A parameter context.</returns>
-        [NotNull]
         ParameterContext AdvertiseParameter(string name);
 
         /// <summary>
@@ -45,7 +43,6 @@ namespace IX.Math.Registration
         /// </summary>
         /// <param name="previousContext">The previous context.</param>
         /// <returns>The new parameter context.</returns>
-        [NotNull]
         ParameterContext CloneFrom(ParameterContext previousContext);
     }
 }

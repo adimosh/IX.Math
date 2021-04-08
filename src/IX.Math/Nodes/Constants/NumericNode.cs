@@ -56,7 +56,7 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <param name="value">The undefined value.</param>
         /// <exception cref="ArgumentException">The value is not in an expected format.</exception>
-        public NumericNode([NotNull] object value)
+        public NumericNode(object value)
         {
             switch (value)
             {
@@ -99,7 +99,7 @@ namespace IX.Math.Nodes.Constants
             Justification = "This is desired.")]
         public object Value
         {
-            [NotNull]
+
             get
             {
                 if (this.IsFloat)
@@ -117,8 +117,7 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        [NotNull]
-        public static NumericNode Add([NotNull] NumericNode left, [NotNull] NumericNode right)
+        public static NumericNode Add(NumericNode left, NumericNode right)
         {
             if (left.IsFloat && right.IsFloat)
             {
@@ -144,8 +143,7 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        [NotNull]
-        public static NumericNode Subtract([NotNull] NumericNode left, [NotNull] NumericNode right)
+        public static NumericNode Subtract(NumericNode left, NumericNode right)
         {
             if (left.IsFloat && right.IsFloat)
             {
@@ -171,8 +169,7 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        [NotNull]
-        public static NumericNode Multiply([NotNull] NumericNode left, [NotNull] NumericNode right)
+        public static NumericNode Multiply(NumericNode left, NumericNode right)
         {
             if (left.IsFloat && right.IsFloat)
             {
@@ -198,14 +195,13 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        [NotNull]
         [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "This is of little consequence at this point.")]
         public static NumericNode Divide(
-            [NotNull] NumericNode left,
-            [NotNull] NumericNode right)
+             NumericNode left,
+             NumericNode right)
         {
             var (divided, divisor, tryInteger) = NumericTypeHelper.ExtractFloats(
                 left.Value,
@@ -222,14 +218,13 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        [NotNull]
         [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "This is of little consequence at this point.")]
         public static NumericNode Power(
-            [NotNull] NumericNode left,
-            [NotNull] NumericNode right)
+             NumericNode left,
+             NumericNode right)
         {
             var (@base, pow, tryInteger) = NumericTypeHelper.ExtractFloats(
                 left.Value,
@@ -248,8 +243,7 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        [NotNull]
-        public static NumericNode LeftShift([NotNull] NumericNode left, [NotNull] NumericNode right)
+        public static NumericNode LeftShift(NumericNode left, NumericNode right)
         {
             var by = right.ExtractInt();
             var data = left.ExtractInteger();
@@ -263,8 +257,7 @@ namespace IX.Math.Nodes.Constants
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>The resulting node.</returns>
-        [NotNull]
-        public static NumericNode RightShift([NotNull] NumericNode left, [NotNull] NumericNode right)
+        public static NumericNode RightShift(NumericNode left, NumericNode right)
         {
             var by = right.ExtractInt();
             var data = left.ExtractInteger();
@@ -292,7 +285,7 @@ namespace IX.Math.Nodes.Constants
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "This is desired.")]
-        [NotNull]
+
         public Expression GenerateFloatExpression() => this.IsFloat ? this.GenerateExpression() : Expression.Constant(Convert.ToDouble(this.floatValue), typeof(double));
 
         /// <summary>
@@ -308,7 +301,7 @@ namespace IX.Math.Nodes.Constants
             "ReSharper",
             "CompareOfFloatsByEqualityOperator",
             Justification = "If we're reaching the precision loss boundary, it means we're rounding to an integer anyway, so it's acceptable.")]
-        [NotNull]
+
         public Expression GenerateLongExpression()
         {
             if (!this.IsFloat)

@@ -10,7 +10,6 @@ using System.Reflection;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Globalization;
-using JetBrains.Annotations;
 using SuppressMessage = System.Diagnostics.CodeAnalysis.SuppressMessageAttribute;
 
 namespace IX.Math.Nodes.Operations.Binary
@@ -214,36 +213,40 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         [SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "We want it this way.")]
-        private Expression PossibleToleranceExpression([NotNull] Expression leftExpression, [NotNull] Expression rightExpression, [NotNull] Tolerance tolerance)
+        private Expression? PossibleToleranceExpression(Expression leftExpression, Expression rightExpression, Tolerance tolerance)
         {
             if (tolerance.IntegerToleranceRangeUpperBound != null)
             {
                 // Integer tolerance
-                MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
+                MethodInfo? mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
                     nameof(ToleranceFunctions.LessThanOrEqualRangeTolerant),
                     leftExpression.Type,
                     rightExpression.Type,
                     typeof(long));
 
-                return Expression.Call(
-                    mi,
-                    leftExpression,
-                    rightExpression,
-                    Expression.Constant(
-                        tolerance.IntegerToleranceRangeUpperBound ?? 0L,
-                        typeof(long)));
+                return mi == null
+                    ? null
+                    : Expression.Call(
+                        mi,
+                        leftExpression,
+                        rightExpression,
+                        Expression.Constant(
+                            tolerance.IntegerToleranceRangeUpperBound ?? 0L,
+                            typeof(long)));
             }
 
             if (tolerance.ToleranceRangeUpperBound != null)
             {
                 // Floating-point tolerance
-                MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
+                MethodInfo? mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
                     nameof(ToleranceFunctions.LessThanOrEqualRangeTolerant),
                     leftExpression.Type,
                     rightExpression.Type,
                     typeof(double));
 
-                return Expression.Call(
+                return mi == null
+                    ? null
+                    : Expression.Call(
                     mi,
                     leftExpression,
                     rightExpression,
@@ -257,13 +260,15 @@ namespace IX.Math.Nodes.Operations.Binary
                 if (tolerance.ProportionalTolerance.Value > 1D)
                 {
                     // Proportional tolerance
-                    MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
+                    MethodInfo? mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
                         nameof(ToleranceFunctions.LessThanOrEqualProportionTolerant),
                         leftExpression.Type,
                         rightExpression.Type,
                         typeof(double));
 
-                    return Expression.Call(
+                    return mi == null
+                        ? null
+                        : Expression.Call(
                         mi,
                         leftExpression,
                         rightExpression,
@@ -275,13 +280,15 @@ namespace IX.Math.Nodes.Operations.Binary
                 if (tolerance.ProportionalTolerance.Value < 1D && tolerance.ProportionalTolerance.Value > 0D)
                 {
                     // Percentage tolerance
-                    MethodInfo mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
+                    MethodInfo? mi = typeof(ToleranceFunctions).GetMethodWithExactParameters(
                         nameof(ToleranceFunctions.LessThanOrEqualPercentageTolerant),
                         leftExpression.Type,
                         rightExpression.Type,
                         typeof(double));
 
-                    return Expression.Call(
+                    return mi == null
+                        ? null
+                        : Expression.Call(
                         mi,
                         leftExpression,
                         rightExpression,
