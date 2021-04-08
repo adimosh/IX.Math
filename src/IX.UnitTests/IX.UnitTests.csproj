@@ -38,9 +38,6 @@
 
   <!--Suppressions -->
   <ItemGroup>
-    <Compile Include="..\Common\HeapAllocationAnalyzerSuppressions.cs" Link="HeapAllocationAnalyzerSuppressions.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="TestData.BasicOperatorsWithRandomNumbers.tt">
       <LastGenOutput>TestData.BasicOperatorsWithRandomNumbers.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>
