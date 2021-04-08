@@ -26,27 +26,6 @@ namespace IX.Math.Computation.InitialExpressionParsers
             [NotNull] Dictionary<string, ExpressionSymbol> symbolTable,
             [NotNull] Dictionary<string, string> reverseSymbolTable)
         {
-            #region Contracts
-            Contract.RequiresNotNullOrWhitespacePrivate(
-                openParenthesis,
-                nameof(openParenthesis));
-            Contract.RequiresNotNullOrWhitespacePrivate(
-                closeParenthesis,
-                nameof(closeParenthesis));
-            Contract.RequiresNotNullOrWhitespacePrivate(
-                parameterSeparator,
-                nameof(parameterSeparator));
-            Contract.RequiresNotNullPrivate(
-                in allOperatorsInOrder,
-                nameof(allOperatorsInOrder));
-            Contract.RequiresNotNullPrivate(
-                in symbolTable,
-                nameof(symbolTable));
-            Contract.RequiresNotNullPrivate(
-                in reverseSymbolTable,
-                nameof(reverseSymbolTable));
-            #endregion
-
             var itemsToProcess = new List<string>();
 
             KeyValuePair<string, ExpressionSymbol> itemToProcess;
@@ -84,30 +63,6 @@ namespace IX.Math.Computation.InitialExpressionParsers
                 Dictionary<string, ExpressionSymbol> symbolTableL1,
                 Dictionary<string, string> reverseSymbolTableL1)
             {
-                #region Contracts
-                Contract.RequiresNotNullPrivate(
-                    in key,
-                    nameof(key));
-                Contract.RequiresNotNullOrWhitespacePrivate(
-                    openParenthesisL1,
-                    nameof(openParenthesisL1));
-                Contract.RequiresNotNullOrWhitespacePrivate(
-                    closeParenthesisL1,
-                    nameof(closeParenthesisL1));
-                Contract.RequiresNotNullOrWhitespacePrivate(
-                    parameterSeparatorL1,
-                    nameof(parameterSeparatorL1));
-                Contract.RequiresNotNullPrivate(
-                    in allOperatorsInOrderL1,
-                    nameof(allOperatorsInOrderL1));
-                Contract.RequiresNotNullPrivate(
-                    in symbolTableL1,
-                    nameof(symbolTableL1));
-                Contract.RequiresNotNullPrivate(
-                    in reverseSymbolTableL1,
-                    nameof(reverseSymbolTableL1));
-                #endregion
-
                 ExpressionSymbol symbol = symbolTableL1[key];
                 if (symbol.IsFunctionCall)
                 {
@@ -139,27 +94,6 @@ namespace IX.Math.Computation.InitialExpressionParsers
                     Dictionary<string, ExpressionSymbol> symbolTableL2,
                     Dictionary<string, string> reverseSymbolTableL2)
                 {
-                    #region Contracts
-                    Contract.RequiresNotNullOrWhitespacePrivate(
-                        openParenthesisL2,
-                        nameof(openParenthesisL2));
-                    Contract.RequiresNotNullOrWhitespacePrivate(
-                        closeParenthesisL2,
-                        nameof(closeParenthesisL2));
-                    Contract.RequiresNotNullOrWhitespacePrivate(
-                        parameterSeparatorSymbolL2,
-                        nameof(parameterSeparatorSymbolL2));
-                    Contract.RequiresNotNullPrivate(
-                        in allOperatorsInOrderSymbolsL2,
-                        nameof(allOperatorsInOrderSymbolsL2));
-                    Contract.RequiresNotNullPrivate(
-                        in symbolTableL2,
-                        nameof(symbolTableL2));
-                    Contract.RequiresNotNullPrivate(
-                        in reverseSymbolTableL2,
-                        nameof(reverseSymbolTableL2));
-                    #endregion
-
                     if (string.IsNullOrWhiteSpace(source))
                     {
                         return string.Empty;

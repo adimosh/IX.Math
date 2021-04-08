@@ -34,10 +34,6 @@ namespace IX.Math.Generators
             Justification = "We want this to happen.")]
         internal static ComputationBody CreateBody([NotNull] WorkingExpressionSet workingSet)
         {
-            Contract.RequiresNotNullPrivate(
-                in workingSet,
-                nameof(workingSet));
-
             if (workingSet.CancellationToken.IsCancellationRequested)
             {
                 return ComputationBody.Empty;
@@ -58,7 +54,9 @@ namespace IX.Math.Generators
                 }
             }
 
-            workingSet.Expression = SubExpressionFormatter.Cleanup(workingSet.Expression);
+            workingSet.Expression = workingSet.Expression.Trim().Replace(
+                " ",
+                string.Empty);
 
             // Start preparing expression
             workingSet.SymbolTable.Add(
@@ -184,13 +182,6 @@ namespace IX.Math.Generators
             [NotNull] string expression,
             [NotNull] WorkingExpressionSet workingSet)
         {
-            Contract.RequiresNotNullOrWhitespacePrivate(
-                expression,
-                nameof(expression));
-            Contract.RequiresNotNullPrivate(
-                in workingSet,
-                nameof(workingSet));
-
             if (workingSet.CancellationToken.IsCancellationRequested)
             {
                 // Cancellation requested, let's exit gracefully

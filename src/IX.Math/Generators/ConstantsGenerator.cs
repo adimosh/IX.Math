@@ -41,19 +41,19 @@ namespace IX.Math.Generators
             [NotNull] string stringIndicator,
             [NotNull] string content)
         {
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 originalExpression,
                 nameof(originalExpression));
-            Contract.RequiresNotNull(
-                in constantsTable,
+            Requires.NotNull(
+                constantsTable,
                 nameof(constantsTable));
-            Contract.RequiresNotNull(
-                in reverseConstantsTable,
+            Requires.NotNull(
+                reverseConstantsTable,
                 nameof(reverseConstantsTable));
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 stringIndicator,
                 nameof(stringIndicator));
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 content,
                 nameof(content));
 
@@ -95,16 +95,16 @@ namespace IX.Math.Generators
             [NotNull] string originalExpression,
             [NotNull] string content)
         {
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 originalExpression,
                 nameof(originalExpression));
-            Contract.RequiresNotNull(
-                in constantsTable,
+            Requires.NotNull(
+                constantsTable,
                 nameof(constantsTable));
-            Contract.RequiresNotNull(
-                in reverseConstantsTable,
+            Requires.NotNull(
+                reverseConstantsTable,
                 nameof(reverseConstantsTable));
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 content,
                 nameof(content));
 
@@ -149,14 +149,14 @@ namespace IX.Math.Generators
             double value,
             params string[] alternateNames)
         {
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 name,
                 nameof(name));
-            Contract.RequiresNotNull(
-                in constantsTable,
+            Requires.NotNull(
+                constantsTable,
                 nameof(constantsTable));
-            Contract.RequiresNotNull(
-                in reverseConstantsTable,
+            Requires.NotNull(
+                reverseConstantsTable,
                 nameof(reverseConstantsTable));
 
             if (reverseConstantsTable.TryGetValue(
@@ -205,20 +205,6 @@ namespace IX.Math.Generators
             [NotNull] string originalExpression,
             [CanBeNull] string content)
         {
-            // Contract validation
-            Contract.RequiresNotNullOrWhitespacePrivate(
-                originalExpression,
-                nameof(originalExpression));
-            Contract.RequiresNotNullPrivate(
-                in constantsTable,
-                nameof(constantsTable));
-            Contract.RequiresNotNullPrivate(
-                in reverseConstantsTable,
-                nameof(reverseConstantsTable));
-            Contract.RequiresNotNullPrivate(
-                in interpreters,
-                nameof(interpreters));
-
             // No content
             if (string.IsNullOrWhiteSpace(content))
             {
@@ -296,10 +282,6 @@ namespace IX.Math.Generators
             [NotNull] IEnumerable<string> keys,
             string originalExpression)
         {
-            Contract.RequiresNotNullPrivate(
-                in keys,
-                nameof(keys));
-
             var index = int.Parse(
                 keys.Where(p => p.InvariantCultureStartsWith("Const") && p.Length > 5).LastOrDefault()?.Substring(5) ?? "0", CultureInfo.CurrentCulture);
 

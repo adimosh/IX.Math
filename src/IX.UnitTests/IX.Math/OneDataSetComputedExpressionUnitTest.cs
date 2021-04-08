@@ -5,8 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IX.DataGeneration;
 using IX.Math;
-using IX.StandardExtensions.TestUtils;
 using Moq;
 using Xunit;
 

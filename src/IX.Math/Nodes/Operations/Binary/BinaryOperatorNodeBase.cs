@@ -33,11 +33,11 @@ namespace IX.Math.Nodes.Operations.Binary
             NodeBase left,
             NodeBase right)
         {
-            Contract.RequiresNotNull(
-                in left,
+            Requires.NotNull(
+                left,
                 nameof(left));
-            Contract.RequiresNotNull(
-                in right,
+            Requires.NotNull(
+                right,
                 nameof(right));
 
             this.EnsureCompatibleOperands(

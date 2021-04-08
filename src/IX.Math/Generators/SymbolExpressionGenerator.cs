@@ -5,7 +5,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using IX.Math.ExpressionState;
-using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
 namespace IX.Math.Generators
@@ -18,16 +17,6 @@ namespace IX.Math.Generators
             [NotNull] string expression,
             bool isFunction)
         {
-            Contract.RequiresNotNullPrivate(
-                in symbolTable,
-                nameof(symbolTable));
-            Contract.RequiresNotNullPrivate(
-                in reverseSymbolTable,
-                nameof(reverseSymbolTable));
-            Contract.RequiresNotNullPrivate(
-                in expression,
-                nameof(expression));
-
             if (reverseSymbolTable.TryGetValue(
                 expression,
                 out var itemName))

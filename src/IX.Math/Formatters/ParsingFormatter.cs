@@ -27,10 +27,6 @@ namespace IX.Math.Formatters
             string expression,
             out object result)
         {
-            Contract.RequiresNotNullPrivate(
-                in expression,
-                nameof(expression));
-
             if (!expression.StartsWith(
                     "0x",
                     StringComparison.CurrentCultureIgnoreCase) && !expression.StartsWith(
@@ -74,10 +70,6 @@ namespace IX.Math.Formatters
                 string specificExpression,
                 out object specificResult)
             {
-                Contract.RequiresNotNullPrivate(
-                    in specificExpression,
-                    nameof(specificExpression));
-
                 IFormatProvider formatProvider = CultureInfo.CurrentCulture;
 
                 if (long.TryParse(
@@ -109,10 +101,6 @@ namespace IX.Math.Formatters
             string expression,
             out byte[] result)
         {
-            Contract.RequiresNotNullPrivate(
-                in expression,
-                nameof(expression));
-
             if (expression.CurrentCultureStartsWithInsensitive("0b"))
             {
                 if (expression.Length > 2)
@@ -133,10 +121,6 @@ namespace IX.Math.Formatters
                 string byteArrayExpression,
                 out byte[] byteArrayResult)
             {
-                Contract.RequiresNotNullPrivate(
-                    in byteArrayExpression,
-                    nameof(byteArrayExpression));
-
                 byteArrayExpression = byteArrayExpression.Replace(
                     "_",
                     string.Empty);

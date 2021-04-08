@@ -794,8 +794,8 @@ namespace IX.Math
 
             var pars = new List<object>();
 
-            Contract.RequiresNotNull(
-                in dataFinder,
+            Requires.NotNull(
+                dataFinder,
                 nameof(dataFinder));
 
             foreach (ParameterContext p in this.parametersRegistry.Dump())

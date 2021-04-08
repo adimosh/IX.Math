@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using IX.Math.Extensibility;
 using IX.Math.Nodes;
-using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
 
 namespace IX.Math.Generators
@@ -29,10 +28,6 @@ namespace IX.Math.Generators
         private static Dictionary<string, Type> GenerateTypeAssignableFrom<T>(IEnumerable<Assembly> assemblies)
             where T : FunctionNodeBase
         {
-            Contract.RequiresNotNullPrivate(
-                in assemblies,
-                nameof(assemblies));
-
             var typeDictionary = new Dictionary<string, Type>();
 
             // TODO: Do this in parallel

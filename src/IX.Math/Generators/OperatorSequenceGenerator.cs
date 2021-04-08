@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
 namespace IX.Math.Generators
@@ -14,15 +13,8 @@ namespace IX.Math.Generators
         [NotNull]
         internal static List<Tuple<int, int, string>> GetOperatorsInOrderInExpression(
             [NotNull] string expression,
-            [NotNull] KeyValuePair<int, string[]>[] operators)
+            [NotNull] IEnumerable<KeyValuePair<int, string[]>> operators)
         {
-            Contract.RequiresNotNullPrivate(
-                in expression,
-                nameof(expression));
-            Contract.RequiresNotNullPrivate(
-                in operators,
-                nameof(operators));
-
             var indexes = new List<Tuple<int, int, string>>();
 
             foreach (KeyValuePair<int, string[]> level in operators)

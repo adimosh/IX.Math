@@ -84,7 +84,7 @@ namespace IX.Math.Nodes
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context)
         {
-            Contract.RequiresNotNull(in context, nameof(context));
+            Requires.NotNull(context, nameof(context));
 
             context.ParameterRegistry.CloneFrom(this.parametersRegistry.AdvertiseParameter(this.Name));
 

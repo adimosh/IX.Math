@@ -3,18 +3,16 @@
 
   <!-- Build configuration -->
   <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net452;net46;net47;net472;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(IxDevOpsBuild)'=='true'">net46;net47;net472;netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(IxDevOpsBuild)'!='true'">net46;netstandard2.1;net5.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
     <FailObsoleteTargetFrameworks>true</FailObsoleteTargetFrameworks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)'!='netstandard2.1' AND '$(TargetFramework)'!='net452'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <!-- Package metadata -->
@@ -23,14 +21,21 @@
     <Description>A library for transforming text expressions containing mathematical operations into executable delegates.</Description>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageReleaseNotes>- Package updates on the classic version
+- Updated opt and all other references</PackageReleaseNotes>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>../../opt/snk/ix.framework.strongname.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
   <!-- References -->
-  <ItemGroup Condition="'$(TargetFramework)'=='net452' OR '$(TargetFramework)'=='net46'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net46'">
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.Abstractions.Collections" Version="[0.5.3,0.6)" />
-    <PackageReference Include="IX.StandardExtensions" Version="[0.5.3,0.6)" />
+    <PackageReference Include="IX.StandardExtensions" Version="[0.7.4,0.8)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">
@@ -40,14 +45,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'!='netstandard2.1'">
-    <PackageReference Include="System.Memory" Version="[4.5.3,5)" />
+    <PackageReference Include="System.Memory" Version="4.5.4" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AsyncUsageAnalyzers" Version="1.0.0-alpha003" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8" PrivateAssets="all" />
-  </ItemGroup>
-
 
   <!-- Resources -->
   <ItemGroup>
@@ -91,7 +90,7 @@
 
   <!-- Project system and dependencies -->
   <ItemGroup>
-    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.1">
+    <PackageReference Include="IX.Framework.ProjectSystem" Version="1.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

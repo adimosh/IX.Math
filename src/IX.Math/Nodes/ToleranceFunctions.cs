@@ -83,7 +83,7 @@ namespace IX.Math.Nodes
             long rightOperand,
             double proportion)
         {
-            Contract.Requires(proportion > 1, nameof(proportion));
+            Requires.True(proportion > 1, nameof(proportion));
 
             double directProportion = ((double)rightOperand) * proportion;
             double inverseProportion = ((double)rightOperand) * (1D / proportion);
@@ -110,7 +110,7 @@ namespace IX.Math.Nodes
             double rightOperand,
             double proportion)
         {
-            Contract.Requires(proportion > 1D, nameof(proportion));
+            Requires.True(proportion > 1D, nameof(proportion));
 
             double directProportion = rightOperand * proportion;
             double inverseProportion = rightOperand * (1D / proportion);
@@ -137,7 +137,7 @@ namespace IX.Math.Nodes
             long rightOperand,
             double percentage)
         {
-            Contract.Requires(percentage < 1 && percentage > 0, nameof(percentage));
+            Requires.True(percentage < 1 && percentage > 0, nameof(percentage));
 
             double directPercentage = ((double)rightOperand) * (1D - percentage);
             double inversePercentage = ((double)rightOperand) * (1D + percentage);
@@ -164,7 +164,7 @@ namespace IX.Math.Nodes
             double rightOperand,
             double percentage)
         {
-            Contract.Requires(percentage < 1 && percentage > 0, nameof(percentage));
+            Requires.True(percentage < 1 && percentage > 0, nameof(percentage));
 
             double directPercentage = ((double)rightOperand) * (1D - percentage);
             double inversePercentage = ((double)rightOperand) * (1D + percentage);
@@ -246,7 +246,7 @@ namespace IX.Math.Nodes
             long rightOperand,
             double proportion)
         {
-            Contract.Requires(proportion > 1, nameof(proportion));
+            Requires.True(proportion > 1, nameof(proportion));
 
             double directProportion = ((double)rightOperand) * proportion;
             double inverseProportion = ((double)rightOperand) * (1D / proportion);
@@ -269,7 +269,7 @@ namespace IX.Math.Nodes
             double rightOperand,
             double proportion)
         {
-            Contract.Requires(proportion > 1D, nameof(proportion));
+            Requires.True(proportion > 1D, nameof(proportion));
 
             double directProportion = rightOperand * proportion;
             double inverseProportion = rightOperand * (1D / proportion);
@@ -292,7 +292,7 @@ namespace IX.Math.Nodes
             long rightOperand,
             double percentage)
         {
-            Contract.Requires(percentage < 1 && percentage > 0, nameof(percentage));
+            Requires.True(percentage < 1 && percentage > 0, nameof(percentage));
 
             double directPercentage = ((double)rightOperand) * (1D - percentage);
             double inversePercentage = ((double)rightOperand) * (1D + percentage);
@@ -315,7 +315,7 @@ namespace IX.Math.Nodes
             double rightOperand,
             double percentage)
         {
-            Contract.Requires(percentage < 1 && percentage > 0, nameof(percentage));
+            Requires.True(percentage < 1 && percentage > 0, nameof(percentage));
 
             double directPercentage = ((double)rightOperand) * (1D - percentage);
             double inversePercentage = ((double)rightOperand) * (1D + percentage);
@@ -393,7 +393,7 @@ namespace IX.Math.Nodes
             long rightOperand,
             double proportion)
         {
-            Contract.Requires(proportion > 1, nameof(proportion));
+            Requires.True(proportion > 1, nameof(proportion));
 
             double directProportion = ((double)rightOperand) * proportion;
             double inverseProportion = ((double)rightOperand) * (1D / proportion);
@@ -416,7 +416,7 @@ namespace IX.Math.Nodes
             double rightOperand,
             double proportion)
         {
-            Contract.Requires(proportion > 1D, nameof(proportion));
+            Requires.True(proportion > 1D, nameof(proportion));
 
             double directProportion = rightOperand * proportion;
             double inverseProportion = rightOperand * (1D / proportion);
@@ -439,7 +439,7 @@ namespace IX.Math.Nodes
             long rightOperand,
             double percentage)
         {
-            Contract.Requires(percentage < 1 && percentage > 0, nameof(percentage));
+            Requires.True(percentage < 1 && percentage > 0, nameof(percentage));
 
             double directPercentage = ((double)rightOperand) * (1D - percentage);
             double inversePercentage = ((double)rightOperand) * (1D + percentage);
@@ -462,7 +462,7 @@ namespace IX.Math.Nodes
             double rightOperand,
             double percentage)
         {
-            Contract.Requires(percentage < 1 && percentage > 0, nameof(percentage));
+            Requires.True(percentage < 1 && percentage > 0, nameof(percentage));
 
             double directPercentage = ((double)rightOperand) * (1D - percentage);
             double inversePercentage = ((double)rightOperand) * (1D + percentage);
@@ -540,7 +540,7 @@ namespace IX.Math.Nodes
             long rightOperand,
             double proportion)
         {
-            Contract.Requires(proportion > 1, nameof(proportion));
+            Requires.True(proportion > 1, nameof(proportion));
 
             double directProportion = ((double)rightOperand) * proportion;
             double inverseProportion = ((double)rightOperand) * (1D / proportion);
@@ -563,7 +563,7 @@ namespace IX.Math.Nodes
             double rightOperand,
             double proportion)
         {
-            Contract.Requires(proportion > 1D, nameof(proportion));
+            Requires.True(proportion > 1D, nameof(proportion));
 
             double directProportion = rightOperand * proportion;
             double inverseProportion = rightOperand * (1D / proportion);
@@ -586,7 +586,7 @@ namespace IX.Math.Nodes
             long rightOperand,
             double percentage)
         {
-            Contract.Requires(percentage < 1 && percentage > 0, nameof(percentage));
+            Requires.True(percentage < 1 && percentage > 0, nameof(percentage));
 
             double directPercentage = ((double)rightOperand) * (1D - percentage);
             double inversePercentage = ((double)rightOperand) * (1D + percentage);
@@ -609,7 +609,7 @@ namespace IX.Math.Nodes
             double rightOperand,
             double percentage)
         {
-            Contract.Requires(percentage < 1 && percentage > 0, nameof(percentage));
+            Requires.True(percentage < 1 && percentage > 0, nameof(percentage));
 
             double directPercentage = ((double)rightOperand) * (1D - percentage);
             double inversePercentage = ((double)rightOperand) * (1D + percentage);
@@ -687,7 +687,7 @@ namespace IX.Math.Nodes
             long rightOperand,
             double proportion)
         {
-            Contract.Requires(proportion > 1, nameof(proportion));
+            Requires.True(proportion > 1, nameof(proportion));
 
             double directProportion = ((double)rightOperand) * proportion;
             double inverseProportion = ((double)rightOperand) * (1D / proportion);
@@ -710,7 +710,7 @@ namespace IX.Math.Nodes
             double rightOperand,
             double proportion)
         {
-            Contract.Requires(proportion > 1D, nameof(proportion));
+            Requires.GreaterThan(in proportion, 1D, nameof(proportion));
 
             double directProportion = rightOperand * proportion;
             double inverseProportion = rightOperand * (1D / proportion);
@@ -733,7 +733,7 @@ namespace IX.Math.Nodes
             long rightOperand,
             double percentage)
         {
-            Contract.Requires(percentage < 1 && percentage > 0, nameof(percentage));
+            Requires.True(percentage < 1 && percentage > 0, nameof(percentage));
 
             double directPercentage = ((double)rightOperand) * (1D - percentage);
             double inversePercentage = ((double)rightOperand) * (1D + percentage);
@@ -756,7 +756,7 @@ namespace IX.Math.Nodes
             double rightOperand,
             double percentage)
         {
-            Contract.Requires(percentage < 1 && percentage > 0, nameof(percentage));
+            Requires.True(percentage < 1 && percentage > 0, nameof(percentage));
 
             double directPercentage = ((double)rightOperand) * (1D - percentage);
             double inversePercentage = ((double)rightOperand) * (1D + percentage);

@@ -3,9 +3,9 @@
 // </copyright>
 
 using System.Globalization;
+using IX.DataGeneration;
 using IX.Math;
 using IX.Math.Extensibility;
-using IX.StandardExtensions.TestUtils;
 using Xunit;
 
 namespace IX.UnitTests

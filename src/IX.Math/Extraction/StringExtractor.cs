@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Text;
 using IX.Math.Generators;
 using IX.Math.Nodes;
-using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Extraction
 {
@@ -36,30 +35,12 @@ namespace IX.Math.Extraction
             "Usage",
             "PC001:API not supported on all platforms",
             Justification = "This is an analyzer bug, TODO: see https://github.com/dotnet/platform-compat/issues/123")]
-#if NETSTANDARD2_1 || NET452
-        public
-#else
-        public unsafe
-#endif
-        string ExtractAllConstants(
+        public string ExtractAllConstants(
             string originalExpression,
             IDictionary<string, ConstantNodeBase> constantsTable,
             IDictionary<string, string> reverseConstantsTable,
             MathDefinition mathDefinition)
         {
-            Contract.RequiresNotNullOrWhitespacePrivate(
-                originalExpression,
-                nameof(originalExpression));
-            Contract.RequiresNotNullPrivate(
-                in constantsTable,
-                nameof(constantsTable));
-            Contract.RequiresNotNullPrivate(
-                in reverseConstantsTable,
-                nameof(reverseConstantsTable));
-            Contract.RequiresNotNullPrivate(
-                in mathDefinition,
-                nameof(mathDefinition));
-
             var stringIndicagtorString = mathDefinition.StringIndicator;
             var stringIndicator = mathDefinition.StringIndicator.AsSpan();
             var stringIndicatorLength = stringIndicator.Length;
@@ -146,14 +127,7 @@ namespace IX.Math.Extraction
 #if NETSTANDARD2_1
                 sb.Append(header);
 #else
-#if NET452
                 sb.Append(header.ToString());
-#else
-                fixed (char* headerPointer = &header.GetPinnableReference())
-                {
-                    sb.Append(headerPointer, header.Length);
-                }
-#endif
 #endif
 
                 sb.Append(itemName);
@@ -169,14 +143,7 @@ namespace IX.Math.Extraction
 #if NETSTANDARD2_1
             sb.Append(process);
 #else
-#if NET452
             sb.Append(process.ToString());
-#else
-            fixed (char* processPointer = &process.GetPinnableReference())
-            {
-                sb.Append(processPointer, process.Length);
-            }
-#endif
 #endif
 
             return sb.ToString();

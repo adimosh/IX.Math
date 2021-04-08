@@ -54,7 +54,7 @@ namespace IX.Math
         /// <param name="definition">The math definition to use.</param>
         protected private ExpressionParsingServiceBase(MathDefinition definition)
         {
-            Contract.RequiresNotNull(ref this.workingDefinition, definition, nameof(definition));
+            Requires.NotNull(out this.workingDefinition, definition, nameof(definition));
 
             this.assembliesToRegister = new List<Assembly>
             {
@@ -99,7 +99,7 @@ namespace IX.Math
             string expression,
             CancellationToken cancellationToken = default)
         {
-            Contract.RequiresNotNullOrWhitespace(
+            Requires.NotNullOrWhiteSpace(
                 expression,
                 nameof(expression));
 
@@ -280,8 +280,8 @@ namespace IX.Math
         /// <param name="assembly">The assembly to register.</param>
         public void RegisterFunctionsAssembly(Assembly assembly)
         {
-            Contract.RequiresNotNull(
-                in assembly,
+            Requires.NotNull(
+                assembly,
                 nameof(assembly));
 
             this.ThrowIfCurrentObjectDisposed();
@@ -309,8 +309,8 @@ namespace IX.Math
         /// </exception>
         public void RegisterTypeFormatter([NotNull] IStringFormatter formatter)
         {
-            Contract.RequiresNotNull(
-                in formatter,
+            Requires.NotNull(
+                formatter,
                 nameof(formatter));
 
             if (this.interpretationDone != 0)

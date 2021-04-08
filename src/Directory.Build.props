@@ -3,13 +3,4 @@
 
   <Import Project="../opt/msbuild/Standard.Build.props" />
 
-  <!-- Extra debug symbols for target framework type -->
-  <PropertyGroup Condition="'$(TargetFrameworkIsStandard2)'=='true'">
-    <DefineConstants>$(DefineConstants);NETSTANDARD2</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFrameworkIsStandard)'=='true'">
-    <DefineConstants>$(DefineConstants);STANDARD</DefineConstants>
-  </PropertyGroup>
-
 </Project>

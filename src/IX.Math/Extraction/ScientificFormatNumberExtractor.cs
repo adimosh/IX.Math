@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using IX.Math.Generators;
 using IX.Math.Nodes;
-using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Extraction
 {
@@ -43,19 +42,6 @@ namespace IX.Math.Extraction
             IDictionary<string, string> reverseConstantsTable,
             MathDefinition mathDefinition)
         {
-            Contract.RequiresNotNullOrWhitespacePrivate(
-                originalExpression,
-                nameof(originalExpression));
-            Contract.RequiresNotNullPrivate(
-                in constantsTable,
-                nameof(constantsTable));
-            Contract.RequiresNotNullPrivate(
-                in reverseConstantsTable,
-                nameof(reverseConstantsTable));
-            Contract.RequiresNotNullPrivate(
-                in mathDefinition,
-                nameof(mathDefinition));
-
             var process = originalExpression;
             var location = 0;
 
