@@ -5,7 +5,6 @@
 using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Globalization;
 
 namespace IX.Math.Formatters
@@ -21,39 +20,52 @@ namespace IX.Math.Formatters
 
         private const NumberStyles HexNumberStyle = NumberStyles.AllowHexSpecifier;
 
-        private static readonly Regex BitRepresentationRegex = new Regex("^[01]{8}$");
+        private static readonly Regex BitRepresentationRegex = new("^[01]{8}$");
 
         internal static bool ParseNumeric(
             string expression,
-            out object result)
+            out object? result)
         {
-            if (!expression.StartsWith(
-                    "0x",
-                    StringComparison.CurrentCultureIgnoreCase) && !expression.StartsWith(
-                    "&h",
-                    StringComparison.CurrentCultureIgnoreCase))
+            var eSpan = expression.AsSpan();
+
+            bool success = false;
+            long possibleLongOutput = default;
+            if (eSpan.Length > 2)
             {
-                return ParseSpecific(
-                    expression,
-                    out result);
+                if ((eSpan[0] == '0' && (eSpan[1] == 'x' || eSpan[1] == 'X')) ||
+                    (eSpan[0] == '&' && (eSpan[1] == 'h' || eSpan[1] == 'H')))
+                {
+                    success = ParseHexSpecific(
+                        eSpan.Slice(2),
+                        out possibleLongOutput);
+                }
             }
 
-            if (expression.Length > 2)
+            if (success)
             {
-                return ParseHexSpecific(
-                    expression.Substring(2),
-                    out result);
+                result = possibleLongOutput;
+
+                return true;
             }
 
-            result = null;
-            return false;
+            return ParseSpecific(
+                #if FRAMEWORK_ADVANCED
+                in eSpan,
+                #else
+                expression,
+                #endif
+                out result);
 
-            bool ParseHexSpecific(
-                string hexExpression,
-                out object hexResult)
+            static bool ParseHexSpecific(
+                ReadOnlySpan<char> hexExpression,
+                out long hexResult)
             {
                 if (long.TryParse(
+                    #if FRAMEWORK_ADVANCED
                     hexExpression,
+                    #else
+                    hexExpression.ToString(),
+                    #endif
                     HexNumberStyle,
                     CultureInfo.CurrentCulture,
                     out var intVal))
@@ -62,13 +74,17 @@ namespace IX.Math.Formatters
                     return true;
                 }
 
-                hexResult = null;
+                hexResult = default;
                 return false;
             }
 
-            bool ParseSpecific(
+            static bool ParseSpecific(
+                #if FRAMEWORK_ADVANCED
+                in ReadOnlySpan<char> specificExpression,
+                #else
                 string specificExpression,
-                out object specificResult)
+                #endif
+                out object? specificResult)
             {
                 IFormatProvider formatProvider = CultureInfo.CurrentCulture;
 
