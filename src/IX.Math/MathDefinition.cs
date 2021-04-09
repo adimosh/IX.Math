@@ -2,9 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Runtime.Serialization;
-using IX.Abstractions.Logging;
 using IX.StandardExtensions;
 
 namespace IX.Math
@@ -13,13 +11,36 @@ namespace IX.Math
     /// A definition for signs and symbols used in expression parsing of a mathematical expression.
     /// </summary>
     [DataContract]
-    public class MathDefinition : IDeepCloneable<MathDefinition>
+    public record MathDefinition : IDeepCloneable<MathDefinition>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MathDefinition"/> class.
         /// </summary>
         public MathDefinition()
         {
+            this.Parentheses = ("(", ")");
+            this.SpecialSymbolIndicators = ("[", "]");
+            this.StringIndicator = "\"";
+            this.ParameterSeparator = ",";
+            this.AddSymbol = "+";
+            this.AndSymbol = "&";
+            this.DivideSymbol = "/";
+            this.NotEqualsSymbol = "!=";
+            this.EqualsSymbol = "=";
+            this.MultiplySymbol = "*";
+            this.NotSymbol = "!";
+            this.OrSymbol = "|";
+            this.PowerSymbol = "^";
+            this.SubtractSymbol = "-";
+            this.XorSymbol = "#";
+            this.GreaterThanOrEqualSymbol = ">=";
+            this.GreaterThanSymbol = ">";
+            this.LessThanOrEqualSymbol = "<=";
+            this.LessThanSymbol = "<";
+            this.RightShiftSymbol = ">>";
+            this.LeftShiftSymbol = "<<";
+            this.OperatorPrecedenceStyle = OperatorPrecedenceStyle.Mathematical;
+            this.EscapeCharacter = "\\";
         }
 
         /// <summary>
@@ -28,8 +49,8 @@ namespace IX.Math
         /// <param name="definition">The definition to use.</param>
         public MathDefinition(MathDefinition definition)
         {
-            this.Parentheses = new Tuple<string, string>(definition.Parentheses.Item1, definition.Parentheses.Item2);
-            this.SpecialSymbolIndicators = new Tuple<string, string>(definition.SpecialSymbolIndicators.Item1, definition.SpecialSymbolIndicators.Item2);
+            this.Parentheses = (definition.Parentheses.Left, definition.Parentheses.Right);
+            this.SpecialSymbolIndicators = (definition.SpecialSymbolIndicators.Begin, definition.SpecialSymbolIndicators.End);
             this.StringIndicator = definition.StringIndicator;
             this.ParameterSeparator = definition.ParameterSeparator;
             this.AddSymbol = definition.AddSymbol;
@@ -49,7 +70,6 @@ namespace IX.Math
             this.RightShiftSymbol = definition.RightShiftSymbol;
             this.SubtractSymbol = definition.SubtractSymbol;
             this.XorSymbol = definition.XorSymbol;
-            this.AutoConvertStringFormatSpecifier = definition.AutoConvertStringFormatSpecifier;
             this.EscapeCharacter = definition.EscapeCharacter;
             this.OperatorPrecedenceStyle = definition.OperatorPrecedenceStyle;
         }
@@ -60,36 +80,7 @@ namespace IX.Math
         /// <value>
         /// The default math definition.
         /// </value>
-        public static MathDefinition Default => new MathDefinition
-        {
-            Parentheses = new Tuple<string, string>(
-                "(",
-                ")"),
-            SpecialSymbolIndicators = new Tuple<string, string>(
-                "[",
-                "]"),
-            StringIndicator = "\"",
-            ParameterSeparator = ",",
-            AddSymbol = "+",
-            AndSymbol = "&",
-            DivideSymbol = "/",
-            NotEqualsSymbol = "!=",
-            EqualsSymbol = "=",
-            MultiplySymbol = "*",
-            NotSymbol = "!",
-            OrSymbol = "|",
-            PowerSymbol = "^",
-            SubtractSymbol = "-",
-            XorSymbol = "#",
-            GreaterThanOrEqualSymbol = ">=",
-            GreaterThanSymbol = ">",
-            LessThanOrEqualSymbol = "<=",
-            LessThanSymbol = "<",
-            RightShiftSymbol = ">>",
-            LeftShiftSymbol = "<<",
-            OperatorPrecedenceStyle = OperatorPrecedenceStyle.Mathematical,
-            EscapeCharacter = "\\",
-        };
+        public static MathDefinition Default => new();
 
         /// <summary>
         /// Gets or sets what should be interpreted as parentheses.
@@ -97,7 +88,7 @@ namespace IX.Math
         /// <value>The parentheses indicators.</value>
         /// <remarks>The first item in the tuple represents the opening parenthesis, whereas the second represents the closing parenthesis.</remarks>
         [DataMember]
-        public Tuple<string, string> Parentheses { get; set; }
+        public (string Left, string Right) Parentheses { get; set; }
 
         /// <summary>
         /// Gets or sets what should be interpreted as special symbols.
@@ -105,7 +96,7 @@ namespace IX.Math
         /// <value>The special symbol indicators.</value>
         /// <remarks>The first item in the tuple represents the opening of the special symbol marker, whereas the second represents its closing.</remarks>
         [DataMember]
-        public Tuple<string, string> SpecialSymbolIndicators { get; set; }
+        public (string Begin, string End) SpecialSymbolIndicators { get; set; }
 
         /// <summary>
         /// Gets or sets what should be interpreted as string markers.
@@ -241,13 +232,6 @@ namespace IX.Math
         public string LeftShiftSymbol { get; set; }
 
         /// <summary>
-        /// Gets or sets the automatic convert string format specifier.
-        /// </summary>
-        /// <value>The automatic convert string format specifier.</value>
-        [DataMember]
-        public string AutoConvertStringFormatSpecifier { get; set; }
-
-        /// <summary>
         /// Gets or sets the escape character.
         /// </summary>
         /// <value>
@@ -264,46 +248,9 @@ namespace IX.Math
         public OperatorPrecedenceStyle OperatorPrecedenceStyle { get; set; }
 
         /// <summary>
-        /// Gets or sets the diagnostics logger.
-        /// </summary>
-        /// <value>
-        /// The logger.
-        /// </value>
-        /// <remarks>The logger does not serialize, and cannot be cloned. It should be used for diagnostics only.</remarks>
-        [IgnoreDataMember]
-        public ILog Logger { get; set; }
-
-        /// <summary>
         /// Creates a deep clone of the source object.
         /// </summary>
         /// <returns>A deep clone.</returns>
-        public MathDefinition DeepClone() =>
-            new MathDefinition
-            {
-                AddSymbol = this.AddSymbol,
-                AndSymbol = this.AndSymbol,
-                DivideSymbol = this.DivideSymbol,
-                EqualsSymbol = this.EqualsSymbol,
-                GreaterThanOrEqualSymbol = this.GreaterThanOrEqualSymbol,
-                GreaterThanSymbol = this.GreaterThanSymbol,
-                LeftShiftSymbol = this.LeftShiftSymbol,
-                LessThanOrEqualSymbol = this.LessThanOrEqualSymbol,
-                LessThanSymbol = this.LessThanSymbol,
-                MultiplySymbol = this.MultiplySymbol,
-                NotEqualsSymbol = this.NotEqualsSymbol,
-                NotSymbol = this.NotSymbol,
-                OrSymbol = this.OrSymbol,
-                ParameterSeparator = this.ParameterSeparator,
-                Parentheses = new Tuple<string, string>(this.Parentheses.Item1, this.Parentheses.Item2),
-                PowerSymbol = this.PowerSymbol,
-                RightShiftSymbol = this.RightShiftSymbol,
-                SpecialSymbolIndicators = new Tuple<string, string>(this.SpecialSymbolIndicators.Item1, this.SpecialSymbolIndicators.Item2),
-                StringIndicator = this.StringIndicator,
-                SubtractSymbol = this.SubtractSymbol,
-                XorSymbol = this.XorSymbol,
-                AutoConvertStringFormatSpecifier = this.AutoConvertStringFormatSpecifier,
-                EscapeCharacter = this.EscapeCharacter,
-                OperatorPrecedenceStyle = this.OperatorPrecedenceStyle
-            };
+        public MathDefinition DeepClone() => new(this);
     }
 }

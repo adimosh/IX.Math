@@ -50,7 +50,7 @@ namespace IX.UnitTests.Helpers
         {
             if (this.Service != null)
             {
-                dispose?.Invoke(this.Service);
+                this.dispose?.Invoke(this.Service);
             }
         }
     }

@@ -20,7 +20,8 @@
     <Description>A library for transforming text expressions containing mathematical operations into executable delegates.</Description>
     <PackageReleaseNotes>- Package updates on the classic version
 - Updated opt and all other references
-- Removed dependency on project system</PackageReleaseNotes>
+- Removed dependency on project system
+- Mathematics definition cleaned up</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>

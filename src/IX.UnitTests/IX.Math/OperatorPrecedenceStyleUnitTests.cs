@@ -22,7 +22,7 @@ namespace IX.UnitTests.IX.Math
         [Fact(DisplayName = "Operator precedence style test")]
         public void Test1()
         {
-            var expression = "true&true|false&false";
+            const string expression = "true&true|false&false";
 
             object result1, result2;
 
@@ -41,8 +41,8 @@ namespace IX.UnitTests.IX.Math
 
             using (var service = new ExpressionParsingService(new MathDefinition
             {
-                Parentheses = new Tuple<string, string>("(", ")"),
-                SpecialSymbolIndicators = new Tuple<string, string>("[", "]"),
+                Parentheses = ("(", ")"),
+                SpecialSymbolIndicators = ("[", "]"),
                 StringIndicator = "\"",
                 ParameterSeparator = ",",
                 AddSymbol = "+",
@@ -62,18 +62,17 @@ namespace IX.UnitTests.IX.Math
                 LessThanSymbol = "<",
                 RightShiftSymbol = ">>",
                 LeftShiftSymbol = "<<",
-                OperatorPrecedenceStyle = OperatorPrecedenceStyle.CStyle,
+                OperatorPrecedenceStyle = OperatorPrecedenceStyle.CStyle
             }))
             {
-                using (ComputedExpression del = service.Interpret(expression))
-                {
-                    if (del == null)
-                    {
-                        throw new InvalidOperationException("No computed expression was generated!");
-                    }
+                using ComputedExpression del = service.Interpret(expression);
 
-                    result2 = del.Compute();
+                if (del == null)
+                {
+                    throw new InvalidOperationException("No computed expression was generated!");
                 }
+
+                result2 = del.Compute();
             }
 
             Assert.False((bool)result1);
