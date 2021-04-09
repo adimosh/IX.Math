@@ -25,9 +25,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.6.0</Version>
-    <FileVersion>0.6.0.0</FileVersion>
-    <AssemblyVersion>0.6.0</AssemblyVersion>
+    <VersionPrefix>0.6.0</VersionPrefix>
+    <VersionSuffix>alpha</VersionSuffix>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>../../opt/snk/ix.framework.strongname.snk</AssemblyOriginatorKeyFile>
