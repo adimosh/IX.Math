@@ -2,10 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using IX.Math.Extensibility;
 using IX.Math.Formatters;
 using JetBrains.Annotations;
 
@@ -16,7 +13,7 @@ namespace IX.Math.Nodes
     /// </summary>
     /// <seealso cref="NodeBase" />
     [PublicAPI]
-    public abstract class OperationNodeBase : CachedExpressionNodeBase, ISpecialRequestNode
+    public abstract class OperationNodeBase : CachedExpressionNodeBase
     {
         /// <summary>
         /// Prevents a default instance of the <see cref="OperationNodeBase"/> class from being created.
@@ -30,14 +27,6 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <value><see langword="true"/> if the node is a constant, <see langword="false"/> otherwise.</value>
         public override bool IsConstant => false;
-
-        /// <summary>
-        /// Gets the special object request function.
-        /// </summary>
-        /// <value>
-        /// The special object request function.
-        /// </value>
-        protected Func<Type, object> SpecialObjectRequestFunction { get; private set; }
 
         /// <summary>
         /// Generates an expression that will be cached before being compiled.
@@ -88,11 +77,7 @@ namespace IX.Math.Nodes
                 return expression;
             }
 
-            var stringFormatters = this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) as List<IStringFormatter>;
-
-            return StringFormatter.CreateStringConversionExpression(
-                expression,
-                stringFormatters);
+            return StringFormatter.CreateStringConversionExpression(expression);
         }
 
         /// <summary>
@@ -109,21 +94,7 @@ namespace IX.Math.Nodes
                 return expression;
             }
 
-            var stringFormatters = this.SpecialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) as List<IStringFormatter>;
-
-            return StringFormatter.CreateStringConversionExpression(
-                expression,
-                stringFormatters);
-        }
-
-        /// <summary>
-        /// Sets the request special object function.
-        /// </summary>
-        /// <param name="func">The function to set.</param>
-        void ISpecialRequestNode.SetRequestSpecialObjectFunction(Func<Type, object> func)
-        {
-            this.SpecialObjectRequestFunction = func;
-            this.SetSpecialObjectRequestFunctionForSubObjects(func);
+            return StringFormatter.CreateStringConversionExpression(expression);
         }
 
         /// <summary>
@@ -134,7 +105,6 @@ namespace IX.Math.Nodes
         public sealed override NodeBase DeepClone(NodeCloningContext context)
         {
             var node = this.DeepCloneNode(context);
-            node.SpecialObjectRequestFunction = context.SpecialRequestFunction;
             return node;
         }
 
@@ -144,12 +114,6 @@ namespace IX.Math.Nodes
         /// <param name="context">The deep cloning context.</param>
         /// <returns>A deep clone.</returns>
         protected abstract OperationNodeBase DeepCloneNode(NodeCloningContext context);
-
-        /// <summary>
-        /// Sets the special object request function for sub objects.
-        /// </summary>
-        /// <param name="func">The function.</param>
-        protected abstract void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func);
 
         /// <summary>
         /// Generates the expression that will be compiled into code.

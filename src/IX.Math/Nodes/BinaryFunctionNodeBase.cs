@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Extensibility;
+using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
@@ -18,7 +19,7 @@ namespace IX.Math.Nodes
     /// </summary>
     /// <seealso cref="FunctionNodeBase" />
     [PublicAPI]
-    public abstract class BinaryFunctionNodeBase : FunctionNodeBase
+    public abstract class BinaryFunctionNodeBase : FunctionNodeBase, IMathematicsPlugin
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryFunctionNodeBase"/> class.
@@ -35,8 +36,8 @@ namespace IX.Math.Nodes
         [SuppressMessage("Usage", "CA2214:Do not call overridable methods in constructors", Justification = "We specifically want this to happen.")]
         protected BinaryFunctionNodeBase(NodeBase firstParameter, NodeBase secondParameter)
         {
-            NodeBase firstParameterTemp = firstParameter ?? throw new ArgumentNullException(nameof(firstParameter));
-            NodeBase secondParameterTemp = secondParameter ?? throw new ArgumentNullException(nameof(secondParameter));
+            NodeBase firstParameterTemp = Requires.NotNull(firstParameter, nameof(firstParameter));
+            NodeBase secondParameterTemp = Requires.NotNull(secondParameter, nameof(secondParameter));
 
             this.EnsureCompatibleParameters(firstParameter, secondParameter);
 
@@ -63,23 +64,6 @@ namespace IX.Math.Nodes
         ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
         /// </value>
         public override bool IsTolerant => this.FirstParameter.IsTolerant || this.SecondParameter.IsTolerant;
-
-        /// <summary>
-        /// Sets the special object request function for sub objects.
-        /// </summary>
-        /// <param name="func">The function.</param>
-        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
-        {
-            if (this.FirstParameter is ISpecialRequestNode srnl)
-            {
-                srnl.SetRequestSpecialObjectFunction(func);
-            }
-
-            if (this.SecondParameter is ISpecialRequestNode srnr)
-            {
-                srnr.SetRequestSpecialObjectFunction(func);
-            }
-        }
 
         /// <summary>
         /// Ensures that the parameters that are received are compatible with the function, optionally allowing the parameter references to change.
@@ -123,7 +107,7 @@ namespace IX.Math.Nodes
         /// <param name="tolerance">The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
         /// <returns>Expression.</returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
-        protected Expression GenerateStaticBinaryFunctionCall(Type t, string functionName, Tolerance tolerance)
+        protected Expression GenerateStaticBinaryFunctionCall(Type t, string functionName, Tolerance? tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
@@ -133,7 +117,7 @@ namespace IX.Math.Nodes
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
             Type secondParameterType = ParameterTypeFromParameter(this.SecondParameter);
 
-            MethodInfo mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
+            MethodInfo? mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
 
             if (mi == null)
             {
@@ -211,7 +195,7 @@ namespace IX.Math.Nodes
         /// The generated binary method call expression.
         /// </returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
-        protected Expression GenerateStaticBinaryFunctionCall<TParam1, TParam2>(Type t, string functionName, Tolerance tolerance)
+        protected Expression GenerateStaticBinaryFunctionCall<TParam1, TParam2>(Type t, string functionName, Tolerance? tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
@@ -221,7 +205,7 @@ namespace IX.Math.Nodes
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
             Type secondParameterType = ParameterTypeFromParameter(this.SecondParameter);
 
-            MethodInfo mi = t.GetMethodWithExactParameters(functionName, typeof(TParam1), typeof(TParam2));
+            MethodInfo? mi = t.GetMethodWithExactParameters(functionName, typeof(TParam1), typeof(TParam2));
 
             Expression e1, e2;
             if (tolerance == null)
@@ -295,7 +279,7 @@ namespace IX.Math.Nodes
         /// Expression.
         /// </returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
-        protected Expression GenerateBinaryFunctionCallFirstParameterInstance(Type t, string functionName, Tolerance tolerance)
+        protected Expression GenerateBinaryFunctionCallFirstParameterInstance(Type t, string functionName, Tolerance? tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
@@ -305,7 +289,7 @@ namespace IX.Math.Nodes
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
             Type secondParameterType = ParameterTypeFromParameter(this.SecondParameter);
 
-            MethodInfo mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
+            MethodInfo? mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
 
             if (mi == null)
             {

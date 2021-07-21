@@ -10,7 +10,7 @@ namespace IX.Math.Extensibility
     /// A service contract for a string formatter of objects.
     /// </summary>
     [PublicAPI]
-    public interface IStringFormatter
+    public interface IStringFormatter : IMathematicsPlugin
     {
         /// <summary>
         /// Parses the input data into string.

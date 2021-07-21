@@ -4,13 +4,11 @@
 
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace IX.Math.Generators
 {
     internal static class OperatorSequenceGenerator
     {
-
         internal static List<Tuple<int, int, string>> GetOperatorsInOrderInExpression(
              string expression,
              IEnumerable<KeyValuePair<int, string[]>> operators)

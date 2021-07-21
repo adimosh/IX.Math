@@ -6,6 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage(
     "StyleCop.CSharp.ReadabilityRules",
-    "SA1124:Do not use regions",
-    Justification = "Leave my regions alone!",
+    "SA1118:Parameter should not span multiple lines",
+    Justification = "This is just silly.",
     Scope = "module")]

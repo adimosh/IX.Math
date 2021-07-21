@@ -11,7 +11,7 @@ namespace IX.Math.Extensibility
     ///     A service contract for a class that can evaluate and interpret possible constants.
     /// </summary>
     [PublicAPI]
-    public interface IConstantInterpreter
+    public interface IConstantInterpreter : IMathematicsPlugin
     {
         /// <summary>
         ///     Evaluates part of an expression, determining whether or not it is a constant.

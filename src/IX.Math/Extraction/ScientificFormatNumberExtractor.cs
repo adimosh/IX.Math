@@ -5,8 +5,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using IX.Math.Generators;
+using IX.Math.Extensibility;
+using IX.Math.Interpretation;
 using IX.Math.Nodes;
+using JetBrains.Annotations;
 
 namespace IX.Math.Extraction
 {
@@ -14,9 +16,11 @@ namespace IX.Math.Extraction
     ///     An extractor for scientific notation of numbers. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="Extensibility.IConstantsExtractor" />
-    internal sealed class ScientificFormatNumberExtractor : Extensibility.IConstantsExtractor
+    [ConstantsExtractor]
+    [UsedImplicitly]
+    internal sealed class ScientificFormatNumberExtractor : IConstantsExtractor
     {
-        private readonly Regex exponentialNotationRegex = new Regex(@"[0-9.,]+(?:e\+|E\+|e\-|E\-|e|E)[0-9]+");
+        private readonly Regex exponentialNotationRegex = new(@"[0-9.,]+(?:e\+|E\+|e\-|E\-|e|E)[0-9]+");
 
         /// <summary>
         ///     Extracts the scientific notations constants and replaces them with expression placeholders.
@@ -56,9 +60,7 @@ namespace IX.Math.Extraction
                     break;
                 }
 
-                var itemName = ConstantsGenerator.GenerateNumericConstant(
-                    constantsTable,
-                    reverseConstantsTable,
+                var itemName = InterpretationContext.Current.GenerateNumericConstant(
                     process,
                     match.Value);
 
@@ -66,7 +68,7 @@ namespace IX.Math.Extraction
                 {
                     process = this.exponentialNotationRegex.Replace(
                         process,
-                        itemName,
+                        itemName!,
                         1,
                         location);
                 }

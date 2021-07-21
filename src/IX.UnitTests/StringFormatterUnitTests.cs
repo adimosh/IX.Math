@@ -8,6 +8,7 @@ using IX.DataGeneration;
 using IX.Math;
 using IX.Math.Extensibility;
 using IX.UnitTests.Helpers;
+using JetBrains.Annotations;
 using Xunit;
 
 namespace IX.UnitTests
@@ -30,14 +31,6 @@ namespace IX.UnitTests
         public StringFormatterUnitTests(CachedExpressionProviderFixture fixture)
         {
             this.fixture = fixture;
-
-            fixture.AtFirstRun(
-                () =>
-                {
-                    var sf = new SillyStringFormatter();
-                    fixture.CachedService.RegisterTypeFormatter(sf);
-                    fixture.Service.RegisterTypeFormatter(sf);
-                });
         }
 
         /// <summary>
@@ -53,11 +46,6 @@ namespace IX.UnitTests
         {
             // Arrange
             using var eps = new FixtureCreateDisposePatternHelper(this.fixture, create, dispose);
-
-            if (dispose != null)
-            {
-                eps.Service.RegisterTypeFormatter(new SillyStringFormatter());
-            }
 
             int comparisonValue = DataGenerator.RandomNonNegativeInteger();
             string expression = $"\"The number is \" + {comparisonValue}";
@@ -87,11 +75,6 @@ namespace IX.UnitTests
             // Arrange
             using var eps = new FixtureCreateDisposePatternHelper(this.fixture, create, dispose);
 
-            if (dispose != null)
-            {
-                eps.Service.RegisterTypeFormatter(new SillyStringFormatter());
-            }
-
             int comparisonValue = DataGenerator.RandomNonNegativeInteger();
             string expression = $"\"The number is \" + x";
             string expectedResult = $"The number is 0x{comparisonValue:x8}";
@@ -117,11 +100,6 @@ namespace IX.UnitTests
         {
             // Arrange
             using var eps = new FixtureCreateDisposePatternHelper(this.fixture, create, dispose);
-
-            if (dispose != null)
-            {
-                eps.Service.RegisterTypeFormatter(new SillyStringFormatter());
-            }
 
             int comparisonValue1 = DataGenerator.RandomNonNegativeInteger();
             int comparisonValue2 = DataGenerator.RandomNonNegativeInteger();
@@ -150,11 +128,6 @@ namespace IX.UnitTests
             // Arrange
             using var eps = new FixtureCreateDisposePatternHelper(this.fixture, create, dispose);
 
-            if (dispose != null)
-            {
-                eps.Service.RegisterTypeFormatter(new SillyStringFormatter());
-            }
-
             long comparisonValue1 = DataGenerator.RandomNonNegativeInteger();
             long comparisonValue2 = DataGenerator.RandomNonNegativeInteger();
             string expression = "\"The number is \" + (x + y)";
@@ -182,11 +155,6 @@ namespace IX.UnitTests
             // Arrange
             using var eps = new FixtureCreateDisposePatternHelper(this.fixture, create, dispose);
 
-            if (dispose != null)
-            {
-                eps.Service.RegisterTypeFormatter(new SillyStringFormatter());
-            }
-
             int comparisonValue = DataGenerator.RandomNonNegativeInteger();
             string expression = $"strlen(\"The number is \" + {comparisonValue})";
             const long expectedResult = 24;
@@ -213,11 +181,6 @@ namespace IX.UnitTests
             // Arrange
             using var eps = new FixtureCreateDisposePatternHelper(this.fixture, create, dispose);
 
-            if (dispose != null)
-            {
-                eps.Service.RegisterTypeFormatter(new SillyStringFormatter());
-            }
-
             int comparisonValue1 = DataGenerator.RandomNonNegativeInteger();
             int comparisonValue2 = DataGenerator.RandomNonNegativeInteger();
             string expression = $"\"The \\\"alabalaportocala\\\" number is \" + ({comparisonValue1} + {comparisonValue2})";
@@ -231,7 +194,9 @@ namespace IX.UnitTests
             Assert.Equal(expectedResult, Assert.IsType<string>(result));
         }
 
-        private class SillyStringFormatter : IStringFormatter
+        [StringFormatter]
+        [UsedImplicitly]
+        public class SillyStringFormatter : IStringFormatter
         {
             public (bool Success, string ParsedData) ParseIntoString<T>(T data) => data switch
             {

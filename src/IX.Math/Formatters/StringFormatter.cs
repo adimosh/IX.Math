@@ -3,13 +3,10 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
-using IX.Math.Extensibility;
 using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
-using DiagCA = System.Diagnostics.CodeAnalysis;
 
 namespace IX.Math.Formatters
 {
@@ -23,27 +20,17 @@ namespace IX.Math.Formatters
         /// </summary>
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="value">The value.</param>
-        /// <param name="formatters">The formatters.</param>
         /// <returns>A formatted string, if the input type is supported.</returns>
-        public static string FormatIntoString<T>(
-            T value,
-            List<IStringFormatter> formatters)
+        public static string FormatIntoString<T>(T value)
         {
-            if (formatters == null)
+            if (typeof(T) == typeof(string))
             {
-                return ToStringRegular(value);
+                return (value as string)!;
             }
 
-            foreach (var formatter in formatters)
-            {
-                var (success, result) = formatter.ParseIntoString(value);
-                if (success)
-                {
-                    return result;
-                }
-            }
+            var (success, result) = PluginCollection.Current.InterpretAsString(value);
 
-            return ToStringRegular(value);
+            return success ? (result ?? ToStringRegular(value)) : ToStringRegular(value);
 
             static string ToStringRegular(T value) =>
                 value switch
@@ -62,27 +49,9 @@ namespace IX.Math.Formatters
         /// Creates the string conversion expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
-        /// <param name="stringFormatters">The string formatters. This parameter can be null.</param>
         /// <returns>An expression representing the string transformation.</returns>
-        [DiagCA.SuppressMessage(
-                    "Performance",
-                    "HAA0301:Closure Allocation Source",
-                    Justification = "We're actively looking for closures in this method.")]
-        [DiagCA.SuppressMessage(
-                    "Performance",
-                    "HAA0302:Display class allocation to capture closure",
-                    Justification = "We're actively looking for closures in this method.")]
-        [DiagCA.SuppressMessage(
-                    "ReSharper",
-                    "AssignNullToNotNullAttribute",
-                    Justification = "We've checked manually.")]
-        [DiagCA.SuppressMessage(
-                    "ReSharper",
-                    "InvertIf",
-                    Justification = "We don't care about inverting ifs here.")]
         public static Expression CreateStringConversionExpression(
-                    Expression expression,
-                    List<IStringFormatter> stringFormatters)
+                    Expression expression)
         {
             Requires.NotNull(
                 expression,
@@ -93,117 +62,43 @@ namespace IX.Math.Formatters
                 return expression;
             }
 
-            bool areFormatters = (stringFormatters?.Count ?? 0) > 0;
-
             if (expression.Type == typeof(long))
             {
-                if (areFormatters)
-                {
-                    Expression<Func<long, string>> innerLambda = value => FormatIntoString(
-                        value,
-                        stringFormatters);
-                    return Expression.Invoke(
-                        innerLambda,
-                        expression);
-                }
-
-                return Expression.Call(
-                    expression,
-                    typeof(long).GetMethod(
-                        nameof(long.ToString),
-                        new[] { typeof(IFormatProvider) }),
-                    Expression.Property(
-                        null,
-                        typeof(CultureInfo),
-                        nameof(CultureInfo.CurrentCulture)));
+                Expression<Func<long, string>> innerLambda = value => FormatIntoString(value);
+                return Expression.Invoke(
+                    innerLambda,
+                    expression);
             }
 
             if (expression.Type == typeof(int))
             {
-                if (areFormatters)
-                {
-                    Expression<Func<int, string>> innerLambda = value => FormatIntoString(
-                        value,
-                        stringFormatters);
-                    return Expression.Invoke(
-                        innerLambda,
-                        expression);
-                }
-
-                return Expression.Call(
-                    expression,
-                    typeof(int).GetMethod(
-                        nameof(int.ToString),
-                        new[] { typeof(IFormatProvider) }),
-                    Expression.Property(
-                        null,
-                        typeof(CultureInfo),
-                        nameof(CultureInfo.CurrentCulture)));
+                Expression<Func<int, string>> innerLambda = value => FormatIntoString(value);
+                return Expression.Invoke(
+                    innerLambda,
+                    expression);
             }
 
             if (expression.Type == typeof(bool))
             {
-                if (areFormatters)
-                {
-                    Expression<Func<bool, string>> innerLambda = value => FormatIntoString(
-                        value,
-                        stringFormatters);
-                    return Expression.Invoke(
-                        innerLambda,
-                        expression);
-                }
-
-                return Expression.Call(
-                    expression,
-                    typeof(bool).GetMethod(
-                        nameof(bool.ToString),
-                        new[] { typeof(IFormatProvider) }),
-                    Expression.Property(
-                        null,
-                        typeof(CultureInfo),
-                        nameof(CultureInfo.CurrentCulture)));
+                Expression<Func<bool, string>> innerLambda = value => FormatIntoString(value);
+                return Expression.Invoke(
+                    innerLambda,
+                    expression);
             }
 
             if (expression.Type == typeof(double))
             {
-                if (areFormatters)
-                {
-                    Expression<Func<double, string>> innerLambda = value => FormatIntoString(
-                        value,
-                        stringFormatters);
-                    return Expression.Invoke(
-                        innerLambda,
-                        expression);
-                }
-
-                return Expression.Call(
-                    expression,
-                    typeof(double).GetMethod(
-                        nameof(double.ToString),
-                        new[] { typeof(IFormatProvider) }),
-                    Expression.Property(
-                        null,
-                        typeof(CultureInfo),
-                        nameof(CultureInfo.CurrentCulture)));
+                Expression<Func<double, string>> innerLambda = value => FormatIntoString(value);
+                return Expression.Invoke(
+                    innerLambda,
+                    expression);
             }
 
             if (expression.Type == typeof(byte[]))
             {
-                if (areFormatters)
-                {
-                    Expression<Func<byte[], string>> innerLambda = value => FormatIntoString(
-                        value,
-                        stringFormatters);
-                    return Expression.Invoke(
-                        innerLambda,
-                        expression);
-                }
-
-                return Expression.Call(
-                    null,
-                    typeof(BitConverter).GetMethod(
-                        nameof(BitConverter.ToString),
-                        new[] { typeof(byte[]) }),
+                Expression<Func<byte[], string>> innerLambda = value => FormatIntoString(value);
+                return Expression.Invoke(
+                    innerLambda,
                     expression);
             }
 

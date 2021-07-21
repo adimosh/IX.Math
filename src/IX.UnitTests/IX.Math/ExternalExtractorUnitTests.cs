@@ -28,10 +28,10 @@ namespace IX.UnitTests.IX.Math
             Assert.NotNull(interpreted);
             Assert.True(interpreted.RecognizedCorrectly);
             Assert.Contains(
-                interpreted.ParameterNames,
+                interpreted.GetParameterNames(),
                 p => p == "stupid");
             Assert.DoesNotContain(
-                interpreted.ParameterNames,
+                interpreted.GetParameterNames(),
                 p => p == "silly");
         }
 

@@ -3,10 +3,8 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using IX.Math.Extensibility;
 using IX.StandardExtensions.Efficiency;
 
 namespace IX.Math.Registration
@@ -14,12 +12,10 @@ namespace IX.Math.Registration
     internal class StandardParameterRegistry : IParameterRegistry
     {
         private readonly ConcurrentDictionary<string, ParameterContext> parameterContexts;
-        private readonly List<IStringFormatter> stringFormatters;
 
-        public StandardParameterRegistry(List<IStringFormatter> stringFormatters)
+        public StandardParameterRegistry()
         {
             this.parameterContexts = new ConcurrentDictionary<string, ParameterContext>();
-            this.stringFormatters = stringFormatters;
         }
 
         public bool Populated => this.parameterContexts.Count > 0;
@@ -31,7 +27,7 @@ namespace IX.Math.Registration
                 throw new ArgumentNullException(nameof(name));
             }
 
-            return this.parameterContexts.GetOrAdd(name, (nameL1, formattersL1) => new ParameterContext(nameL1, formattersL1), this.stringFormatters);
+            return this.parameterContexts.GetOrAdd(name, (nameL1) => new ParameterContext(nameL1));
         }
 
         public ParameterContext CloneFrom(ParameterContext previousContext)

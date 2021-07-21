@@ -81,6 +81,7 @@ namespace IX.UnitTests
             Dictionary<string, object> parameters,
             object expectedResult)
         {
+            // Arrange
             try
             {
                 object result;
@@ -89,6 +90,7 @@ namespace IX.UnitTests
                 {
                     using (ComputedExpression del = service.Interpret(expression))
                     {
+                        // Act
                         result = del.Compute(
                             parameters?.OrderBy(
                                 q => expression.IndexOf(
@@ -98,6 +100,7 @@ namespace IX.UnitTests
                     }
                 }
 
+                // Assert
                 this.AssertResults(
                     in expectedResult,
                     in result);

@@ -3,10 +3,8 @@
 // </copyright>
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using IX.Math.Extensibility;
 using IX.Math.Formatters;
 using IX.Math.TypeHelpers;
 using JetBrains.Annotations;
@@ -19,10 +17,8 @@ namespace IX.Math.Nodes.Constants
     /// <seealso cref="ConstantNodeBase" />
     [DebuggerDisplay("{" + nameof(Value) + "}")]
     [PublicAPI]
-    public sealed class NumericNode : ConstantNodeBase, ISpecialRequestNode
+    public sealed class NumericNode : ConstantNodeBase
     {
-        private Func<Type, object> specialObjectRequestFunction;
-
         /// <summary>
         /// The integer value.
         /// </summary>
@@ -389,13 +385,10 @@ namespace IX.Math.Nodes.Constants
         /// Generates the expression that will be compiled into code as a string expression.
         /// </summary>
         /// <returns>The string expression.</returns>
-        public override Expression GenerateCachedStringExpression()
-        {
-            var stringFormatters = this.specialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) as List<IStringFormatter>;
-            return Expression.Constant(
-                StringFormatter.FormatIntoString(this.Value, stringFormatters),
+        public override Expression GenerateCachedStringExpression() =>
+            Expression.Constant(
+                StringFormatter.FormatIntoString(this.Value),
                 typeof(string));
-        }
 
         /// <summary>
         /// Creates a deep clone of the source object.
@@ -408,12 +401,6 @@ namespace IX.Math.Nodes.Constants
             floatValue = this.floatValue,
             IsFloat = this.IsFloat,
         };
-
-        /// <summary>
-        /// Sets the request special object function.
-        /// </summary>
-        /// <param name="func">The function to set.</param>
-        void ISpecialRequestNode.SetRequestSpecialObjectFunction(Func<Type, object> func) => this.specialObjectRequestFunction = func;
 
         /// <summary>
         /// Initializes the specified value.

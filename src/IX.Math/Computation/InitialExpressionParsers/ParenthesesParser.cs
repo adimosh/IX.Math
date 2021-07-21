@@ -8,30 +8,38 @@ using System.Globalization;
 using System.Linq;
 using IX.Math.ExpressionState;
 using IX.Math.Generators;
-using IX.StandardExtensions.Contracts;
+using IX.Math.Interpretation;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Globalization;
-using JetBrains.Annotations;
 
 namespace IX.Math.Computation.InitialExpressionParsers
 {
     internal static class ParenthesesParser
     {
 #pragma warning disable HAA0603 // Delegate allocation from a method group - unavoidable
-        internal static void FormatParentheses(
-             string openParenthesis,
-             string closeParenthesis,
-             string parameterSeparator,
-             string[] allOperatorsInOrder,
-             Dictionary<string, ExpressionSymbol> symbolTable,
-             Dictionary<string, string> reverseSymbolTable)
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0302:Display class allocation to capture closure",
+            Justification = "A major closure is preferred, since the closure can be optimized and is much cheaper than otherwise")]
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0301:Closure Allocation Source",
+            Justification = "A major closure is preferred, since the closure can be optimized and is much cheaper than otherwise")]
+        internal static void FormatParentheses()
         {
-            var itemsToProcess = new List<string>();
+            // Context symbols
+            var context = InterpretationContext.Current;
+            var symbolTable = context.SymbolTable;
+            var definition = context.Definition;
+            var allOperatorsInOrder = context.AllOperatorsInOrder;
+            var (openParenthesis, closeParenthesis) = definition.Parentheses;
+            var parameterSeparatorSymbol = definition.ParameterSeparator;
 
             KeyValuePair<string, ExpressionSymbol> itemToProcess;
+            var itemsToProcess = new List<string>();
 
             // Select the first expression that hasn't already been parsed
-            while ((itemToProcess = symbolTable.Where(
+            while ((itemToProcess = context.SymbolTable.Where(
                     (
                             p,
                             itemsToProcessL1) => !itemsToProcessL1.Contains(p.Key) && !p.Value.IsFunctionCall,
@@ -39,14 +47,7 @@ namespace IX.Math.Computation.InitialExpressionParsers
             {
                 try
                 {
-                    FormatParenthesis(
-                        itemToProcess.Key,
-                        openParenthesis,
-                        closeParenthesis,
-                        parameterSeparator,
-                        allOperatorsInOrder,
-                        symbolTable,
-                        reverseSymbolTable);
+                    FormatParenthesis(itemToProcess.Key);
                 }
                 finally
                 {
@@ -54,16 +55,9 @@ namespace IX.Math.Computation.InitialExpressionParsers
                 }
             }
 
-            void FormatParenthesis(
-                string key,
-                string openParenthesisL1,
-                string closeParenthesisL1,
-                string parameterSeparatorL1,
-                string[] allOperatorsInOrderL1,
-                Dictionary<string, ExpressionSymbol> symbolTableL1,
-                Dictionary<string, string> reverseSymbolTableL1)
+            void FormatParenthesis(string key)
             {
-                ExpressionSymbol symbol = symbolTableL1[key];
+                ExpressionSymbol symbol = symbolTable[key];
                 if (symbol.IsFunctionCall)
                 {
                     return;
@@ -73,90 +67,68 @@ namespace IX.Math.Computation.InitialExpressionParsers
                 var replaced = symbol.Expression;
                 while (replaced != replacedPreviously)
                 {
-                    symbolTableL1[key].Expression = replaced;
+                    symbolTable[key].Expression = replaced;
                     replacedPreviously = replaced;
-                    replaced = ReplaceParanthesis(
-                        replaced,
-                        openParenthesisL1,
-                        closeParenthesisL1,
-                        parameterSeparatorL1,
-                        allOperatorsInOrderL1,
-                        symbolTableL1,
-                        reverseSymbolTableL1);
+                    replaced = ReplaceParenthesis(replaced);
                 }
 
-                string ReplaceParanthesis(
-                    string source,
-                    string openParenthesisL2,
-                    string closeParenthesisL2,
-                    string parameterSeparatorSymbolL2,
-                    string[] allOperatorsInOrderSymbolsL2,
-                    Dictionary<string, ExpressionSymbol> symbolTableL2,
-                    Dictionary<string, string> reverseSymbolTableL2)
+                string ReplaceParenthesis(
+                    string? source)
                 {
                     if (string.IsNullOrWhiteSpace(source))
                     {
                         return string.Empty;
                     }
 
-                    var src = source;
+                    var src = source!;
 
-                    var openingParanthesisLocation = src.InvariantCultureIndexOf(
-                        openParenthesisL2);
-                    var closingParanthesisLocation = src.InvariantCultureIndexOf(
-                        closeParenthesisL2);
+                    var openingParenthesisLocation = src.InvariantCultureIndexOf(
+                        openParenthesis);
+                    var closingParenthesisLocation = src.InvariantCultureIndexOf(
+                        closeParenthesis);
 
                     beginning:
-                    if (openingParanthesisLocation != -1)
+                    if (openingParenthesisLocation != -1)
                     {
-                        if (closingParanthesisLocation == -1)
+                        if (closingParenthesisLocation == -1)
                         {
                             throw new InvalidOperationException();
                         }
 
-                        if (openingParanthesisLocation < closingParanthesisLocation)
+                        if (openingParenthesisLocation < closingParenthesisLocation)
                         {
-                            var resultingSubExpression = ReplaceParanthesis(
-                                src.Substring(openingParanthesisLocation + openParenthesisL2.Length),
-                                openParenthesisL2,
-                                closeParenthesisL2,
-                                parameterSeparatorSymbolL2,
-                                allOperatorsInOrderSymbolsL2,
-                                symbolTableL2,
-                                reverseSymbolTableL2);
+                            var resultingSubExpression = ReplaceParenthesis(src.Substring(openingParenthesisLocation + openParenthesis.Length));
 
-                            if (openingParanthesisLocation == 0)
+                            if (openingParenthesisLocation == 0)
                             {
                                 src = resultingSubExpression;
                             }
                             else
                             {
-                                var expr4 = openingParanthesisLocation == 0
-                                    ? string.Empty
-                                    : src.Substring(
+                                var expr4 = src.Substring(
                                         0,
-                                        openingParanthesisLocation);
+                                        openingParenthesisLocation);
 
-                                if (!allOperatorsInOrderSymbolsL2.Any(
+                                if (!allOperatorsInOrder.Any(
                                     (
                                         p,
-                                        expr4L1) => expr4L1.InvariantCultureEndsWith(p), expr4))
+                                        expr4L1) => expr4L1.InvariantCultureEndsWith(p),
+                                    expr4))
                                 {
                                     // We have a function call
-                                    var inx = allOperatorsInOrderSymbolsL2.Max(expr4.LastIndexOf);
+                                    var inx = allOperatorsInOrder.Max(expr4.LastIndexOf);
                                     var expr5 = inx == -1 ? expr4 : expr4.Substring(inx);
-                                    var op1 = allOperatorsInOrderSymbolsL2.OrderByDescending(p => p.Length)
+                                    var op1 = allOperatorsInOrder.OrderByDescending(p => p.Length)
                                         .FirstOrDefault(
                                             (
                                                 p,
-                                                expr5L1) => expr5L1.InvariantCultureStartsWith(p), expr5);
+                                                expr5L1) => expr5L1.InvariantCultureStartsWith(p),
+                                            expr5);
                                     var expr6 = op1 == null ? expr5 : expr5.Substring(op1.Length);
 
                                     // ReSharper disable once AssignmentIsFullyDiscarded - We're interested only in having the symbol in the table, and nothing more
                                     _ = SymbolExpressionGenerator.GenerateSymbolExpression(
-                                        symbolTableL2,
-                                        reverseSymbolTableL2,
-                                        $"{expr6}{openParenthesisL2}item{(symbolTableL2.Count - 1).ToString(CultureInfo.InvariantCulture)}{closeParenthesisL2}",
+                                        $"{expr6}{openParenthesis}item{(symbolTable.Count - 1).ToString(CultureInfo.InvariantCulture)}{closeParenthesis}",
                                         false);
 
                                     expr4 = expr6 == expr4
@@ -166,57 +138,45 @@ namespace IX.Math.Computation.InitialExpressionParsers
                                             expr4.Length - expr6.Length);
 
                                     resultingSubExpression = resultingSubExpression.Replace(
-                                        $"item{(symbolTableL2.Count - 1).ToString(CultureInfo.InvariantCulture)}",
-                                        $"item{symbolTableL2.Count.ToString(CultureInfo.InvariantCulture)}");
+                                        $"item{(symbolTable.Count - 1).ToString(CultureInfo.InvariantCulture)}",
+                                        $"item{symbolTable.Count.ToString(CultureInfo.InvariantCulture)}");
                                 }
 
                                 src = $"{expr4}{resultingSubExpression}";
                             }
 
-                            openingParanthesisLocation = src.InvariantCultureIndexOf(
-                                openParenthesisL2);
-                            closingParanthesisLocation = src.InvariantCultureIndexOf(
-                                closeParenthesisL2);
+                            openingParenthesisLocation = src.InvariantCultureIndexOf(
+                                openParenthesis);
+                            closingParenthesisLocation = src.InvariantCultureIndexOf(
+                                closeParenthesis);
 
                             goto beginning;
                         }
 
                         return ProcessSubExpression(
-                            closingParanthesisLocation,
-                            closeParenthesisL2,
-                            src,
-                            parameterSeparatorSymbolL2,
-                            symbolTableL2,
-                            reverseSymbolTableL2);
+                            closingParenthesisLocation,
+                            src);
                     }
 
-                    if (closingParanthesisLocation == -1)
+                    if (closingParenthesisLocation == -1)
                     {
                         return src;
                     }
 
                     return ProcessSubExpression(
-                        closingParanthesisLocation,
-                        closeParenthesisL2,
-                        src,
-                        parameterSeparatorSymbolL2,
-                        symbolTableL2,
-                        reverseSymbolTableL2);
+                        closingParenthesisLocation,
+                        src);
 
                     string ProcessSubExpression(
                         int cp,
-                        string closeParenthesisL3,
-                        string sourceL3,
-                        string parameterSeparatorL3,
-                        Dictionary<string, ExpressionSymbol> symbolTableL3,
-                        Dictionary<string, string> reverseSymbolTableL3)
+                        string sourceL3)
                     {
                         var expr1 = sourceL3.Substring(
                             0,
                             cp);
 
                         string[] parameters = expr1.Split(
-                            new[] { parameterSeparatorL3 },
+                            new[] { parameterSeparatorSymbol },
                             StringSplitOptions.None);
 
                         var parSymbols = new List<string>(parameters.Length);
@@ -226,15 +186,13 @@ namespace IX.Math.Computation.InitialExpressionParsers
                         {
                             parSymbols.Add(
                                 SymbolExpressionGenerator.GenerateSymbolExpression(
-                                    symbolTableL3,
-                                    reverseSymbolTableL3,
                                     s,
                                     false));
                         }
 
-                        var k = cp + closeParenthesisL3.Length;
+                        var k = cp + InterpretationContext.Current.Definition.Parentheses.Right.Length;
                         return
-                            $"{string.Join(parameterSeparatorL3, parSymbols)}{(sourceL3.Length == k ? string.Empty : sourceL3.Substring(k))}";
+                            $"{string.Join(parameterSeparatorSymbol, parSymbols)}{(sourceL3.Length == k ? string.Empty : sourceL3.Substring(k))}";
                     }
                 }
             }

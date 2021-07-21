@@ -5,15 +5,19 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using IX.Math.Generators;
+using IX.Math.Extensibility;
+using IX.Math.Interpretation;
 using IX.Math.Nodes;
+using JetBrains.Annotations;
 
 namespace IX.Math.Extraction
 {
     /// <summary>
     ///     An extractor for strings. This class cannot be inherited.
     /// </summary>
-    internal sealed class StringExtractor : Extensibility.IConstantsExtractor
+    [ConstantsExtractor]
+    [UsedImplicitly]
+    internal sealed class StringExtractor : IConstantsExtractor
     {
         /// <summary>
         ///     Extracts the string constants and replaces them with expression placeholders.
@@ -31,10 +35,6 @@ namespace IX.Math.Extraction
         ///     <paramref name="reverseConstantsTable" />
         ///     is <see langword="null" /> (<see langword="Nothing" /> in Visual Basic).
         /// </exception>
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Usage",
-            "PC001:API not supported on all platforms",
-            Justification = "This is an analyzer bug, TODO: see https://github.com/dotnet/platform-compat/issues/123")]
         public string ExtractAllConstants(
             string originalExpression,
             IDictionary<string, ConstantNodeBase> constantsTable,
@@ -48,7 +48,7 @@ namespace IX.Math.Extraction
             var escapeCharacterLength = escapeCharacter.Length;
 
             var process = originalExpression.AsSpan();
-            StringBuilder sb = null;
+            StringBuilder? sb = null;
 
             while (true)
             {
@@ -112,17 +112,12 @@ namespace IX.Math.Extraction
                         openingPosition,
                         process.Length - header.Length - rest.Length);
 
-                var itemName = ConstantsGenerator.GenerateStringConstant(
-                    constantsTable,
-                    reverseConstantsTable,
+                var itemName = InterpretationContext.Current.GenerateStringConstant(
                     originalExpression,
                     stringIndicagtorString,
                     body.ToString());
 
-                if (sb == null)
-                {
-                    sb = new StringBuilder(originalExpression.Length);
-                }
+                sb ??= new StringBuilder(originalExpression.Length);
 
 #if NETSTANDARD2_1
                 sb.Append(header);

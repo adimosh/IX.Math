@@ -10,7 +10,7 @@ namespace IX.Math.Extensibility
     ///     A service contract for extracting pass-through constants.
     /// </summary>
     [PublicAPI]
-    public interface IConstantPassThroughExtractor
+    public interface IConstantPassThroughExtractor : IMathematicsPlugin
     {
         /// <summary>
         ///     Evaluates an expression and decides whether or not it should be a pass-through constant.

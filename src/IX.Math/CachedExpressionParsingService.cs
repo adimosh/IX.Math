@@ -5,7 +5,6 @@
 using System.Threading;
 using IX.StandardExtensions.Efficiency;
 using JetBrains.Annotations;
-using DiagCA = System.Diagnostics.CodeAnalysis;
 
 namespace IX.Math
 {
@@ -95,22 +94,6 @@ namespace IX.Math
             this.cachedComputedExpressions.Clear();
 
             base.DisposeManagedContext();
-        }
-
-        /// <summary>
-        ///     Disposes in the general (managed and unmanaged) context.
-        /// </summary>
-        [DiagCA.SuppressMessageAttribute(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP003:Dispose previous before re-assigning.",
-            Justification = "It is disposed.")]
-        protected override void DisposeGeneralContext()
-        {
-            base.DisposeGeneralContext();
-
-            Interlocked.Exchange(
-                ref this.cachedComputedExpressions,
-                null);
         }
     }
 }

@@ -6,6 +6,7 @@ using System;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Math.Extensibility;
 using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
@@ -16,7 +17,7 @@ namespace IX.Math.Nodes
     /// </summary>
     /// <seealso cref="FunctionNodeBase" />
     [PublicAPI]
-    public abstract class NonaryFunctionNodeBase : FunctionNodeBase
+    public abstract class NonaryFunctionNodeBase : FunctionNodeBase, IMathematicsPlugin
     {
         /// <summary>
         ///     Gets a value indicating whether this node supports tolerance.
@@ -25,14 +26,6 @@ namespace IX.Math.Nodes
         ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
         /// </value>
         public override bool IsTolerant => false;
-
-        /// <summary>
-        /// Sets the special object request function for sub objects.
-        /// </summary>
-        /// <param name="func">The function.</param>
-        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
-        {
-        }
 
         /// <summary>
         /// Generates a static function call for a function with no parameters.

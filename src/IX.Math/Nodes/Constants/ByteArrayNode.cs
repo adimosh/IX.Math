@@ -2,12 +2,10 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
-using IX.Math.Extensibility;
 using IX.Math.Formatters;
+using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Constants
@@ -18,10 +16,9 @@ namespace IX.Math.Nodes.Constants
     /// <seealso cref="ConstantNodeBase" />
     [DebuggerDisplay("{" + nameof(DisplayValue) + "}")]
     [PublicAPI]
-    public class ByteArrayNode : ConstantNodeBase, ISpecialRequestNode
+    public class ByteArrayNode : ConstantNodeBase
     {
-        private string cachedDistilledStringValue;
-        private Func<Type, object> specialObjectRequestFunction;
+        private string? cachedDistilledStringValue;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ByteArrayNode" /> class.
@@ -29,7 +26,7 @@ namespace IX.Math.Nodes.Constants
         /// <param name="value">The value of the constant.</param>
         public ByteArrayNode(byte[] value)
         {
-            this.Value = value ?? throw new ArgumentNullException(nameof(value));
+            this.Value = Requires.NotNull(value, nameof(value));
         }
 
         /// <summary>
@@ -82,24 +79,7 @@ namespace IX.Math.Nodes.Constants
         /// <returns>A deep clone.</returns>
         public override NodeBase DeepClone(NodeCloningContext context) => new ByteArrayNode(this.Value);
 
-        /// <summary>
-        /// Sets the request special object function.
-        /// </summary>
-        /// <param name="func">The function to set.</param>
-        void ISpecialRequestNode.SetRequestSpecialObjectFunction(Func<Type, object> func) => this.specialObjectRequestFunction = func;
-
-        private string GetString()
-        {
-            if (this.cachedDistilledStringValue == null)
-            {
-                var stringFormatters = this.specialObjectRequestFunction?.Invoke(typeof(IStringFormatter)) as List<IStringFormatter>;
-
-                this.cachedDistilledStringValue = StringFormatter.FormatIntoString(
-                    this.Value,
-                    stringFormatters);
-            }
-
-            return this.cachedDistilledStringValue;
-        }
+        private string GetString() =>
+            this.cachedDistilledStringValue ??= StringFormatter.FormatIntoString(this.Value);
     }
 }

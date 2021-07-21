@@ -9,7 +9,6 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
-using IX.Math.Extensibility;
 using IX.Math.Formatters;
 using IX.Math.Nodes;
 using IX.Math.Registration;
@@ -26,24 +25,17 @@ namespace IX.Math
     [PublicAPI]
     public sealed class ComputedExpression : DisposableBase, IDeepCloneable<ComputedExpression>
     {
-        private readonly IParameterRegistry parametersRegistry;
-        private readonly List<IStringFormatter> stringFormatters;
-        private readonly Func<Type, object> specialObjectRequestFunc;
-
+        private readonly IReadOnlyParameterRegistry parametersRegistry;
         private readonly string initialExpression;
-        private NodeBase body;
+        private NodeBase? body;
 
         internal ComputedExpression(
             string initialExpression,
-            NodeBase body,
+            NodeBase? body,
             bool isRecognized,
-            IParameterRegistry parameterRegistry,
-            List<IStringFormatter> stringFormatters,
-            Func<Type, object> specialObjectRequestFunc)
+            IReadOnlyParameterRegistry parameterRegistry)
         {
             this.parametersRegistry = parameterRegistry;
-            this.stringFormatters = stringFormatters;
-            this.specialObjectRequestFunc = specialObjectRequestFunc;
 
             this.initialExpression = initialExpression;
             this.body = body;
@@ -316,7 +308,7 @@ namespace IX.Math
                                 case SupportedValueType.String:
                                     paramValue = CreateValue(
                                         paraContext,
-                                        StringFormatter.FormatIntoString(convertedParam, this.stringFormatters));
+                                        StringFormatter.FormatIntoString(convertedParam));
 
                                     break;
 
@@ -358,7 +350,7 @@ namespace IX.Math
                                 case SupportedValueType.String:
                                     paramValue = CreateValue(
                                         paraContext,
-                                        StringFormatter.FormatIntoString(convertedParam, this.stringFormatters));
+                                        StringFormatter.FormatIntoString(convertedParam));
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -385,7 +377,7 @@ namespace IX.Math
                                 case SupportedValueType.String:
                                     paramValue = CreateValue(
                                         paraContext,
-                                        StringFormatter.FormatIntoString(convertedParam, this.stringFormatters));
+                                        StringFormatter.FormatIntoString(convertedParam));
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -484,7 +476,7 @@ namespace IX.Math
                                 case SupportedValueType.String:
                                     paramValue = CreateValue(
                                         paraContext,
-                                        StringFormatter.FormatIntoString(convertedParam, this.stringFormatters));
+                                        StringFormatter.FormatIntoString(convertedParam));
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -524,7 +516,7 @@ namespace IX.Math
                                     break;
 
                                 case SupportedValueType.String:
-                                    paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam(), this.stringFormatters));
+                                    paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam()));
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -565,7 +557,7 @@ namespace IX.Math
                                     break;
 
                                 case SupportedValueType.String:
-                                    paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam(), this.stringFormatters));
+                                    paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam()));
 
                                     break;
 
@@ -593,7 +585,7 @@ namespace IX.Math
                                     return null;
 
                                 case SupportedValueType.String:
-                                    paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam(), this.stringFormatters));
+                                    paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam()));
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -681,7 +673,7 @@ namespace IX.Math
                                     break;
 
                                 case SupportedValueType.String:
-                                    paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam(), this.stringFormatters));
+                                    paramValue = CreateValueFromFunc(paraContext, () => StringFormatter.FormatIntoString(convertedParam()));
                                     break;
 
                                 case SupportedValueType.Unknown:
@@ -817,10 +809,10 @@ namespace IX.Math
         /// <returns>A deep clone.</returns>
         public ComputedExpression DeepClone()
         {
-            var registry = new StandardParameterRegistry(this.stringFormatters);
-            var context = new NodeCloningContext { ParameterRegistry = registry, SpecialRequestFunction = this.specialObjectRequestFunc };
+            var registry = new StandardParameterRegistry();
+            var context = new NodeCloningContext { ParameterRegistry = registry };
 
-            return new ComputedExpression(this.initialExpression, this.body.DeepClone(context), this.RecognizedCorrectly, registry, this.stringFormatters, this.specialObjectRequestFunc);
+            return new ComputedExpression(this.initialExpression, this.body.DeepClone(context), this.RecognizedCorrectly, registry);
         }
 
         /// <summary>

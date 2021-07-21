@@ -2,21 +2,19 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Collections.Generic;
 using System.Globalization;
 using IX.Math.ExpressionState;
-using JetBrains.Annotations;
+using IX.Math.Interpretation;
 
 namespace IX.Math.Generators
 {
     internal static class SymbolExpressionGenerator
     {
         internal static string GenerateSymbolExpression(
-             Dictionary<string, ExpressionSymbol> symbolTable,
-             Dictionary<string, string> reverseSymbolTable,
-             string expression,
+            string expression,
             bool isFunction)
         {
+            var reverseSymbolTable = InterpretationContext.Current.ReverseSymbolTable;
             if (reverseSymbolTable.TryGetValue(
                 expression,
                 out var itemName))
@@ -24,6 +22,7 @@ namespace IX.Math.Generators
                 return itemName;
             }
 
+            var symbolTable = InterpretationContext.Current.SymbolTable;
             itemName = $"item{symbolTable.Count.ToString(CultureInfo.InvariantCulture).PadLeft(4, '0')}";
             ExpressionSymbol symb = isFunction
                 ? ExpressionSymbol.GenerateFunctionCall(

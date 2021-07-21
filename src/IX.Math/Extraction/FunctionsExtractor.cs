@@ -7,15 +7,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using IX.Math.ExpressionState;
-using IX.Math.Extensibility;
 using IX.Math.Generators;
-using IX.Math.Nodes;
+using IX.Math.Interpretation;
 using IX.Math.Registration;
-using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Globalization;
-using IX.System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace IX.Math.Extraction
 {
@@ -27,78 +23,28 @@ namespace IX.Math.Extraction
         /// <summary>
         ///     Replaces functions calls with expression placeholders.
         /// </summary>
-        /// <param name="openParenthesis">The symbol of an open parenthesis.</param>
-        /// <param name="closeParenthesis">The symbol of a closed parenthesis.</param>
-        /// <param name="parameterSeparator">The symbol of a parameter separator.</param>
-        /// <param name="constantsTable">The constants table.</param>
-        /// <param name="reverseConstantsTable">The reverse-lookup constants table.</param>
-        /// <param name="symbolTable">The symbols table.</param>
-        /// <param name="reverseSymbolTable">The reverse-lookup symbols table.</param>
-        /// <param name="interpreters">The constant interpreters.</param>
-        /// <param name="parametersTable">The parameters table.</param>
         /// <param name="expression">The expression before processing.</param>
-        /// <param name="allSymbols">All symbols.</param>
-        internal static void ReplaceFunctions(
-             string openParenthesis,
-             string closeParenthesis,
-             string parameterSeparator,
-             Dictionary<string, ConstantNodeBase> constantsTable,
-             Dictionary<string, string> reverseConstantsTable,
-             Dictionary<string, ExpressionSymbol> symbolTable,
-             Dictionary<string, string> reverseSymbolTable,
-             LevelDictionary<Type, IConstantInterpreter> interpreters,
-             IParameterRegistry parametersTable,
-             string expression,
-             string[] allSymbols)
+        internal static void ReplaceFunctions(string expression)
         {
             // Replace the main expression
             ReplaceOneFunction(
                 string.Empty,
-                openParenthesis,
-                closeParenthesis,
-                parameterSeparator,
-                constantsTable,
-                reverseConstantsTable,
-                symbolTable,
-                reverseSymbolTable,
-                interpreters,
-                parametersTable,
-                expression,
-                allSymbols);
+                expression);
 
-            for (var i = 1; i < symbolTable.Count; i++)
+            for (var i = 1; i < InterpretationContext.Current.SymbolTable.Count; i++)
             {
                 // Replace sub-expressions
                 ReplaceOneFunction(
                     $"item{i.ToString(CultureInfo.InvariantCulture).PadLeft(4, '0')}",
-                    openParenthesis,
-                    closeParenthesis,
-                    parameterSeparator,
-                    constantsTable,
-                    reverseConstantsTable,
-                    symbolTable,
-                    reverseSymbolTable,
-                    interpreters,
-                    parametersTable,
-                    expression,
-                    allSymbols);
+                    expression);
             }
 
             static void ReplaceOneFunction(
                 string key,
-                string outerOpenParanthesisSymbol,
-                string outerCloseParanthesisSymbol,
-                string outerParameterSeparatorSymbol,
-                Dictionary<string, ConstantNodeBase> outerConstantsTableReference,
-                Dictionary<string, string> outerReverseConstantsTableReference,
-                Dictionary<string, ExpressionSymbol> outerSymbolTableReference,
-                Dictionary<string, string> outerReverseSymbolTableRefeerence,
-                LevelDictionary<Type, IConstantInterpreter> interpreters,
-                IParameterRegistry outerParametersTableReference,
-                string outerExpressionSymbol,
-                string[] outerAllSymbolsSymbols)
+                string outerExpressionSymbol)
             {
-                ExpressionSymbol symbol = outerSymbolTableReference[key];
+                var symbolTable = InterpretationContext.Current.SymbolTable;
+                ExpressionSymbol symbol = symbolTable[key];
                 if (symbol.IsFunctionCall)
                 {
                     return;
@@ -107,44 +53,29 @@ namespace IX.Math.Extraction
                 var replaced = symbol.Expression;
                 while (replaced != null)
                 {
-                    outerSymbolTableReference[key].Expression = replaced;
-                    replaced = ReplaceFunctions(
+                    symbolTable[key].Expression = replaced;
+                    replaced = ReplaceFunctionsInternal(
                         replaced,
-                        outerOpenParanthesisSymbol,
-                        outerCloseParanthesisSymbol,
-                        outerParameterSeparatorSymbol,
-                        outerConstantsTableReference,
-                        outerReverseConstantsTableReference,
-                        outerSymbolTableReference,
-                        outerReverseSymbolTableRefeerence,
-                        interpreters,
-                        outerParametersTableReference,
-                        outerExpressionSymbol,
-                        outerAllSymbolsSymbols);
+                        outerExpressionSymbol);
                 }
 
-                static string ReplaceFunctions(
+                static string? ReplaceFunctionsInternal(
                     string source,
-                    string openParanthesisSymbol,
-                    string closeParanthesisSymbol,
-                    string parameterSeparatorSymbol,
-                    Dictionary<string, ConstantNodeBase> constantsTableReference,
-                    Dictionary<string, string> reverseConstantsTableReference,
-                    Dictionary<string, ExpressionSymbol> symbolTableReference,
-                    Dictionary<string, string> reverseSymbolTableReference,
-                    LevelDictionary<Type, IConstantInterpreter> interpretersReference,
-                    IParameterRegistry parametersTableReference,
-                    string expressionSymbol,
-                    string[] allSymbolsSymbols)
+                    string expressionSymbol)
                 {
                     var op = -1;
-                    var opl = openParanthesisSymbol.Length;
-                    var cpl = closeParanthesisSymbol.Length;
+                    var context = InterpretationContext.Current;
+                    var definition = context.Definition;
+                    var (openParenthesisSymbol, closeParenthesisSymbol) = definition.Parentheses;
+                    string parameterSeparatorSymbol = definition.ParameterSeparator;
+                    var opl = openParenthesisSymbol.Length;
+                    var cpl = closeParenthesisSymbol.Length;
+                    IParameterRegistry parametersTableReference = context.ParameterRegistry;
 
                     while (true)
                     {
                         op = source.InvariantCultureIndexOf(
-                            openParanthesisSymbol,
+                            openParenthesisSymbol,
                             op + opl);
 
                         if (op == -1)
@@ -161,32 +92,34 @@ namespace IX.Math.Extraction
                             0,
                             op);
 
-                        if (allSymbolsSymbols.Any(
+                        var allSymbols = InterpretationContext.Current.AllSymbols;
+                        if (allSymbols.Any(
                             (
                                 p,
-                                check) => check.InvariantCultureEndsWith(p), functionHeaderCheck))
+                                check) => check.InvariantCultureEndsWith(p),
+                            functionHeaderCheck))
                         {
                             continue;
                         }
 
                         var functionHeader = functionHeaderCheck.Split(
-                            allSymbolsSymbols,
+                            allSymbols,
                             StringSplitOptions.None).Last();
 
                         var oop = source.InvariantCultureIndexOf(
-                            openParanthesisSymbol,
+                            openParenthesisSymbol,
                             op + opl);
                         var cp = source.InvariantCultureIndexOf(
-                            closeParanthesisSymbol,
+                            closeParenthesisSymbol,
                             op + cpl);
 
                         while (oop < cp && oop != -1 && cp != -1)
                         {
                             oop = source.InvariantCultureIndexOf(
-                                openParanthesisSymbol,
+                                openParenthesisSymbol,
                                 oop + opl);
                             cp = source.InvariantCultureIndexOf(
-                                closeParanthesisSymbol,
+                                closeParenthesisSymbol,
                                 cp + cpl);
                         }
 
@@ -204,19 +137,9 @@ namespace IX.Math.Extraction
                         while (q != null)
                         {
                             arguments = q;
-                            q = ReplaceFunctions(
+                            q = ReplaceFunctionsInternal(
                                 q,
-                                openParanthesisSymbol,
-                                closeParanthesisSymbol,
-                                parameterSeparatorSymbol,
-                                constantsTableReference,
-                                reverseConstantsTableReference,
-                                symbolTableReference,
-                                reverseSymbolTableReference,
-                                interpretersReference,
-                                parametersTableReference,
-                                expressionSymbol,
-                                allSymbolsSymbols);
+                                expressionSymbol);
                         }
 
                         var argPlaceholders = new List<string>();
@@ -226,39 +149,24 @@ namespace IX.Math.Extraction
                         {
                             TablePopulationGenerator.PopulateTables(
                                 s,
-                                constantsTableReference,
-                                reverseConstantsTableReference,
-                                symbolTableReference,
-                                reverseSymbolTableReference,
-                                parametersTableReference,
-                                interpretersReference,
-                                expressionSymbol,
-                                openParanthesisSymbol,
-                                allSymbolsSymbols);
+                                expressionSymbol);
 
                             // We check whether or not this is actually a constant
                             argPlaceholders.Add(
-                                ConstantsGenerator.CheckAndAdd(
-                                    constantsTableReference,
-                                    reverseConstantsTableReference,
-                                    interpretersReference,
+                                InterpretationContext.Current.CheckAndAddConstant(
                                     expressionSymbol,
                                     s) ?? (!parametersTableReference.Exists(s)
                                     ? SymbolExpressionGenerator.GenerateSymbolExpression(
-                                        symbolTableReference,
-                                        reverseSymbolTableReference,
                                         s,
                                         false)
                                     : s));
                         }
 
                         var functionCallBody =
-                            $"{functionHeader}{openParanthesisSymbol}{string.Join(parameterSeparatorSymbol, argPlaceholders)}{closeParanthesisSymbol}";
+                            $"{functionHeader}{openParenthesisSymbol}{string.Join(parameterSeparatorSymbol, argPlaceholders)}{closeParenthesisSymbol}";
                         var functionCallToReplace =
-                            $"{functionHeader}{openParanthesisSymbol}{originalArguments}{closeParanthesisSymbol}";
+                            $"{functionHeader}{openParenthesisSymbol}{originalArguments}{closeParenthesisSymbol}";
                         var functionCallItem = SymbolExpressionGenerator.GenerateSymbolExpression(
-                            symbolTableReference,
-                            reverseSymbolTableReference,
                             functionCallBody,
                             true);
 

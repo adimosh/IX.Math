@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 using IX.Math.Extensibility;
+using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
 using JetBrains.Annotations;
 
@@ -17,7 +18,7 @@ namespace IX.Math.Nodes
     /// </summary>
     /// <seealso cref="FunctionNodeBase" />
     [PublicAPI]
-    public abstract class UnaryFunctionNodeBase : FunctionNodeBase
+    public abstract class UnaryFunctionNodeBase : FunctionNodeBase, IMathematicsPlugin
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="UnaryFunctionNodeBase" /> class.
@@ -30,7 +31,7 @@ namespace IX.Math.Nodes
             Justification = "This is OK and expected at this point.")]
         protected UnaryFunctionNodeBase(NodeBase parameter)
         {
-            NodeBase parameterTemp = parameter ?? throw new ArgumentNullException(nameof(parameter));
+            NodeBase parameterTemp = Requires.NotNull(parameter, nameof(parameter));
 
             // ReSharper disable once VirtualMemberCallInConstructor - We want this to happen
             this.EnsureCompatibleParameter(parameterTemp);
@@ -51,18 +52,6 @@ namespace IX.Math.Nodes
         ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
         /// </value>
         public override bool IsTolerant => this.Parameter.IsTolerant;
-
-        /// <summary>
-        /// Sets the special object request function for sub objects.
-        /// </summary>
-        /// <param name="func">The function.</param>
-        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
-        {
-            if (this.Parameter is ISpecialRequestNode srnl)
-            {
-                srnl.SetRequestSpecialObjectFunction(func);
-            }
-        }
 
         /// <summary>
         ///     Ensures that the parameter that is received is compatible with the function, optionally allowing the parameter
@@ -128,7 +117,7 @@ namespace IX.Math.Nodes
         protected Expression GenerateStaticUnaryFunctionCall(
              Type t,
              string functionName,
-             Tolerance tolerance)
+             Tolerance? tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
@@ -142,7 +131,7 @@ namespace IX.Math.Nodes
 
             Type parameterType = ParameterTypeFromParameter(this.Parameter);
 
-            MethodInfo mi = t.GetMethodWithExactParameters(
+            MethodInfo? mi = t.GetMethodWithExactParameters(
                 functionName,
                 parameterType);
 
@@ -217,7 +206,7 @@ namespace IX.Math.Nodes
         /// <exception cref="ArgumentException"><paramref name="propertyName" /> represents a property that cannot be found.</exception>
         protected Expression GenerateParameterPropertyCall<T>(
              string propertyName,
-             Tolerance tolerance)
+             Tolerance? tolerance)
         {
             if (string.IsNullOrWhiteSpace(propertyName))
             {
@@ -264,7 +253,7 @@ namespace IX.Math.Nodes
         /// <exception cref="ArgumentException"><paramref name="methodName" /> represents a property that cannot be found.</exception>
         protected Expression GenerateParameterMethodCall<T>(
              string methodName,
-              Tolerance tolerance)
+              Tolerance? tolerance)
         {
             if (string.IsNullOrWhiteSpace(methodName))
             {

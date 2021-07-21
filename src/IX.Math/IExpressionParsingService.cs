@@ -26,20 +26,16 @@ namespace IX.Math
         ComputedExpression Interpret(string expression, CancellationToken cancellationToken = default);
 
         /// <summary>
-        ///     Registers type formatters.
-        /// </summary>
-        /// <param name="formatter">The formatter to register.</param>
-        /// <exception cref="InvalidOperationException">
-        ///     This method was called after having called <see cref="Interpret" />
-        ///     successfully for the first time.
-        /// </exception>
-        void RegisterTypeFormatter([NotNull] IStringFormatter formatter);
-
-        /// <summary>
         /// Registers an assembly to extract compatible functions from.
         /// </summary>
         /// <param name="assembly">The assembly to register.</param>
         void RegisterFunctionsAssembly(Assembly assembly);
+
+        /// <summary>
+        /// Registers an array of assemblies to extract compatible functions from.
+        /// </summary>
+        /// <param name="assemblies">The assemblies to register.</param>
+        void RegisterFunctionsAssemblies(params Assembly[] assemblies);
 
         /// <summary>
         /// Returns the prototypes of all registered functions.

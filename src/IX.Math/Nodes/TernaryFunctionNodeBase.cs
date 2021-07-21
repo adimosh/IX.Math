@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using IX.Math.Extensibility;
+using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Nodes
 {
@@ -12,7 +13,7 @@ namespace IX.Math.Nodes
     /// A base class for a function that takes three parameters.
     /// </summary>
     /// <seealso cref="FunctionNodeBase" />
-    public abstract class TernaryFunctionNodeBase : FunctionNodeBase
+    public abstract class TernaryFunctionNodeBase : FunctionNodeBase, IMathematicsPlugin
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TernaryFunctionNodeBase" /> class.
@@ -39,9 +40,9 @@ namespace IX.Math.Nodes
             NodeBase secondParameter,
             NodeBase thirdParameter)
         {
-            NodeBase firstParameterTemp = firstParameter ?? throw new ArgumentNullException(nameof(firstParameter));
-            NodeBase secondParameterTemp = secondParameter ?? throw new ArgumentNullException(nameof(secondParameter));
-            NodeBase thirdParameterTemp = thirdParameter ?? throw new ArgumentNullException(nameof(thirdParameter));
+            NodeBase firstParameterTemp = Requires.NotNull(firstParameter, nameof(firstParameter));
+            NodeBase secondParameterTemp = Requires.NotNull(secondParameter, nameof(secondParameter));
+            NodeBase thirdParameterTemp = Requires.NotNull(thirdParameter, nameof(thirdParameter));
 
             this.EnsureCompatibleParameters(firstParameter, secondParameter, thirdParameter);
 
@@ -76,28 +77,6 @@ namespace IX.Math.Nodes
         /// </value>
         public override bool IsTolerant =>
             this.FirstParameter.IsTolerant || this.SecondParameter.IsTolerant || this.ThirdParameter.IsTolerant;
-
-        /// <summary>
-        /// Sets the special object request function for sub objects.
-        /// </summary>
-        /// <param name="func">The function.</param>
-        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
-        {
-            if (this.FirstParameter is ISpecialRequestNode srnl)
-            {
-                srnl.SetRequestSpecialObjectFunction(func);
-            }
-
-            if (this.SecondParameter is ISpecialRequestNode srnr)
-            {
-                srnr.SetRequestSpecialObjectFunction(func);
-            }
-
-            if (this.ThirdParameter is ISpecialRequestNode trnr)
-            {
-                trnr.SetRequestSpecialObjectFunction(func);
-            }
-        }
 
         /// <summary>
         /// Ensures the parameters are compatible for this node.

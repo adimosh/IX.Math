@@ -2,7 +2,6 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using IX.Math.Registration;
 using JetBrains.Annotations;
 
@@ -19,13 +18,5 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <value>The parameter registry.</value>
         public IParameterRegistry ParameterRegistry { get; set; }
-
-        /// <summary>
-        /// Gets or sets the special request function.
-        /// </summary>
-        /// <value>
-        /// The special request function.
-        /// </value>
-        public Func<Type, object> SpecialRequestFunction { get; set; }
     }
 }

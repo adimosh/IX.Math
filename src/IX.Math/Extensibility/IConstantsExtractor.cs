@@ -12,7 +12,7 @@ namespace IX.Math.Extensibility
     ///     A service contract for extractors of constant values from the expression.
     /// </summary>
     [PublicAPI]
-    public interface IConstantsExtractor
+    public interface IConstantsExtractor : IMathematicsPlugin
     {
         /// <summary>
         ///     Extracts all constants, replacing them from the original expression.

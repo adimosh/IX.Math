@@ -2,10 +2,8 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using IX.Math.Extensibility;
 using IX.StandardExtensions.Contracts;
 
 namespace IX.Math.Nodes.Operations.Binary
@@ -95,23 +93,6 @@ namespace IX.Math.Nodes.Operations.Binary
         protected abstract void EnsureCompatibleOperands(
             NodeBase left,
             NodeBase right);
-
-        /// <summary>
-        ///     Sets the special object request function for sub objects.
-        /// </summary>
-        /// <param name="func">The function.</param>
-        protected override void SetSpecialObjectRequestFunctionForSubObjects(Func<Type, object> func)
-        {
-            if (this.Left is ISpecialRequestNode srnl)
-            {
-                srnl.SetRequestSpecialObjectFunction(func);
-            }
-
-            if (this.Right is ISpecialRequestNode srnr)
-            {
-                srnr.SetRequestSpecialObjectFunction(func);
-            }
-        }
 
         /// <summary>
         ///     Gets the expressions of same type from operands.
