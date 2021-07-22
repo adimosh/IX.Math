@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using IX.StandardExtensions.Globalization;
@@ -24,6 +25,9 @@ namespace IX.Math.Formatters
 
         internal static bool ParseNumeric(
             string expression,
+#if FRAMEWORK_ADVANCED
+            [NotNullWhen(true)]
+#endif
             out object? result)
         {
             var eSpan = expression.AsSpan();

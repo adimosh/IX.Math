@@ -141,5 +141,11 @@ namespace IX.Math
         /// </summary>
         /// <param name="assembly">The assembly to register.</param>
         public void RegisterFunctionsAssembly(Assembly assembly) => PluginCollection.Current.RegisterFunctionsAssembly(assembly);
+
+        /// <summary>
+        ///     Registers the assembly calling this method as an assembly to extract compatible functions from.
+        /// </summary>
+        public void RegisterCurrentAssembly() =>
+            PluginCollection.Current.RegisterFunctionsAssembly(Assembly.GetCallingAssembly());
     }
 }

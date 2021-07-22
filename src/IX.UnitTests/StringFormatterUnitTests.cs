@@ -4,6 +4,7 @@
 
 using System;
 using System.Globalization;
+using System.Reflection;
 using IX.DataGeneration;
 using IX.Math;
 using IX.Math.Extensibility;
@@ -16,11 +17,8 @@ namespace IX.UnitTests
     /// <summary>
     /// Tests with the string formatter.
     /// </summary>
-    [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
-        "IDisposableAnalyzers.Correctness",
-        "IDISP001:Dispose created.",
-        Justification = "It is disposed if needed, the analyzer can't tell.")]
-    public class StringFormatterUnitTests : IClassFixture<CachedExpressionProviderFixture>
+    [CollectionDefinition("SpecificFormatter", DisableParallelization = true)]
+    public class StringFormatterUnitTests : IClassFixture<CachedExpressionProviderFixture>, IDisposable
     {
         private readonly CachedExpressionProviderFixture fixture;
 
@@ -30,6 +28,7 @@ namespace IX.UnitTests
         /// <param name="fixture">The fixture.</param>
         public StringFormatterUnitTests(CachedExpressionProviderFixture fixture)
         {
+            PluginCollection.Current.RegisterSpecificPlugin<SillyStringFormatter>(true);
             this.fixture = fixture;
         }
 
@@ -157,7 +156,7 @@ namespace IX.UnitTests
 
             int comparisonValue = DataGenerator.RandomNonNegativeInteger();
             string expression = $"strlen(\"The number is \" + {comparisonValue})";
-            const long expectedResult = 24;
+            long expectedResult = 24;
 
             // Act
             using var computedExpression = eps.Service.Interpret(expression);
@@ -180,6 +179,7 @@ namespace IX.UnitTests
         {
             // Arrange
             using var eps = new FixtureCreateDisposePatternHelper(this.fixture, create, dispose);
+            eps.Service.RegisterFunctionsAssembly(Assembly.GetExecutingAssembly());
 
             int comparisonValue1 = DataGenerator.RandomNonNegativeInteger();
             int comparisonValue2 = DataGenerator.RandomNonNegativeInteger();
@@ -194,10 +194,25 @@ namespace IX.UnitTests
             Assert.Equal(expectedResult, Assert.IsType<string>(result));
         }
 
-        [StringFormatter]
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        public void Dispose()
+        {
+            PluginCollection.Current.Reset();
+            PluginCollection.Current.RegisterCurrentAssembly();
+        }
+
+        /// <summary>
+        /// The test formatter.
+        /// </summary>
         [UsedImplicitly]
         public class SillyStringFormatter : IStringFormatter
         {
+            /// <summary>
+            /// Implements the parser.
+            /// </summary>
+            /// <typeparam name="T">The type of data to parse into.</typeparam>
+            /// <param name="data">The data to parse.</param>
+            /// <returns>A success state, as well as the parse data.</returns>
             public (bool Success, string ParsedData) ParseIntoString<T>(T data) => data switch
             {
                 long integralNumber => (true, "0x" + integralNumber.ToString("x8", CultureInfo.CurrentCulture)),

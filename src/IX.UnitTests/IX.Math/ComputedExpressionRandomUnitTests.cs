@@ -14,6 +14,13 @@ namespace IX.UnitTests.IX.Math
     public class ComputedExpressionRandomUnitTests
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ComputedExpressionRandomUnitTests"/> class.
+        /// </summary>
+        public ComputedExpressionRandomUnitTests()
+        {
+        }
+
+        /// <summary>
         ///     Computes the unary random function call expression, for testing.
         /// </summary>
         /// <exception cref="InvalidOperationException">

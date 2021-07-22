@@ -14,6 +14,13 @@ namespace IX.UnitTests.IX.Math
     public class ExternalExtractorUnitTests
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ExternalExtractorUnitTests"/> class.
+        /// </summary>
+        public ExternalExtractorUnitTests()
+        {
+        }
+
+        /// <summary>
         ///     Tests extractors from external libraries.
         /// </summary>
         [Fact(DisplayName = "Test extractors from external libraries")]
@@ -21,7 +28,7 @@ namespace IX.UnitTests.IX.Math
         {
             using var eps = new ExpressionParsingService();
 
-            eps.RegisterFunctionsAssembly(typeof(ExternalExtractorUnitTests).GetTypeInfo().Assembly);
+            eps.RegisterCurrentAssembly();
 
             using ComputedExpression interpreted = eps.Interpret("1+silly+3");
 
@@ -43,7 +50,7 @@ namespace IX.UnitTests.IX.Math
         {
             using var eps = new ExpressionParsingService();
 
-            eps.RegisterFunctionsAssembly(typeof(ExternalExtractorUnitTests).GetTypeInfo().Assembly);
+            eps.RegisterCurrentAssembly();
 
             using ComputedExpression interpreted = eps.Interpret("\"I am silly very much\"");
 
@@ -63,7 +70,7 @@ namespace IX.UnitTests.IX.Math
         {
             using var eps = new ExpressionParsingService();
 
-            eps.RegisterFunctionsAssembly(typeof(ExternalExtractorUnitTests).GetTypeInfo().Assembly);
+            eps.RegisterCurrentAssembly();
 
             using ComputedExpression interpreted = eps.Interpret("1+2");
 
@@ -83,7 +90,7 @@ namespace IX.UnitTests.IX.Math
         {
             using var eps = new ExpressionParsingService();
 
-            eps.RegisterFunctionsAssembly(typeof(ExternalExtractorUnitTests).GetTypeInfo().Assembly);
+            eps.RegisterCurrentAssembly();
 
             using ComputedExpression interpreted = eps.Interpret("substring(\"alabalaportocala\",bumbly dumb)");
 

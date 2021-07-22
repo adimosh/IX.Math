@@ -15,18 +15,22 @@ using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Threading;
 using IX.System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace IX.Math
 {
     /// <summary>
     ///     A collection of functions for the parsing services.
     /// </summary>
+    [PublicAPI]
     public class PluginCollection : ReaderWriterSynchronizedBase
     {
-#region Internal state
+        #region Internal state
 
+        #region Assemblies and types
         private readonly List<Assembly> assembliesToRegister;
-        private readonly Dictionary<string, Type> binaryFunctions;
+        private readonly List<(TypeInfo Type, bool TolerateMissingAttribute)> customTypesToRegister;
+        #endregion
 
         [SuppressMessage(
             "IDisposableAnalyzers.Correctness",
@@ -46,16 +50,20 @@ namespace IX.Math
             Justification = "IDisposable is correctly implemented.")]
         private readonly LevelDictionary<Type, IConstantPassThroughExtractor> constantPassThroughExtractors;
 
-        private readonly Dictionary<string, Type> nonaryFunctions;
-
         [SuppressMessage(
             "IDisposableAnalyzers.Correctness",
             "IDISP006:Implement IDisposable.",
             Justification = "IDisposable is correctly implemented.")]
         private readonly LevelDictionary<Type, IStringFormatter> stringFormatters;
 
+        #region Function dictionaries
+
+        private readonly Dictionary<string, Type> binaryFunctions;
         private readonly Dictionary<string, Type> ternaryFunctions;
         private readonly Dictionary<string, Type> unaryFunctions;
+        private readonly Dictionary<string, Type> nonaryFunctions;
+
+        #endregion
 
         private int constantExtractorsIndex;
         private int constantInterpretersIndex;
@@ -64,16 +72,17 @@ namespace IX.Math
         private bool initialized;
         private int stringFormattersIndex;
 
-#endregion
+        #endregion
 
-#region Constructors and destructors
+        #region Constructors and destructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="PluginCollection" /> class.
         /// </summary>
         private PluginCollection()
         {
-            this.assembliesToRegister = new List<Assembly>();
+            this.assembliesToRegister = new();
+            this.customTypesToRegister = new();
 
             this.nonaryFunctions = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
             this.unaryFunctions = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
@@ -134,9 +143,7 @@ namespace IX.Math
             using var locker = this.ReadLock();
 
             var localContext = InterpretationContext.Current;
-            foreach (Type extractorType in this.constantExtractors.KeysByLevel.OrderBy(p => p.Key)
-                .SelectMany(p => p.Value)
-                .ToArray())
+            foreach (var extractor in this.constantExtractors.EnumerateValuesOnLevelKeys())
             {
                 if (localContext.CancellationToken.IsCancellationRequested)
                 {
@@ -146,7 +153,7 @@ namespace IX.Math
                 string localExpression;
                 try
                 {
-                    localExpression = this.constantExtractors[extractorType]
+                    localExpression = extractor
                         .ExtractAllConstants(
                             expression,
                             localContext.ConstantsTable,
@@ -184,21 +191,24 @@ namespace IX.Math
 
             using var locker = this.ReadLock();
 
-            return this.constantPassThroughExtractors.KeysByLevel.SelectMany(p => p.Value)
+            return this.constantPassThroughExtractors.EnumerateValuesOnLevelKeys()
                 .Any(
                     ConstantPassThroughExtractorPredicate,
-                    expression,
-                    this);
+                    expression);
 
             static bool ConstantPassThroughExtractorPredicate(
-                Type cpteKey,
-                string innerExpression,
-                PluginCollection innerThis)
+                IConstantPassThroughExtractor extractor,
+                string innerExpression)
             {
-                return innerThis.constantPassThroughExtractors[cpteKey]
+                return extractor
                     .Evaluate(innerExpression);
             }
         }
+
+        /// <summary>
+        ///     Registers the assembly calling this method as an assembly to extract compatible functions from.
+        /// </summary>
+        public void RegisterCurrentAssembly() => this.RegisterFunctionsAssembly(Assembly.GetCallingAssembly());
 
         /// <summary>
         ///     Registers an assembly to extract compatible functions from.
@@ -223,17 +233,7 @@ namespace IX.Math
 
             this.assembliesToRegister.Add(assembly);
 
-            this.nonaryFunctions.Clear();
-            this.unaryFunctions.Clear();
-            this.binaryFunctions.Clear();
-            this.ternaryFunctions.Clear();
-
-            this.constantExtractors.Clear();
-            this.constantInterpreters.Clear();
-            this.constantPassThroughExtractors.Clear();
-            this.stringFormatters.Clear();
-
-            this.initialized = false;
+            this.ClearData();
         }
 
         /// <summary>
@@ -250,7 +250,7 @@ namespace IX.Math
 
             using ReadWriteSynchronizationLocker locker = this.ReadWriteLock();
 
-            Assembly[]? unregisteredAssemblies = assemblies.Except(this.assembliesToRegister)
+            Assembly[] unregisteredAssemblies = assemblies.Except(this.assembliesToRegister)
                 .ToArray();
             if (unregisteredAssemblies.Length == 0)
             {
@@ -261,17 +261,66 @@ namespace IX.Math
 
             this.assembliesToRegister.AddRange(unregisteredAssemblies);
 
-            this.nonaryFunctions.Clear();
-            this.unaryFunctions.Clear();
-            this.binaryFunctions.Clear();
-            this.ternaryFunctions.Clear();
+            this.ClearData();
+        }
 
-            this.constantExtractors.Clear();
-            this.constantInterpreters.Clear();
-            this.constantPassThroughExtractors.Clear();
-            this.stringFormatters.Clear();
+        /// <summary>
+        /// Registers a specific class as a plugin.
+        /// </summary>
+        /// <typeparam name="TPlugin">The type of the plugin to register.</typeparam>
+        /// <param name="tolerateMissingAttribute">Whether or not to tolerate the missing attribute when registering.</param>
+        public void RegisterSpecificPlugin<TPlugin>(bool tolerateMissingAttribute = false)
+            where TPlugin : class =>
+            this.RegisterSpecificPlugin(typeof(TPlugin).GetTypeInfo(), tolerateMissingAttribute);
 
-            this.initialized = false;
+        /// <summary>
+        /// Registers a specific class as a plugin.
+        /// </summary>
+        /// <param name="pluginType">The type of the plugin to register.</param>
+        /// <param name="tolerateMissingAttribute">Whether or not to tolerate the missing attribute when registering.</param>
+        public void RegisterSpecificPlugin(Type pluginType, bool tolerateMissingAttribute = false) =>
+            this.RegisterSpecificPlugin(Requires.NotNull(pluginType, nameof(pluginType)).GetTypeInfo(), tolerateMissingAttribute);
+
+        /// <summary>
+        /// Registers a specific class as a plugin.
+        /// </summary>
+        /// <param name="pluginType">The type of the plugin to register.</param>
+        /// <param name="tolerateMissingAttribute">Whether or not to tolerate the missing attribute when registering.</param>
+        [SuppressMessage("Performance", "HAA0301:Closure Allocation Source", Justification = "LINQ works like this")]
+        public void RegisterSpecificPlugin(TypeInfo pluginType, bool tolerateMissingAttribute = false)
+        {
+            Requires.NotNull(pluginType, nameof(pluginType));
+
+            this.ThrowIfCurrentObjectDisposed();
+
+            this.EnsureFunctionsInitialized();
+
+            using var locker = this.ReadWriteLock();
+
+            if (this.customTypesToRegister.Any(p => p.Type == pluginType))
+            {
+                return;
+            }
+
+            locker.Upgrade();
+
+            this.CheckType(pluginType, tolerateMissingAttribute);
+
+            this.customTypesToRegister.Add((pluginType, tolerateMissingAttribute));
+        }
+
+        /// <summary>
+        /// Resets the plugin collection entirely.
+        /// </summary>
+        public void Reset()
+        {
+            using (this.WriteLock())
+            {
+                this.assembliesToRegister.Clear();
+                this.customTypesToRegister.Clear();
+
+                this.ClearData();
+            }
         }
 
         /// <summary>
@@ -283,6 +332,8 @@ namespace IX.Math
             this.ThrowIfCurrentObjectDisposed();
 
             this.EnsureFunctionsInitialized();
+
+            using var locker = this.ReadLock();
 
             // Capacity is sum of all, times 3; the "3" number was chosen as a good-enough average of how many overloads are defined, on average
             var bldr = new List<string>(
@@ -367,9 +418,9 @@ namespace IX.Math
 
             using ReadOnlySynchronizationLocker locker = this.ReadLock();
 
-            foreach (var interpreter in this.stringFormatters.KeysByLevel.SelectMany(p => p.Value))
+            foreach (var interpreter in this.stringFormatters.EnumerateValuesOnLevelKeys())
             {
-                var (success, result) = this.stringFormatters[interpreter].ParseIntoString(value);
+                var (success, result) = interpreter.ParseIntoString(value);
                 if (success)
                 {
                     return (true, result);
@@ -480,7 +531,7 @@ namespace IX.Math
             base.DisposeManagedContext();
         }
 
-#endregion
+        #endregion
 
         [SuppressMessage(
             "Performance",
@@ -508,9 +559,15 @@ namespace IX.Math
             this.stringFormattersIndex = 2001;
 
             this.assembliesToRegister.ParallelForEach(this.InitializeAssembly);
+            this.customTypesToRegister.ForEach(this.RegisterCustomTypeAction);
 
             this.initialized = true;
         }
+
+        private void RegisterCustomTypeAction((TypeInfo Type, bool TolerateMissingAttribute) p) =>
+            this.CheckType(
+                p.Type,
+                p.TolerateMissingAttribute);
 
         [SuppressMessage(
             "Performance",
@@ -521,101 +578,176 @@ namespace IX.Math
                     p => p.IsClass &&
                          !p.IsAbstract &&
                          !p.IsGenericTypeDefinition &&
-                         p.HasPublicParameterlessConstructor() &&
                          typeof(IMathematicsPlugin).IsAssignableFrom(p))
-                .ParallelForEach(this.CheckType);
+                .ParallelForEach(this.RegisterAssemblyAction);
 
-        private void CheckType(TypeInfo p)
+        private void RegisterAssemblyAction(TypeInfo p) => this.CheckType(p);
+
+        private void ClearData()
         {
-            if (typeof(NonaryFunctionNodeBase).IsAssignableFrom(p))
+            this.nonaryFunctions.Clear();
+            this.unaryFunctions.Clear();
+            this.binaryFunctions.Clear();
+            this.ternaryFunctions.Clear();
+
+            this.constantExtractors.Clear();
+            this.constantInterpreters.Clear();
+            this.constantPassThroughExtractors.Clear();
+            this.stringFormatters.Clear();
+
+            this.initialized = false;
+        }
+
+        private void CheckType(
+            TypeInfo p,
+            bool tolerateMissingAttribute = false)
+        {
+            if (typeof(NonaryFunctionNodeBase).IsAssignableFrom(p) && p.HasPublicParameterlessConstructor())
             {
                 AddToTypeDictionary(
                     p,
-                    this.nonaryFunctions);
+                    this.nonaryFunctions,
+                    tolerateMissingAttribute);
             }
             else if (typeof(UnaryFunctionNodeBase).IsAssignableFrom(p))
             {
                 AddToTypeDictionary(
                     p,
-                    this.unaryFunctions);
+                    this.unaryFunctions,
+                    tolerateMissingAttribute);
             }
             else if (typeof(BinaryFunctionNodeBase).IsAssignableFrom(p))
             {
                 AddToTypeDictionary(
                     p,
-                    this.binaryFunctions);
+                    this.binaryFunctions,
+                    tolerateMissingAttribute);
             }
             else if (typeof(TernaryFunctionNodeBase).IsAssignableFrom(p))
             {
                 AddToTypeDictionary(
                     p,
-                    this.ternaryFunctions);
+                    this.ternaryFunctions,
+                    tolerateMissingAttribute);
             }
-            else if (typeof(IConstantsExtractor).IsAssignableFrom(p))
+
+            if (!p.HasPublicParameterlessConstructor())
             {
-                this.constantExtractors.Add(
-                    p,
-                    (IConstantsExtractor)p.Instantiate(),
-                    p.GetAttributeDataByTypeWithoutVersionBinding<ConstantsExtractorAttribute, int>(
-                        out var explicitLevel)
-                        ? explicitLevel
-                        : Interlocked.Increment(ref this.constantExtractorsIndex));
+                // All of the below require a public parameter-less constructor to work, so let's quit if we don't have one
+                return;
             }
-            else if (typeof(IConstantPassThroughExtractor).IsAssignableFrom(p))
+
+            if (typeof(IConstantsExtractor).IsAssignableFrom(p))
             {
-                this.constantPassThroughExtractors.Add(
+                AddToPluginDictionary<IConstantsExtractor, ConstantsExtractorAttribute>(
+                    this.constantExtractors,
                     p,
-                    (IConstantPassThroughExtractor)p.Instantiate(),
-                    p.GetAttributeDataByTypeWithoutVersionBinding<ConstantsPassThroughExtractorAttribute, int>(
-                        out var explicitLevel)
-                        ? explicitLevel
-                        : Interlocked.Increment(ref this.constantPassThroughExtractorsIndex));
+                    tolerateMissingAttribute,
+                    ref this.constantExtractorsIndex);
             }
-            else if (typeof(IConstantInterpreter).IsAssignableFrom(p))
+
+            if (typeof(IConstantPassThroughExtractor).IsAssignableFrom(p))
             {
-                this.constantInterpreters.Add(
+                AddToPluginDictionary<IConstantPassThroughExtractor, ConstantsPassThroughExtractorAttribute>(
+                    this.constantPassThroughExtractors,
                     p,
-                    (IConstantInterpreter)p.Instantiate(),
-                    p.GetAttributeDataByTypeWithoutVersionBinding<ConstantsInterpreterAttribute, int>(
-                        out var explicitLevel)
-                        ? explicitLevel
-                        : Interlocked.Increment(ref this.constantInterpretersIndex));
+                    tolerateMissingAttribute,
+                    ref this.constantPassThroughExtractorsIndex);
             }
-            else if (typeof(IStringFormatter).IsAssignableFrom(p))
+
+            if (typeof(IConstantInterpreter).IsAssignableFrom(p))
             {
-                this.stringFormatters.Add(
+                AddToPluginDictionary<IConstantInterpreter, ConstantsInterpreterAttribute>(
+                    this.constantInterpreters,
                     p,
-                    (IStringFormatter)p.Instantiate(),
-                    p.GetAttributeDataByTypeWithoutVersionBinding<StringFormatterAttribute, int>(out var explicitLevel)
-                        ? explicitLevel
-                        : Interlocked.Increment(ref this.stringFormattersIndex));
+                    tolerateMissingAttribute,
+                    ref this.constantInterpretersIndex);
+            }
+
+            if (typeof(IStringFormatter).IsAssignableFrom(p))
+            {
+                AddToPluginDictionary<IStringFormatter, StringFormatterAttribute>(
+                    this.stringFormatters,
+                    p,
+                    tolerateMissingAttribute,
+                    ref this.stringFormattersIndex);
+            }
+
+            static void AddToPluginDictionary<T, TAttribute>(LevelDictionary<Type, T> levelDictionary, TypeInfo p, bool tolerateMissingAttribute, ref int cci)
+                where TAttribute : Attribute, ILevelAttribute
+            {
+                int explicitLevel;
+                var attr = p.GetCustomAttribute<TAttribute>(true);
+
+                if (attr == null)
+                {
+                    if (tolerateMissingAttribute)
+                    {
+                        explicitLevel = Interlocked.Increment(ref cci);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    explicitLevel = attr.Level == default ? Interlocked.Increment(ref cci) : attr.Level;
+                }
+
+                lock (levelDictionary)
+                {
+                    levelDictionary.Add(
+                        p,
+                        (T)p.Instantiate(),
+                        explicitLevel);
+                }
             }
 
             static void AddToTypeDictionary(
                 TypeInfo p,
-                IDictionary<string, Type> td)
+                IDictionary<string, Type> td,
+                bool tolerateMissingAttribute)
             {
-                var attr = p.GetCustomAttribute<CallableMathematicsFunctionAttribute>();
+                string[] names;
+                var attr = p.GetCustomAttribute<CallableMathematicsFunctionAttribute>(true);
 
                 if (attr == null)
                 {
-                    return;
+                    if (tolerateMissingAttribute)
+                    {
+                        names = new[]
+                        {
+                            p.Name
+                        };
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    names = attr.Names;
                 }
 
-                foreach (var q in attr.Names)
+                lock (td)
                 {
-                    if (td.ContainsKey(q))
+                    foreach (var q in names)
                     {
-                        continue;
-                    }
+                        if (td.ContainsKey(q))
+                        {
+                            continue;
+                        }
 
-                    td.Add(
-                        q,
-                        p.AsType());
+                        td.Add(
+                            q,
+                            p.AsType());
+                    }
                 }
             }
         }
 
-#endregion
+        #endregion
     }
 }

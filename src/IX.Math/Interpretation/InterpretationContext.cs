@@ -264,7 +264,7 @@ namespace IX.Math.Interpretation
 
             var stringIndicatorLength = stringIndicator.Length;
 
-            var name = GenerateName(
+            var name = this.GenerateName(
                 originalExpression);
             this.constantsTable.Add(
                 name,
@@ -419,7 +419,7 @@ namespace IX.Math.Interpretation
             }
 
             // Get the constant a new name
-            string name = GenerateName(originalExpression);
+            string name = this.GenerateName(originalExpression);
 
             // Add constant data to tables
             this.constantsTable.Add(

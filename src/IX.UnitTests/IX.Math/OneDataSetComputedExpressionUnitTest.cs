@@ -38,9 +38,14 @@ namespace IX.UnitTests.IX.Math
         {
             new object[]
             {
-                "min(2,17)",
-                null,
-                2L,
+                "replace(x, y, z)",
+                new Dictionary<string, object>
+                {
+                    ["x"] = "abcde",
+                    ["y"] = "bc",
+                    ["z"] = "q",
+                },
+                "aqde",
             },
         };
 

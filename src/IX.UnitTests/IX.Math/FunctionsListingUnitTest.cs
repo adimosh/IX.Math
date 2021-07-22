@@ -13,6 +13,13 @@ namespace IX.UnitTests.IX.Math
     public class FunctionsListingUnitTest
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="FunctionsListingUnitTest"/> class.
+        /// </summary>
+        public FunctionsListingUnitTest()
+        {
+        }
+
+        /// <summary>
         ///     Test functionality that gets the available functions test.
         /// </summary>
         [Fact(DisplayName = "Test getting available functions and parameters.")]

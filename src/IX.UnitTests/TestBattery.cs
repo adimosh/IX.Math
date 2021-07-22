@@ -8,7 +8,6 @@ using System.Linq;
 using IX.DataGeneration;
 using IX.Math;
 using IX.UnitTests.Helpers;
-using IX.UnitTests.IX.Math;
 using Moq;
 using Xunit;
 
@@ -161,8 +160,6 @@ namespace IX.UnitTests
             {
             }
         }
-
-#pragma warning disable IDISP001 // Dispose created. - We specifically do not want these to be disposed
 
         /// <summary>
         ///     Tests the cached computed expression with parameters.
@@ -383,7 +380,6 @@ namespace IX.UnitTests
             {
             }
         }
-#pragma warning restore IDISP001 // Dispose created.
 
         private void AssertResults(
             in object expectedResult,

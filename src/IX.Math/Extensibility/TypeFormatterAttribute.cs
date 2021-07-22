@@ -13,7 +13,7 @@ namespace IX.Math.Extensibility
     /// <seealso cref="Attribute" />
     [PublicAPI]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
-    public class TypeFormatterAttribute : Attribute
+    public class TypeFormatterAttribute : Attribute, ILevelAttribute
     {
         /// <summary>
         ///     Gets or sets the level.

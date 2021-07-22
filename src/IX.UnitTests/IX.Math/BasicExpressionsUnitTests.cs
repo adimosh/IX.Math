@@ -16,6 +16,13 @@ namespace IX.UnitTests.IX.Math
     public class BasicExpressionsUnitTests
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="BasicExpressionsUnitTests"/> class.
+        /// </summary>
+        public BasicExpressionsUnitTests()
+        {
+        }
+
+        /// <summary>
         ///     Provides the data for theory.
         /// </summary>
         /// <returns>System.Object[][].</returns>

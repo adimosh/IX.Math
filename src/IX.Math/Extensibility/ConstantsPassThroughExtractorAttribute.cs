@@ -13,7 +13,7 @@ namespace IX.Math.Extensibility
     /// <seealso cref="Attribute" />
     [PublicAPI]
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class ConstantsPassThroughExtractorAttribute : Attribute
+    public class ConstantsPassThroughExtractorAttribute : Attribute, ILevelAttribute
     {
         /// <summary>
         ///     Gets or sets the level.

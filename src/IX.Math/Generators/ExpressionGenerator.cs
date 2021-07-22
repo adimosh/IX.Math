@@ -62,11 +62,6 @@ namespace IX.Math.Generators
                 return ComputationBody.Empty;
             }
 
-            // We save a split expression for determining parameter order
-            var splitExpression = context.SymbolTable[string.Empty].Expression.Split(
-                context.AllSymbols.ToArray(),
-                StringSplitOptions.RemoveEmptyEntries);
-
             // Break by parentheses
             ParenthesesParser.FormatParentheses();
 
@@ -85,6 +80,9 @@ namespace IX.Math.Generators
             }
 
             // For each parameter from the table we've just populated, see where it's first used, and fill in that index as the order
+            var splitExpression = context.OriginalExpression.Split(
+                context.AllSymbols.ToArray(),
+                StringSplitOptions.RemoveEmptyEntries);
             foreach (ParameterContext paramForOrdering in context.ParameterRegistry.Dump())
             {
                 paramForOrdering.Order = Array.IndexOf(

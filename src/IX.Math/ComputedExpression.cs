@@ -86,14 +86,6 @@ namespace IX.Math
         /// <para>The method <see cref="GetParameterNames"/> instead.</para>
         /// </remarks>
         [Obsolete("Please use the GetParameterNames method instead.")]
-        [SuppressMessage(
-            "Performance",
-            "CA1819:Properties should not return arrays",
-            Justification = "This is obsolete and will be removed soon.")]
-        [SuppressMessage(
-            "Naming",
-            "CA1721:Property names should not match get methods",
-            Justification = "This is obsolete and will be removed soon.")]
         public string[] ParameterNames => this.GetParameterNames();
 
         /// <summary>
@@ -123,10 +115,9 @@ namespace IX.Math
         /// <returns>
         /// The computed result, or, if the expression is not recognized correctly, the expression as a <see cref="string" />.
         /// </returns>
-        [SuppressMessage("CodeSmell", "ERP022:Unobserved exception in generic exception handler", Justification = "We want this in this case.")]
         [SuppressMessage("Performance", "HAA0302:Display class allocation to capture closure", Justification = "Unavoidable for now.")]
         [SuppressMessage("Performance", "HAA0301:Closure Allocation Source", Justification = "Unavoidable for now.")]
-        public object Compute(Tolerance tolerance, params object[] arguments)
+        public object Compute(Tolerance? tolerance, params object[] arguments)
         {
             this.RequiresNotDisposed();
 
@@ -138,7 +129,7 @@ namespace IX.Math
 
             var convertedArguments = FormatArgumentsAccordingToParameters(arguments, this.parametersRegistry.Dump());
 
-            object[] FormatArgumentsAccordingToParameters(
+            object[]? FormatArgumentsAccordingToParameters(
                 object[] parameterValues,
                 ParameterContext[] parameters)
             {
@@ -151,7 +142,7 @@ namespace IX.Math
 
                 var i = 0;
 
-                object paramValue = null;
+                object? paramValue = null;
 
                 while (i < finalValues.Length)
                 {
@@ -775,7 +766,7 @@ namespace IX.Math
         /// <returns>
         /// The computed result, or, if the expression is not recognized correctly, the expression as a <see cref="string" />.
         /// </returns>
-        public object Compute( Tolerance tolerance, IDataFinder dataFinder)
+        public object Compute(Tolerance? tolerance, IDataFinder dataFinder)
         {
             this.RequiresNotDisposed();
 
@@ -794,13 +785,14 @@ namespace IX.Math
             {
                 if (!dataFinder.TryGetData(p.Name, out var data))
                 {
-                    data = null;
+                    // Not found
+                    return this.initialExpression;
                 }
 
                 pars.Add(data);
             }
 
-            return pars.Any(p => p == null) ? this.initialExpression : this.Compute(tolerance, pars.ToArray());
+            return this.Compute(tolerance, pars.ToArray());
         }
 
         /// <summary>
@@ -812,7 +804,7 @@ namespace IX.Math
             var registry = new StandardParameterRegistry();
             var context = new NodeCloningContext { ParameterRegistry = registry };
 
-            return new ComputedExpression(this.initialExpression, this.body.DeepClone(context), this.RecognizedCorrectly, registry);
+            return new ComputedExpression(this.initialExpression, this.body?.DeepClone(context), this.RecognizedCorrectly, registry);
         }
 
         /// <summary>

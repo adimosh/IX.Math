@@ -49,7 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IX.StandardExtensions" Version="[0.7.4,0.8)" />
+    <PackageReference Include="IX.StandardExtensions" Version="[0.7.10,0.8)" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">

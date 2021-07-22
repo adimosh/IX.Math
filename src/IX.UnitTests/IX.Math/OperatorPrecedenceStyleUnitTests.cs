@@ -14,6 +14,13 @@ namespace IX.UnitTests.IX.Math
     public class OperatorPrecedenceStyleUnitTests
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="OperatorPrecedenceStyleUnitTests"/> class.
+        /// </summary>
+        public OperatorPrecedenceStyleUnitTests()
+        {
+        }
+
+        /// <summary>
         /// Tests mathematical and C-style operator precedence style.
         /// </summary>
         /// <exception cref="InvalidOperationException">
