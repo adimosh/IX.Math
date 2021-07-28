@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using IX.Abstractions.Logging;
 using IX.Math.Extensibility;
 using IX.Math.Interpretation;
 using IX.Math.Nodes;
@@ -160,8 +161,10 @@ namespace IX.Math
                             localContext.ReverseConstantsTable,
                             localContext.Definition);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Log.Current?.Error(ex, "Constant extractor threw exception.");
+
                     continue;
                 }
 

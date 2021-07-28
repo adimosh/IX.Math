@@ -5,12 +5,15 @@
 using System;
 using System.Globalization;
 using System.Reflection;
+using IX.Abstractions.Logging;
 using IX.DataGeneration;
 using IX.Math;
 using IX.Math.Extensibility;
 using IX.UnitTests.Helpers;
+using IX.UnitTests.Output;
 using JetBrains.Annotations;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace IX.UnitTests
 {
@@ -21,14 +24,17 @@ namespace IX.UnitTests
     public class StringFormatterUnitTests : IClassFixture<CachedExpressionProviderFixture>, IDisposable
     {
         private readonly CachedExpressionProviderFixture fixture;
+        private readonly IDisposable logFixture;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="StringFormatterUnitTests" /> class.
         /// </summary>
         /// <param name="fixture">The fixture.</param>
-        public StringFormatterUnitTests(CachedExpressionProviderFixture fixture)
+        /// <param name="outputHelper">The output helper.</param>
+        public StringFormatterUnitTests(CachedExpressionProviderFixture fixture, ITestOutputHelper outputHelper)
         {
             PluginCollection.Current.RegisterSpecificPlugin<SillyStringFormatter>(true);
+            this.logFixture = Log.UseSpecialLogger(new OutputLoggingShim(outputHelper));
             this.fixture = fixture;
         }
 
@@ -199,6 +205,8 @@ namespace IX.UnitTests
         {
             PluginCollection.Current.Reset();
             PluginCollection.Current.RegisterCurrentAssembly();
+
+            this.logFixture?.Dispose();
         }
 
         /// <summary>

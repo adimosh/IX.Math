@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
+using IX.Abstractions.Logging;
 using IX.Math.Computation;
 using IX.Math.Computation.InitialExpressionParsers;
 using IX.Math.ExpressionState;
@@ -101,9 +102,11 @@ namespace IX.Math.Generators
             {
                 body = GenerateExpression(context.SymbolTable[string.Empty].Expression);
             }
-            catch
+            catch (Exception ex)
             {
                 body = null;
+
+                Log.Current?.Debug(ex, "Main expression body generation failed.");
             }
 
             if (body == null || cancellationToken.IsCancellationRequested)
@@ -126,8 +129,13 @@ namespace IX.Math.Generators
             "ERP022:Unobserved exception in generic exception handler",
             Justification = "We want that.")]
         private static NodeBase? GenerateExpression(
-             string expression)
+             string? expression)
         {
+            if (expression is null)
+            {
+                return null;
+            }
+
             var context = InterpretationContext.Current;
 
             var cancellationToken = context.CancellationToken;
@@ -451,8 +459,10 @@ namespace IX.Math.Generators
                         return returnValue;
                     }
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Log.Current?.Debug(ex, "Expression generation failed.");
+
                     return null;
                 }
 

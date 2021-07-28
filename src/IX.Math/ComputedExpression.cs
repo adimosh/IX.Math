@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
+using IX.Abstractions.Logging;
 using IX.Math.Formatters;
 using IX.Math.Nodes;
 using IX.Math.Registration;
@@ -710,17 +711,19 @@ namespace IX.Math
                 return this.initialExpression;
             }
 
-            Delegate del;
+            Delegate? del;
             try
             {
                 del = Expression.Lambda(
                     tolerance == null ? this.body.GenerateExpression() : this.body.GenerateExpression(tolerance),
                     this.parametersRegistry.Dump().Select(p => p.ParameterExpression)).Compile();
             }
-            catch
+            catch (Exception ex)
             {
                 // Expression is somehow not valid
                 del = null;
+
+                Log.Current?.Debug(ex, "Expression is not valid when being compiled into lambda.");
             }
 
             if (del == null)
@@ -741,9 +744,10 @@ namespace IX.Math
             {
                 throw;
             }
-            catch
+            catch (Exception ex)
             {
                 // Dynamic invocation of generated expression failed.
+                Log.Current?.Debug(ex, "Lambda-compiled expression threw exception when invoked.");
                 return this.initialExpression;
             }
         }

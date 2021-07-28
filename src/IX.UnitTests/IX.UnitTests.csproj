@@ -1,4 +1,4 @@
-<!--EXTERNAL_PROPERTIES: TargetFramework-->
+﻿<!--EXTERNAL_PROPERTIES: TargetFramework-->
 <!--EXTERNAL_PROPERTIES: IxDevOpsBuild-->
 <Project Sdk="Microsoft.NET.Sdk">
 
