@@ -4,22 +4,29 @@
 
 using System;
 using System.Collections.Generic;
+using IX.Abstractions.Logging;
 using IX.DataGeneration;
 using IX.Math;
+using IX.UnitTests.Output;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace IX.UnitTests.IX.Math
 {
     /// <summary>
     ///     Tests for basic expressions.
     /// </summary>
-    public class BasicExpressionsUnitTests
+    public class BasicExpressionsUnitTests : IDisposable
     {
+        private readonly IDisposable logFixture;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BasicExpressionsUnitTests"/> class.
         /// </summary>
-        public BasicExpressionsUnitTests()
+        /// <param name="outputHelper">The output helper.</param>
+        public BasicExpressionsUnitTests(ITestOutputHelper outputHelper)
         {
+            this.logFixture = Log.UseSpecialLogger(new OutputLoggingShim(outputHelper));
         }
 
         /// <summary>
@@ -412,5 +419,8 @@ namespace IX.UnitTests.IX.Math
                 }
             }
         }
+
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        public void Dispose() => this.logFixture?.Dispose();
     }
 }

@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using IX.Abstractions.Logging;
 using IX.Math.ExpressionState;
 using IX.Math.Formatters;
 using IX.Math.Generators;
@@ -307,6 +308,7 @@ namespace IX.Math.Interpretation
                 content,
                 out var result))
             {
+                Log.Current?.Debug($"No numeric constant can be parsed from {content}.");
                 return null;
             }
 
@@ -375,6 +377,7 @@ namespace IX.Math.Interpretation
             // No content
             if (string.IsNullOrWhiteSpace(content))
             {
+                Log.Current?.Debug("No content for constant.");
                 return null;
             }
 
@@ -415,6 +418,7 @@ namespace IX.Math.Interpretation
             // Node not recognized
             if (node == null)
             {
+                // Not a constant - this is an expected execution path.
                 return null;
             }
 

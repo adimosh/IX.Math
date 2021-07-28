@@ -5,28 +5,34 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IX.Abstractions.Logging;
 using IX.DataGeneration;
 using IX.Math;
 using IX.UnitTests.Helpers;
+using IX.UnitTests.Output;
 using Moq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace IX.UnitTests.IX.Math
 {
     /// <summary>
     ///     Tests computed expressions.
     /// </summary>
-    public class ComputedExpressionUnitTests : IClassFixture<CachedExpressionProviderFixture>
+    public class ComputedExpressionUnitTests : IClassFixture<CachedExpressionProviderFixture>, IDisposable
     {
         private readonly CachedExpressionProviderFixture fixture;
+        private readonly IDisposable logFixture;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ComputedExpressionUnitTests" /> class.
         /// </summary>
         /// <param name="fixture">The fixture.</param>
-        public ComputedExpressionUnitTests(CachedExpressionProviderFixture fixture)
+        /// <param name="outputHelper">Output helper.</param>
+        public ComputedExpressionUnitTests(CachedExpressionProviderFixture fixture, ITestOutputHelper outputHelper)
         {
             this.fixture = fixture;
+            this.logFixture = Log.UseSpecialLogger(new OutputLoggingShim(outputHelper));
         }
 
         /// <summary>
@@ -1769,5 +1775,10 @@ namespace IX.UnitTests.IX.Math
                     result);
             }
         }
+
+        /// <summary>
+        /// Disposes of this test class.
+        /// </summary>
+        public void Dispose() => this.logFixture?.Dispose();
     }
 }

@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Abstractions.Logging;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Globalization;
@@ -292,6 +293,7 @@ namespace IX.Math.Nodes.Operations.Binary
                 }
             }
 
+            Log.Current?.Debug("No numerical tolerance expression generated.");
             return null;
         }
     }

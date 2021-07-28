@@ -33,9 +33,12 @@ namespace IX.UnitTests
         /// <param name="outputHelper">The output helper.</param>
         public StringFormatterUnitTests(CachedExpressionProviderFixture fixture, ITestOutputHelper outputHelper)
         {
-            PluginCollection.Current.RegisterSpecificPlugin<SillyStringFormatter>(true);
-            this.logFixture = Log.UseSpecialLogger(new OutputLoggingShim(outputHelper));
-            this.fixture = fixture;
+            lock (PluginCollection.Current)
+            {
+                PluginCollection.Current.RegisterSpecificPlugin<SillyStringFormatter>(true);
+                this.logFixture = Log.UseSpecialLogger(new OutputLoggingShim(outputHelper));
+                this.fixture = fixture;
+            }
         }
 
         /// <summary>
@@ -51,6 +54,8 @@ namespace IX.UnitTests
         {
             // Arrange
             using var eps = new FixtureCreateDisposePatternHelper(this.fixture, create, dispose);
+
+            Log.Current?.Info("This is a logging test.");
 
             int comparisonValue = DataGenerator.RandomNonNegativeInteger();
             string expression = $"\"The number is \" + {comparisonValue}";
@@ -203,8 +208,11 @@ namespace IX.UnitTests
         /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
         public void Dispose()
         {
-            PluginCollection.Current.Reset();
-            PluginCollection.Current.RegisterCurrentAssembly();
+            lock (PluginCollection.Current)
+            {
+                PluginCollection.Current.Reset();
+                PluginCollection.Current.RegisterCurrentAssembly();
+            }
 
             this.logFixture?.Dispose();
         }

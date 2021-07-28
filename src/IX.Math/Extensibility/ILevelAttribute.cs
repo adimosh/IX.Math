@@ -10,7 +10,7 @@ namespace IX.Math.Extensibility
     public interface ILevelAttribute
     {
         /// <summary>
-        /// Gets or sets the level.
+        /// Gets the level.
         /// </summary>
         public int Level { get; }
     }

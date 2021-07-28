@@ -3,21 +3,28 @@
 // </copyright>
 
 using System;
+using IX.Abstractions.Logging;
 using IX.Math;
+using IX.UnitTests.Output;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace IX.UnitTests.IX.Math
 {
     /// <summary>
     ///     Class ComputedExpressionRandomTests.
     /// </summary>
-    public class ComputedExpressionRandomUnitTests
+    public class ComputedExpressionRandomUnitTests : IDisposable
     {
+        private readonly IDisposable logFixture;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ComputedExpressionRandomUnitTests"/> class.
         /// </summary>
-        public ComputedExpressionRandomUnitTests()
+        /// <param name="outputHelper">The output helper.</param>
+        public ComputedExpressionRandomUnitTests(ITestOutputHelper outputHelper)
         {
+            this.logFixture = Log.UseSpecialLogger(new OutputLoggingShim(outputHelper));
         }
 
         /// <summary>
@@ -283,5 +290,8 @@ namespace IX.UnitTests.IX.Math
                 }
             }
         }
+
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        public void Dispose() => this.logFixture?.Dispose();
     }
 }

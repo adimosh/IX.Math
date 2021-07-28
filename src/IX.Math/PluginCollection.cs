@@ -118,11 +118,15 @@ namespace IX.Math
 
             using var locker = this.ReadLock();
 
+            Log.Current?.Debug($"Currently interpreting expression \"{expression}\" for constants with {this.constantInterpreters.Count} interpreters.");
+
             foreach (var interpreter in this.constantInterpreters.KeysByLevel.SelectMany(p => p.Value))
             {
                 var (success, result) = this.constantInterpreters[interpreter].EvaluateIsConstant(expression);
                 if (success)
                 {
+                    Log.Current?.Debug($"Interpretation of constant complete, with result \"{result}\".");
+
                     return result;
                 }
             }
@@ -142,6 +146,8 @@ namespace IX.Math
             this.EnsureFunctionsInitialized();
 
             using var locker = this.ReadLock();
+
+            Log.Current?.Debug($"Currently extracting constants from \"{expression}\" with {this.constantExtractors.Count} extractors.");
 
             var localContext = InterpretationContext.Current;
             foreach (var extractor in this.constantExtractors.EnumerateValuesOnLevelKeys())
@@ -170,9 +176,13 @@ namespace IX.Math
 
                 if (!string.IsNullOrEmpty(localExpression))
                 {
+                    Log.Current?.Debug($"Extracted constants, resulting in \"{expression}\".");
+
                     expression = localExpression;
                 }
             }
+
+            Log.Current?.Debug($"Final expression after constants extraction is \"{expression}\".");
 
             return expression;
         }
@@ -193,6 +203,8 @@ namespace IX.Math
             this.EnsureFunctionsInitialized();
 
             using var locker = this.ReadLock();
+
+            Log.Current?.Debug($"Checking pass-through expression \"{expression}\" with {this.constantPassThroughExtractors.Count} extractors.");
 
             return this.constantPassThroughExtractors.EnumerateValuesOnLevelKeys()
                 .Any(
@@ -317,12 +329,21 @@ namespace IX.Math
         /// </summary>
         public void Reset()
         {
-            using (this.WriteLock())
-            {
-                this.assembliesToRegister.Clear();
-                this.customTypesToRegister.Clear();
+            Log.Current?.Debug("Resetting plugins.");
 
-                this.ClearData();
+            try
+            {
+                using (this.WriteLock())
+                {
+                    this.assembliesToRegister.Clear();
+                    this.customTypesToRegister.Clear();
+
+                    this.ClearData();
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Current?.Error(e, "Exception during resetting the plugin collection.");
             }
         }
 
@@ -421,11 +442,15 @@ namespace IX.Math
 
             using ReadOnlySynchronizationLocker locker = this.ReadLock();
 
+            Log.Current?.Debug($"Interpreting \"{value}\" as string.");
+
             foreach (var interpreter in this.stringFormatters.EnumerateValuesOnLevelKeys())
             {
                 var (success, result) = interpreter.ParseIntoString(value);
                 if (success)
                 {
+                    Log.Current?.Debug($"String interpretation of value \"{value}\" successful with result \"{result}\".");
+
                     return (true, result);
                 }
             }

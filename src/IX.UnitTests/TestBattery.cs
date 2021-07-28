@@ -5,28 +5,34 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IX.Abstractions.Logging;
 using IX.DataGeneration;
 using IX.Math;
 using IX.UnitTests.Helpers;
+using IX.UnitTests.Output;
 using Moq;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace IX.UnitTests
 {
     /// <summary>
     ///     Tests computed expressions.
     /// </summary>
-    public class TestBattery : IClassFixture<CachedExpressionProviderFixture>
+    public class TestBattery : IClassFixture<CachedExpressionProviderFixture>, IDisposable
     {
         private readonly CachedExpressionProviderFixture fixture;
         private readonly ReturnValueEqualityComparer comparer;
+        private readonly IDisposable logFixture;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="TestBattery" /> class.
         /// </summary>
         /// <param name="fixture">The fixture.</param>
-        public TestBattery(CachedExpressionProviderFixture fixture)
+        /// <param name="outputHelper">The output helper.</param>
+        public TestBattery(CachedExpressionProviderFixture fixture, ITestOutputHelper outputHelper)
         {
+            this.logFixture = Log.UseSpecialLogger(new OutputLoggingShim(outputHelper));
             this.fixture = fixture;
             this.comparer = new ReturnValueEqualityComparer();
         }
@@ -51,16 +57,16 @@ namespace IX.UnitTests
 
         private static Type FixNumericType(in object source) => source switch
         {
-            byte _ => typeof(double),
-            sbyte _ => typeof(double),
-            int _ => typeof(double),
-            uint _ => typeof(double),
-            short _ => typeof(double),
-            ushort _ => typeof(double),
-            long _ => typeof(double),
-            ulong _ => typeof(double),
-            float _ => typeof(double),
-            double _ => typeof(double),
+            byte => typeof(double),
+            sbyte => typeof(double),
+            int => typeof(double),
+            uint => typeof(double),
+            short => typeof(double),
+            ushort => typeof(double),
+            long => typeof(double),
+            ulong => typeof(double),
+            float => typeof(double),
+            double => typeof(double),
             _ => source.GetType()
         };
 
@@ -397,5 +403,8 @@ namespace IX.UnitTests
                 result,
                 this.comparer);
         }
+
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        public void Dispose() => this.logFixture?.Dispose();
     }
 }

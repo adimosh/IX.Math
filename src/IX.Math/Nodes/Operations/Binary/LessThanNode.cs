@@ -6,10 +6,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Abstractions.Logging;
 using IX.Math.Nodes.Constants;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Globalization;
-using JetBrains.Annotations;
 using SuppressMessage = System.Diagnostics.CodeAnalysis.SuppressMessageAttribute;
 
 namespace IX.Math.Nodes.Operations.Binary
@@ -214,7 +214,7 @@ namespace IX.Math.Nodes.Operations.Binary
         }
 
         [SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "We want it this way.")]
-        private Expression PossibleToleranceExpression(Expression leftExpression, Expression rightExpression, Tolerance tolerance)
+        private Expression? PossibleToleranceExpression(Expression leftExpression, Expression rightExpression, Tolerance tolerance)
         {
             if (tolerance.IntegerToleranceRangeUpperBound != null)
             {
@@ -291,6 +291,7 @@ namespace IX.Math.Nodes.Operations.Binary
                 }
             }
 
+            Log.Current?.Debug("No numerical tolerance expression generated.");
             return null;
         }
     }

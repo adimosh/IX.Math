@@ -18,10 +18,8 @@
   <PropertyGroup>
     <Title>IX Mathematics</Title>
     <Description>A library for transforming text expressions containing mathematical operations into executable delegates.</Description>
-    <PackageReleaseNotes>- Package updates on the classic version
-- Updated opt and all other references
-- Removed dependency on project system
-- Mathematics definition cleaned up</PackageReleaseNotes>
+    <PackageReleaseNotes>- Logging
+- Interpretation context</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -51,6 +49,13 @@
   <ItemGroup>
     <PackageReference Include="IX.StandardExtensions" Version="0.7.11" />
   </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>$(DefineConstants);IXLOGGINGAll</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DefineConstants>$(DefineConstants);IXLOGGINGWARNING</DefineConstants>
+  </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIsFramework)'=='true'">
     <Reference Include="System" />

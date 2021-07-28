@@ -136,6 +136,7 @@ namespace IX.Math
             {
                 if (parameterValues.Length != parameters.Length)
                 {
+                    Log.Current?.Debug($"The expression has been invoked with {parameterValues.Length} parameters, but takes {parameters.Length} parameters.");
                     return null;
                 }
 
@@ -264,6 +265,7 @@ namespace IX.Math
 
                         default:
                             // Argument type is not (yet) supported
+                            Log.Current?.Debug($"An argument of type {paramValue.GetType().FullName} was given, but that argument type is not yet supported.");
                             return null;
                     }
 
@@ -395,6 +397,7 @@ namespace IX.Math
                                         else
                                         {
                                             // Cannot parse byte array.
+                                            Log.Current?.Debug($"The string {convertedParam} cannot be parsed into a byte array.");
                                             return null;
                                         }
                                     }
@@ -415,6 +418,7 @@ namespace IX.Math
                                                     break;
                                                 default:
                                                     // Numeric type unknown.
+                                                    Log.Current?.Debug($"The string {convertedParam} cannot be parsed into a numeric value.");
                                                     return null;
                                             }
                                         }
@@ -692,6 +696,7 @@ namespace IX.Math
 
                     if (paramValue == null)
                     {
+                        Log.Current?.Debug($"Somehow, the parameter value could not be ultimately converted.");
                         return null;
                     }
 

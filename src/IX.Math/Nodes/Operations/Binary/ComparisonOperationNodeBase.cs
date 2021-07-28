@@ -4,8 +4,8 @@
 
 using System.Linq.Expressions;
 using System.Reflection;
+using IX.Abstractions.Logging;
 using IX.StandardExtensions.Extensions;
-using JetBrains.Annotations;
 
 namespace IX.Math.Nodes.Operations.Binary
 {
@@ -122,7 +122,7 @@ namespace IX.Math.Nodes.Operations.Binary
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "We want it this way.")]
-        protected Expression GenerateNumericalToleranceEquateExpression(
+        protected Expression? GenerateNumericalToleranceEquateExpression(
              Expression leftExpression,
              Expression rightExpression,
              Tolerance tolerance)
@@ -210,6 +210,7 @@ namespace IX.Math.Nodes.Operations.Binary
                 }
             }
 
+            Log.Current?.Debug("No numerical tolerance expression generated.");
             return null;
         }
     }

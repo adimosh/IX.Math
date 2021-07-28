@@ -80,6 +80,7 @@ namespace IX.Math.Extraction
 
                         if (op == -1)
                         {
+                            // Not a function - this is a normal execution path
                             return null;
                         }
 

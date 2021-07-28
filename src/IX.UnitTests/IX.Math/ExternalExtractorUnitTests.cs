@@ -2,22 +2,29 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
-using System.Reflection;
+using System;
+using IX.Abstractions.Logging;
 using IX.Math;
+using IX.UnitTests.Output;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace IX.UnitTests.IX.Math
 {
     /// <summary>
     ///     A class containing tests for external library support in IX.Math.
     /// </summary>
-    public class ExternalExtractorUnitTests
+    public class ExternalExtractorUnitTests : IDisposable
     {
+        private readonly IDisposable logFixture;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ExternalExtractorUnitTests"/> class.
         /// </summary>
-        public ExternalExtractorUnitTests()
+        /// <param name="outputHelper">The output helper.</param>
+        public ExternalExtractorUnitTests(ITestOutputHelper outputHelper)
         {
+            this.logFixture = Log.UseSpecialLogger(new OutputLoggingShim(outputHelper));
         }
 
         /// <summary>
@@ -101,5 +108,8 @@ namespace IX.UnitTests.IX.Math
                 "abalaportocala",
                 interpreted.Compute());
         }
+
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+        public void Dispose() => this.logFixture?.Dispose();
     }
 }
