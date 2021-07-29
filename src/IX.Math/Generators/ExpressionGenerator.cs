@@ -106,7 +106,7 @@ namespace IX.Math.Generators
             {
                 body = null;
 
-                Log.Current?.Debug(ex, "Main expression body generation failed.");
+                Log.Debug(ex, "Main expression body generation failed.");
             }
 
             if (body == null || cancellationToken.IsCancellationRequested)
@@ -129,7 +129,7 @@ namespace IX.Math.Generators
         {
             if (expression is null)
             {
-                Log.Current?.Debug("Expression sent for generation as null.");
+                Log.Debug("Expression sent for generation as null.");
                 return null;
             }
 
@@ -222,7 +222,7 @@ namespace IX.Math.Generators
                     if (position == 0)
                     {
                         // We certainly have an unary operator if the operator is at the beginning of the expression. We therefore cannot continue with binary
-                        Log.Current?.Debug($"Binary operator requested in place of unary in {s}.");
+                        Log.Debug($"Binary operator requested in place of unary in {s}.");
                         return null;
                     }
 
@@ -237,7 +237,7 @@ namespace IX.Math.Generators
                         out Func<NodeBase, NodeBase, BinaryOperatorNodeBase> t))
                     {
                         // Binary operator not actually found.
-                        Log.Current?.Warning($"The binary operator {op} was sought, but not actually found. This should be checked.");
+                        Log.Warning($"The binary operator {op} was sought, but not actually found. This should be checked.");
                         return null;
                     }
 
@@ -248,7 +248,7 @@ namespace IX.Math.Generators
                     if (string.IsNullOrWhiteSpace(eee))
                     {
                         // Empty space before operator. Normally, this should never be hit.
-                        Log.Current?.Warning($"There is a space before the operator, something that should never happen.");
+                        Log.Warning($"There is a space before the operator, something that should never happen.");
                         return null;
                     }
 
@@ -256,7 +256,7 @@ namespace IX.Math.Generators
                     if (left == null)
                     {
                         // Left expression is invalid.
-                        Log.Current?.Debug($"The expression {eee} is not valid.");
+                        Log.Debug($"The expression {eee} is not valid.");
                         return null;
                     }
 
@@ -264,7 +264,7 @@ namespace IX.Math.Generators
                     if (string.IsNullOrWhiteSpace(eee))
                     {
                         // Empty space after operator. Normally, this should never be hit.
-                        Log.Current?.Warning($"There is a space after the operator, something that should never happen.");
+                        Log.Warning($"There is a space after the operator, something that should never happen.");
                         return null;
                     }
 
@@ -272,7 +272,7 @@ namespace IX.Math.Generators
                     if (right == null)
                     {
                         // Right expression is invalid.
-                        Log.Current?.Debug($"The expression {eee} is not valid.");
+                        Log.Debug($"The expression {eee} is not valid.");
                         return null;
                     }
 
@@ -314,7 +314,7 @@ namespace IX.Math.Generators
                             out Func<NodeBase, UnaryOperatorNodeBase> t))
                     {
                         // The unary operator is not valid.
-                        Log.Current?.Warning($"The unary operator {op} was sought, but not actually found. This should be checked.");
+                        Log.Warning($"The unary operator {op} was sought, but not actually found. This should be checked.");
                         return null;
                     }
 
@@ -322,7 +322,7 @@ namespace IX.Math.Generators
                     if (string.IsNullOrWhiteSpace(eee))
                     {
                         // We might have a valid unary operator but attached to nothing - the expression cannot be evaluated any further on this branch
-                        Log.Current?.Debug($"The unary operator {op} appears to not be attached to anything valid.");
+                        Log.Debug($"The unary operator {op} appears to not be attached to anything valid.");
                         return null;
                     }
 
@@ -332,7 +332,7 @@ namespace IX.Math.Generators
                     if (expr == null)
                     {
                         // The operand expression was not valid, or cancellation was requested.
-                        Log.Current?.Debug($"The expression {eee} is not valid.");
+                        Log.Debug($"The expression {eee} is not valid.");
                         return null;
                     }
 
@@ -347,7 +347,7 @@ namespace IX.Math.Generators
                 }
             }
 
-            Log.Current?.Debug("The expression yielded nothing.");
+            Log.Debug("The expression yielded nothing.");
             return null;
 
             static NodeBase? GenerateFunctionCallExpression(
@@ -411,7 +411,7 @@ namespace IX.Math.Generators
                                 }
                                 else
                                 {
-                                    Log.Current?.Debug($"Unary function {functionName} not found.");
+                                    Log.Debug($"Unary function {functionName} not found.");
                                     returnValue = null;
                                 }
 
@@ -431,7 +431,7 @@ namespace IX.Math.Generators
                                 }
                                 else
                                 {
-                                    Log.Current?.Debug($"Binary function {functionName} not found.");
+                                    Log.Debug($"Binary function {functionName} not found.");
                                     returnValue = null;
                                 }
 
@@ -453,14 +453,14 @@ namespace IX.Math.Generators
                                 }
                                 else
                                 {
-                                    Log.Current?.Debug($"Ternary function {functionName} not found.");
+                                    Log.Debug($"Ternary function {functionName} not found.");
                                     returnValue = null;
                                 }
 
                                 break;
 
                             default:
-                                Log.Current?.Debug($"Function {functionName} was invoked with more than 3 parameters, which is currently not supported.");
+                                Log.Debug($"Function {functionName} was invoked with more than 3 parameters, which is currently not supported.");
                                 returnValue = null;
                                 break;
                         }
@@ -470,7 +470,7 @@ namespace IX.Math.Generators
                 }
                 catch (Exception ex)
                 {
-                    Log.Current?.Debug(ex, "Expression generation failed.");
+                    Log.Debug(ex, "Expression generation failed.");
 
                     return null;
                 }

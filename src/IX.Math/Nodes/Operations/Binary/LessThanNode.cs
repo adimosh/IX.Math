@@ -291,7 +291,7 @@ namespace IX.Math.Nodes.Operations.Binary
                 }
             }
 
-            Log.Current?.Debug("No numerical tolerance expression generated.");
+            Log.Debug("No numerical tolerance expression generated.");
             return null;
         }
     }

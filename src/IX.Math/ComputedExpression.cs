@@ -136,7 +136,7 @@ namespace IX.Math
             {
                 if (parameterValues.Length != parameters.Length)
                 {
-                    Log.Current?.Debug($"The expression has been invoked with {parameterValues.Length} parameters, but takes {parameters.Length} parameters.");
+                    Log.Debug($"The expression has been invoked with {parameterValues.Length} parameters, but takes {parameters.Length} parameters.");
                     return null;
                 }
 
@@ -265,7 +265,7 @@ namespace IX.Math
 
                         default:
                             // Argument type is not (yet) supported
-                            Log.Current?.Debug($"An argument of type {paramValue.GetType().FullName} was given, but that argument type is not yet supported.");
+                            Log.Debug($"An argument of type {paramValue.GetType().FullName} was given, but that argument type is not yet supported.");
                             return null;
                     }
 
@@ -397,7 +397,7 @@ namespace IX.Math
                                         else
                                         {
                                             // Cannot parse byte array.
-                                            Log.Current?.Debug($"The string {convertedParam} cannot be parsed into a byte array.");
+                                            Log.Debug($"The string {convertedParam} cannot be parsed into a byte array.");
                                             return null;
                                         }
                                     }
@@ -418,7 +418,7 @@ namespace IX.Math
                                                     break;
                                                 default:
                                                     // Numeric type unknown.
-                                                    Log.Current?.Debug($"The string {convertedParam} cannot be parsed into a numeric value.");
+                                                    Log.Debug($"The string {convertedParam} cannot be parsed into a numeric value.");
                                                     return null;
                                             }
                                         }
@@ -696,7 +696,7 @@ namespace IX.Math
 
                     if (paramValue == null)
                     {
-                        Log.Current?.Debug($"Somehow, the parameter value could not be ultimately converted.");
+                        Log.Debug($"Somehow, the parameter value could not be ultimately converted.");
                         return null;
                     }
 
@@ -728,7 +728,7 @@ namespace IX.Math
                 // Expression is somehow not valid
                 del = null;
 
-                Log.Current?.Debug(ex, "Expression is not valid when being compiled into lambda.");
+                Log.Debug(ex, "Expression is not valid when being compiled into lambda.");
             }
 
             if (del == null)
@@ -752,7 +752,7 @@ namespace IX.Math
             catch (Exception ex)
             {
                 // Dynamic invocation of generated expression failed.
-                Log.Current?.Debug(ex, "Lambda-compiled expression threw exception when invoked.");
+                Log.Debug(ex, "Lambda-compiled expression threw exception when invoked.");
                 return this.initialExpression;
             }
         }

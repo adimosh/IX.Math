@@ -55,7 +55,7 @@ namespace IX.UnitTests
             // Arrange
             using var eps = new FixtureCreateDisposePatternHelper(this.fixture, create, dispose);
 
-            Log.Current?.Info("This is a logging test.");
+            Log.Info("This is a logging test.");
 
             int comparisonValue = DataGenerator.RandomNonNegativeInteger();
             string expression = $"\"The number is \" + {comparisonValue}";

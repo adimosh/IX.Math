@@ -308,7 +308,7 @@ namespace IX.Math.Interpretation
                 content,
                 out var result))
             {
-                Log.Current?.Debug($"No numeric constant can be parsed from {content}.");
+                Log.Debug($"No numeric constant can be parsed from {content}.");
                 return null;
             }
 
@@ -377,7 +377,7 @@ namespace IX.Math.Interpretation
             // No content
             if (string.IsNullOrWhiteSpace(content))
             {
-                Log.Current?.Debug("No content for constant.");
+                Log.Debug("No content for constant.");
                 return null;
             }
 

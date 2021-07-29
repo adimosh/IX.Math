@@ -5,6 +5,7 @@
 using System;
 using System.Reflection;
 using System.Threading;
+using IX.Abstractions.Logging;
 using IX.Math.Generators;
 using IX.Math.Interpretation;
 using IX.Math.Nodes;
@@ -14,7 +15,6 @@ using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Threading;
 using JetBrains.Annotations;
-using DiagCA = System.Diagnostics.CodeAnalysis;
 
 namespace IX.Math
 {
@@ -64,14 +64,6 @@ namespace IX.Math
         ///     expression itself makes sense.
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="expression" /> is either null, empty or whitespace-only.</exception>
-        [DiagCA.SuppressMessage(
-            "Performance",
-            "HAA0401:Possible allocation of reference type enumerator",
-            Justification = "Unavoidable here.")]
-        [DiagCA.SuppressMessage(
-            "Performance",
-            "HAA0603:Delegate allocation from a method group",
-            Justification = "We're OK with this.")]
         protected ComputedExpression InterpretInternal(
             string expression,
             CancellationToken cancellationToken = default)
