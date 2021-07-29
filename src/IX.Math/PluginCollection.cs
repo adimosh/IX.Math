@@ -56,6 +56,7 @@ namespace IX.Math
         private PluginCollection()
         {
             this.assembliesToRegister = new List<Assembly>();
+            this.assembliesToRegister.Add(Assembly.GetExecutingAssembly());
             this.customTypesToRegister = new List<(TypeInfo Type, bool TolerateMissingAttribute)>();
 
             this.nonaryFunctions = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
@@ -307,6 +308,7 @@ namespace IX.Math
                 using (this.WriteLock())
                 {
                     this.assembliesToRegister.Clear();
+                    this.assembliesToRegister.Add(Assembly.GetExecutingAssembly());
                     this.customTypesToRegister.Clear();
 
                     this.ClearData();

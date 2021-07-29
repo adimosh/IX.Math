@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using IX.Abstractions.Logging;
 using IX.Math.Extensibility;
 using IX.Math.Interpretation;
 using IX.Math.Nodes;
@@ -41,6 +42,8 @@ namespace IX.Math.Extraction
             IDictionary<string, string> reverseConstantsTable,
             MathDefinition mathDefinition)
         {
+            Log.Debug($"Currently extracting strings from \"{originalExpression}\"");
+
             var stringIndicagtorString = mathDefinition.StringIndicator;
             var stringIndicator = mathDefinition.StringIndicator.AsSpan();
             var stringIndicatorLength = stringIndicator.Length;
@@ -141,7 +144,11 @@ namespace IX.Math.Extraction
             sb.Append(process.ToString());
 #endif
 
-            return sb.ToString();
+            var sResult = sb.ToString();
+
+            Log.Debug($"Resulting expression is \"{sResult}\".");
+
+            return sResult;
         }
     }
 }

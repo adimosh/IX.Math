@@ -37,9 +37,6 @@ namespace IX.Math
         protected private ExpressionParsingServiceBase(MathDefinition definition)
         {
             Requires.NotNull(out this.workingDefinition, definition, nameof(definition));
-
-            PluginCollection.Current.RegisterFunctionsAssembly(typeof(ExpressionParsingService).GetTypeInfo()
-                .Assembly);
         }
 
         /// <summary>
@@ -73,6 +70,8 @@ namespace IX.Math
                 nameof(expression));
 
             this.ThrowIfCurrentObjectDisposed();
+
+            Log.Debug($"Started interpreting expression \"{expression}\"");
 
             if (PluginCollection.Current.CheckExpressionPassThroughConstant(expression))
             {

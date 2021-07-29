@@ -5,6 +5,7 @@
 using System;
 using System.Globalization;
 using System.Linq.Expressions;
+using IX.Abstractions.Logging;
 using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
 
@@ -23,6 +24,8 @@ namespace IX.Math.Formatters
         /// <returns>A formatted string, if the input type is supported.</returns>
         public static string FormatIntoString<T>(T value)
         {
+            Log.Debug($"Formatting {value} into string.");
+
             if (typeof(T) == typeof(string))
             {
                 return (value as string)!;

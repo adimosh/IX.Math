@@ -26,10 +26,6 @@ namespace IX.Math.Generators
             "Performance",
             "HAA0401:Possible allocation of reference type enumerator",
             Justification = "Not avoidable for now.")]
-        [SuppressMessage(
-            "CodeSmell",
-            "ERP022:Unobserved exception in generic exception handler",
-            Justification = "We want this to happen.")]
         internal static ComputationBody CreateBody()
         {
             var context = InterpretationContext.Current;
