@@ -26,45 +26,18 @@ namespace IX.Math
     [PublicAPI]
     public class PluginCollection : ReaderWriterSynchronizedBase
     {
-        #region Internal state
+#region Internal state
 
-        #region Assemblies and types
         private readonly List<Assembly> assembliesToRegister;
-        private readonly List<(TypeInfo Type, bool TolerateMissingAttribute)> customTypesToRegister;
-        #endregion
-
-        [SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP006:Implement IDisposable.",
-            Justification = "IDisposable is correctly implemented.")]
-        private readonly LevelDictionary<Type, IConstantsExtractor> constantExtractors;
-
-        [SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP006:Implement IDisposable.",
-            Justification = "IDisposable is correctly implemented.")]
-        private readonly LevelDictionary<Type, IConstantInterpreter> constantInterpreters;
-
-        [SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP006:Implement IDisposable.",
-            Justification = "IDisposable is correctly implemented.")]
-        private readonly LevelDictionary<Type, IConstantPassThroughExtractor> constantPassThroughExtractors;
-
-        [SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP006:Implement IDisposable.",
-            Justification = "IDisposable is correctly implemented.")]
-        private readonly LevelDictionary<Type, IStringFormatter> stringFormatters;
-
-        #region Function dictionaries
-
         private readonly Dictionary<string, Type> binaryFunctions;
+        private readonly LevelDictionary<Type, IConstantsExtractor> constantExtractors;
+        private readonly LevelDictionary<Type, IConstantInterpreter> constantInterpreters;
+        private readonly LevelDictionary<Type, IConstantPassThroughExtractor> constantPassThroughExtractors;
+        private readonly List<(TypeInfo Type, bool TolerateMissingAttribute)> customTypesToRegister;
+        private readonly Dictionary<string, Type> nonaryFunctions;
+        private readonly LevelDictionary<Type, IStringFormatter> stringFormatters;
         private readonly Dictionary<string, Type> ternaryFunctions;
         private readonly Dictionary<string, Type> unaryFunctions;
-        private readonly Dictionary<string, Type> nonaryFunctions;
-
-        #endregion
 
         private int constantExtractorsIndex;
         private int constantInterpretersIndex;
@@ -73,17 +46,17 @@ namespace IX.Math
         private bool initialized;
         private int stringFormattersIndex;
 
-        #endregion
+#endregion
 
-        #region Constructors and destructors
+#region Constructors and destructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="PluginCollection" /> class.
         /// </summary>
         private PluginCollection()
         {
-            this.assembliesToRegister = new();
-            this.customTypesToRegister = new();
+            this.assembliesToRegister = new List<Assembly>();
+            this.customTypesToRegister = new List<(TypeInfo Type, bool TolerateMissingAttribute)>();
 
             this.nonaryFunctions = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
             this.unaryFunctions = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
@@ -96,99 +69,62 @@ namespace IX.Math
             this.stringFormatters = new LevelDictionary<Type, IStringFormatter>();
         }
 
-        #endregion
+#endregion
+
+#region Properties and indexers
 
         /// <summary>
-        /// The current plugin collection.
+        ///     Gets the current plugin collection.
         /// </summary>
         public static PluginCollection Current { get; } = new();
 
-        #region Methods
+#endregion
+
+#region Methods
 
         /// <summary>
-        /// Interprets an expression based on constant interpreters.
+        ///     Interprets an expression based on constant interpreters.
         /// </summary>
         /// <param name="expression">The expression to interpret.</param>
         /// <returns>A node, if the expression is recognized, or <c>null</c> (<c>Nothing</c> in Visual Basic) otherwise.</returns>
+        [SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "We're OK with this enumeration.")]
+        [SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "Currently string interpolation does this.")]
         public ConstantNodeBase? InterpretExpression(string expression)
         {
             this.ThrowIfCurrentObjectDisposed();
 
-            this.EnsureFunctionsInitialized();
+            using ReadOnlySynchronizationLocker locker = this.EnsureFunctionsInitialized();
 
-            using var locker = this.ReadLock();
+            // TODO: Remove the suppression after string interpolation is optimized
+            Log.Debug(
+                $"Currently interpreting expression \"{expression}\" for constants with {this.constantInterpreters.Count} interpreters.");
 
-            Log.Current?.Debug($"Currently interpreting expression \"{expression}\" for constants with {this.constantInterpreters.Count} interpreters.");
-
+            // TODO: Remove the suppression after EnumerateValuesOnLevelKeys gets a struct enumerator
             foreach (var interpreter in this.constantInterpreters.KeysByLevel.SelectMany(p => p.Value))
             {
-                var (success, result) = this.constantInterpreters[interpreter].EvaluateIsConstant(expression);
-                if (success)
+                var (success, result) = this.constantInterpreters[interpreter]
+                    .EvaluateIsConstant(expression);
+                if (!success)
                 {
-                    Log.Current?.Debug($"Interpretation of constant complete, with result \"{result}\".");
-
-                    return result;
+                    continue;
                 }
+
+                Log.Debug($"Interpretation of constant complete, with result \"{result}\".");
+
+                return result;
             }
 
             return null;
         }
 
         /// <summary>
-        /// Extracts constants out of an expression.
-        /// </summary>
-        /// <param name="expression">The expression to extract constants from.</param>
-        /// <returns>The expression, with constants removed, or the original expression if no constants were found.</returns>
-        internal string ExtractConstants(string expression)
-        {
-            this.ThrowIfCurrentObjectDisposed();
-
-            this.EnsureFunctionsInitialized();
-
-            using var locker = this.ReadLock();
-
-            Log.Current?.Debug($"Currently extracting constants from \"{expression}\" with {this.constantExtractors.Count} extractors.");
-
-            var localContext = InterpretationContext.Current;
-            foreach (var extractor in this.constantExtractors.EnumerateValuesOnLevelKeys())
-            {
-                if (localContext.CancellationToken.IsCancellationRequested)
-                {
-                    return expression;
-                }
-
-                string localExpression;
-                try
-                {
-                    localExpression = extractor
-                        .ExtractAllConstants(
-                            expression,
-                            localContext.ConstantsTable,
-                            localContext.ReverseConstantsTable,
-                            localContext.Definition);
-                }
-                catch (Exception ex)
-                {
-                    Log.Current?.Error(ex, "Constant extractor threw exception.");
-
-                    continue;
-                }
-
-                if (!string.IsNullOrEmpty(localExpression))
-                {
-                    Log.Current?.Debug($"Extracted constants, resulting in \"{expression}\".");
-
-                    expression = localExpression;
-                }
-            }
-
-            Log.Current?.Debug($"Final expression after constants extraction is \"{expression}\".");
-
-            return expression;
-        }
-
-        /// <summary>
-        /// Checks whether or not the expression is recognized by a pass-through extractor.
+        ///     Checks whether or not the expression is recognized by a pass-through extractor.
         /// </summary>
         /// <param name="expression">The expression to check.</param>
         /// <returns><c>true</c> if the expression is a constant, <c>false</c> otherwise.</returns>
@@ -196,15 +132,21 @@ namespace IX.Math
             "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "We don't care.")]
+        [SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "Currently string interpolation does this.")]
         public bool CheckExpressionPassThroughConstant(string expression)
         {
             this.ThrowIfCurrentObjectDisposed();
 
-            this.EnsureFunctionsInitialized();
+            using ReadOnlySynchronizationLocker locker = this.EnsureFunctionsInitialized();
 
-            using var locker = this.ReadLock();
-
-            Log.Current?.Debug($"Checking pass-through expression \"{expression}\" with {this.constantPassThroughExtractors.Count} extractors.");
+            // TODO: Remove the suppression after string interpolation is optimized
+            Log.Debug(
+                $"Checking pass-through expression \"{expression}\" with {this.constantPassThroughExtractors.Count} extractors.");
+            Log.Debug(
+                $"Current plugins: {this.constantExtractors.Count} CE, {this.constantInterpreters.Count} CI, {this.constantPassThroughExtractors.Count} CPTE, {this.stringFormatters.Count} SF, {this.nonaryFunctions.Count} NF, {this.unaryFunctions.Count} UF, {this.binaryFunctions.Count} BF, {this.ternaryFunctions.Count} TF.");
 
             return this.constantPassThroughExtractors.EnumerateValuesOnLevelKeys()
                 .Any(
@@ -215,8 +157,7 @@ namespace IX.Math
                 IConstantPassThroughExtractor extractor,
                 string innerExpression)
             {
-                return extractor
-                    .Evaluate(innerExpression);
+                return extractor.Evaluate(innerExpression);
             }
         }
 
@@ -237,16 +178,21 @@ namespace IX.Math
 
             this.ThrowIfCurrentObjectDisposed();
 
+            Log.Debug($"Currently registering assembly \"{assembly}\".");
+
             using ReadWriteSynchronizationLocker locker = this.ReadWriteLock();
 
             if (this.assembliesToRegister.Contains(assembly))
             {
+                Log.Debug($"Assembly \"{assembly}\" had previously been registered.");
                 return;
             }
 
             locker.Upgrade();
 
             this.assembliesToRegister.Add(assembly);
+
+            Log.Debug($"The assembly \"{assembly}\" has been successfully registered.");
 
             this.ClearData();
         }
@@ -280,37 +226,55 @@ namespace IX.Math
         }
 
         /// <summary>
-        /// Registers a specific class as a plugin.
+        ///     Registers a specific class as a plugin.
         /// </summary>
         /// <typeparam name="TPlugin">The type of the plugin to register.</typeparam>
         /// <param name="tolerateMissingAttribute">Whether or not to tolerate the missing attribute when registering.</param>
         public void RegisterSpecificPlugin<TPlugin>(bool tolerateMissingAttribute = false)
             where TPlugin : class =>
-            this.RegisterSpecificPlugin(typeof(TPlugin).GetTypeInfo(), tolerateMissingAttribute);
+            this.RegisterSpecificPlugin(
+                typeof(TPlugin).GetTypeInfo(),
+                tolerateMissingAttribute);
 
         /// <summary>
-        /// Registers a specific class as a plugin.
+        ///     Registers a specific class as a plugin.
         /// </summary>
         /// <param name="pluginType">The type of the plugin to register.</param>
         /// <param name="tolerateMissingAttribute">Whether or not to tolerate the missing attribute when registering.</param>
-        public void RegisterSpecificPlugin(Type pluginType, bool tolerateMissingAttribute = false) =>
-            this.RegisterSpecificPlugin(Requires.NotNull(pluginType, nameof(pluginType)).GetTypeInfo(), tolerateMissingAttribute);
+        public void RegisterSpecificPlugin(
+            Type pluginType,
+            bool tolerateMissingAttribute = false) =>
+            this.RegisterSpecificPlugin(
+                Requires.NotNull(
+                        pluginType,
+                        nameof(pluginType))
+                    .GetTypeInfo(),
+                tolerateMissingAttribute);
 
         /// <summary>
-        /// Registers a specific class as a plugin.
+        ///     Registers a specific class as a plugin.
         /// </summary>
         /// <param name="pluginType">The type of the plugin to register.</param>
         /// <param name="tolerateMissingAttribute">Whether or not to tolerate the missing attribute when registering.</param>
-        [SuppressMessage("Performance", "HAA0301:Closure Allocation Source", Justification = "LINQ works like this")]
-        public void RegisterSpecificPlugin(TypeInfo pluginType, bool tolerateMissingAttribute = false)
+        [SuppressMessage(
+            "Performance",
+            "HAA0301:Closure Allocation Source",
+            Justification = "LINQ works like this")]
+        [SuppressMessage(
+            "Performance",
+            "HAA0302:Display class allocation to capture closure",
+            Justification = "LINQ works like this")]
+        public void RegisterSpecificPlugin(
+            TypeInfo pluginType,
+            bool tolerateMissingAttribute = false)
         {
-            Requires.NotNull(pluginType, nameof(pluginType));
+            Requires.NotNull(
+                pluginType,
+                nameof(pluginType));
 
             this.ThrowIfCurrentObjectDisposed();
 
-            this.EnsureFunctionsInitialized();
-
-            using var locker = this.ReadWriteLock();
+            using ReadWriteSynchronizationLocker locker = this.ReadWriteLock();
 
             if (this.customTypesToRegister.Any(p => p.Type == pluginType))
             {
@@ -319,17 +283,24 @@ namespace IX.Math
 
             locker.Upgrade();
 
-            this.CheckType(pluginType, tolerateMissingAttribute);
+            if (!this.initialized)
+            {
+                this.LoadData();
+            }
+
+            this.CheckType(
+                pluginType,
+                tolerateMissingAttribute);
 
             this.customTypesToRegister.Add((pluginType, tolerateMissingAttribute));
         }
 
         /// <summary>
-        /// Resets the plugin collection entirely.
+        ///     Resets the plugin collection entirely.
         /// </summary>
         public void Reset()
         {
-            Log.Current?.Debug("Resetting plugins.");
+            Log.Debug("Resetting plugins.");
 
             try
             {
@@ -340,10 +311,14 @@ namespace IX.Math
 
                     this.ClearData();
                 }
+
+                Log.Debug("Plugins reset and went out of lock.");
             }
             catch (Exception e)
             {
-                Log.Current?.Error(e, "Exception during resetting the plugin collection.");
+                Log.Error(
+                    e,
+                    "Exception during resetting the plugin collection.");
             }
         }
 
@@ -355,19 +330,17 @@ namespace IX.Math
         {
             this.ThrowIfCurrentObjectDisposed();
 
-            this.EnsureFunctionsInitialized();
-
-            using var locker = this.ReadLock();
+            using ReadOnlySynchronizationLocker locker = this.EnsureFunctionsInitialized();
 
             // Capacity is sum of all, times 3; the "3" number was chosen as a good-enough average of how many overloads are defined, on average
-            var bldr = new List<string>(
+            var builder = new List<string>(
                 (this.nonaryFunctions.Count +
                  this.unaryFunctions.Count +
                  this.binaryFunctions.Count +
                  this.ternaryFunctions.Count) *
                 3);
 
-            bldr.AddRange(this.nonaryFunctions.Select(function => $"{function.Key}()"));
+            builder.AddRange(this.nonaryFunctions.Select(function => $"{function.Key}()"));
 
             (
                 from KeyValuePair<string, Type> function in this.unaryFunctions
@@ -382,8 +355,8 @@ namespace IX.Math
                 select (functionName, parameterName)).ForEach(
                 (
                     parameter,
-                    bldrL1) => bldrL1.Add($"{parameter.functionName}({parameter.parameterName})"),
-                bldr);
+                    builderInternal) => builderInternal.Add($"{parameter.functionName}({parameter.parameterName})"),
+                builder);
 
             (
                 from KeyValuePair<string, Type> function in this.binaryFunctions
@@ -400,9 +373,9 @@ namespace IX.Math
                 select (functionName, parameterNameLeft, parameterNameRight)).ForEach(
                 (
                     parameter,
-                    bldrL1) => bldrL1.Add(
+                    builderInternal) => builderInternal.Add(
                     $"{parameter.functionName}({parameter.parameterNameLeft}, {parameter.parameterNameRight})"),
-                bldr);
+                builder);
 
             (
                 from KeyValuePair<string, Type> function in this.ternaryFunctions
@@ -421,38 +394,44 @@ namespace IX.Math
                 select (functionName, parameterNameLeft, parameterNameMiddle, parameterNameRight)).ForEach(
                 (
                     parameter,
-                    bldrL1) => bldrL1.Add(
+                    builderInternal) => builderInternal.Add(
                     $"{parameter.functionName}({parameter.parameterNameLeft}, {parameter.parameterNameMiddle}, {parameter.parameterNameRight})"),
-                bldr);
+                builder);
 
-            return bldr.ToArray();
+            return builder.ToArray();
         }
 
         /// <summary>
-        /// Interprets an object as a string.
+        ///     Interprets an object as a string.
         /// </summary>
         /// <typeparam name="T">The type of object to interpret.</typeparam>
         /// <param name="value">The value to interpret as string.</param>
         /// <returns>A success status, and the resulting string.</returns>
+        [SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "We're OK with this enumeration.")]
         public (bool Success, string? ResultingString) InterpretAsString<T>(T value)
         {
             this.ThrowIfCurrentObjectDisposed();
 
-            this.EnsureFunctionsInitialized();
+            using ReadOnlySynchronizationLocker locker = this.EnsureFunctionsInitialized();
 
-            using ReadOnlySynchronizationLocker locker = this.ReadLock();
+            Log.Debug($"Interpreting \"{value}\" as string.");
 
-            Log.Current?.Debug($"Interpreting \"{value}\" as string.");
-
+            // TODO: Remove the suppression after EnumerateValuesOnLevelKeys gets a struct enumerator
             foreach (var interpreter in this.stringFormatters.EnumerateValuesOnLevelKeys())
             {
                 var (success, result) = interpreter.ParseIntoString(value);
-                if (success)
-                {
-                    Log.Current?.Debug($"String interpretation of value \"{value}\" successful with result \"{result}\".");
 
-                    return (true, result);
+                if (!success)
+                {
+                    continue;
                 }
+
+                Log.Debug($"String interpretation of value \"{value}\" successful with result \"{result}\".");
+
+                return (true, result);
             }
 
             return (false, default);
@@ -470,9 +449,7 @@ namespace IX.Math
         {
             this.ThrowIfCurrentObjectDisposed();
 
-            this.EnsureFunctionsInitialized();
-
-            using ReadOnlySynchronizationLocker locker = this.ReadLock();
+            using ReadOnlySynchronizationLocker locker = this.EnsureFunctionsInitialized();
 
             return this.nonaryFunctions.TryGetValue(
                 name,
@@ -491,9 +468,7 @@ namespace IX.Math
         {
             this.ThrowIfCurrentObjectDisposed();
 
-            this.EnsureFunctionsInitialized();
-
-            using ReadOnlySynchronizationLocker locker = this.ReadLock();
+            using ReadOnlySynchronizationLocker locker = this.EnsureFunctionsInitialized();
 
             return this.unaryFunctions.TryGetValue(
                 name,
@@ -512,9 +487,7 @@ namespace IX.Math
         {
             this.ThrowIfCurrentObjectDisposed();
 
-            this.EnsureFunctionsInitialized();
-
-            using ReadOnlySynchronizationLocker locker = this.ReadLock();
+            using ReadOnlySynchronizationLocker locker = this.EnsureFunctionsInitialized();
 
             return this.binaryFunctions.TryGetValue(
                 name,
@@ -533,16 +506,78 @@ namespace IX.Math
         {
             this.ThrowIfCurrentObjectDisposed();
 
-            this.EnsureFunctionsInitialized();
-
-            using ReadOnlySynchronizationLocker locker = this.ReadLock();
+            using ReadOnlySynchronizationLocker locker = this.EnsureFunctionsInitialized();
 
             return this.ternaryFunctions.TryGetValue(
                 name,
                 out value);
         }
 
-        #region Disposable
+        /// <summary>
+        ///     Extracts constants out of an expression.
+        /// </summary>
+        /// <param name="expression">The expression to extract constants from.</param>
+        /// <returns>The expression, with constants removed, or the original expression if no constants were found.</returns>
+        [SuppressMessage(
+            "Performance",
+            "HAA0401:Possible allocation of reference type enumerator",
+            Justification = "We're OK with this enumeration.")]
+        [SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "Currently string interpolation does this.")]
+        internal string ExtractConstants(string expression)
+        {
+            this.ThrowIfCurrentObjectDisposed();
+
+            using ReadOnlySynchronizationLocker locker = this.EnsureFunctionsInitialized();
+
+            // TODO: Remove the suppression after string interpolation is optimized
+            Log.Debug(
+                $"Currently extracting constants from \"{expression}\" with {this.constantExtractors.Count} extractors.");
+
+            InterpretationContext localContext = InterpretationContext.Current;
+
+            // TODO: Remove the suppression after EnumerateValuesOnLevelKeys gets a struct enumerator
+            foreach (var extractor in this.constantExtractors.EnumerateValuesOnLevelKeys())
+            {
+                if (localContext.CancellationToken.IsCancellationRequested)
+                {
+                    return expression;
+                }
+
+                string localExpression;
+                try
+                {
+                    localExpression = extractor.ExtractAllConstants(
+                        expression,
+                        localContext.ConstantsTable,
+                        localContext.ReverseConstantsTable,
+                        localContext.Definition);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(
+                        ex,
+                        "Constant extractor threw exception.");
+
+                    continue;
+                }
+
+                if (!string.IsNullOrEmpty(localExpression))
+                {
+                    Log.Debug($"Extracted constants, resulting in \"{expression}\".");
+
+                    expression = localExpression;
+                }
+            }
+
+            Log.Debug($"Final expression after constants extraction is \"{expression}\".");
+
+            return expression;
+        }
+
+#region Disposable
 
         /// <summary>Disposes in the managed context.</summary>
         [SuppressMessage(
@@ -559,37 +594,38 @@ namespace IX.Math
             base.DisposeManagedContext();
         }
 
-        #endregion
+#endregion
 
         [SuppressMessage(
-            "Performance",
-            "HAA0603:Delegate allocation from a method group",
-            Justification = "Acceptable for parallel foreach.")]
-        private void EnsureFunctionsInitialized()
+            "IDisposableAnalyzers.Correctness",
+            "IDISP011:Don't return disposed instance.",
+            Justification = "This is acceptable in this case.")]
+        private ReadOnlySynchronizationLocker EnsureFunctionsInitialized()
         {
-            using ReadWriteSynchronizationLocker locker = this.ReadWriteLock();
-
-            if (this.initialized)
+            using (ReadOnlySynchronizationLocker readLocker = this.ReadLock())
             {
-                return;
+                if (this.initialized)
+                {
+                    return readLocker;
+                }
             }
 
-            locker.Upgrade();
-
-            if (this.initialized)
+            using (ReadWriteSynchronizationLocker locker = this.ReadWriteLock())
             {
-                return;
+                if (this.initialized)
+                {
+                    // We'll se if anyone else, by any chance, also started writing
+                    locker.Dispose();
+
+                    return this.ReadLock();
+                }
+
+                locker.Upgrade();
+
+                this.LoadData();
             }
 
-            this.constantExtractorsIndex = 2001;
-            this.constantInterpretersIndex = 2001;
-            this.constantPassThroughExtractorsIndex = 2001;
-            this.stringFormattersIndex = 2001;
-
-            this.assembliesToRegister.ParallelForEach(this.InitializeAssembly);
-            this.customTypesToRegister.ForEach(this.RegisterCustomTypeAction);
-
-            this.initialized = true;
+            return this.ReadLock();
         }
 
         private void RegisterCustomTypeAction((TypeInfo Type, bool TolerateMissingAttribute) p) =>
@@ -613,6 +649,8 @@ namespace IX.Math
 
         private void ClearData()
         {
+            this.initialized = false;
+
             this.nonaryFunctions.Clear();
             this.unaryFunctions.Clear();
             this.binaryFunctions.Clear();
@@ -622,16 +660,45 @@ namespace IX.Math
             this.constantInterpreters.Clear();
             this.constantPassThroughExtractors.Clear();
             this.stringFormatters.Clear();
+        }
 
+        [SuppressMessage(
+            "Performance",
+            "HAA0603:Delegate allocation from a method group",
+            Justification = "Acceptable for parallel foreach.")]
+        [SuppressMessage(
+            "Performance",
+            "HAA0601:Value type to reference type conversion causing boxing allocation",
+            Justification = "Currently string interpolation does this.")]
+        private void LoadData()
+        {
             this.initialized = false;
+
+            Log.Debug("Started refreshing plugins list.");
+
+            this.constantExtractorsIndex = 2001;
+            this.constantInterpretersIndex = 2001;
+            this.constantPassThroughExtractorsIndex = 2001;
+            this.stringFormattersIndex = 2001;
+
+            this.assembliesToRegister.ParallelForEach(this.InitializeAssembly);
+            this.customTypesToRegister.ForEach(this.RegisterCustomTypeAction);
+
+            // TODO: Remove the suppression after string interpolation is optimized
+            Log.Debug(
+                $"Plugins: {this.constantExtractors.Count} CE, {this.constantInterpreters.Count} CI, {this.constantPassThroughExtractors.Count} CPTE, {this.stringFormatters.Count} SF, {this.nonaryFunctions.Count} NF, {this.unaryFunctions.Count} UF, {this.binaryFunctions.Count} BF, {this.ternaryFunctions.Count} TF.");
+
+            this.initialized = true;
         }
 
         private void CheckType(
             TypeInfo p,
             bool tolerateMissingAttribute = false)
         {
+            Log.Debug($"Started analyzing type {p.FullName}.");
             if (typeof(NonaryFunctionNodeBase).IsAssignableFrom(p) && p.HasPublicParameterlessConstructor())
             {
+                Log.Debug($"Type {p.FullName} analyzed as NF.");
                 AddToTypeDictionary(
                     p,
                     this.nonaryFunctions,
@@ -639,6 +706,7 @@ namespace IX.Math
             }
             else if (typeof(UnaryFunctionNodeBase).IsAssignableFrom(p))
             {
+                Log.Debug($"Type {p.FullName} analyzed as UF.");
                 AddToTypeDictionary(
                     p,
                     this.unaryFunctions,
@@ -646,6 +714,7 @@ namespace IX.Math
             }
             else if (typeof(BinaryFunctionNodeBase).IsAssignableFrom(p))
             {
+                Log.Debug($"Type {p.FullName} analyzed as BF.");
                 AddToTypeDictionary(
                     p,
                     this.binaryFunctions,
@@ -653,6 +722,7 @@ namespace IX.Math
             }
             else if (typeof(TernaryFunctionNodeBase).IsAssignableFrom(p))
             {
+                Log.Debug($"Type {p.FullName} analyzed as TF.");
                 AddToTypeDictionary(
                     p,
                     this.ternaryFunctions,
@@ -667,6 +737,7 @@ namespace IX.Math
 
             if (typeof(IConstantsExtractor).IsAssignableFrom(p))
             {
+                Log.Debug($"Type {p.FullName} analyzed as CE.");
                 AddToPluginDictionary<IConstantsExtractor, ConstantsExtractorAttribute>(
                     this.constantExtractors,
                     p,
@@ -676,6 +747,7 @@ namespace IX.Math
 
             if (typeof(IConstantPassThroughExtractor).IsAssignableFrom(p))
             {
+                Log.Debug($"Type {p.FullName} analyzed as CPTE.");
                 AddToPluginDictionary<IConstantPassThroughExtractor, ConstantsPassThroughExtractorAttribute>(
                     this.constantPassThroughExtractors,
                     p,
@@ -685,6 +757,7 @@ namespace IX.Math
 
             if (typeof(IConstantInterpreter).IsAssignableFrom(p))
             {
+                Log.Debug($"Type {p.FullName} analyzed as CI.");
                 AddToPluginDictionary<IConstantInterpreter, ConstantsInterpreterAttribute>(
                     this.constantInterpreters,
                     p,
@@ -694,6 +767,7 @@ namespace IX.Math
 
             if (typeof(IStringFormatter).IsAssignableFrom(p))
             {
+                Log.Debug($"Type {p.FullName} analyzed as SF.");
                 AddToPluginDictionary<IStringFormatter, StringFormatterAttribute>(
                     this.stringFormatters,
                     p,
@@ -701,7 +775,11 @@ namespace IX.Math
                     ref this.stringFormattersIndex);
             }
 
-            static void AddToPluginDictionary<T, TAttribute>(LevelDictionary<Type, T> levelDictionary, TypeInfo p, bool tolerateMissingAttribute, ref int cci)
+            static void AddToPluginDictionary<T, TAttribute>(
+                LevelDictionary<Type, T> levelDictionary,
+                TypeInfo p,
+                bool tolerateMissingAttribute,
+                ref int cci)
                 where TAttribute : Attribute, ILevelAttribute
             {
                 int explicitLevel;
@@ -776,6 +854,6 @@ namespace IX.Math
             }
         }
 
-        #endregion
+#endregion
     }
 }
