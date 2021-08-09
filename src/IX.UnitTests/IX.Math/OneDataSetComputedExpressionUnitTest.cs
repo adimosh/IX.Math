@@ -38,14 +38,9 @@ namespace IX.UnitTests.IX.Math
         {
             new object[]
             {
-                "replace(x, y, z)",
-                new Dictionary<string, object>
-                {
-                    ["x"] = "abcde",
-                    ["y"] = "bc",
-                    ["z"] = "q",
-                },
-                "aqde",
+                "\"3\"+6",
+                null,
+                "36",
             },
         };
 

@@ -14,51 +14,44 @@ namespace IX.Math.ExpressionState
     [PublicAPI]
     public class ExpressionSymbol
     {
-        private string? expression;
-
-        private ExpressionSymbol()
+        private ExpressionSymbol(string name, string? expression, bool isFunctionCall)
         {
+            this.Name = name;
+            this.Expression = string.IsNullOrWhiteSpace(expression) ? null : expression?.Trim();
         }
 
         /// <summary>
-        ///     Gets or sets the expression.
+        ///     Gets the expression.
         /// </summary>
         /// <value>The name.</value>
-        public string? Expression
-        {
-            get => this.expression;
-            set => this.expression = string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-        }
+        public string? Expression { get; }
 
         /// <summary>
         ///     Gets a value indicating whether this symbol represents a function call.
         /// </summary>
         /// <value><see langword="true" /> if this symbol is a function call; otherwise, <see langword="false" />.</value>
-        public bool IsFunctionCall { get; private set; }
+        public bool IsFunctionCall { get; }
 
         /// <summary>
-        ///     Gets or sets the name of the expression symbol.
+        ///     Gets the name of the expression symbol.
         /// </summary>
         /// <value>The name.</value>
-        public string Name { get; set; }
+        public string Name { get; }
 
         internal static ExpressionSymbol GenerateSymbol(
             string name,
-            string expression) => new()
-            {
-                Name = name,
-                Expression = expression
-            };
+            string expression) =>
+            new(
+                name,
+                expression,
+                false);
 
         internal static ExpressionSymbol GenerateFunctionCall(
             string name,
-            string expression)
-        {
-            ExpressionSymbol generatedExpression = GenerateSymbol(
+            string expression) =>
+            new(
                 name,
-                expression);
-            generatedExpression.IsFunctionCall = true;
-            return generatedExpression;
-        }
+                expression,
+                true);
     }
 }

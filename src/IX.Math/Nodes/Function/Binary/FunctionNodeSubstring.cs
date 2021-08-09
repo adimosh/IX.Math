@@ -132,13 +132,13 @@ namespace IX.Math.Nodes.Function.Binary
         /// </summary>
         /// <param name="tolerance">The tolerance.</param>
         /// <returns>The expression.</returns>
-        protected override Expression GenerateExpressionInternal(Tolerance tolerance)
+        protected override Expression GenerateExpressionInternal(Tolerance? tolerance)
         {
             Type firstParameterType = typeof(string);
             Type secondParameterType = typeof(int);
             const string functionName = nameof(string.Substring);
 
-            MethodInfo mi = typeof(string).GetMethodWithExactParameters(
+            MethodInfo? mi = typeof(string).GetMethodWithExactParameters(
                 functionName,
                 secondParameterType);
 

@@ -151,10 +151,7 @@ namespace IX.Math
                     ParameterContext paraContext = parameters[i];
 
                     // If there was no continuation, initialize parameter with value.
-                    if (paramValue == null)
-                    {
-                        paramValue = parameterValues[i];
-                    }
+                    paramValue ??= parameterValues[i];
 
                     // Initial filtration
                     switch (paramValue)

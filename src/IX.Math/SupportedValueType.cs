@@ -23,7 +23,7 @@ namespace IX.Math
         Unknown = 0,
 
         /// <summary>
-        ///     Numeric (depends on the numeric type).
+        ///     Numeric (pass as <see cref="long" />).
         /// </summary>
         Numeric = 1,
 
@@ -41,5 +41,10 @@ namespace IX.Math
         ///     Byte array (pass as array of <see cref="byte" />).
         /// </summary>
         ByteArray = 8,
+
+        /// <summary>
+        ///     Integer (pass as <see cref="long" />).
+        /// </summary>
+        Integer = 16,
     }
 }

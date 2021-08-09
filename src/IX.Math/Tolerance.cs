@@ -6,6 +6,8 @@ using System.Runtime.Serialization;
 
 namespace IX.Math
 {
+    // TODO BREAKING: Change this into a readonly struct when the next breaking change occurs
+
     /// <summary>
     /// A data contract for a numeric tolerance.
     /// </summary>

@@ -403,7 +403,7 @@ namespace IX.Math.Interpretation
                 }
                 else if (ParsingFormatter.ParseByteArray(
                     content,
-                    out byte[] ba))
+                    out byte[]? ba))
                 {
                     node = new ByteArrayNode(ba);
                 }

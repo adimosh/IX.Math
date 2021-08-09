@@ -15,47 +15,62 @@ using JetBrains.Annotations;
 namespace IX.Math.Nodes
 {
     /// <summary>
-    /// A base class for a function that takes two parameters.
+    ///     A base class for a function that takes two parameters.
     /// </summary>
     /// <seealso cref="FunctionNodeBase" />
     [PublicAPI]
-    public abstract class BinaryFunctionNodeBase : FunctionNodeBase, IMathematicsPlugin
+    public abstract class BinaryFunctionNodeBase : FunctionNodeBase,
+        IMathematicsPlugin
     {
+#region Constructors and destructors
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="BinaryFunctionNodeBase"/> class.
+        ///     Initializes a new instance of the <see cref="BinaryFunctionNodeBase" /> class.
         /// </summary>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="firstParameter"/>
-        /// or
-        /// <paramref name="secondParameter"/>
-        /// is <see langword="null"/> (<see langword="Nothing"/> in Visual Basic).
+        ///     <paramref name="firstParameter" />
+        ///     or
+        ///     <paramref name="secondParameter" />
+        ///     is <see langword="null" /> (<see langword="Nothing" /> in Visual Basic).
         /// </exception>
-        [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor", Justification = "We specifically want this to happen.")]
-        [SuppressMessage("Usage", "CA2214:Do not call overridable methods in constructors", Justification = "We specifically want this to happen.")]
-        protected BinaryFunctionNodeBase(NodeBase firstParameter, NodeBase secondParameter)
+        [SuppressMessage(
+            "ReSharper",
+            "VirtualMemberCallInConstructor",
+            Justification = "We specifically want this to hapen.")]
+        [SuppressMessage(
+            "CodeQuality",
+            "IDE0079:Remove unnecessary suppression",
+            Justification = "ReSharper is used with this project.")]
+        protected BinaryFunctionNodeBase(
+            NodeBase firstParameter,
+            NodeBase secondParameter)
         {
-            NodeBase firstParameterTemp = Requires.NotNull(firstParameter, nameof(firstParameter));
-            NodeBase secondParameterTemp = Requires.NotNull(secondParameter, nameof(secondParameter));
+            NodeBase firstParameterTemp = Requires.NotNull(
+                firstParameter,
+                nameof(firstParameter));
+            NodeBase secondParameterTemp = Requires.NotNull(
+                secondParameter,
+                nameof(secondParameter));
 
-            this.EnsureCompatibleParameters(firstParameter, secondParameter);
+            this.EnsureCompatibleParameters(
+                firstParameter,
+                secondParameter);
 
             this.FirstParameter = firstParameterTemp.Simplify();
             this.SecondParameter = secondParameterTemp.Simplify();
         }
 
+#endregion
+
+#region Properties and indexers
+
         /// <summary>
-        /// Gets the first parameter.
+        ///     Gets the first parameter.
         /// </summary>
         /// <value>The first parameter.</value>
         public NodeBase FirstParameter { get; }
-
-        /// <summary>
-        /// Gets the second parameter.
-        /// </summary>
-        /// <value>The second parameter.</value>
-        public NodeBase SecondParameter { get; }
 
         /// <summary>
         ///     Gets a value indicating whether this node supports tolerance.
@@ -66,80 +81,139 @@ namespace IX.Math.Nodes
         public override bool IsTolerant => this.FirstParameter.IsTolerant || this.SecondParameter.IsTolerant;
 
         /// <summary>
-        /// Ensures that the parameters that are received are compatible with the function, optionally allowing the parameter references to change.
+        ///     Gets the second parameter.
+        /// </summary>
+        /// <value>The second parameter.</value>
+        public NodeBase SecondParameter { get; }
+
+#endregion
+
+#region Methods
+
+        /// <summary>
+        ///     Ensures that the parameters that are received are compatible with the function, optionally allowing the parameter
+        ///     references to change.
         /// </summary>
         /// <param name="firstParameter">The first parameter.</param>
         /// <param name="secondParameter">The second parameter.</param>
-        protected abstract void EnsureCompatibleParameters(NodeBase firstParameter, NodeBase secondParameter);
+        protected abstract void EnsureCompatibleParameters(
+            NodeBase firstParameter,
+            NodeBase secondParameter);
 
         /// <summary>
-        /// Generates a static binary function call expression.
+        ///     Generates a static binary function call expression.
         /// </summary>
         /// <typeparam name="T">The type to call on.</typeparam>
         /// <param name="functionName">Name of the function.</param>
         /// <returns>An expression representing the call.</returns>
-        protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName) => this.GenerateStaticBinaryFunctionCall(typeof(T), functionName, null);
+        protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName) =>
+            this.GenerateStaticBinaryFunctionCall(
+                typeof(T),
+                functionName,
+                null);
 
         /// <summary>
-        /// Generates a static binary function call expression.
+        ///     Generates a static binary function call expression.
         /// </summary>
         /// <typeparam name="T">The type to call on.</typeparam>
         /// <param name="functionName">Name of the function.</param>
-        /// <param name="tolerance">The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
+        /// <param name="tolerance">
+        ///     The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual
+        ///     Basic).
+        /// </param>
         /// <returns>An expression representing the call.</returns>
-        protected Expression GenerateStaticBinaryFunctionCall<T>(string functionName, Tolerance tolerance) => this.GenerateStaticBinaryFunctionCall(typeof(T), functionName, tolerance);
+        protected Expression GenerateStaticBinaryFunctionCall<T>(
+            string functionName,
+            Tolerance tolerance) =>
+            this.GenerateStaticBinaryFunctionCall(
+                typeof(T),
+                functionName,
+                tolerance);
 
         /// <summary>
-        /// Generates a static binary function call expression.
+        ///     Generates a static binary function call expression.
         /// </summary>
         /// <param name="t">The type to call on.</param>
         /// <param name="functionName">Name of the function.</param>
         /// <returns>Expression.</returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
-        protected Expression GenerateStaticBinaryFunctionCall(Type t, string functionName)
-            => this.GenerateStaticBinaryFunctionCall(t, functionName, null);
+        protected Expression GenerateStaticBinaryFunctionCall(
+            Type t,
+            string functionName) =>
+            this.GenerateStaticBinaryFunctionCall(
+                t,
+                functionName,
+                null);
 
         /// <summary>
-        /// Generates a static binary function call expression.
+        ///     Generates a static binary function call expression.
         /// </summary>
         /// <param name="t">The type to call on.</param>
         /// <param name="functionName">Name of the function.</param>
-        /// <param name="tolerance">The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
+        /// <param name="tolerance">
+        ///     The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual
+        ///     Basic).
+        /// </param>
         /// <returns>Expression.</returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
-        protected Expression GenerateStaticBinaryFunctionCall(Type t, string functionName, Tolerance? tolerance)
+        protected Expression GenerateStaticBinaryFunctionCall(
+            Type t,
+            string functionName,
+            Tolerance? tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                throw new ArgumentException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        Resources.FunctionCouldNotBeFound,
+                        functionName),
+                    nameof(functionName));
             }
 
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
             Type secondParameterType = ParameterTypeFromParameter(this.SecondParameter);
 
-            MethodInfo? mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
+            MethodInfo? mi = t.GetMethodWithExactParameters(
+                functionName,
+                firstParameterType,
+                secondParameterType);
 
             if (mi == null)
             {
                 firstParameterType = typeof(double);
                 secondParameterType = typeof(double);
 
-                mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
+                mi = t.GetMethodWithExactParameters(
+                    functionName,
+                    firstParameterType,
+                    secondParameterType);
 
                 if (mi == null)
                 {
                     firstParameterType = typeof(long);
                     secondParameterType = typeof(long);
 
-                    mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
+                    mi = t.GetMethodWithExactParameters(
+                        functionName,
+                        firstParameterType,
+                        secondParameterType);
 
                     if (mi == null)
                     {
                         firstParameterType = typeof(int);
                         secondParameterType = typeof(int);
 
-                        mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType) ??
-                            throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                        mi = t.GetMethodWithExactParameters(
+                                 functionName,
+                                 firstParameterType,
+                                 secondParameterType) ??
+                             throw new ArgumentException(
+                                 string.Format(
+                                     CultureInfo.CurrentCulture,
+                                     Resources.FunctionCouldNotBeFound,
+                                     functionName),
+                                 nameof(functionName));
                     }
                 }
             }
@@ -158,54 +232,89 @@ namespace IX.Math.Nodes
 
             if (e1.Type != firstParameterType)
             {
-                e1 = Expression.Convert(e1, firstParameterType);
+                e1 = Expression.Convert(
+                    e1,
+                    firstParameterType);
             }
 
             if (e2.Type != secondParameterType)
             {
-                e2 = Expression.Convert(e2, secondParameterType);
+                e2 = Expression.Convert(
+                    e2,
+                    secondParameterType);
             }
 
-            return Expression.Call(mi, e1, e2);
+            return Expression.Call(
+                mi,
+                e1,
+                e2);
         }
 
         /// <summary>
-        /// Generates a static binary function call with explicit parameter types.
+        ///     Generates a static binary function call with explicit parameter types.
         /// </summary>
         /// <typeparam name="TParam1">The type of the first parameter.</typeparam>
         /// <typeparam name="TParam2">The type of the second parameter.</typeparam>
         /// <param name="t">The type to call on.</param>
         /// <param name="functionName">Name of the function.</param>
         /// <returns>
-        /// The generated binary method call expression.
+        ///     The generated binary method call expression.
         /// </returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
-        protected Expression GenerateStaticBinaryFunctionCall<TParam1, TParam2>(Type t, string functionName)
-            => this.GenerateStaticBinaryFunctionCall<TParam1, TParam2>(t, functionName, null);
+        protected Expression GenerateStaticBinaryFunctionCall<TParam1, TParam2>(
+            Type t,
+            string functionName) =>
+            this.GenerateStaticBinaryFunctionCall<TParam1, TParam2>(
+                t,
+                functionName,
+                null);
 
         /// <summary>
-        /// Generates a static binary function call with explicit parameter types.
+        ///     Generates a static binary function call with explicit parameter types.
         /// </summary>
         /// <typeparam name="TParam1">The type of the first parameter.</typeparam>
         /// <typeparam name="TParam2">The type of the second parameter.</typeparam>
         /// <param name="t">The type to call on.</param>
         /// <param name="functionName">Name of the function.</param>
-        /// <param name="tolerance">The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
+        /// <param name="tolerance">
+        ///     The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual
+        ///     Basic).
+        /// </param>
         /// <returns>
-        /// The generated binary method call expression.
+        ///     The generated binary method call expression.
         /// </returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
-        protected Expression GenerateStaticBinaryFunctionCall<TParam1, TParam2>(Type t, string functionName, Tolerance? tolerance)
+        protected Expression GenerateStaticBinaryFunctionCall<TParam1, TParam2>(
+            Type t,
+            string functionName,
+            Tolerance? tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
-                throw new ArgumentException(string.Format(Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                throw new ArgumentException(
+                    string.Format(
+                        Resources.FunctionCouldNotBeFound,
+                        functionName),
+                    nameof(functionName));
             }
 
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
             Type secondParameterType = ParameterTypeFromParameter(this.SecondParameter);
 
-            MethodInfo? mi = t.GetMethodWithExactParameters(functionName, typeof(TParam1), typeof(TParam2));
+            MethodInfo? mi = t.GetMethodWithExactParameters(
+                functionName,
+                typeof(TParam1),
+                typeof(TParam2));
+
+            if (mi == null)
+            {
+                throw new ArgumentException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        Resources.FunctionCouldNotBeFound,
+                        functionName),
+                    nameof(functionName));
+            }
 
             Expression e1, e2;
             if (tolerance == null)
@@ -221,29 +330,40 @@ namespace IX.Math.Nodes
 
             if (e1.Type != firstParameterType)
             {
-                e1 = Expression.Convert(e1, firstParameterType);
+                e1 = Expression.Convert(
+                    e1,
+                    firstParameterType);
             }
 
             if (e2.Type != secondParameterType)
             {
-                e2 = Expression.Convert(e2, secondParameterType);
+                e2 = Expression.Convert(
+                    e2,
+                    secondParameterType);
             }
 
             if (e1.Type != typeof(TParam1))
             {
-                e1 = Expression.Convert(e1, typeof(TParam1));
+                e1 = Expression.Convert(
+                    e1,
+                    typeof(TParam1));
             }
 
             if (e2.Type != typeof(TParam2))
             {
-                e2 = Expression.Convert(e2, typeof(TParam2));
+                e2 = Expression.Convert(
+                    e2,
+                    typeof(TParam2));
             }
 
-            return Expression.Call(mi, e1, e2);
+            return Expression.Call(
+                mi,
+                e1,
+                e2);
         }
 
         /// <summary>
-        /// Generates a static binary function call expression.
+        ///     Generates a static binary function call expression.
         /// </summary>
         /// <typeparam name="T">The type to call on.</typeparam>
         /// <param name="functionName">Name of the function.</param>
@@ -255,7 +375,7 @@ namespace IX.Math.Nodes
                 null);
 
         /// <summary>
-        /// Generates a static binary function call expression.
+        ///     Generates a static binary function call expression.
         /// </summary>
         /// <param name="t">The type to call on.</param>
         /// <param name="functionName">Name of the function.</param>
@@ -270,26 +390,40 @@ namespace IX.Math.Nodes
                 null);
 
         /// <summary>
-        /// Generates a static binary function call expression.
+        ///     Generates a static binary function call expression.
         /// </summary>
         /// <param name="t">The type to call on.</param>
         /// <param name="functionName">Name of the function.</param>
-        /// <param name="tolerance">The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual Basic).</param>
+        /// <param name="tolerance">
+        ///     The tolerance, should there be any. This argument can be <c>null</c> (<c>Nothing</c> in Visual
+        ///     Basic).
+        /// </param>
         /// <returns>
-        /// Expression.
+        ///     Expression.
         /// </returns>
         /// <exception cref="ArgumentException">The function name is invalid.</exception>
-        protected Expression GenerateBinaryFunctionCallFirstParameterInstance(Type t, string functionName, Tolerance? tolerance)
+        protected Expression GenerateBinaryFunctionCallFirstParameterInstance(
+            Type t,
+            string functionName,
+            Tolerance? tolerance)
         {
             if (string.IsNullOrWhiteSpace(functionName))
             {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                throw new ArgumentException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        Resources.FunctionCouldNotBeFound,
+                        functionName),
+                    nameof(functionName));
             }
 
             Type firstParameterType = ParameterTypeFromParameter(this.FirstParameter);
             Type secondParameterType = ParameterTypeFromParameter(this.SecondParameter);
 
-            MethodInfo? mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
+            MethodInfo? mi = t.GetMethodWithExactParameters(
+                functionName,
+                firstParameterType,
+                secondParameterType);
 
             if (mi == null)
             {
@@ -299,28 +433,47 @@ namespace IX.Math.Nodes
                     firstParameterType = typeof(double);
                     secondParameterType = typeof(double);
 
-                    mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
+                    mi = t.GetMethodWithExactParameters(
+                        functionName,
+                        firstParameterType,
+                        secondParameterType);
 
                     if (mi == null)
                     {
                         firstParameterType = typeof(long);
                         secondParameterType = typeof(long);
 
-                        mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType);
+                        mi = t.GetMethodWithExactParameters(
+                            functionName,
+                            firstParameterType,
+                            secondParameterType);
 
                         if (mi == null)
                         {
                             firstParameterType = typeof(int);
                             secondParameterType = typeof(int);
 
-                            mi = t.GetMethodWithExactParameters(functionName, firstParameterType, secondParameterType) ??
-                                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                            mi = t.GetMethodWithExactParameters(
+                                     functionName,
+                                     firstParameterType,
+                                     secondParameterType) ??
+                                 throw new ArgumentException(
+                                     string.Format(
+                                         CultureInfo.CurrentCulture,
+                                         Resources.FunctionCouldNotBeFound,
+                                         functionName),
+                                     nameof(functionName));
                         }
                     }
                 }
                 else
                 {
-                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.FunctionCouldNotBeFound, functionName), nameof(functionName));
+                    throw new ArgumentException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.FunctionCouldNotBeFound,
+                            functionName),
+                        nameof(functionName));
                 }
             }
 
@@ -338,15 +491,24 @@ namespace IX.Math.Nodes
 
             if (e1.Type != firstParameterType)
             {
-                e1 = Expression.Convert(e1, firstParameterType);
+                e1 = Expression.Convert(
+                    e1,
+                    firstParameterType);
             }
 
             if (e2.Type != secondParameterType)
             {
-                e2 = Expression.Convert(e2, secondParameterType);
+                e2 = Expression.Convert(
+                    e2,
+                    secondParameterType);
             }
 
-            return Expression.Call(e1, mi, e2);
+            return Expression.Call(
+                e1,
+                mi,
+                e2);
         }
+
+#endregion
     }
 }

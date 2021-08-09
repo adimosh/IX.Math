@@ -14,8 +14,8 @@ namespace IX.Math.Nodes
     [PublicAPI]
     public abstract class CachedExpressionNodeBase : NodeBase
     {
-        private Expression generatedExpression;
-        private Expression generatedStringExpression;
+        private Expression? generatedExpression;
+        private Expression? generatedStringExpression;
 
         /// <summary>
         /// Prevents a default instance of the <see cref="CachedExpressionNodeBase"/> class from being created.

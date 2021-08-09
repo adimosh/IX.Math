@@ -16,7 +16,6 @@ namespace IX.Math.Computation.InitialExpressionParsers
 {
     internal static class ParenthesesParser
     {
-#pragma warning disable HAA0603 // Delegate allocation from a method group - unavoidable
         [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Performance",
             "HAA0302:Display class allocation to capture closure",
@@ -25,6 +24,10 @@ namespace IX.Math.Computation.InitialExpressionParsers
             "Performance",
             "HAA0301:Closure Allocation Source",
             Justification = "A major closure is preferred, since the closure can be optimized and is much cheaper than otherwise")]
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "HAA0603:Delegate allocation from a method group",
+            Justification = "Unavoidable")]
         internal static void FormatParentheses()
         {
             // Context symbols
@@ -197,6 +200,5 @@ namespace IX.Math.Computation.InitialExpressionParsers
                 }
             }
         }
-#pragma warning restore HAA0603 // Delegate allocation from a method group
     }
 }

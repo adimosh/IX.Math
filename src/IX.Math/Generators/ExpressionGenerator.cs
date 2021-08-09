@@ -52,7 +52,7 @@ namespace IX.Math.Generators
             }
 
             // Break expression based on function calls
-            FunctionsExtractor.ReplaceFunctions(context.SymbolTable[string.Empty].Expression);
+            FunctionsParser.ReplaceFunctions(context.SymbolTable[string.Empty].Expression);
 
             if (cancellationToken.IsCancellationRequested)
             {

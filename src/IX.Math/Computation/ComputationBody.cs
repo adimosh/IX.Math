@@ -2,6 +2,7 @@
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
+using System.Diagnostics.CodeAnalysis;
 using IX.Math.Nodes;
 using IX.Math.Registration;
 
@@ -13,24 +14,32 @@ namespace IX.Math.Computation
             null,
             EmptyParametersRegistry.Empty);
 
-        internal readonly NodeBase? BodyNode;
+        private readonly NodeBase? bodyNode;
 
-        internal readonly IReadOnlyParameterRegistry ParameterRegistry;
+        private readonly IReadOnlyParameterRegistry parameterRegistry;
 
         internal ComputationBody(
             NodeBase? bodyNode,
             IReadOnlyParameterRegistry parameterRegistry)
         {
-            this.BodyNode = bodyNode;
-            this.ParameterRegistry = parameterRegistry;
+            this.bodyNode = bodyNode;
+            this.parameterRegistry = parameterRegistry;
         }
 
+        [SuppressMessage(
+            "ReSharper",
+            "ParameterHidesMember",
+            Justification = "We're not overly concerned, as these are private members.")]
+        [SuppressMessage(
+            "CodeQuality",
+            "IDE0079:Remove unnecessary suppression",
+            Justification = "ReSharper is used in this project.")]
         internal void Deconstruct(
             out NodeBase? bodyNode,
             out IReadOnlyParameterRegistry parameterRegistry)
         {
-            bodyNode = this.BodyNode;
-            parameterRegistry = this.ParameterRegistry;
+            bodyNode = this.bodyNode;
+            parameterRegistry = this.parameterRegistry;
         }
     }
 }

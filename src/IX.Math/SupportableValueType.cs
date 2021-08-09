@@ -29,7 +29,7 @@ namespace IX.Math
         None = 0,
 
         /// <summary>
-        ///     Numeric (depends on the numeric type).
+        ///     Numeric (pass as <see cref="double" />).
         /// </summary>
         Numeric = 1,
 
@@ -49,8 +49,13 @@ namespace IX.Math
         ByteArray = 8,
 
         /// <summary>
+        ///     Boolean (pass as <see cref="long" />).
+        /// </summary>
+        Integer = 16,
+
+        /// <summary>
         ///     All possible types.
         /// </summary>
-        All = 15
+        All = 31
     }
 }

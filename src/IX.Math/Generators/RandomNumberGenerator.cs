@@ -12,7 +12,7 @@ namespace IX.Math.Generators
     /// </summary>
     internal static class RandomNumberGenerator
     {
-        private static readonly Random RandomGenerator = new Random();
+        private static readonly Random RandomGenerator = new();
 
         public static double Generate() => Generate(
             0D,

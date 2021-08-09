@@ -25,14 +25,8 @@ namespace IX.Math.Nodes
         /// <exception cref="ArgumentNullException">parameterName.</exception>
         internal ParameterNode(string parameterName, IParameterRegistry parametersRegistry)
         {
-            if (string.IsNullOrWhiteSpace(parameterName))
-            {
-                throw new ArgumentNullException(nameof(parameterName));
-            }
-
-            this.Name = parameterName;
-
-            this.parametersRegistry = parametersRegistry ?? throw new ArgumentNullException(nameof(parametersRegistry));
+            this.Name = Requires.NotNullOrWhiteSpace(parameterName, nameof(parameterName));
+            Requires.NotNull(out this.parametersRegistry, parametersRegistry, nameof(parametersRegistry));
 
             this.parametersRegistry.AdvertiseParameter(parameterName);
         }
@@ -128,17 +122,5 @@ namespace IX.Math.Nodes
             this.parametersRegistry.AdvertiseParameter(this.Name).DetermineFloat();
             return this;
         }
-
-        /// <summary>
-        /// Strongly determines the node's type, if possible.
-        /// </summary>
-        /// <param name="type">The type to determine to.</param>
-        public override void DetermineStrongly(SupportedValueType type) => this.parametersRegistry.AdvertiseParameter(this.Name).DetermineType(type);
-
-        /// <summary>
-        /// Weakly determines the node's type, if possible, and, optionally, strongly determines if there is only one possible type left.
-        /// </summary>
-        /// <param name="type">The type or types to determine to.</param>
-        public override void DetermineWeakly(SupportableValueType type) => this.parametersRegistry.AdvertiseParameter(this.Name).LimitPossibleType(type);
     }
 }

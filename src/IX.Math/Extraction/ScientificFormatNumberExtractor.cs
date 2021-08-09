@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using IX.Abstractions.Logging;
 using IX.Math.Extensibility;
 using IX.Math.Interpretation;
 using IX.Math.Nodes;
@@ -46,6 +47,8 @@ namespace IX.Math.Extraction
             IDictionary<string, string> reverseConstantsTable,
             MathDefinition mathDefinition)
         {
+            Log.Debug($"Extracting scientific constants from expression \"{originalExpression}\".");
+
             var process = originalExpression;
             var location = 0;
 
@@ -77,6 +80,8 @@ namespace IX.Math.Extraction
                     location = match.Index + match.Length;
                 }
             }
+
+            Log.Debug($"Resulting expression is \"{originalExpression}\".");
 
             return process;
         }

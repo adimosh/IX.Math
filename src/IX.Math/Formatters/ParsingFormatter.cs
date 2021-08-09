@@ -25,9 +25,7 @@ namespace IX.Math.Formatters
 
         internal static bool ParseNumeric(
             string expression,
-#if FRAMEWORK_ADVANCED
             [NotNullWhen(true)]
-#endif
             out object? result)
         {
             var eSpan = expression.AsSpan();
@@ -119,13 +117,13 @@ namespace IX.Math.Formatters
 
         internal static bool ParseByteArray(
             string expression,
-            out byte[] result)
+            out byte[]? result)
         {
             if (expression.CurrentCultureStartsWithInsensitive("0b"))
             {
                 if (expression.Length > 2)
                 {
-                    return ParseByteArray(
+                    return ParseByteArrayLocal(
                         expression.Substring(2),
                         out result);
                 }
@@ -136,55 +134,56 @@ namespace IX.Math.Formatters
 
             result = null;
             return false;
+        }
 
-            bool ParseByteArray(
-                string byteArrayExpression,
-                out byte[] byteArrayResult)
+        private static bool ParseByteArrayLocal(
+            string byteArrayExpression,
+            out byte[]? byteArrayResult)
+        {
+            byteArrayExpression = byteArrayExpression.Replace(
+                "_",
+                string.Empty);
+            var stringLength = byteArrayExpression.Length;
+            var byteLength = stringLength / 8;
+            if (byteLength < (double)stringLength / 8)
             {
-                byteArrayExpression = byteArrayExpression.Replace(
-                    "_",
-                    string.Empty);
-                var stringLength = byteArrayExpression.Length;
-                var byteLength = stringLength / 8;
-                if (byteLength < (double)stringLength / 8)
-                {
-                    byteLength++;
-                }
-
-                stringLength = byteLength * 8;
-                if (byteArrayExpression.Length < stringLength)
-                {
-                    byteArrayExpression = byteArrayExpression.PadLeft(
-                        stringLength,
-                        '0');
-                }
-
-                var bytes = new byte[byteLength];
-
-                for (var i = byteLength - 1; i >= 0; i -= 1)
-                {
-                    var startingIndex = stringLength - (byteLength - i) * 8;
-
-                    var currentByteExpression = byteArrayExpression.Substring(
-                        startingIndex,
-                        8);
-
-                    if (!BitRepresentationRegex.IsMatch(currentByteExpression))
-                    {
-                        byteArrayResult = null;
-                        return false;
-                    }
-
-                    bytes[i] = Convert.ToByte(
-                        currentByteExpression,
-                        2);
-                }
-
-                Array.Reverse(bytes);
-                byteArrayResult = bytes;
-
-                return true;
+                byteLength++;
             }
+
+            stringLength = byteLength * 8;
+            if (byteArrayExpression.Length < stringLength)
+            {
+                byteArrayExpression = byteArrayExpression.PadLeft(
+                    stringLength,
+                    '0');
+            }
+
+            var bytes = new byte[byteLength];
+
+            for (var i = byteLength - 1; i >= 0; i -= 1)
+            {
+                var startingIndex = stringLength - (byteLength - i) * 8;
+
+                var currentByteExpression = byteArrayExpression.Substring(
+                    startingIndex,
+                    8);
+
+                if (!BitRepresentationRegex.IsMatch(currentByteExpression))
+                {
+                    byteArrayResult = null;
+
+                    return false;
+                }
+
+                bytes[i] = Convert.ToByte(
+                    currentByteExpression,
+                    2);
+            }
+
+            Array.Reverse(bytes);
+            byteArrayResult = bytes;
+
+            return true;
         }
     }
 }

@@ -5,6 +5,7 @@
 using System;
 using System.Globalization;
 using System.Reflection;
+using System.Threading;
 using IX.Abstractions.Logging;
 using IX.DataGeneration;
 using IX.Math;
@@ -62,8 +63,10 @@ namespace IX.UnitTests
             string expectedResult = $"The number is 0x{comparisonValue:x8}";
 
             // Act
+            SillyStringFormatter.IsActive = true;
             using var computedExpression = eps.Service.Interpret(expression);
             var result = computedExpression.Compute();
+            SillyStringFormatter.IsActive = false;
 
             // Assert
             Assert.Equal(
@@ -90,8 +93,10 @@ namespace IX.UnitTests
             string expectedResult = $"The number is 0x{comparisonValue:x8}";
 
             // Act
+            SillyStringFormatter.IsActive = true;
             using var computedExpression = eps.Service.Interpret(expression);
             var result = computedExpression.Compute(comparisonValue);
+            SillyStringFormatter.IsActive = false;
 
             // Assert
             Assert.Equal(expectedResult, Assert.IsType<string>(result));
@@ -117,8 +122,10 @@ namespace IX.UnitTests
             string expectedResult = $"The number is 0x{comparisonValue1 + comparisonValue2:x8}";
 
             // Act
+            SillyStringFormatter.IsActive = true;
             using var computedExpression = eps.Service.Interpret(expression);
             var result = computedExpression.Compute();
+            SillyStringFormatter.IsActive = false;
 
             // Assert
             Assert.Equal(expectedResult, Assert.IsType<string>(result));
@@ -144,8 +151,10 @@ namespace IX.UnitTests
             string expectedResult = $"The number is 0x{comparisonValue1 + comparisonValue2:x8}";
 
             // Act
+            SillyStringFormatter.IsActive = true;
             using var computedExpression = eps.Service.Interpret(expression);
             var result = computedExpression.Compute(comparisonValue1, comparisonValue2);
+            SillyStringFormatter.IsActive = false;
 
             // Assert
             Assert.Equal(expectedResult, Assert.IsType<string>(result));
@@ -170,8 +179,10 @@ namespace IX.UnitTests
             long expectedResult = 24;
 
             // Act
+            SillyStringFormatter.IsActive = true;
             using var computedExpression = eps.Service.Interpret(expression);
             var result = computedExpression.Compute();
+            SillyStringFormatter.IsActive = false;
 
             // Assert
             Assert.Equal(expectedResult, Assert.IsType<long>(result));
@@ -198,8 +209,10 @@ namespace IX.UnitTests
             string expectedResult = $"The \\\"alabalaportocala\\\" number is 0x{comparisonValue1 + comparisonValue2:x8}";
 
             // Act
+            SillyStringFormatter.IsActive = true;
             using var computedExpression = eps.Service.Interpret(expression);
             var result = computedExpression.Compute();
+            SillyStringFormatter.IsActive = false;
 
             // Assert
             Assert.Equal(expectedResult, Assert.IsType<string>(result));
@@ -223,17 +236,33 @@ namespace IX.UnitTests
         [UsedImplicitly]
         public class SillyStringFormatter : IStringFormatter
         {
+            [ThreadStatic]
+            internal static bool IsActive;
+
             /// <summary>
             /// Implements the parser.
             /// </summary>
             /// <typeparam name="T">The type of data to parse into.</typeparam>
             /// <param name="data">The data to parse.</param>
             /// <returns>A success state, as well as the parse data.</returns>
-            public (bool Success, string ParsedData) ParseIntoString<T>(T data) => data switch
+            public (bool Success, string ParsedData) ParseIntoString<T>(T data)
             {
-                long integralNumber => (true, "0x" + integralNumber.ToString("x8", CultureInfo.CurrentCulture)),
-                _ => (false, default),
-            };
+                //if (!IsActive)
+                //{
+                //    return (false, default);
+                //}
+
+                Log.Debug($"Parsing long value {data} into hex string.");
+
+                return data switch
+                {
+                    long integralNumber => (true, "0x" +
+                    integralNumber.ToString(
+                        "x8",
+                        CultureInfo.CurrentCulture)),
+                    _ => (false, default),
+                };
+            }
         }
     }
 }
