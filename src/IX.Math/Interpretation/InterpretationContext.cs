@@ -14,14 +14,16 @@ using IX.Math.ExpressionState;
 using IX.Math.Formatters;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
-using IX.Math.Nodes.Operators.Binary;
+using IX.Math.Nodes.Operations.Binary;
 using IX.Math.Nodes.Operators.Binary.Mathematical;
+using IX.Math.Nodes.Operators.Binary.Other;
 using IX.Math.Nodes.Operators.Unary;
 using IX.Math.Registration;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Globalization;
 using IX.System.Collections.Generic;
+using BinaryOperatorNodeBase = IX.Math.Nodes.Operators.Binary.BinaryOperatorNodeBase;
 using SubtractOperator = IX.Math.Nodes.Operators.Unary.SubtractOperator;
 
 namespace IX.Math.Interpretation
@@ -690,7 +692,7 @@ namespace IX.Math.Interpretation
                 definition.PowerSymbol,
                 (
                     leftOperand,
-                    rightOperand) => new PowerNode(
+                    rightOperand) => new PowerOperator(
                     leftOperand,
                     rightOperand),
                 50);
