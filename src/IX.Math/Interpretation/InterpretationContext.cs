@@ -14,14 +14,15 @@ using IX.Math.ExpressionState;
 using IX.Math.Formatters;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
-using IX.Math.Nodes.Operations.Binary;
+using IX.Math.Nodes.Operators.Binary;
+using IX.Math.Nodes.Operators.Binary.Mathematical;
 using IX.Math.Nodes.Operators.Unary;
 using IX.Math.Registration;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
 using IX.StandardExtensions.Globalization;
 using IX.System.Collections.Generic;
-using SubtractNode = IX.Math.Nodes.Operations.Binary.SubtractNode;
+using SubtractOperator = IX.Math.Nodes.Operators.Unary.SubtractOperator;
 
 namespace IX.Math.Interpretation
 {
@@ -30,7 +31,7 @@ namespace IX.Math.Interpretation
         private static readonly AsyncLocal<InterpretationContext?> current = new();
 
         // Constants
-        private readonly Dictionary<string, ConstantNodeBase> constantsTable = new();
+        private readonly Dictionary<string, ConstantNode> constantsTable = new();
         private readonly Dictionary<string, string> reverseConstantsTable = new();
 
         // Symbols
@@ -149,7 +150,7 @@ namespace IX.Math.Interpretation
         /// <value>
         ///     The constants table.
         /// </value>
-        internal Dictionary<string, ConstantNodeBase> ConstantsTable => this.constantsTable;
+        internal Dictionary<string, ConstantNode> ConstantsTable => this.constantsTable;
 
         /// <summary>
         ///     Gets the reverse constants table.
@@ -269,7 +270,7 @@ namespace IX.Math.Interpretation
                 originalExpression);
             this.constantsTable.Add(
                 name,
-                new StringNode(
+                new ConstantNode(
                     content.Substring(
                         stringIndicatorLength,
                         content.Length - stringIndicatorLength * 2)));
@@ -316,7 +317,7 @@ namespace IX.Math.Interpretation
                 originalExpression);
             this.constantsTable.Add(
                 name,
-                new NumericNode(result));
+                new ConstantNode(result));
             reverseConstantsTable.Add(
                 content,
                 name);
@@ -347,7 +348,7 @@ namespace IX.Math.Interpretation
 
             this.constantsTable.Add(
                 name,
-                new NumericNode(value));
+                new ConstantNode(value));
             this.reverseConstantsTable.Add(
                 value.ToString(CultureInfo.CurrentCulture),
                 name);
@@ -390,7 +391,7 @@ namespace IX.Math.Interpretation
                 return key;
             }
 
-            ConstantNodeBase? node = PluginCollection.Current.InterpretExpression(content);
+            ConstantNode? node = PluginCollection.Current.InterpretExpression(content);
 
             // Standard formatters
             if (node == null)
@@ -399,19 +400,26 @@ namespace IX.Math.Interpretation
                     content,
                     out object? n))
                 {
-                    node = new NumericNode(n);
+                    if (n is long integerN)
+                    {
+                        node = new ConstantNode(integerN);
+                    }
+                    if (n is double numericN)
+                    {
+                        node = new ConstantNode(numericN);
+                    }
                 }
                 else if (ParsingFormatter.ParseByteArray(
                     content,
                     out byte[]? ba))
                 {
-                    node = new ByteArrayNode(ba);
+                    node = new ConstantNode(ba);
                 }
                 else if (bool.TryParse(
                     content,
                     out var b))
                 {
-                    node = new BoolNode(b);
+                    node = new ConstantNode(b);
                 }
             }
 
@@ -654,7 +662,7 @@ namespace IX.Math.Interpretation
                 definition.SubtractSymbol,
                 (
                     leftOperand,
-                    rightOperand) => new SubtractNode(
+                    rightOperand) => new Nodes.Operators.Binary.Mathematical.SubtractOperator(
                     leftOperand,
                     rightOperand),
                 30);
@@ -664,7 +672,7 @@ namespace IX.Math.Interpretation
                 definition.DivideSymbol,
                 (
                     leftOperand,
-                    rightOperand) => new DivideNode(
+                    rightOperand) => new DivideOperator(
                     leftOperand,
                     rightOperand),
                 40);
@@ -672,7 +680,7 @@ namespace IX.Math.Interpretation
                 definition.MultiplySymbol,
                 (
                     leftOperand,
-                    rightOperand) => new MultiplyNode(
+                    rightOperand) => new MultiplyOperator(
                     leftOperand,
                     rightOperand),
                 40);

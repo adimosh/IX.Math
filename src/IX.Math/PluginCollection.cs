@@ -96,7 +96,7 @@ namespace IX.Math
             "Performance",
             "HAA0601:Value type to reference type conversion causing boxing allocation",
             Justification = "Currently string interpolation does this.")]
-        public ConstantNodeBase? InterpretExpression(string expression)
+        public ConstantNode? InterpretExpression(string expression)
         {
             this.ThrowIfCurrentObjectDisposed();
 
