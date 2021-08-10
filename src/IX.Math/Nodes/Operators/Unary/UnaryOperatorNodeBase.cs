@@ -4,7 +4,6 @@
 
 using IX.Math.Values;
 using IX.StandardExtensions.Contracts;
-using NotImplementedException = System.NotImplementedException;
 
 namespace IX.Math.Nodes.Operators.Unary
 {
@@ -26,7 +25,7 @@ namespace IX.Math.Nodes.Operators.Unary
         }
 
         /// <summary>
-        /// The operand for this unary operator.
+        /// Gets the operand for this unary operator.
         /// </summary>
         private protected NodeBase Operand { get; }
 

@@ -11,11 +11,10 @@ using System.Threading;
 using IX.Abstractions.Logging;
 using IX.Math.ExpressionState;
 using IX.Math.Formatters;
-using IX.Math.Generators;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Operations.Binary;
-using IX.Math.Nodes.Operations.Unary;
+using IX.Math.Nodes.Operators.Unary;
 using IX.Math.Registration;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
@@ -710,11 +709,11 @@ namespace IX.Math.Interpretation
             // First tier - Negation and inversion
             this.unaryOperators.Add(
                 definition.SubtractSymbol,
-                (operand) => new Nodes.Operations.Unary.SubtractNode(operand),
+                (operand) => new Nodes.Operators.Unary.SubtractOperator(operand),
                 1);
             this.unaryOperators.Add(
                 definition.NotSymbol,
-                (operand) => new NotNode(operand),
+                (operand) => new NotOperator(operand),
                 1);
 
             // All symbols

@@ -10,8 +10,11 @@ namespace IX.Math.Nodes.Operators.Unary
     /// <summary>
     /// A negation unary operator.
     /// </summary>
-    internal class NotOperator : UnaryOperatorNodeBase
+    internal sealed class NotOperator : UnaryOperatorNodeBase
     {
+        private const SupportableValueType SupportableValueTypes =
+            SupportableValueType.Integer | SupportableValueType.Boolean;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="NotOperator"/> class.
         /// </summary>
@@ -36,14 +39,21 @@ namespace IX.Math.Nodes.Operators.Unary
         public override SupportableValueType CalculateSupportableValueType(
             SupportableValueType constraints = SupportableValueType.All)
         {
-            if (this.Operand.CalculateSupportableValueType(
-                    SupportableValueType.Boolean | SupportableValueType.Integer) ==
+            var processedConstraint = constraints & SupportableValueTypes;
+
+            if (processedConstraint ==
                 SupportableValueType.None)
             {
+                // Constraints cannot possibly match this operator
                 return SupportableValueType.None;
             }
 
-            return constraints & (SupportableValueType.Integer | SupportableValueType.Boolean);
+            // We take the operand constraint
+            var operandConstraint = this.Operand.CalculateSupportableValueType(
+                SupportableValueTypes);
+
+            // We get the common ground between operator and request
+            return processedConstraint & operandConstraint;
         }
 
         /// <summary>

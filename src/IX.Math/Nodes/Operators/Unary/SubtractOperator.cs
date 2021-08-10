@@ -7,8 +7,11 @@ namespace IX.Math.Nodes.Operators.Unary
     /// <summary>
     /// A subtraction unary operator.
     /// </summary>
-    internal class SubtractOperator : UnaryOperatorNodeBase
+    internal sealed class SubtractOperator : UnaryOperatorNodeBase
     {
+        private const SupportableValueType SupportableValueTypes =
+            SupportableValueType.Integer | SupportableValueType.Numeric;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SubtractOperator"/> class.
         /// </summary>
@@ -66,7 +69,9 @@ namespace IX.Math.Nodes.Operators.Unary
                     throw new ExpressionNotValidLogicallyException();
             }
 
-            return Expression.Subtract(zeroExpression, operandExpression);
+            return Expression.Subtract(
+                zeroExpression,
+                operandExpression);
         }
 
         /// <summary>
@@ -78,16 +83,46 @@ namespace IX.Math.Nodes.Operators.Unary
         public override SupportableValueType CalculateSupportableValueType(
             SupportableValueType constraints = SupportableValueType.All)
         {
-            if (this.Operand.CalculateSupportableValueType(
-                    SupportableValueType.Integer | SupportableValueType.Numeric) ==
-                SupportableValueType.None)
+            var processedConstraint = constraints & SupportableValueTypes;
+
+            if (processedConstraint == SupportableValueType.None)
             {
+                // Constraints cannot possibly match this operator
                 return SupportableValueType.None;
             }
 
-            return constraints & (SupportableValueType.Integer | SupportableValueType.Numeric);
-        }
+            // We take the operand constraint
+            var operandConstraint = this.Operand.CalculateSupportableValueType(SupportableValueTypes);
 
+            switch (processedConstraint)
+            {
+                case SupportableValueType.Integer:
+                    // Integer constraints require integer operands
+                    return (operandConstraint & SupportableValueType.Integer) == SupportableValueType.None
+                        ? SupportableValueType.None
+                        : SupportableValueType.Integer;
+
+                case SupportableValueType.Numeric:
+                    if ((operandConstraint & SupportableValueType.Integer) == SupportableValueType.Integer)
+                    {
+                        // An integer operand can result in a numeric assignment
+                        return SupportableValueType.Numeric;
+                    }
+
+                    break;
+
+                case SupportableValueType.Integer | SupportableValueType.Numeric:
+                    if ((operandConstraint & SupportableValueType.Integer) != SupportableValueType.None)
+                    {
+                        return SupportableValueType.Integer | SupportableValueType.Numeric;
+                    }
+
+                    break;
+            }
+
+            // We get the common ground between operator and request
+            return processedConstraint & operandConstraint;
+        }
 
         /// <summary>
         ///     Simplifies this node, if possible, based on a constant operand value.
