@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using IX.Abstractions.Logging;
@@ -709,7 +710,7 @@ namespace IX.Math.Interpretation
             // First tier - Negation and inversion
             this.unaryOperators.Add(
                 definition.SubtractSymbol,
-                (operand) => new Nodes.Operators.Unary.SubtractOperator(operand),
+                (operand) => new SubtractOperator(operand),
                 1);
             this.unaryOperators.Add(
                 definition.NotSymbol,
