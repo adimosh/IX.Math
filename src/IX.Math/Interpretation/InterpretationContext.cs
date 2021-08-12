@@ -16,6 +16,7 @@ using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Operations.Binary;
 using IX.Math.Nodes.Operators.Binary.ByteShift;
+using IX.Math.Nodes.Operators.Binary.Logical;
 using IX.Math.Nodes.Operators.Binary.Mathematical;
 using IX.Math.Nodes.Operators.Binary.Other;
 using IX.Math.Nodes.Operators.Unary;
@@ -631,7 +632,7 @@ namespace IX.Math.Interpretation
                 definition.OrSymbol,
                 (
                     leftOperand,
-                    rightOperand) => new OrNode(
+                    rightOperand) => new OrOperator(
                     leftOperand,
                     rightOperand),
                 20);
@@ -639,7 +640,7 @@ namespace IX.Math.Interpretation
                 definition.XorSymbol,
                 (
                     leftOperand,
-                    rightOperand) => new XorNode(
+                    rightOperand) => new XorOperator(
                     leftOperand,
                     rightOperand),
                 definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 21 : 20);
@@ -647,7 +648,7 @@ namespace IX.Math.Interpretation
                 definition.AndSymbol,
                 (
                     leftOperand,
-                    rightOperand) => new AndNode(
+                    rightOperand) => new AndOperator(
                     leftOperand,
                     rightOperand),
                 definition.OperatorPrecedenceStyle == OperatorPrecedenceStyle.CStyle ? 22 : 20);
