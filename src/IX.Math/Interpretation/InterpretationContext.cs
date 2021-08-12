@@ -15,6 +15,7 @@ using IX.Math.Formatters;
 using IX.Math.Nodes;
 using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Operations.Binary;
+using IX.Math.Nodes.Operators.Binary.ByteShift;
 using IX.Math.Nodes.Operators.Binary.Mathematical;
 using IX.Math.Nodes.Operators.Binary.Other;
 using IX.Math.Nodes.Operators.Unary;
@@ -702,7 +703,7 @@ namespace IX.Math.Interpretation
                 definition.LeftShiftSymbol,
                 (
                     leftOperand,
-                    rightOperand) => new LeftShiftNode(
+                    rightOperand) => new LeftShiftOperator(
                     leftOperand,
                     rightOperand),
                 60);
@@ -710,7 +711,7 @@ namespace IX.Math.Interpretation
                 definition.RightShiftSymbol,
                 (
                     leftOperand,
-                    rightOperand) => new RightShiftNode(
+                    rightOperand) => new RightShiftOperator(
                     leftOperand,
                     rightOperand),
                 60);
