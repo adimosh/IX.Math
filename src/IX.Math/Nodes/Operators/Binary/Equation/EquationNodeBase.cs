@@ -1,4 +1,4 @@
-﻿// <copyright file="ComparisonOperatorNodeBase.cs" company="Adrian Mos">
+﻿// <copyright file="EquationNodeBase.cs" company="Adrian Mos">
 // Copyright (c) Adrian Mos with all rights reserved. Part of the IX Framework.
 // </copyright>
 
@@ -8,22 +8,19 @@ using System.Reflection;
 using IX.Math.Formatters;
 using IX.Math.Values;
 
-namespace IX.Math.Nodes.Operators.Binary.Comparison
+namespace IX.Math.Nodes.Operators.Binary.Equation
 {
     /// <summary>
-    /// A base class for a comparison node.
+    ///  A base class for an equation node.
     /// </summary>
-    internal abstract class ComparisonOperatorNodeBase : BinaryOperatorNodeBase
+    internal abstract class EquationNodeBase : BinaryOperatorNodeBase
     {
-        private const SupportableValueType SupportableValueTypes =
-            SupportableValueType.ByteArray | SupportableValueType.Integer | SupportableValueType.Numeric | SupportableValueType.String;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="ComparisonOperatorNodeBase"/> class.
+        /// Initializes a new instance of the <see cref="EquationNodeBase"/> class.
         /// </summary>
         /// <param name="leftOperand">The left operand.</param>
         /// <param name="rightOperand">The right operand.</param>
-        protected private ComparisonOperatorNodeBase(
+        protected private EquationNodeBase(
             NodeBase leftOperand,
             NodeBase rightOperand)
             : base(
@@ -39,18 +36,18 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         public sealed override SupportableValueType CalculateSupportableValueType(
             SupportableValueType constraints = SupportableValueType.All)
         {
-            if ((constraints & SupportableValueTypes) == SupportableValueType.None)
+            if (constraints == SupportableValueType.None)
             {
                 return SupportableValueType.None;
             }
 
-            var leftType = this.LeftOperand.CalculateSupportableValueType(SupportableValueTypes);
+            var leftType = this.LeftOperand.CalculateSupportableValueType();
             if (leftType == SupportableValueType.None)
             {
                 return SupportableValueType.None;
             }
 
-            var rightType = this.RightOperand.CalculateSupportableValueType(SupportableValueTypes);
+            var rightType = this.RightOperand.CalculateSupportableValueType();
             if (rightType == SupportableValueType.None)
             {
                 return SupportableValueType.None;
@@ -105,6 +102,12 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                 svt |= SupportableValueType.Integer;
             }
 
+            if ((rightType & leftType & SupportableValueType.Boolean) != SupportableValueType.None)
+            {
+                // Boolean comparison is supported if both operands are boolean
+                svt |= SupportableValueType.Boolean;
+            }
+
             return svt;
         }
 
@@ -120,14 +123,14 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
             SupportedValueType forType,
             Tolerance? tolerance = null)
         {
-            if (((SupportableValueType)forType & SupportableValueTypes) == SupportableValueType.None)
+            if (forType == SupportedValueType.Unknown)
             {
                 // We don't have a supportable return type
                 throw new ExpressionNotValidLogicallyException();
             }
 
-            var leftType = this.LeftOperand.CalculateSupportableValueType(SupportableValueTypes);
-            var rightType = this.RightOperand.CalculateSupportableValueType(SupportableValueTypes);
+            var leftType = this.LeftOperand.CalculateSupportableValueType();
+            var rightType = this.RightOperand.CalculateSupportableValueType();
 
             switch (forType)
             {
@@ -294,6 +297,15 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
                             SupportedValueType.Integer,
                             tolerance));
 
+                case SupportedValueType.Boolean:
+                    return this.GenerateBooleanExpression(
+                        this.LeftOperand.GenerateExpression(
+                            SupportedValueType.Boolean,
+                            tolerance),
+                        this.RightOperand.GenerateExpression(
+                            SupportedValueType.Boolean,
+                            tolerance));
+
                 case SupportedValueType.String:
                 {
                     // Calculate left expression
@@ -441,6 +453,16 @@ namespace IX.Math.Nodes.Operators.Binary.Comparison
         /// <param name="right">The right operand expression.</param>
         /// <returns>An expression containing the operation.</returns>
         private protected abstract Expression GenerateBinaryExpression(
+            Expression left,
+            Expression right);
+
+        /// <summary>
+        /// Generates a boolean mathematical expression.
+        /// </summary>
+        /// <param name="left">The left operand expression.</param>
+        /// <param name="right">The right operand expression.</param>
+        /// <returns>An expression containing the operation.</returns>
+        private protected abstract Expression GenerateBooleanExpression(
             Expression left,
             Expression right);
 

@@ -5,6 +5,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using IX.StandardExtensions;
 using JetBrains.Annotations;
 
 // ReSharper disable once CheckNamespace
@@ -39,7 +40,7 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <value>Always <see cref="SupportedValueType.String"/>.</value>
         [Obsolete]
-        public override SupportedValueType ReturnType => SupportedValueType.String;
+        public SupportedValueType ReturnType => SupportedValueType.String;
 
         /// <summary>
         /// Generates the expression that will be compiled into code.
@@ -67,9 +68,24 @@ namespace IX.Math.Nodes.Constants
         public override NodeBase DeepClone(NodeCloningContext context) => new StringNode(this.Value);
 
         /// <summary>
-        /// x.
+        ///     Generates the expression that will be compiled into code.
         /// </summary>
-        /// <returns>y.</returns>
-        protected override SupportableValueType ResetDetermination() => SupportableValueType.String;
+        /// <param name="forType">What type the expression is generated for.</param>
+        /// <param name="tolerance">The tolerance. If this parameter is <c>null</c> (<c>Nothing</c> in Visual Basic), then the operation is exact.</param>
+        /// <returns>
+        ///     The generated <see cref="Expression" />.
+        /// </returns>
+        public override Expression GenerateExpression(
+            SupportedValueType forType,
+            Tolerance? tolerance = null) =>
+            this.GenerateExpression();
+
+        /// <summary>
+        /// Calculates all supportable value types, as a result of the node and all nodes above it.
+        /// </summary>
+        /// <param name="constraints">The constraints to place on the node's supportable types.</param>
+        /// <returns>The resulting supportable value type.</returns>
+        /// <exception cref="ExpressionNotValidLogicallyException">The expression is not valid, either structurally or given the constraints.</exception>
+        public override SupportableValueType CalculateSupportableValueType(SupportableValueType constraints = SupportableValueType.All) => throw new NotImplementedByDesignException();
     }
 }

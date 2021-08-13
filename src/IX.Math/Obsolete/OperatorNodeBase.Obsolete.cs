@@ -17,13 +17,13 @@ namespace IX.Math.Nodes.Operators
         /// </summary>
         /// <value>The node return type.</value>
         [Obsolete("This is not to be used anymore in determining the possible uses for a node.")]
-        public sealed override SupportedValueType ReturnType => SupportedValueType.Unknown;
+        public SupportedValueType ReturnType => SupportedValueType.Unknown;
 
         /// <summary>
         ///     Generates the expression that will be compiled into code as a string expression.
         /// </summary>
         /// <returns>The generated <see cref="Expression" /> that gives the values as a string.</returns>
         [Obsolete("This is not going to be used anymore.")]
-        public sealed override Expression GenerateStringExpression() => this.GenerateExpression();
+        public Expression GenerateStringExpression() => this.GenerateExpression();
     }
 }

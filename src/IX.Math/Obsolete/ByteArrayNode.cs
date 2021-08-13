@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Formatters;
+using IX.StandardExtensions;
 using IX.StandardExtensions.Contracts;
 using JetBrains.Annotations;
 
@@ -42,7 +43,7 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <value>Always <see cref="SupportedValueType.ByteArray" />.</value>
         [Obsolete]
-        public override SupportedValueType ReturnType => SupportedValueType.ByteArray;
+        public SupportedValueType ReturnType => SupportedValueType.ByteArray;
 
         /// <summary>
         ///     Gets the value of the node.
@@ -84,10 +85,31 @@ namespace IX.Math.Nodes.Constants
         public override NodeBase DeepClone(NodeCloningContext context) => new ByteArrayNode(this.Value);
 
         /// <summary>
+        ///     Generates the expression that will be compiled into code.
+        /// </summary>
+        /// <param name="forType">What type the expression is generated for.</param>
+        /// <param name="tolerance">The tolerance. If this parameter is <c>null</c> (<c>Nothing</c> in Visual Basic), then the operation is exact.</param>
+        /// <returns>
+        ///     The generated <see cref="Expression" />.
+        /// </returns>
+        public override Expression GenerateExpression(
+            SupportedValueType forType,
+            Tolerance? tolerance = null) =>
+            throw new NotImplementedByDesignException();
+
+        /// <summary>
+        /// Calculates all supportable value types, as a result of the node and all nodes above it.
+        /// </summary>
+        /// <param name="constraints">The constraints to place on the node's supportable types.</param>
+        /// <returns>The resulting supportable value type.</returns>
+        /// <exception cref="ExpressionNotValidLogicallyException">The expression is not valid, either structurally or given the constraints.</exception>
+        public override SupportableValueType CalculateSupportableValueType(SupportableValueType constraints = SupportableValueType.All) => throw new NotImplementedByDesignException();
+
+        /// <summary>
         /// x.
         /// </summary>
         /// <returns>y.</returns>
-        protected override SupportableValueType ResetDetermination() => SupportableValueType.ByteArray;
+        protected SupportableValueType ResetDetermination() => SupportableValueType.ByteArray;
 
         private string GetString() =>
             this.cachedDistilledStringValue ??= StringFormatter.FormatIntoString(this.Value);

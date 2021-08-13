@@ -28,7 +28,7 @@ namespace IX.Math.Nodes
         /// </summary>
         /// <value><see langword="true"/> if the node is a constant, <see langword="false"/> otherwise.</value>
         [Obsolete("This is not going to be used anymore.")]
-        public sealed override bool IsConstant => true;
+        public bool IsConstant => true;
 
         /// <summary>
         ///     Gets a value indicating whether this node supports tolerance.
@@ -37,7 +37,7 @@ namespace IX.Math.Nodes
         ///     <c>true</c> if this instance is tolerant; otherwise, <c>false</c>.
         /// </value>
         [Obsolete("This is not going to be used anymore.")]
-        public override bool IsTolerant => false;
+        public bool IsTolerant => false;
 
         /// <summary>
         /// Distills the value into a usable constant.

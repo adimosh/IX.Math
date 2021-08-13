@@ -6,17 +6,16 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using IX.Abstractions.Logging;
 using IX.Math.ExpressionState;
 using IX.Math.Formatters;
 using IX.Math.Nodes;
-using IX.Math.Nodes.Constants;
 using IX.Math.Nodes.Operations.Binary;
 using IX.Math.Nodes.Operators.Binary.ByteShift;
 using IX.Math.Nodes.Operators.Binary.Comparison;
+using IX.Math.Nodes.Operators.Binary.Equation;
 using IX.Math.Nodes.Operators.Binary.Logical;
 using IX.Math.Nodes.Operators.Binary.Mathematical;
 using IX.Math.Nodes.Operators.Binary.Other;
@@ -615,7 +614,7 @@ namespace IX.Math.Interpretation
                 definition.NotEqualsSymbol,
                 (
                     leftOperand,
-                    rightOperand) => new NotEqualsNode(
+                    rightOperand) => new NotEqualsOperator(
                     leftOperand,
                     rightOperand),
                 10);
@@ -623,7 +622,7 @@ namespace IX.Math.Interpretation
                 definition.EqualsSymbol,
                 (
                     leftOperand,
-                    rightOperand) => new EqualsNode(
+                    rightOperand) => new EqualsOperator(
                     leftOperand,
                     rightOperand),
                 10);

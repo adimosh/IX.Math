@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using IX.Math.Formatters;
 using IX.Math.TypeHelpers;
+using IX.StandardExtensions;
 using JetBrains.Annotations;
 
 // ReSharper disable once CheckNamespace
@@ -78,7 +79,7 @@ namespace IX.Math.Nodes.Constants
         /// </summary>
         /// <value>Always <see cref="SupportedValueType.Numeric"/>.</value>
         [Obsolete]
-        public override SupportedValueType ReturnType => SupportedValueType.Numeric;
+        public SupportedValueType ReturnType => SupportedValueType.Numeric;
 
         /// <summary>
         /// Gets a value indicating whether this instance is a floating point number.
@@ -405,10 +406,25 @@ namespace IX.Math.Nodes.Constants
         };
 
         /// <summary>
-        /// Resets the determination for supported types on this node, and, presumably, those above it in the tree.
+        ///     Generates the expression that will be compiled into code.
         /// </summary>
-        /// <returns>The most expanded supportable types for this node.</returns>
-        protected override SupportableValueType ResetDetermination() => SupportableValueType.Numeric;
+        /// <param name="forType">What type the expression is generated for.</param>
+        /// <param name="tolerance">The tolerance. If this parameter is <c>null</c> (<c>Nothing</c> in Visual Basic), then the operation is exact.</param>
+        /// <returns>
+        ///     The generated <see cref="Expression" />.
+        /// </returns>
+        public override Expression GenerateExpression(
+            SupportedValueType forType,
+            Tolerance? tolerance = null) =>
+            throw new NotImplementedByDesignException();
+
+        /// <summary>
+        /// Calculates all supportable value types, as a result of the node and all nodes above it.
+        /// </summary>
+        /// <param name="constraints">The constraints to place on the node's supportable types.</param>
+        /// <returns>The resulting supportable value type.</returns>
+        /// <exception cref="ExpressionNotValidLogicallyException">The expression is not valid, either structurally or given the constraints.</exception>
+        public override SupportableValueType CalculateSupportableValueType(SupportableValueType constraints = SupportableValueType.All) => throw new NotImplementedByDesignException();
 
         /// <summary>
         /// Initializes the specified value.

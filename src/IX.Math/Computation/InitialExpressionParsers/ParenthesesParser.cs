@@ -19,11 +19,13 @@ namespace IX.Math.Computation.InitialExpressionParsers
         [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Performance",
             "HAA0302:Display class allocation to capture closure",
-            Justification = "A major closure is preferred, since the closure can be optimized and is much cheaper than otherwise")]
+            Justification =
+                "A major closure is preferred, since the closure can be optimized and is much cheaper than otherwise")]
         [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Performance",
             "HAA0301:Closure Allocation Source",
-            Justification = "A major closure is preferred, since the closure can be optimized and is much cheaper than otherwise")]
+            Justification =
+                "A major closure is preferred, since the closure can be optimized and is much cheaper than otherwise")]
         [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Performance",
             "HAA0603:Delegate allocation from a method group",
@@ -34,7 +36,6 @@ namespace IX.Math.Computation.InitialExpressionParsers
             var context = InterpretationContext.Current;
             var symbolTable = context.SymbolTable;
             var definition = context.Definition;
-            var allOperatorsInOrder = context.AllOperatorsInOrder;
             var (openParenthesis, closeParenthesis) = definition.Parentheses;
             var parameterSeparatorSymbol = definition.ParameterSeparator;
 
@@ -43,10 +44,12 @@ namespace IX.Math.Computation.InitialExpressionParsers
 
             // Select the first expression that hasn't already been parsed
             while ((itemToProcess = context.SymbolTable.Where(
-                    (
-                            p,
-                            itemsToProcessL1) => !itemsToProcessL1.Contains(p.Key) && !p.Value.IsFunctionCall,
-                    itemsToProcess).FirstOrDefault()).Value != null)
+                           (
+                               p,
+                               itemsToProcessL1) => !itemsToProcessL1.Contains(p.Key) && !p.Value.IsFunctionCall,
+                           itemsToProcess)
+                       .FirstOrDefault()).Value !=
+                   null)
             {
                 try
                 {
@@ -70,13 +73,15 @@ namespace IX.Math.Computation.InitialExpressionParsers
                 var replaced = symbol.Expression;
                 while (replaced != replacedPreviously)
                 {
-                    symbolTable[key].Expression = replaced;
+                    symbolTable[key] = new ExpressionSymbol(
+                        symbol.Name,
+                        replaced,
+                        symbol.IsFunctionCall);
                     replacedPreviously = replaced;
                     replaced = ReplaceParenthesis(replaced);
                 }
 
-                string ReplaceParenthesis(
-                    string? source)
+                string ReplaceParenthesis(string? source)
                 {
                     if (string.IsNullOrWhiteSpace(source))
                     {
@@ -85,10 +90,8 @@ namespace IX.Math.Computation.InitialExpressionParsers
 
                     var src = source!;
 
-                    var openingParenthesisLocation = src.InvariantCultureIndexOf(
-                        openParenthesis);
-                    var closingParenthesisLocation = src.InvariantCultureIndexOf(
-                        closeParenthesis);
+                    var openingParenthesisLocation = src.InvariantCultureIndexOf(openParenthesis);
+                    var closingParenthesisLocation = src.InvariantCultureIndexOf(closeParenthesis);
 
                     beginning:
                     if (openingParenthesisLocation != -1)
@@ -100,7 +103,8 @@ namespace IX.Math.Computation.InitialExpressionParsers
 
                         if (openingParenthesisLocation < closingParenthesisLocation)
                         {
-                            var resultingSubExpression = ReplaceParenthesis(src.Substring(openingParenthesisLocation + openParenthesis.Length));
+                            var resultingSubExpression = ReplaceParenthesis(
+                                src.Substring(openingParenthesisLocation + openParenthesis.Length));
 
                             if (openingParenthesisLocation == 0)
                             {
@@ -109,9 +113,10 @@ namespace IX.Math.Computation.InitialExpressionParsers
                             else
                             {
                                 var expr4 = src.Substring(
-                                        0,
-                                        openingParenthesisLocation);
+                                    0,
+                                    openingParenthesisLocation);
 
+                                var allOperatorsInOrder = context.AllOperatorsInOrder;
                                 if (!allOperatorsInOrder.Any(
                                     (
                                         p,
@@ -148,10 +153,8 @@ namespace IX.Math.Computation.InitialExpressionParsers
                                 src = $"{expr4}{resultingSubExpression}";
                             }
 
-                            openingParenthesisLocation = src.InvariantCultureIndexOf(
-                                openParenthesis);
-                            closingParenthesisLocation = src.InvariantCultureIndexOf(
-                                closeParenthesis);
+                            openingParenthesisLocation = src.InvariantCultureIndexOf(openParenthesis);
+                            closingParenthesisLocation = src.InvariantCultureIndexOf(closeParenthesis);
 
                             goto beginning;
                         }
@@ -179,7 +182,10 @@ namespace IX.Math.Computation.InitialExpressionParsers
                             cp);
 
                         string[] parameters = expr1.Split(
-                            new[] { parameterSeparatorSymbol },
+                            new[]
+                            {
+                                parameterSeparatorSymbol
+                            },
                             StringSplitOptions.None);
 
                         var parSymbols = new List<string>(parameters.Length);
@@ -194,6 +200,7 @@ namespace IX.Math.Computation.InitialExpressionParsers
                         }
 
                         var k = cp + InterpretationContext.Current.Definition.Parentheses.Right.Length;
+
                         return
                             $"{string.Join(parameterSeparatorSymbol, parSymbols)}{(sourceL3.Length == k ? string.Empty : sourceL3.Substring(k))}";
                     }

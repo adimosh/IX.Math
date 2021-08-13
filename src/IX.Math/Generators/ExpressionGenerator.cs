@@ -10,11 +10,10 @@ using IX.Abstractions.Logging;
 using IX.Math.Computation;
 using IX.Math.Computation.InitialExpressionParsers;
 using IX.Math.ExpressionState;
-using IX.Math.Extraction;
 using IX.Math.Interpretation;
 using IX.Math.Nodes;
-using IX.Math.Nodes.Operations.Binary;
-using IX.Math.Nodes.Operations.Unary;
+using IX.Math.Nodes.Operators.Binary;
+using IX.Math.Nodes.Operators.Unary;
 using IX.Math.Registration;
 using IX.StandardExtensions.Globalization;
 
@@ -141,7 +140,7 @@ namespace IX.Math.Generators
             // Expression might be an already-defined constant
             if (context.ConstantsTable.TryGetValue(
                 expression,
-                out ConstantNodeBase c1))
+                out ConstantNode c1))
             {
                 return c1;
             }
@@ -152,7 +151,7 @@ namespace IX.Math.Generators
             {
                 if (context.ConstantsTable.TryGetValue(
                     c2,
-                    out ConstantNodeBase c3))
+                    out ConstantNode c3))
                 {
                     return c3;
                 }

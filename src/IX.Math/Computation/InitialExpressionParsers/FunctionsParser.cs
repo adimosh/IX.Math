@@ -53,7 +53,10 @@ namespace IX.Math.Computation.InitialExpressionParsers
                 var replaced = symbol.Expression;
                 while (replaced != null)
                 {
-                    symbolTable[key].Expression = replaced;
+                    symbolTable[key] = new ExpressionSymbol(
+                        symbol.Name,
+                        replaced,
+                        symbol.IsFunctionCall);
                     replaced = ReplaceFunctionsInternal(
                         replaced,
                         outerExpressionSymbol);
@@ -104,8 +107,9 @@ namespace IX.Math.Computation.InitialExpressionParsers
                         }
 
                         var functionHeader = functionHeaderCheck.Split(
-                            allSymbols,
-                            StringSplitOptions.None).Last();
+                                allSymbols,
+                                StringSplitOptions.None)
+                            .Last();
 
                         var oop = source.InvariantCultureIndexOf(
                             openParenthesisSymbol,
@@ -145,7 +149,10 @@ namespace IX.Math.Computation.InitialExpressionParsers
 
                         var argPlaceholders = new List<string>();
                         foreach (var s in arguments.Split(
-                            new[] { parameterSeparatorSymbol },
+                            new[]
+                            {
+                                parameterSeparatorSymbol
+                            },
                             StringSplitOptions.RemoveEmptyEntries))
                         {
                             TablePopulationGenerator.PopulateTables(
@@ -156,7 +163,8 @@ namespace IX.Math.Computation.InitialExpressionParsers
                             argPlaceholders.Add(
                                 InterpretationContext.Current.CheckAndAddConstant(
                                     expressionSymbol,
-                                    s) ?? (!parametersTableReference.Exists(s)
+                                    s) ??
+                                (!parametersTableReference.Exists(s)
                                     ? SymbolExpressionGenerator.GenerateSymbolExpression(
                                         s,
                                         false)

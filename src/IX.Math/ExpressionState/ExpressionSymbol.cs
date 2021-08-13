@@ -14,7 +14,7 @@ namespace IX.Math.ExpressionState
     [PublicAPI]
     public class ExpressionSymbol
     {
-        private ExpressionSymbol(string name, string? expression, bool isFunctionCall)
+        internal ExpressionSymbol(string name, string? expression, bool isFunctionCall)
         {
             this.Name = name;
             this.Expression = string.IsNullOrWhiteSpace(expression) ? null : expression?.Trim();
