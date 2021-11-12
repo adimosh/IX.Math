@@ -4,24 +4,23 @@
 
 using System.Runtime.Serialization;
 
-namespace IX.Math
+namespace IX.Math;
+
+/// <summary>
+/// Defines precedence styles in the order of operations.
+/// </summary>
+[DataContract]
+public enum OperatorPrecedenceStyle
 {
     /// <summary>
-    /// Defines precedence styles in the order of operations.
+    /// Mathematical precedence: comparison and equation, logical operators, add and subtract, multiply and divide, power, byte shift
     /// </summary>
-    [DataContract]
-    public enum OperatorPrecedenceStyle
-    {
-        /// <summary>
-        /// Mathematical precedence: comparison and equation, logical operators, add and subtract, multiply and divide, power, byte shift
-        /// </summary>
-        [EnumMember]
-        Mathematical = 0,
+    [EnumMember]
+    Mathematical = 0,
 
-        /// <summary>
-        /// C-style precedence: comparison and equation, or, and, xor, add and subtract, multiply and divide, power, byte shift
-        /// </summary>
-        [EnumMember]
-        CStyle = 1,
-    }
+    /// <summary>
+    /// C-style precedence: comparison and equation, or, and, xor, add and subtract, multiply and divide, power, byte shift
+    /// </summary>
+    [EnumMember]
+    CStyle = 1,
 }

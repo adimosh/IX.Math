@@ -77,8 +77,8 @@ namespace IX.Math.Generators
 
             // Break expression based on function calls
             FunctionsExtractor.ReplaceFunctions(
-                workingSet.Definition.Parentheses.Item1,
-                workingSet.Definition.Parentheses.Item2,
+                workingSet.Definition.Parentheses.Left,
+                workingSet.Definition.Parentheses.Right,
                 workingSet.Definition.ParameterSeparator,
                 workingSet.ConstantsTable,
                 workingSet.ReverseConstantsTable,
@@ -101,8 +101,8 @@ namespace IX.Math.Generators
 
             // Break by parentheses
             ParenthesesParser.FormatParentheses(
-                workingSet.Definition.Parentheses.Item1,
-                workingSet.Definition.Parentheses.Item2,
+                workingSet.Definition.Parentheses.Left,
+                workingSet.Definition.Parentheses.Right,
                 workingSet.Definition.ParameterSeparator,
                 workingSet.AllOperatorsInOrder,
                 workingSet.SymbolTable,
@@ -126,7 +126,7 @@ namespace IX.Math.Generators
                     workingSet.ParameterRegistry,
                     workingSet.Interpreters,
                     workingSet.Expression,
-                    workingSet.Definition.Parentheses.Item1,
+                    workingSet.Definition.Parentheses.Left,
                     workingSet.AllSymbols);
             }
 
@@ -243,8 +243,8 @@ namespace IX.Math.Generators
             }
 
             // Check whether the expression is a function call
-            if (expression.InvariantCultureContains(workingSet.Definition.Parentheses.Item1) &&
-                expression.InvariantCultureContains(workingSet.Definition.Parentheses.Item2))
+            if (expression.InvariantCultureContains(workingSet.Definition.Parentheses.Left) &&
+                expression.InvariantCultureContains(workingSet.Definition.Parentheses.Right))
             {
                 return GenerateFunctionCallExpression(
                     expression,
