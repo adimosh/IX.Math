@@ -9,65 +9,72 @@ using IX.Math.Extensibility;
 using IX.Math.Nodes;
 using IX.StandardExtensions.Extensions;
 
-namespace IX.Math.Generators
+namespace IX.Math.Generators;
+
+internal static class FunctionsDictionaryGenerator
 {
-    internal static class FunctionsDictionaryGenerator
+    internal static void GenerateInternalNonaryFunctionsDictionary(
+        this IEnumerable<Assembly> assemblies,
+        Dictionary<string, Type> typeDictionary) =>
+        GenerateTypeAssignableFrom<NonaryFunctionNodeBase>(assemblies, typeDictionary);
+
+    internal static void GenerateInternalUnaryFunctionsDictionary(
+        this IEnumerable<Assembly> assemblies,
+        Dictionary<string, Type> typeDictionary) =>
+        GenerateTypeAssignableFrom<UnaryFunctionNodeBase>(assemblies, typeDictionary);
+
+    internal static void GenerateInternalBinaryFunctionsDictionary(
+        this IEnumerable<Assembly> assemblies,
+        Dictionary<string, Type> typeDictionary) =>
+        GenerateTypeAssignableFrom<BinaryFunctionNodeBase>(assemblies, typeDictionary);
+
+    internal static void GenerateInternalTernaryFunctionsDictionary(
+        this IEnumerable<Assembly> assemblies,
+        Dictionary<string, Type> typeDictionary) =>
+        GenerateTypeAssignableFrom<TernaryFunctionNodeBase>(assemblies, typeDictionary);
+
+    [global::System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Performance",
+        "HAA0603:Delegate allocation from a method group",
+        Justification = "This is how LINQ works")]
+    private static void GenerateTypeAssignableFrom<T>(IEnumerable<Assembly> assemblies, Dictionary<string, Type> typeDictionary)
+        where T : FunctionNodeBase
     {
-        internal static Dictionary<string, Type> GenerateInternalNonaryFunctionsDictionary(
-            IEnumerable<Assembly> assemblies) => GenerateTypeAssignableFrom<NonaryFunctionNodeBase>(assemblies);
+        // TODO: Do this in parallel
+        assemblies.GetTypesAssignableFrom<T>().ForEach(
+            AddToTypeDictionary,
+            typeDictionary);
 
-        internal static Dictionary<string, Type> GenerateInternalUnaryFunctionsDictionary(
-            IEnumerable<Assembly> assemblies) => GenerateTypeAssignableFrom<UnaryFunctionNodeBase>(assemblies);
-
-        internal static Dictionary<string, Type> GenerateInternalBinaryFunctionsDictionary(
-            IEnumerable<Assembly> assemblies) => GenerateTypeAssignableFrom<BinaryFunctionNodeBase>(assemblies);
-
-        internal static Dictionary<string, Type> GenerateInternalTernaryFunctionsDictionary(
-            IEnumerable<Assembly> assemblies) => GenerateTypeAssignableFrom<TernaryFunctionNodeBase>(assemblies);
-
-        private static Dictionary<string, Type> GenerateTypeAssignableFrom<T>(IEnumerable<Assembly> assemblies)
-            where T : FunctionNodeBase
+        void AddToTypeDictionary(
+            TypeInfo p,
+            Dictionary<string, Type> td)
         {
-            var typeDictionary = new Dictionary<string, Type>();
-
-            // TODO: Do this in parallel
-            assemblies.GetTypesAssignableFrom<T>().ForEach(
-                AddToTypeDictionary,
-                typeDictionary);
-
-            void AddToTypeDictionary(
-                TypeInfo p,
-                Dictionary<string, Type> td)
+            CallableMathematicsFunctionAttribute attr;
+            try
             {
-                CallableMathematicsFunctionAttribute attr;
-                try
-                {
-                    attr = p.GetCustomAttribute<CallableMathematicsFunctionAttribute>();
-                }
-                catch
-                {
-                    return;
-                }
-
-                if (attr == null)
-                {
-                    return;
-                }
-
-                foreach (var q in attr.Names)
-                {
-                    if (td.ContainsKey(q))
-                    {
-                        continue;
-                    }
-
-                    td.Add(
-                        q,
-                        p.AsType());
-                }
+                attr = p.GetCustomAttribute<CallableMathematicsFunctionAttribute>();
+            }
+            catch
+            {
+                return;
             }
 
-            return typeDictionary;
+            if (attr == null)
+            {
+                return;
+            }
+
+            foreach (var q in attr.Names)
+            {
+                if (td.ContainsKey(q))
+                {
+                    continue;
+                }
+
+                td.Add(
+                    q,
+                    p.AsType());
+            }
         }
     }
 }

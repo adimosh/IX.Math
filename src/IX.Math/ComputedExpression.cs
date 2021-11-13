@@ -28,18 +28,18 @@ namespace IX.Math
     {
         private readonly IParameterRegistry parametersRegistry;
         private readonly List<IStringFormatter> stringFormatters;
-        private readonly Func<Type, object> specialObjectRequestFunc;
+        private readonly Func<Type, object>? specialObjectRequestFunc;
 
         private readonly string initialExpression;
-        private NodeBase body;
+        private NodeBase? body;
 
         internal ComputedExpression(
             string initialExpression,
-            NodeBase body,
+            NodeBase? body,
             bool isRecognized,
             IParameterRegistry parameterRegistry,
             List<IStringFormatter> stringFormatters,
-            Func<Type, object> specialObjectRequestFunc)
+            Func<Type, object>? specialObjectRequestFunc)
         {
             this.parametersRegistry = parameterRegistry;
             this.stringFormatters = stringFormatters;
@@ -134,7 +134,7 @@ namespace IX.Math
         [SuppressMessage("CodeSmell", "ERP022:Unobserved exception in generic exception handler", Justification = "We want this in this case.")]
         [SuppressMessage("Performance", "HAA0302:Display class allocation to capture closure", Justification = "Unavoidable for now.")]
         [SuppressMessage("Performance", "HAA0301:Closure Allocation Source", Justification = "Unavoidable for now.")]
-        public object Compute(Tolerance tolerance, params object[] arguments)
+        public object Compute(Tolerance? tolerance, params object[] arguments)
         {
             this.RequiresNotDisposed();
 
@@ -146,7 +146,7 @@ namespace IX.Math
 
             var convertedArguments = FormatArgumentsAccordingToParameters(arguments, this.parametersRegistry.Dump());
 
-            object[] FormatArgumentsAccordingToParameters(
+            object[]? FormatArgumentsAccordingToParameters(
                 object[] parameterValues,
                 ParameterContext[] parameters)
             {
@@ -159,7 +159,7 @@ namespace IX.Math
 
                 var i = 0;
 
-                object paramValue = null;
+                object? paramValue = null;
 
                 while (i < finalValues.Length)
                 {

@@ -18,14 +18,13 @@
   <PropertyGroup>
     <Title>IX Mathematics</Title>
     <Description>A library for transforming text expressions containing mathematical operations into executable delegates.</Description>
-    <PackageReleaseNotes>- Package updates on the classic version
-- Updated opt and all other references
-- Removed dependency on project system
-- Mathematics definition cleaned up</PackageReleaseNotes>
+    <PackageReleaseNotes>- Updated IX.StandardExtensions dependency
+- Updated C# to language version 10
+- Added .NET 6.0 target</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionPrefix>0.6.0</VersionPrefix>
+    <VersionPrefix>0.5.7</VersionPrefix>
     <VersionSuffix>alpha</VersionSuffix>
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>

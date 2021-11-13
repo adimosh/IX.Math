@@ -16,6 +16,7 @@ using IX.Math.Registration;
 using IX.StandardExtensions.ComponentModel;
 using IX.StandardExtensions.Contracts;
 using IX.StandardExtensions.Extensions;
+using IX.StandardExtensions.Threading;
 using IX.System.Collections.Generic;
 using JetBrains.Annotations;
 using DiagCA = System.Diagnostics.CodeAnalysis;
@@ -30,21 +31,25 @@ namespace IX.Math
     /// <seealso cref="DisposableBase" />
     /// <seealso cref="IExpressionParsingService" />
     [PublicAPI]
-    public abstract class ExpressionParsingServiceBase : DisposableBase, IExpressionParsingService
+    public abstract class ExpressionParsingServiceBase : ReaderWriterSynchronizedBase, IExpressionParsingService
     {
-        private List<Assembly> assembliesToRegister;
-        private Dictionary<string, Type> binaryFunctions;
+        private readonly List<Assembly> assembliesToRegister;
 
-        private LevelDictionary<Type, IConstantsExtractor> constantExtractors;
-        private LevelDictionary<Type, IConstantInterpreter> constantInterpreters;
-        private LevelDictionary<Type, IConstantPassThroughExtractor> constantPassThroughExtractors;
+        private readonly LevelDictionary<Type, IConstantsExtractor> constantExtractors;
+        private readonly LevelDictionary<Type, IConstantInterpreter> constantInterpreters;
+        private readonly LevelDictionary<Type, IConstantPassThroughExtractor> constantPassThroughExtractors;
+        private readonly List<IStringFormatter> stringFormatters;
+
+        private readonly Dictionary<string, Type> nonaryFunctions;
+        private readonly Dictionary<string, Type> unaryFunctions;
+        private readonly Dictionary<string, Type> binaryFunctions;
+        private readonly Dictionary<string, Type> ternaryFunctions;
+
+        private readonly MathDefinition workingDefinition;
+
+        private bool isInitialized = false;
 
         private int interpretationDone;
-        private Dictionary<string, Type> nonaryFunctions;
-        private List<IStringFormatter> stringFormatters;
-        private Dictionary<string, Type> ternaryFunctions;
-        private Dictionary<string, Type> unaryFunctions;
-        private MathDefinition workingDefinition;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ExpressionParsingServiceBase" /> class with a specified math
@@ -54,15 +59,25 @@ namespace IX.Math
         /// <param name="definition">The math definition to use.</param>
         protected private ExpressionParsingServiceBase(MathDefinition definition)
         {
+            // Preconditions
             Requires.NotNull(out this.workingDefinition, definition, nameof(definition));
+
+            // Initialized internal state
+            this.constantExtractors = new LevelDictionary<Type, IConstantsExtractor>();
+            this.constantInterpreters = new LevelDictionary<Type, IConstantInterpreter>();
+            this.constantPassThroughExtractors = new LevelDictionary<Type, IConstantPassThroughExtractor>();
+            this.stringFormatters = new List<IStringFormatter>();
+
+            this.nonaryFunctions = new Dictionary<string, Type>();
+            this.unaryFunctions = new Dictionary<string, Type>();
+            this.binaryFunctions = new Dictionary<string, Type>();
+            this.ternaryFunctions = new Dictionary<string, Type>();
 
             this.assembliesToRegister = new List<Assembly>
             {
                 typeof(ExpressionParsingService).GetTypeInfo()
                     .Assembly
             };
-
-            this.stringFormatters = new List<IStringFormatter>();
         }
 
         /// <summary>
@@ -89,10 +104,6 @@ namespace IX.Math
         /// <exception cref="ArgumentNullException"><paramref name="expression" /> is either null, empty or whitespace-only.</exception>
         [DiagCA.SuppressMessage(
             "Performance",
-            "HAA0401:Possible allocation of reference type enumerator",
-            Justification = "Unavoidable here.")]
-        [DiagCA.SuppressMessage(
-            "Performance",
             "HAA0603:Delegate allocation from a method group",
             Justification = "We're OK with this.")]
         protected ComputedExpression InterpretInternal(
@@ -105,11 +116,9 @@ namespace IX.Math
 
             this.ThrowIfCurrentObjectDisposed();
 
-            if (this.constantPassThroughExtractors == null)
-            {
-                this.InitializePassThroughExtractorsDictionary();
-            }
+            using var innerLock = this.EnsureInitialization();
 
+            // Check expression through pass-through extractors
             if (this.constantPassThroughExtractors.KeysByLevel.SelectMany(p => p.Value)
                 .Any(
                     ConstantPassThroughExtractorPredicate,
@@ -132,24 +141,6 @@ namespace IX.Math
             {
                 return innerThis.constantPassThroughExtractors[cpteKey]
                     .Evaluate(innerExpression);
-            }
-
-            if (this.nonaryFunctions == null ||
-                this.unaryFunctions == null ||
-                this.binaryFunctions == null ||
-                this.ternaryFunctions == null)
-            {
-                this.InitializeFunctionsDictionary();
-            }
-
-            if (this.constantExtractors == null)
-            {
-                this.InitializeExtractorsDictionary();
-            }
-
-            if (this.constantInterpreters == null)
-            {
-                this.InitializeInterpretersDictionary();
             }
 
             ComputedExpression result;
@@ -200,13 +191,7 @@ namespace IX.Math
         {
             this.ThrowIfCurrentObjectDisposed();
 
-            if (this.nonaryFunctions == null ||
-                this.unaryFunctions == null ||
-                this.binaryFunctions == null ||
-                this.ternaryFunctions == null)
-            {
-                this.InitializeFunctionsDictionary();
-            }
+            using var innerLock = this.EnsureInitialization();
 
             // Capacity is sum of all, times 3; the "3" number was chosen as a good-enough average of how many overloads are defined, on average
             var bldr = new List<string>(
@@ -286,17 +271,21 @@ namespace IX.Math
 
             this.ThrowIfCurrentObjectDisposed();
 
+            using var innerLocker = this.ReadWriteLock();
+
+            if (this.isInitialized)
+            {
+                throw new InvalidOperationException("Initialization has already completed, so you cannot register any more assemblies for this service.");
+            }
+
             if (this.assembliesToRegister.Contains(assembly))
             {
                 return;
             }
 
-            this.assembliesToRegister.Add(assembly);
+            innerLocker.Upgrade();
 
-            this.nonaryFunctions?.Clear();
-            this.unaryFunctions?.Clear();
-            this.binaryFunctions?.Clear();
-            this.ternaryFunctions?.Clear();
+            this.assembliesToRegister.Add(assembly);
         }
 
         /// <summary>
@@ -328,88 +317,76 @@ namespace IX.Math
         /// </summary>
         protected override void DisposeManagedContext()
         {
-            this.nonaryFunctions?.Clear();
-            this.unaryFunctions?.Clear();
-            this.binaryFunctions?.Clear();
-            this.ternaryFunctions?.Clear();
-            this.assembliesToRegister?.Clear();
-            this.stringFormatters?.Clear();
+            this.nonaryFunctions.Clear();
+            this.unaryFunctions.Clear();
+            this.binaryFunctions.Clear();
+            this.ternaryFunctions.Clear();
+
+            this.stringFormatters.Clear();
+            this.constantExtractors.Clear();
+            this.constantInterpreters.Clear();
+            this.constantPassThroughExtractors.Clear();
+
+            this.assembliesToRegister.Clear();
 
             base.DisposeManagedContext();
         }
 
-        /// <summary>
-        ///     Disposes in the general (managed and unmanaged) context.
-        /// </summary>
-        protected override void DisposeGeneralContext()
+        [DiagCA.SuppressMessage(
+            "IDisposableAnalyzers.Correctness",
+            "IDISP017:Prefer using.",
+            Justification = "This ")]
+        private SynchronizationLocker EnsureInitialization()
         {
-            base.DisposeGeneralContext();
+            var innerLock = this.ReadLock();
 
-            Interlocked.Exchange(
-                ref this.nonaryFunctions,
-                null);
-            Interlocked.Exchange(
-                ref this.unaryFunctions,
-                null);
-            Interlocked.Exchange(
-                ref this.binaryFunctions,
-                null);
-            Interlocked.Exchange(
-                ref this.ternaryFunctions,
-                null);
-            Interlocked.Exchange(
-                ref this.assembliesToRegister,
-                null);
-            Interlocked.Exchange(
-                ref this.stringFormatters,
-                null);
+            if (this.isInitialized)
+            {
+                return innerLock;
+            }
 
-            Interlocked.Exchange(
-                ref this.workingDefinition,
-                null);
-        }
+            innerLock.Dispose();
 
-        private void InitializeFunctionsDictionary()
-        {
-            Interlocked.Exchange(
-                    ref this.nonaryFunctions,
-                    FunctionsDictionaryGenerator.GenerateInternalNonaryFunctionsDictionary(this.assembliesToRegister))
-                ?.Clear();
+            var innerWriteLock = this.ReadWriteLock();
 
-            Interlocked.Exchange(
-                    ref this.unaryFunctions,
-                    FunctionsDictionaryGenerator.GenerateInternalUnaryFunctionsDictionary(this.assembliesToRegister))
-                ?.Clear();
+            if (this.isInitialized)
+            {
+                return innerWriteLock;
+            }
 
-            Interlocked.Exchange(
-                    ref this.binaryFunctions,
-                    FunctionsDictionaryGenerator.GenerateInternalBinaryFunctionsDictionary(this.assembliesToRegister))
-                ?.Clear();
+            try
+            {
+                innerWriteLock.Upgrade();
 
-            Interlocked.Exchange(
-                    ref this.ternaryFunctions,
-                    FunctionsDictionaryGenerator.GenerateInternalTernaryFunctionsDictionary(this.assembliesToRegister))
-                ?.Clear();
+                // Initializing functions dictionaries
+                this.assembliesToRegister.GenerateInternalNonaryFunctionsDictionary(this.nonaryFunctions);
+                this.assembliesToRegister.GenerateInternalUnaryFunctionsDictionary(this.unaryFunctions);
+                this.assembliesToRegister.GenerateInternalBinaryFunctionsDictionary(this.binaryFunctions);
+                this.assembliesToRegister.GenerateInternalTernaryFunctionsDictionary(this.ternaryFunctions);
+
+                // Extractors
+                this.InitializePassThroughExtractorsDictionary();
+                this.InitializeExtractorsDictionary();
+                this.InitializeInterpretersDictionary();
+
+                this.isInitialized = true;
+            }
+            finally
+            {
+                innerWriteLock.Dispose();
+            }
+
+            return this.ReadLock();
         }
 
         [DiagCA.SuppressMessage(
             "StyleCop.CSharp.ReadabilityRules",
             "SA1118:Parameter should not span multiple lines",
             Justification = "Parameters are very complex in this method.")]
-        [DiagCA.SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP004:Don't ignore created IDisposable.",
-            Justification = "Objects are correctly disposed, but the analyzer can't tell.")]
         private void InitializeExtractorsDictionary()
         {
-            Interlocked.Exchange(
-                    ref this.constantExtractors,
-                    new LevelDictionary<Type, IConstantsExtractor>
-                    {
-                        { typeof(StringExtractor), new StringExtractor(), 1000 },
-                        { typeof(ScientificFormatNumberExtractor), new ScientificFormatNumberExtractor(), 2000 }
-                    })
-                ?.Dispose();
+            this.constantExtractors.Add(typeof(StringExtractor), new StringExtractor(), 1000);
+            this.constantExtractors.Add(typeof(ScientificFormatNumberExtractor), new ScientificFormatNumberExtractor(), 2000);
 
             var incrementer = 2001;
             this.assembliesToRegister.GetTypesAssignableFrom<IConstantsExtractor>()
@@ -426,13 +403,18 @@ namespace IX.Math
                     this)
                 .ForEach(
                     (
-                        Type p,
+                        in Type p,
                         ref int i,
                         ExpressionParsingServiceBase thisL1) =>
                     {
+                        if (p.Instantiate() is not IConstantsExtractor extractor)
+                        {
+                            return;
+                        }
+
                         thisL1.constantExtractors.Add(
                             p,
-                            (IConstantsExtractor)p.Instantiate(),
+                            extractor,
                             p.GetAttributeDataByTypeWithoutVersionBinding<ConstantsExtractorAttribute, int>(
                                 out var explicitLevel)
                                 ? explicitLevel
@@ -446,17 +428,8 @@ namespace IX.Math
             "StyleCop.CSharp.ReadabilityRules",
             "SA1118:Parameter should not span multiple lines",
             Justification = "Parameters are very complex in this method.")]
-        [DiagCA.SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP004:Don't ignore created IDisposable.",
-            Justification = "We're not ignoring it, but the analysis can't tell.")]
         private void InitializePassThroughExtractorsDictionary()
         {
-            Interlocked.Exchange(
-                    ref this.constantPassThroughExtractors,
-                    new LevelDictionary<Type, IConstantPassThroughExtractor>())
-                ?.Dispose();
-
             var incrementer = 2001;
             this.assembliesToRegister.GetTypesAssignableFrom<IConstantPassThroughExtractor>()
                 .Where(
@@ -472,13 +445,18 @@ namespace IX.Math
                     this)
                 .ForEach(
                     (
-                        Type p,
+                        in Type p,
                         ref int i,
                         ExpressionParsingServiceBase thisL1) =>
                     {
+                        if (p.Instantiate() is not IConstantPassThroughExtractor extractor)
+                        {
+                            return;
+                        }
+
                         thisL1.constantPassThroughExtractors.Add(
                             p,
-                            (IConstantPassThroughExtractor)p.Instantiate(),
+                            extractor,
                             p.GetAttributeDataByTypeWithoutVersionBinding<ConstantsPassThroughExtractorAttribute, int>(
                                 out var explicitLevel)
                                 ? explicitLevel
@@ -492,17 +470,8 @@ namespace IX.Math
             "StyleCop.CSharp.ReadabilityRules",
             "SA1118:Parameter should not span multiple lines",
             Justification = "Parameters are very complex in this method.")]
-        [DiagCA.SuppressMessage(
-            "IDisposableAnalyzers.Correctness",
-            "IDISP004:Don't ignore created IDisposable.",
-            Justification = "Objects are correctly disposed, but the analyzer can't tell.")]
         private void InitializeInterpretersDictionary()
         {
-            Interlocked.Exchange(
-                    ref this.constantInterpreters,
-                    new LevelDictionary<Type, IConstantInterpreter>())
-                ?.Dispose();
-
             var incrementer = 2001;
             this.assembliesToRegister.GetTypesAssignableFrom<IConstantInterpreter>()
                 .Where(
@@ -518,13 +487,18 @@ namespace IX.Math
                     this)
                 .ForEach(
                     (
-                        Type p,
+                        in Type p,
                         ref int i,
                         ExpressionParsingServiceBase thisL1) =>
                     {
+                        if (p.Instantiate() is not IConstantInterpreter interpreter)
+                        {
+                            return;
+                        }
+
                         thisL1.constantInterpreters.Add(
                             p,
-                            (IConstantInterpreter)p.Instantiate(),
+                            interpreter,
                             p.GetAttributeDataByTypeWithoutVersionBinding<ConstantsInterpreterAttribute, int>(
                                 out var explicitLevel)
                                 ? explicitLevel
