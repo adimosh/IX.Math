@@ -1,6 +1,0 @@
-<!--EXTERNAL_PROPERTIES: TargetFramework-->
-<Project>
-
-  <Import Project="../opt/msbuild/Standard.Build.props" />
-
-</Project>

@@ -15,6 +15,10 @@ numeric formats), floating-point numbers (as
 [bool](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)) values, and can
 compute the most common mathematic operations, as well as certain mathematics functions.
 
+## Where you can get it
+
+Until further notice, the source code is available at [https://github.com/adimosh/IX.StandardExtensions/tree/master/src/IX.Math](https://github.com/adimosh/IX.StandardExtensions/tree/master/src/IX.Math)
+
 ## What you can do with it
 
 Let's assume that you have a text box in which a user can introduce a formula:
@@ -151,14 +155,3 @@ behavior for IX.Math.
 Contributing can be done by anyone, at any time and in any form, as long as the
 contributor has read the [contributing guidelines](https://adimosh.github.io/contributingguidelines)
 beforehand and tries their best to abide by them.
-
-### Code health checks
-
-| Build | Status |
-|:-----:|:------:|
-| Master branch | [![Build Status](https://dev.azure.com/adimosh/IX.Framework/_apis/build/status/Master%20CI%20for%20IX.Math?branchName=master)](https://dev.azure.com/adimosh/IX.Framework/_build/latest?definitionId=5&branchName=master) |
-| Continuous integration | [![Build Status](https://dev.azure.com/adimosh/IX.Framework/_apis/build/status/Dev%20CI%20for%20IX.Math?branchName=master)](https://dev.azure.com/adimosh/IX.Framework/_build/latest?definitionId=4&branchName=master) |
-
-## Licenses and structure
-
-Please be aware that this project is a sub-project of [IX.Framework](https://github.com/adimosh/IX.Framework). All credits and license information should be taken from there.
